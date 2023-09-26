@@ -1,0 +1,11 @@
+package com.project.vodto;
+
+import java.security.Timestamp;
+
+public class Wishlist {
+	private int wishlistNo;
+	private String memberId;
+	private String productId;
+	private Timestamp registrationDate;
+	private String categoryKey;
+}

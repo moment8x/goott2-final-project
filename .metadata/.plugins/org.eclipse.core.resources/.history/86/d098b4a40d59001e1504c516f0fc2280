@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	
+	<!-- 
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+	 <property name="driverClassName" value="org.mariadb.jdbc.Driver" />
+	 <property name="url"
+			value="jdbc:mysql://localhost:3306/kjs?serverTimezone=Asia/Seoul&amp;useSSL=false">
+	 <property name="username" value="root" />
+	 <property name="password" value="1234" />
+	</bean>
+	-->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="org.mariadb.jdbc.Driver" />
+		<!-- <property name="url" value="jdbc:mariadb://gott123.cafe24.com:3306/gott123"/> -->
+		<property name="url" value="jdbc:mariadb://localhost:3308/kjsserverTimezone=Asia/Seoul&amp;useSSL=false"/>
+		<property name="username" value="root" />
+		<property name="password" value="1234" />
+		<!-- <property name="username" value="gott123" />
+		<property name="password" value="gottclass66" /> -->
+	</bean>
+	
+	<!-- SqlSessionFactory (PreparedStatememt 역할) 설정 -->
+    <bean id="sqlSessionFactory"
+    	class="org.mybatis.spring.SqlSessionFactoryBean">
+    	<property name="dataSource" ref="dataSource"></property>
+    	<property name="configLocation"
+    		value="classpath:/mybatis-config.xml">
+    	</property>
+    	<property name="mapperLocations"
+    		value="classpath:/mappers/**/*Mapper.xml">
+    	</property>
+    </bean>
+    
+    <!-- SqlSessionTemplate 객체 설정 -->
+	<bean id="sqlSession"
+		class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory"></constructor-arg>
+	</bean>
+	
+	<!-- transactionManager 객체 설정 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<!-- 어노테이션으로 트랜잭션 설정 -->
+	<tx:annotation-driven/>
+	
+	<!-- AOP 설정을 위한 proxy 객체 생성 -->
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+	
+	<!-- 작업 스케쥴러를 annotation방식으로 처리함 -->
+	<task:annotation-driven/>
+	
+	<!-- 아래의 패키지를 조사(scan)하여 패키지 안의 객체를 관리 -->
+	
+</beans>

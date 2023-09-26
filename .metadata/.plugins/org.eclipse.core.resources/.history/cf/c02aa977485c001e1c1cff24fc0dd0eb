@@ -1,0 +1,6 @@
+package com.project.vodto;
+
+public class Wishlist {
+	private int wishlistNo;
+	private String memberId;
+}

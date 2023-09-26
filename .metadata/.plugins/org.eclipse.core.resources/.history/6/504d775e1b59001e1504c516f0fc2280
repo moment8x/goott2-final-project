@@ -1,0 +1,15 @@
+package com.kjs.dao;
+
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class TestDAO {
+	
+	private static String ns = "com.kjs.mappers.TestMapper";
+	
+	public int testInsert() {
+		int result = -1;
+		
+		return result;
+	}
+}

@@ -1,0 +1,13 @@
+package com.kjs.dao;
+
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class testDAO {
+	
+	public int testInsert() {
+		int result = -1;
+		
+		return result;
+	}
+}

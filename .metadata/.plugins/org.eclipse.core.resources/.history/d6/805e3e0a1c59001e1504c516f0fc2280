@@ -1,0 +1,20 @@
+package com.kjs.dao;
+
+import javax.inject.Inject;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class TestDAO {
+	
+	@Inject
+	private SqlSession ses;
+	
+	private static String ns = "com.kjs.mappers.TestMapper";
+	
+	public int testInsert(String testValue) {
+		
+		return ses.insert("", testValue);
+	}
+}
