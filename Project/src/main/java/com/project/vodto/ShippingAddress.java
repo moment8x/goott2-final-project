@@ -1,5 +1,21 @@
 package com.project.vodto;
 
-public class ShippingAddress {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+public class ShippingAddress {
+	private int addrNo;
+	private String memberId;
+	private String zipCode;
+	private String address;
+	private String detailAddress;
+	private char basic_addr;
 }

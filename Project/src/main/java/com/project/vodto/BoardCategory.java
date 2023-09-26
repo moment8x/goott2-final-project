@@ -1,7 +1,5 @@
 package com.project.vodto;
 
-import java.sql.Timestamp;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,11 +11,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ShoppingCart {
-	private int no;
-	private String nonMemberId;
-	private String memberId;
-	private String productId;
-	private int memberCheck;
-	private Timestamp registrationDate;
+public class BoardCategory {
+	private int categoryId;
+	private String categoryName;
+	private String subcategory;
 }

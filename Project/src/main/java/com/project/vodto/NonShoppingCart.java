@@ -1,5 +1,16 @@
 package com.project.vodto;
 
-public class NonShoppingCart {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+public class NonShoppingCart {
+	private int nonMemberId;
 }
