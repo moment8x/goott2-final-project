@@ -15,9 +15,9 @@ import lombok.ToString;
 @ToString
 public class CouponLog {
 	private int no;
-	private String memberId;
-	private String couponNumber;
-	private String couponname;
-	private Timestamp obtainedDate;
-	private Timestamp usedDate;
+	private String member_id;
+	private String coupon_number;
+	private String coupon_name;
+	private Timestamp obtained_date;
+	private Timestamp used_date;
 }

@@ -12,10 +12,10 @@ import lombok.ToString;
 @Setter
 @ToString
 public class UploadFile {
-	private int ufNo;
-	private String thumbnailFileName;
+	private int uf_no;
+	private String thumbnail_fileName;
 	private String extension;
-	private String originalFileName;
-	private String newFileName;
-	private int fileSize;
+	private String original_fileName;
+	private String new_file_name;
+	private int file_size;
 }

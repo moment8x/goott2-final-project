@@ -14,11 +14,11 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Exchange {
-	private int exchangeNo;
-	private String productId;
+	private int exchange_no;
+	private String product_id;
 	private String reason;
-	private char processingStatus;
-	private Timestamp requestTime;
-	private Timestamp completionTime;
-	private String exchangeProductStatus;
+	private char processing_status;
+	private Timestamp request_time;
+	private Timestamp completion_time;
+	private String exchangeProduct_status;
 }

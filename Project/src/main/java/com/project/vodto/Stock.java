@@ -12,8 +12,8 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Stock {
-	private String productId;
-	private String productName;
-	private int currentQuantity;
-	private String categoryKey;
+	private String product_dd;
+	private String product_name;
+	private int current_quantity;
+	private String category_key;
 }

@@ -13,10 +13,10 @@ import lombok.ToString;
 @ToString
 public class DetailOrderItem {
 	private int no;
-	private int orderNo;
-	private int nonOrderNo;
-	private String productId;
-	private int productPrice;
+	private int order_no;
+	private int non_order_no;
+	private String product_id;
+	private int product_price;
 	private int coupon;
-	private int discountedPrice;
+	private int discounted_price;
 }

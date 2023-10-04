@@ -14,8 +14,8 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Coupon {
-	private String couponNumber;
-	private Timestamp expirationDate;
-	private char discountMethod;
-	private int discountAmount;
+	private String coupon_number;
+	private Timestamp expiration_date;
+	private char discount_method;
+	private int discount_amount;
 }

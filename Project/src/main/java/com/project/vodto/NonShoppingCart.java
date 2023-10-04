@@ -12,5 +12,5 @@ import lombok.ToString;
 @Setter
 @ToString
 public class NonShoppingCart {
-	private int nonMemberId;
+	private int non_member_id;
 }

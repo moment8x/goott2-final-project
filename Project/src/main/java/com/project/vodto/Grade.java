@@ -13,5 +13,5 @@ import lombok.ToString;
 @ToString
 public class Grade {
 	private String grade;
-	private int discountRate;
+	private int discount_rate;
 }

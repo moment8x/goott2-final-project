@@ -14,14 +14,14 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Board {
-   private int postNo;
+   private int post_no;
    private String author;
-   private Timestamp createdDate;
+   private Timestamp created_date;
    private String title;
    private String content;
    private int file;
    private int ref;
    private int step;
-   private int refOrder;
+   private int ref_order;
    private int likes;
 }

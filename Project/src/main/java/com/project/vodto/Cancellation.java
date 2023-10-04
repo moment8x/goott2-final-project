@@ -14,12 +14,12 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Cancellation {
-	private int cancelNo;
-	private String productId;
+	private int cancel_no;
+	private String product_id;
 	private String reason;
 	private int amount;
-	private int processingStatus;
-	private int refundStatus;
-	private Timestamp requestTime;
-	private Timestamp completionTime;
+	private int processing_status;
+	private int refund_status;
+	private Timestamp request_time;
+	private Timestamp completion_time;
 }

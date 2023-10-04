@@ -14,15 +14,15 @@ import lombok.ToString;
 @Setter
 @ToString
 public class OrderHistory {
-	private int orderNo;
-	private String memberId;
-	private String invoiceNumber;
-	private String recipientName;
-	private String recipientPhoneNumber;
-	private Timestamp orderTime;
-	private String zipCode;
-	private String shippingAddress;
-	private String detailedShippingAddress;
-	private String deliveryStatus;
-	private String deliveryMessage;
+	private int order_no;
+	private String member_id;
+	private String invoice_number;
+	private String recipient_name;
+	private String recipient_phone_number;
+	private Timestamp order_time;
+	private String zip_code;
+	private String shipping_address;
+	private String detailed_shipping_address;
+	private String delivery_status;
+	private String delivery_message;
 }
