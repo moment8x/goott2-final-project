@@ -6,6 +6,8 @@ import javax.naming.NamingException;
 
 import org.springframework.stereotype.Repository;
 
+import com.project.vodto.Member;
+
 @Repository
 public interface MemberDAO {
 	// 회원가입
