@@ -1,15 +1,18 @@
 package com.project.controller.jmj;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
+import com.project.vodto.MyPageOrderList;
 
 @Controller
 @RequestMapping("/user/*")
@@ -34,17 +37,22 @@ public class myPageController {
 	}
 	
 	@RequestMapping("orderList")
-	public void getOrderList(String memberId) {
+	public void getOrderList(Model model) {
 		System.out.println("주문 내역");
+		String memberId = "abc1234";
 		
 		try {
-			mService.getOrderHistory(memberId);
-		} catch (SQLException e) {
+			List<MyPageOrderList> lst = mService.getOrderHistory(memberId);
+			model.addAttribute("orderList", lst);
+//			System.out.println(lst);
+		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (NamingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
+	}
+	
+	@RequestMapping("detailOrderList")
+	public void getDetailOrderList() {
+		System.out.println("주문 상세 내역");
 	}
 }

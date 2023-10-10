@@ -11,6 +11,7 @@ import com.project.vodto.Board;
 import com.project.vodto.CouponLog;
 import com.project.vodto.CustomerInquiry;
 import com.project.vodto.Member;
+import com.project.vodto.MyPageOrderList;
 import com.project.vodto.OrderHistory;
 import com.project.vodto.PointLog;
 import com.project.vodto.ShippingAddress;
@@ -41,5 +42,5 @@ public interface MemberService {
 	// 장바구니 목록 가져오기
 	
 	//주문내역 가져오기
-	List<OrderHistory> getOrderHistory(String memberId) throws SQLException, NamingException;
+	List<MyPageOrderList> getOrderHistory(String memberId) throws SQLException, NamingException;
 }

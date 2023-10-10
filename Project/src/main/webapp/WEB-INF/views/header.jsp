@@ -56,7 +56,7 @@
       </div>
       <div class="humberger__menu__widget">
         <div class="header__top__right__auth">
-          <a href="${contextPath }/user/myPage"><i class="fa fa-user"></i>로그인</a>
+          <a href="#"><i class="fa fa-user"></i>로그인</a>
         </div>
         <div class="header__top__right__auth">
           <a href="#"><i class="fa-solid fa-right-to-bracket"></i>회원가입</a>
@@ -115,7 +115,7 @@
                   <a href="#"><i class="fa fa-pinterest-p"></i></a>
                 </div>
                 <div class="header__top__right__auth">
-                  <a href="${contextPath }/user/myPage"><i class="fa fa-user"></i> 로그인</a>
+                  <a href="#"><i class="fa fa-user"></i> 로그인</a>
                 </div>
                 <div class="header__top__right__auth">
                   <a href="#"
@@ -162,6 +162,11 @@
                 <li>
                   <a href="#"
                     ><i class="fa fa-shopping-bag"></i> <span>3</span></a
+                  >
+                </li>
+                <li>
+                  <a href="${contextPath }/user/myPage"
+                    ><i class="fa-solid fa-user-pen"></i></a
                   >
                 </li>
               </ul>

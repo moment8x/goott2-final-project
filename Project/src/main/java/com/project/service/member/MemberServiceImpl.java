@@ -3,21 +3,27 @@ package com.project.service.member;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.naming.NamingException;
 
 import org.springframework.stereotype.Service;
 
+import com.project.dao.member.MemberDAO;
 import com.project.service.member.MemberService;
 import com.project.vodto.Board;
 import com.project.vodto.CouponLog;
 import com.project.vodto.CustomerInquiry;
 import com.project.vodto.Member;
+import com.project.vodto.MyPageOrderList;
 import com.project.vodto.OrderHistory;
 import com.project.vodto.PointLog;
 import com.project.vodto.ShippingAddress;
 
 @Service
 public class MemberServiceImpl implements MemberService {
+	
+	@Inject
+	private MemberDAO mDao;
 
 	@Override
 	public Boolean signUp(Member member) throws SQLException, NamingException {
@@ -80,9 +86,9 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public List<OrderHistory> getOrderHistory(String memberId) throws SQLException, NamingException {
-
-		return null;
+	public List<MyPageOrderList> getOrderHistory(String memberId) throws SQLException, NamingException {
+		
+		return mDao.selectOrderHistory(memberId);
 	}
 
 }

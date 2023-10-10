@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,18 +20,7 @@
 	})
 </script>
 <style type="text/css">
-body > section.blog.spad {
-padding-top: 0px;
-}
-body > section.blog.spad > div > div > div.col-lg-4.col-md-5 > div{
-	padding-top: 0px;
-}
-body > section.blog.spad > div > div > div.col-lg-4.col-md-5{
-	padding-right: 0px;
-}
-body > section.blog.spad > div > div > div.col-sm-8 > section{
-	padding-top: 30px;
-}
+
 #orderHistory{
 	margin-top: 30px; 
 	border: 1px solid #d2d2d2;
@@ -39,6 +29,18 @@ body > section.blog.spad > div > div > div.col-sm-8 > section{
 .orderHistoryBtn{
 	margin: 10px;
 	width: 126px;
+}
+.shoping__cart__item img{
+	width: 80px;
+}
+#totalPayments{
+	width: 100px;
+}
+#deliveryStatus{
+	width: 120px;
+}
+#productImg{
+width: 140px;
 }
 </style>
 </head>
@@ -115,36 +117,30 @@ body > section.blog.spad > div > div > div.col-sm-8 > section{
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="shoping__cart__table">
-										<table>
-											<thead>
-												<tr>
-													<th class="shoping__product">주문번호</th>
-													<th>상품</th>
-													<th>가격</th>
-													<th>수량</th>
-													<th>상태</th>
-												</tr>
-											</thead>
+												<c:forEach var="order" items="${orderList }">
+										<table id="orderList">
+											<th>${order.order_no }<a href="detailOrderList"><p>상세보기</p></a></th>
+											<th colspan="3">${order.order_time }</th>
+											<th colspan="2"></th>
 											<tbody>
 												<tr>
-													<td class="shoping__cart__price">1234560<p>상세보기</p></td>
-													<td class="shoping__cart__item"><img
-														src="img/cart/cart-1.jpg" alt="" />
-														<h5>Vegetable’s Package</h5></td>
-													<td class="shoping__cart__price">$55.00</td>
+													<td class="shoping__cart__item" id="productImg"><a href="#"><img
+														src="${order.product_image }" alt="${order.product_name }" /></a></td>
+													<td class="shoping__cart__item"><a href="#"><p>${order.product_name }</p></a></td>
+													<td class="shoping__cart__item" id="totalPayments">${order.actual_payment_amount }</td>
 													<td class="shoping__cart__quantity">
 														<div class="quantity">
 															<span>1</span>
 														</div>
 													</td>
-													<td class="shoping__cart__total">$110.00</td>
-													<td class="shoping__cart__item__close"><span
-														class="icon_close"></span></td>
+													<td class="shoping__cart__item" id="deliveryStatus">${order.delivery_status }</td>
 													<td class="shoping__cart__item__close delOrderList"><span
 														class="icon_close"></span></td>
 												</tr>
 											</tbody>
+											</c:forEach>
 										</table>
+										${orderList }
 									</div>
 								</div>
 							</div>
