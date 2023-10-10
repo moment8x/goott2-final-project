@@ -119,7 +119,7 @@ width: 140px;
 									<div class="shoping__cart__table">
 												<c:forEach var="order" items="${orderList }">
 										<table id="orderList">
-											<th>${order.order_no }<a href="detailOrderList"><p>상세보기</p></a></th>
+											<th>${order.order_no }<a href="detailOrderList?order_no=${order.order_no }"><p>상세보기</p></a></th>
 											<th colspan="3">${order.order_time }</th>
 											<th colspan="2"></th>
 											<tbody>
