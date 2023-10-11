@@ -43,7 +43,9 @@ public class myPageController {
 		
 		try {
 			List<MyPageOrderList> lst = mService.getOrderHistory(memberId);
+			int result = mService.getOrderProductCount();
 			model.addAttribute("orderList", lst);
+			model.addAttribute("orderProductCount", result);
 //			System.out.println(lst);
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block

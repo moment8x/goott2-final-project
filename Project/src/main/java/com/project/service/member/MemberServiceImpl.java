@@ -91,4 +91,10 @@ public class MemberServiceImpl implements MemberService {
 		return mDao.selectOrderHistory(memberId);
 	}
 
+	@Override
+	public int getOrderProductCount() throws SQLException, NamingException {
+		
+		return mDao.selectOrderProductCount();
+	}
+
 }

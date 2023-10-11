@@ -50,4 +50,10 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectList(ns + ".getOrderList", memberId);
 	}
 
+	@Override
+	public int selectOrderProductCount() throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".getOrderProductCount");
+	}
+
 }

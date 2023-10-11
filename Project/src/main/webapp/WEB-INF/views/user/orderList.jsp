@@ -1,12 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>주문내역</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script type="text/javascript">
 	$(function() {
 		//주문 내역 삭제 모달 열기
@@ -20,29 +21,32 @@
 	})
 </script>
 <style type="text/css">
-
-#orderHistory{
-	margin-top: 30px; 
+#orderHistory {
+	margin-top: 30px;
 	border: 1px solid #d2d2d2;
 	border-radius: 10px;
 }
-.orderHistoryBtn{
+
+.orderHistoryBtn {
 	margin: 10px;
 	width: 126px;
 }
-.shoping__cart__item img{
+
+.shoping__cart__item img {
 	width: 80px;
 }
-#totalPayments{
+
+#totalPayments {
 	width: 100px;
 }
-#deliveryStatus{
+
+#deliveryStatus {
 	width: 120px;
 }
-#productImg{
-width: 140px;
-}
 
+#productImg {
+	width: 140px;
+}
 </style>
 </head>
 <body>
@@ -88,7 +92,7 @@ width: 140px;
 
 
 				<div class="col-sm-8">
-					
+
 					<h4 class="mt-5">주문내역</h4>
 					<div id="orderHistory">
 						<button type="button" class="btn btn-light orderHistoryBtn">
@@ -118,30 +122,34 @@ width: 140px;
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="shoping__cart__table">
-												<c:forEach var="order" items="${orderList }">
-										<table id="orderList">
-											<th>${order.order_no }<a href="detailOrderList?order_no=${order.order_no }"><p>상세보기</p></a></th>
-											<th colspan="3">${order.order_time }</th>
-											<th colspan="2"></th>
-											<tbody>
-												<tr>
-													<td class="shoping__cart__item" id="productImg"><a href="#"><img
-														src="${order.product_image }" alt="${order.product_name }" /></a></td>
-													<td class="shoping__cart__item"><a href="#"><p>${order.product_name }</p></a></td>
-													<td class="shoping__cart__item" id="totalPayments">${order.actual_payment_amount }</td>
-													<td class="shoping__cart__quantity">
-														<div class="quantity">
-															<span>1</span>
-														</div>
-													</td>
-													<td class="shoping__cart__item" id="deliveryStatus">${order.delivery_status }</td>
-													<td class="shoping__cart__item__close delOrderList"><span
-														class="icon_close"></span></td>
-												</tr>
-											</tbody>
-											</c:forEach>
-										</table>
+										<c:forEach var="order" items="${orderList }">
+											<table id="orderList">
+												<th>${order.order_no }<a
+													href="detailOrderList?order_no=${order.order_no }"><p>상세보기</p></a></th>
+												<th colspan="3">${order.order_time }</th>
+												<th colspan="2"></th>
+												<tbody>
+													<tr>
+														<td class="shoping__cart__item" id="productImg"><a
+															href="#"><img src="${order.product_image }"
+																alt="${order.product_name }" /></a></td>
+														<td class="shoping__cart__item"><a href="#"><p>${order.product_name }</p></a></td>
+														<td class="shoping__cart__item" id="totalPayments">${order.actual_payment_amount }</td>
+														<td class="shoping__cart__quantity">
+															<div class="quantity">
+																<span>${orderProductCount }</span>
+															</div>
+														</td>
+														<td class="shoping__cart__item" id="deliveryStatus">${order.delivery_status }</td>
+														<td class="shoping__cart__item__close delOrderList"><span
+															class="icon_close"></span></td>
+													</tr>
+												</tbody>
+											</table>
+												</c:forEach>
 										${orderList }
+										${orderProductCount }
+									
 									</div>
 								</div>
 							</div>
@@ -152,27 +160,28 @@ width: 140px;
 		</div>
 
 	</section>
-<!-- The Modal -->
-<div class="modal" id="delOrderListModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
+	<!-- The Modal -->
+	<div class="modal" id="delOrderListModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
 
-      <!-- Modal body -->
-      <div class="modal-body">
-        <p>주문,배송 목록에서 삭제하시겠습니까? </p>
-        <p>삭제된 주문은 주문배송 목록에서 노출되지 않으며, 복구가 불가능합니다. </p>
-        <p>교환/반품 신청은 고객센터를 통해 문의해주세요.</p>
-      </div>
+				<!-- Modal body -->
+				<div class="modal-body">
+					<p>주문,배송 목록에서 삭제하시겠습니까?</p>
+					<p>삭제된 주문은 주문배송 목록에서 노출되지 않으며, 복구가 불가능합니다.</p>
+					<p>교환/반품 신청은 고객센터를 통해 문의해주세요.</p>
+				</div>
 
-      <!-- Modal footer -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger delOrderListClose" data-bs-dismiss="modal">취소</button>
-        <button type="button" class="btn btn-outline-success" onclick="">삭제</button>
-      </div>
+				<!-- Modal footer -->
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger delOrderListClose"
+						data-bs-dismiss="modal">취소</button>
+					<button type="button" class="btn btn-outline-success" onclick="">삭제</button>
+				</div>
 
-    </div>
-  </div>
-</div>
+			</div>
+		</div>
+	</div>
 
 	<jsp:include page="../footer.jsp"></jsp:include>
 </body>

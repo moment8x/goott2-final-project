@@ -24,4 +24,7 @@ public interface MemberDAO {
 	boolean updateWithdraw(String memberId) throws SQLException, NamingException;
 	// 주문 내역 가져오기
 	List<MyPageOrderList> selectOrderHistory (String memberId) throws SQLException, NamingException;
+	
+	//유저당 주문한 상품 갯수 가져오기
+	int selectOrderProductCount() throws SQLException, NamingException;
 }

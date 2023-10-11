@@ -5,12 +5,19 @@
 
 <mapper namespace="com.project.mappers.memberMapper">
 	<select id="getOrderList" resultType="com.project.vodto.MyPageOrderList">
-		SELECT o.order_no, o.order_time, o.delivery_status, o.invoice_number,
+		SELECT o.order_no, o.order_time, o.delivery_status, o.invoice_number, o.member_id,
 		pay.actual_payment_amount, prod.product_image, prod.product_name
-		FROM order_history o
+		FROM products prod
+		JOIN  detailed_order_items d
+        on prod.product_id = d.product_id
 		JOIN payments pay
-		JOIN products prod
+        on d.order_no = pay.order_no
+        join order_history o
+        on pay.order_no = o.order_no
 		WHERE member_id = #{memberId};
 	</select>
 
+	<select id="getOrderProductCount" resultType="int">
+		select count(*) from detailed_order_items
+	</select>
 </mapper>

@@ -12,14 +12,6 @@ UPDATE `test`.`order_history` SET `invoice_number` = '12345' WHERE (`order_no` =
 INSERT INTO `test`.`payments` (`payment_number`, `order_no`, `payment_method`, `total_amount`, `shipping_fee`, `used_reward`, `used_points`, `actual_payment_amount`) VALUES ('2', '2', '카드', '15300', '0', '0', '1000', '14300');
 UPDATE `test`.`payments` SET `payment_method` = '카드' WHERE (`payment_number` = '1');
 UPDATE `test`.`payments` SET `order_no` = '1' WHERE (`payment_number` = '2');
-
--- 주문내역 페이지 쿼리
-SELECT o.order_no, o.order_time, o.delivery_status, o.invoice_number,
-		pay.actual_payment_amount, prod.product_image, prod.product_name
-		FROM order_history o
-		JOIN payments pay
-		JOIN products prod
-		WHERE member_id = 'abc1234';
         
 ALTER TABLE `test`.`detailed_order_items` 
 CHANGE COLUMN `coupon` `coupon` VARCHAR(5) NULL DEFAULT '0' COMMENT '할인 쿠폰' ;
@@ -37,7 +29,7 @@ ADD CONSTRAINT `detailOrder_coupon_fk`
 ALTER TABLE `test`.`detailed_order_items` 
 CHANGE COLUMN `discounted_price` `discounted_price` INT(11) NULL COMMENT '쿠폰 적용 가격' ;
 
-ALTER TABLE `gott123`.`non_order_history` 
+ALTER TABLE `test`.`non_order_history` 
 ADD COLUMN `no` INT NOT NULL AUTO_INCREMENT FIRST,
 CHANGE COLUMN `non_order_no` `non_order_no` INT(11) NULL COMMENT '주문 번호' ,
 ADD UNIQUE INDEX `non_order_no_UNIQUE` (`non_order_no` ASC) ,
@@ -45,15 +37,10 @@ DROP PRIMARY KEY,
 ADD PRIMARY KEY (`no`);
 ;
 
-ALTER TABLE `gott123`.`detailed_order_items` 
-ADD INDEX `detailOrder_coupon_fk_idx` (`coupon` ASC) ;
-;
-ALTER TABLE `gott123`.`detailed_order_items` 
-ADD CONSTRAINT `detailOrder_coupon_fk`
-  FOREIGN KEY (`coupon`)
-  REFERENCES `gott123`.`coupons` (`coupon_number`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
-
-ALTER TABLE `gott123`.`detailed_order_items` 
-CHANGE COLUMN `discounted_price` `discounted_price` INT(11) NULL COMMENT '쿠폰 적용 가격' ;
+-- 주문상세상품 테이블 product_price fk
+ALTER TABLE `test`.`detailed_order_items` 
+ADD CONSTRAINT `detailOrder_productPrice_fk`
+  FOREIGN KEY (`product_price`)
+  REFERENCES `test`.`products` (`selling_price`)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
