@@ -166,7 +166,7 @@
                 </li>
                 <li>
                   <a href="${contextPath }/user/myPage"
-                    ><i class="fa-solid fa-user-pen"></i></a
+                    ><i class="fa-regular fa-user"></i></a
                   >
                 </li>
               </ul>

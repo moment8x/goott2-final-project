@@ -45,6 +45,9 @@
 padding-left: 20px;
 font-size: 13px;
 }
+.list-group-item{
+	font-size: 15px;
+}
 </style>
 </head>
 <body>

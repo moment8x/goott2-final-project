@@ -42,6 +42,7 @@
 #productImg{
 width: 140px;
 }
+
 </style>
 </head>
 <body>
