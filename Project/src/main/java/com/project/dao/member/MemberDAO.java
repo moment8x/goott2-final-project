@@ -26,7 +26,7 @@ public interface MemberDAO {
 	List<MyPageOrderList> selectOrderHistory (String memberId) throws SQLException, NamingException;
 	
 	// 주문건당 상품 총 갯수 가져오기
-	int selectOrderProductCount(int orderNo) throws SQLException, NamingException;
+	int selectOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException;
 	
 	//
 	List<Integer> selectOrderNo(String memberId);

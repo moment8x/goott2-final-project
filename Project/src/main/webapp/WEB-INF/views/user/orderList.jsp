@@ -140,7 +140,7 @@ body > section.blog.spad > div > div > div.col-sm-8 > section{
 												<th colspan="3">${order.order_time }</th>
 												<th colspan="2"></th>
 												<tbody>
-													<tr id="noImg">
+													<tr>
 													<c:choose>
 													<c:when test="${order.product_image == '' }">
 													<td class="shoping__cart__item" id="productImg"><i class="fa-regular fa-image fa-2xl" ></i></td>

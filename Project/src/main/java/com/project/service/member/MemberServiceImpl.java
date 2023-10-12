@@ -92,7 +92,7 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public int getOrderProductCount(int orderNo) throws SQLException, NamingException {
+	public int getOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException {
 		
 		return mDao.selectOrderProductCount(orderNo);
 	}

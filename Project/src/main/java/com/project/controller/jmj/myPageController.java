@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,9 +25,9 @@ public class myPageController {
 	private MemberService mService;
 	
 	@RequestMapping("myPage")
-	public String myPage(Model model) {
+	public void myPage(Model model) {
 		
-		return "user/orderList";
+		System.out.println("마이페이지");
 		
 	}
 	
@@ -41,27 +42,22 @@ public class myPageController {
 	}
 	
 	@RequestMapping("orderList")
-	public void getOrderList(Model model) {
+	public void getOrderList(Model model, HttpServletRequest req) {
 		
 		System.out.println("주문 내역");
 		String memberId = "abc1234";
-		
-		List<Integer> list = mService.getOrderNo(memberId);
-		
-		System.out.println(model);
-	
-	
+		String orderNo = req.getParameter("orderNo");
+		System.out.println(orderNo);
 		
 		try {
+//			List<Integer> list = mService.getOrderNo(memberId);
 			List<MyPageOrderList> lst = mService.getOrderHistory(memberId);
+//			List<Integer> orderNo = mService.getOrderNo(memberId);
 //			int result = mService.getOrderProductCount(orderNo);
-//			mService.getOrderNO(memberId)
 			
 			System.out.println("list : " + lst);
-//			System.out.println("result = " + result);
-			
+//			System.out.println(orderNo);
 			model.addAttribute("orderList", lst);
-			
 			
 //			model.addAttribute("orderProductCount", result);
 //			System.out.println(lst);
