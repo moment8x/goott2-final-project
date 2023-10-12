@@ -41,9 +41,11 @@ public interface MemberService {
 
 	// 장바구니 목록 가져오기
 	
-	//주문내역 가져오기
+	//주문건당 주문내역 가져오기
 	List<MyPageOrderList> getOrderHistory(String memberId) throws SQLException, NamingException;
 	
-	//유저당 주문한 상품갯수 가져오기
-	int getOrderProductCount() throws SQLException, NamingException;
+	//주문건당 총 상품 갯수 가져오기
+	int getOrderProductCount(int orderNo) throws SQLException, NamingException;
+	
+	List<Integer> getOrderNo(String memberId);
 }

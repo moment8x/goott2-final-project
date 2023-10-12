@@ -12,7 +12,12 @@ UPDATE `test`.`order_history` SET `invoice_number` = '12345' WHERE (`order_no` =
 INSERT INTO `test`.`payments` (`payment_number`, `order_no`, `payment_method`, `total_amount`, `shipping_fee`, `used_reward`, `used_points`, `actual_payment_amount`) VALUES ('2', '2', '카드', '15300', '0', '0', '1000', '14300');
 UPDATE `test`.`payments` SET `payment_method` = '카드' WHERE (`payment_number` = '1');
 UPDATE `test`.`payments` SET `order_no` = '1' WHERE (`payment_number` = '2');
-        
+INSERT INTO `test`.`products` (`product_id`, `product_name`, `consumer_price`, `supply_price`, `selling_price`, `product_image`, `category_key`) VALUES ('S000208995869', '생각이 너무 많은 어른들을 위한 심리학(10만 부 기념 스페셜 에디션)', '17800', '0', '16020', 'https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791190538602.jpg', '1');
+INSERT INTO `test`.`products` (`product_id`, `product_name`, `consumer_price`, `supply_price`, `selling_price`, `product_image`, `category_key`) VALUES ('S000209182431', '오늘도 나아가는 중입니다', '16800', '0', '15120', 'https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791159259777.jpg', '1');
+INSERT INTO `test`.`order_history` (`order_no`, `member_id`, `invoice_number`, `recipient_name`, `recipient_phone_number`, `zip_code`, `shipping_address`, `detailed_shipping_address`, `delivery_status`, `delivery_message`) VALUES ('2', 'abc1234', '34253', 'abc', '35236236243', '233335', '서울시 구로구 구로동', '구트아카데미', '배송중', '문앞');
+INSERT INTO `test`.`detailed_order_items` (`order_no`, `product_id`, `product_price`) VALUES ('2', 'S000208995869', '16020');
+INSERT INTO `test`.`payments` (`payment_number`, `order_no`, `payment_method`, `total_amount`, `shipping_fee`, `used_reward`, `used_points`, `actual_payment_amount`) VALUES ('2', '2', '카드', '16020', '0', '0', '0', '16020');
+
 ALTER TABLE `test`.`detailed_order_items` 
 CHANGE COLUMN `coupon` `coupon` VARCHAR(5) NULL DEFAULT '0' COMMENT '할인 쿠폰' ;
 

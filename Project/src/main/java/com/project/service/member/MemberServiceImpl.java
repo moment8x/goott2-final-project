@@ -92,9 +92,16 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public int getOrderProductCount() throws SQLException, NamingException {
+	public int getOrderProductCount(int orderNo) throws SQLException, NamingException {
 		
-		return mDao.selectOrderProductCount();
+		return mDao.selectOrderProductCount(orderNo);
+	}
+
+	// 주문번호 가져오기 위한 임시 메서드
+	@Override
+	public List<Integer> getOrderNo(String memberId) {
+	
+		return mDao.selectOrderNo(memberId);
 	}
 
 }

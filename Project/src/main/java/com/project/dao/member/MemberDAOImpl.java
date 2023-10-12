@@ -51,9 +51,15 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public int selectOrderProductCount() throws SQLException, NamingException {
+	public int selectOrderProductCount(int orderNo) throws SQLException, NamingException {
 		
-		return ses.selectOne(ns + ".getOrderProductCount");
+		return ses.selectOne(ns + ".getOrderProductCount" , orderNo);
+	}
+
+	@Override
+	public List<Integer> selectOrderNo(String memberId) {
+		
+		return ses.selectList(ns + ".getOrderNo", memberId);
 	}
 
 }

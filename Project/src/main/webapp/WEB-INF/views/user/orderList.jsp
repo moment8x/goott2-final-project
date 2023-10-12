@@ -46,6 +46,17 @@
 
 #productImg {
 	width: 140px;
+
+
+}
+.orderName{
+	text-align: center;
+}
+#orderList{
+ margin-top: 20px;
+}
+body > section.blog.spad > div > div > div.col-sm-8 > section{
+ padding-top: 10px;
 }
 </style>
 </head>
@@ -129,11 +140,18 @@
 												<th colspan="3">${order.order_time }</th>
 												<th colspan="2"></th>
 												<tbody>
-													<tr>
+													<tr id="noImg">
+													<c:choose>
+													<c:when test="${order.product_image == '' }">
+													<td class="shoping__cart__item" id="productImg"><i class="fa-regular fa-image fa-2xl" ></i></td>
+													</c:when>
+													<c:otherwise>
 														<td class="shoping__cart__item" id="productImg"><a
 															href="#"><img src="${order.product_image }"
 																alt="${order.product_name }" /></a></td>
-														<td class="shoping__cart__item"><a href="#"><p>${order.product_name }</p></a></td>
+													</c:otherwise>
+													</c:choose>
+														<td class="shoping__cart__item"><a href="#"><p class="orderName">${order.product_name }</p></a></td>
 														<td class="shoping__cart__item" id="totalPayments">${order.actual_payment_amount }</td>
 														<td class="shoping__cart__quantity">
 															<div class="quantity">

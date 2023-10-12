@@ -22,9 +22,12 @@ public interface MemberDAO {
 	boolean updateMyInfo(Member member) throws SQLException, NamingException;
 	// 특정 회원 탈퇴(기록 저장 및 삭제)
 	boolean updateWithdraw(String memberId) throws SQLException, NamingException;
-	// 주문 내역 가져오기
+	// 주문건당 주문 내역 가져오기
 	List<MyPageOrderList> selectOrderHistory (String memberId) throws SQLException, NamingException;
 	
-	//유저당 주문한 상품 갯수 가져오기
-	int selectOrderProductCount() throws SQLException, NamingException;
+	// 주문건당 상품 총 갯수 가져오기
+	int selectOrderProductCount(int orderNo) throws SQLException, NamingException;
+	
+	//
+	List<Integer> selectOrderNo(String memberId);
 }

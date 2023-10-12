@@ -9,6 +9,8 @@ import javax.naming.NamingException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
@@ -22,8 +24,10 @@ public class myPageController {
 	private MemberService mService;
 	
 	@RequestMapping("myPage")
-	public void myPage() {
-		System.out.println("마이페이지");
+	public String myPage(Model model) {
+		
+		return "user/orderList";
+		
 	}
 	
 	@RequestMapping("address")
@@ -38,14 +42,28 @@ public class myPageController {
 	
 	@RequestMapping("orderList")
 	public void getOrderList(Model model) {
+		
 		System.out.println("주문 내역");
 		String memberId = "abc1234";
 		
+		List<Integer> list = mService.getOrderNo(memberId);
+		
+		System.out.println(model);
+	
+	
+		
 		try {
 			List<MyPageOrderList> lst = mService.getOrderHistory(memberId);
-			int result = mService.getOrderProductCount();
+//			int result = mService.getOrderProductCount(orderNo);
+//			mService.getOrderNO(memberId)
+			
+			System.out.println("list : " + lst);
+//			System.out.println("result = " + result);
+			
 			model.addAttribute("orderList", lst);
-			model.addAttribute("orderProductCount", result);
+			
+			
+//			model.addAttribute("orderProductCount", result);
 //			System.out.println(lst);
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
