@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     
-    <title>Ogani | Template</title>
+    <title>Kyobo Books</title>
 
     <!-- Google Font -->
     <link
@@ -19,14 +19,14 @@
     />
 
     <!-- Css Styles -->
-    <link rel="stylesheet" href="/controller/resources/css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="/controller/resources/css/font-awesome.min.css" type="text/css" />
-    <link rel="stylesheet" href="/controller/resources/css/elegant-icons.css" type="text/css" />
-    <link rel="stylesheet" href="/controller/resources/css/nice-select.css" type="text/css" />
-    <link rel="stylesheet" href="/controller/resources/css/jquery-ui.min.css" type="text/css" />
-    <link rel="stylesheet" href="/controller/resources/css/owl.carousel.min.css" type="text/css" />
-    <link rel="stylesheet" href="/controller/resources/css/slicknav.min.css" type="text/css" />
-    <link rel="stylesheet" href="/controller/resources/css/style.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/font-awesome.min.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/elegant-icons.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/nice-select.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/jquery-ui.min.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/owl.carousel.min.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/slicknav.min.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/style.css" type="text/css" />
   </head>
 
   <body>
@@ -75,7 +75,7 @@
           <li>
             <a href="#">신상품</a>
             <ul class="header__menu__dropdown">
-              <li><a href="./shop-details.html">Shop Details</a></li>
+              <li><a href="detail/?no=S000208698551">Shop Details</a></li>
               <li><a href="./shoping-cart.html">Shoping Cart</a></li>
               <li><a href="./checkout.html">Check Out</a></li>
               <li><a href="./blog-details.html">Blog Details</a></li>
@@ -141,7 +141,7 @@
                 <li>
                   <a href="#">신상품</a>
                   <ul class="header__menu__dropdown">
-                    <li><a href="./shop-details.html">Shop Details</a></li>
+                    <li><a href="detail/?no=S000208698551">Shop Details</a></li>
                     <li><a href="./shoping-cart.html">Shoping Cart</a></li>
                     <li><a href="./checkout.html">Check Out</a></li>
                     <li><a href="./blog-details.html">Blog Details</a></li>
@@ -257,13 +257,13 @@
       src="https://kit.fontawesome.com/fd7fb2445c.js"
       crossorigin="anonymous"
     ></script>
-    <script src="/controller/resources/js/jquery-3.3.1.min.js"></script>
-    <script src="/controller/resources/js/bootstrap.min.js"></script>
-    <script src="/controller/resources/js/jquery.nice-select.min.js"></script>
-    <script src="/controller/resources/js/jquery-ui.min.js"></script>
-    <script src="/controller/resources/js/jquery.slicknav.js"></script>
-    <script src="/controller/resources/js/mixitup.min.js"></script>
-    <script src="/controller/resources/js/owl.carousel.min.js"></script>
-    <script src="/controller/resources/js/main.js"></script>
+    <script src="/resources/js/jquery-3.3.1.min.js"></script>
+    <script src="/resources/js/bootstrap.min.js"></script>
+    <script src="/resources/js/jquery.nice-select.min.js"></script>
+    <script src="/resources/js/jquery-ui.min.js"></script>
+    <script src="/resources/js/jquery.slicknav.js"></script>
+    <script src="/resources/js/mixitup.min.js"></script>
+    <script src="/resources/js/owl.carousel.min.js"></script>
+    <script src="/resources/js/main.js"></script>
   </body>
 </html>
