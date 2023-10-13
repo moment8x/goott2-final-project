@@ -20,16 +20,11 @@
 	<resources mapping="/sass/**" location="/resources/sass/" />
 	<resources mapping="/fonts/**" location="/resources/fonts/" />
 	
-	<resources mapping="/detail/css/**" location="/resources/css/" />
-	<resources mapping="/detail/js/**" location="/resources/js/" />
-	<resources mapping="/detail/img/**" location="/resources/img/" />
-	<resources mapping="/detail/sass/**" location="/resources/sass/" />
-	<resources mapping="/detail/fonts/**" location="/resources/fonts/" />
-	
-	
-	
-
-
+	<resources mapping="user/css/**" location="/resources/css/" />
+	<resources mapping="user/js/**" location="/resources/js/" />
+	<resources mapping="user/img/**" location="/resources/img/" />
+	<resources mapping="user/sass/**" location="/resources/sass/" />
+	<resources mapping="user/fonts/**" location="/resources/fonts/" />
 	
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">

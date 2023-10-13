@@ -129,7 +129,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
         <div class="row">
           <div class="col-lg-3">
             <div class="header__logo">
-              <a href="./index.html">Kyobo Books</a>
+              <a href="${contextPath }/index.jsp">Kyobo Books</a>
             </div>
           </div>
           <div class="col-lg-6">
@@ -160,6 +160,11 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                 <li>
                   <a href="#"
                     ><i class="fa fa-shopping-bag"></i> <span>3</span></a
+                  >
+                </li>
+                <li>
+                  <a href="${contextPath }/user/myPage"
+                    ><i class="fa-regular fa-user"></i></a
                   >
                 </li>
               </ul>

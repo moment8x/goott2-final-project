@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.mappers.memberMapper">
+	<select id="getOrderList"
+		resultType="com.project.vodto.MyPageOrderList">
+		SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, o.member_id,
+		pay.actual_payment_amount, prod.product_image, prod.product_name
+		FROM products prod
+		inner JOIN  detailed_order_items d
+        on prod.product_id = d.product_id
+		inner JOIN payments pay
+        on d.order_no = pay.order_no
+        inner join order_history o
+        on pay.order_no = o.order_no
+		WHERE member_id = #{memberId}
+	</select>
+
+	<select id="getOrderNo" resultType="int">
+		select order_no from order_history where member_id = #{memberId}
+	</select>
+
+	<select id="getProductCount" resultType="int">
+		select count(*) from
+		detailed_order_items where order_no = #{orderNo}
+	</select>
+</mapper>
