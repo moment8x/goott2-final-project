@@ -1,5 +1,0 @@
-INDEX VERSION 1.131
-D:\lecture\project\goott2-final-project\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1403975306.index
-\Project\src\main\java
-D:\lecture\project\goott2-final-project\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\337801693.index
-\Project\src\main\java

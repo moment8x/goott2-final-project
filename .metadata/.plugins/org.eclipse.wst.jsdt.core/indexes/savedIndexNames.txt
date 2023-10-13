@@ -1,9 +1,0 @@
-INDEX VERSION 1.4+D:\lecture\project\goott2-final-project\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
-337801693.index
-337801693.index
-1869977485.index
-733002592.index
-2921027695.index
-449384428.index
-3029940084.index
-4075631185.index
