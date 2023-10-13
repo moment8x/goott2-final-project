@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ksh.mappers.KshMapper">
+	<insert id="insertNewPayment">
+		INSERT INTO payments (payment_number, non_order_no, payment_method, total_amount, shipping_fee, used_points, used_reward, actual_payment_amount, payment_time) 
+		VALUES(#{payment_number}, #{non_order_no}, #{payment_method}, #{total_amount}, #{shipping_fee}, #{used_points}, #{used_reward}, #{actual_payment_amount}, #{payment_time})
+	</insert>
+</mapper>
