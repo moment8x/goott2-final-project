@@ -46,16 +46,19 @@ public class myPageController {
 		
 		System.out.println("주문 내역");
 		String memberId = "abc1234";
-		String orderNo = req.getParameter("orderNo");
-		System.out.println(orderNo);
+//		String orderNo = req.getParameter("orderNo");
+//		System.out.println(orderListNo);
+
+		List<MyPageOrderList> lst= null;
 		
 		try {
 //			List<Integer> list = mService.getOrderNo(memberId);
-			List<MyPageOrderList> lst = mService.getOrderHistory(memberId);
+			lst = mService.getOrderHistory(memberId);
 //			List<Integer> orderNo = mService.getOrderNo(memberId);
 //			int result = mService.getOrderProductCount(orderNo);
 			
 			System.out.println("list : " + lst);
+//			System.out.println("orderNo : " + orderNo);
 //			System.out.println(orderNo);
 			model.addAttribute("orderList", lst);
 			
