@@ -1,16 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-   pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
-<html lang="zxx">
+<html >
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content="Ogani Template" />
     <meta name="keywords" content="Ogani, unica, creative, html" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    
-    <title>Kyobo Books</title>
+
+    <title>Ogani | Template</title>
 
     <!-- Google Font -->
     <link
@@ -19,22 +18,23 @@
     />
 
     <!-- Css Styles -->
-    <link rel="stylesheet" href="/resources/css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="/resources/css/font-awesome.min.css" type="text/css" />
-    <link rel="stylesheet" href="/resources/css/elegant-icons.css" type="text/css" />
-    <link rel="stylesheet" href="/resources/css/nice-select.css" type="text/css" />
-    <link rel="stylesheet" href="/resources/css/jquery-ui.min.css" type="text/css" />
-    <link rel="stylesheet" href="/resources/css/owl.carousel.min.css" type="text/css" />
-    <link rel="stylesheet" href="/resources/css/slicknav.min.css" type="text/css" />
-    <link rel="stylesheet" href="/resources/css/style.css" type="text/css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" type="text/css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/elegant-icons.css" type="text/css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/nice-select.css" type="text/css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/jquery-ui.min.css" type="text/css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/owl.carousel.min.css" type="text/css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/slicknav.min.css" type="text/css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css" type="text/css" />
+   
   </head>
 
   <body>
-    <!-- Page Preloder -->
+    <!-- Page Preloder 
     <div id="preloder">
       <div class="loader"></div>
     </div>
-
+    -->
     <!-- Humberger Begin -->
     <div class="humberger__menu__overlay"></div>
     <div class="humberger__menu__wrapper">
@@ -92,8 +92,7 @@
         <a href="#"><i class="fa fa-linkedin"></i></a>
         <a href="#"><i class="fa fa-pinterest-p"></i></a>
       </div>
-      <div class="humberger__menu__contact">
-      </div>
+      <div class="humberger__menu__contact"></div>
     </div>
     <!-- Humberger End -->
 
@@ -164,12 +163,12 @@
                   >
                 </li>
               </ul>
+            </div>
+          </div>
+          <div class="humberger__open">
+            <i class="fa fa-bars"></i>
           </div>
         </div>
-        <div class="humberger__open">
-          <i class="fa fa-bars"></i>
-        </div>
-      </div>
       </div>
     </header>
     <!-- Header Section End -->
@@ -193,19 +192,21 @@
                 <div id="drop_in_category" style="display: flex">
                   <ul>
                     <li>
-                      <a href="#" style="font-weight: bold">국내도서 전체</a>
+                      <a href="/list/category/KOR" style="font-weight: bold"
+                        >국내도서 전체</a
+                      >
                     </li>
-                    <li><a href="#">소설</a></li>
-                    <li><a href="#">시/에세이</a></li>
-                    <li><a href="#">인문</a></li>
-                    <li><a href="#">가정/육아</a></li>
-                    <li><a href="#">요리</a></li>
-                    <li><a href="#">건강</a></li>
-                    <li><a href="#">취미/실용/스포츠</a></li>
-                    <li><a href="#">경제/경영</a></li>
-                    <li><a href="#">자기계발</a></li>
-                    <li><a href="#">정치/사회</a></li>
-                    <li><a href="#">역사/문화</a></li>
+                    <li><a href="/list/categoryList/KOR01">소설</a></li>
+                    <li><a href="/list/categoryList/KOR02">시/에세이</a></li>
+                    <li><a href="/list/categoryList/KOR03">인문</a></li>
+                    <li><a href="/list/categoryList/KOR04">가정/육아</a></li>
+                    <li><a href="/list/categoryList/KOR05">요리</a></li>
+                    <li><a href="/list/categoryList/KOR06">건강</a></li>
+                    <li><a href="/list/categoryList/KOR07">취미/실용/스포츠</a></li>
+                    <li><a href="/list/categoryList/KOR08">경제/경영</a></li>
+                    <li><a href="/list/categoryList/KOR09">자기계발</a></li>
+                    <li><a href="/list/categoryList/KOR10">정치/사회</a></li>
+                    <li><a href="/list/categoryList/KOR11">역사/문화</a></li>
                   </ul>
                   <ul style="padding-top: 60px">
                     <li><a href="#">종교</a></li>
@@ -251,19 +252,16 @@
       </div>
     </section>
     <!-- Hero Section End -->
-
-    <!-- Js Plugins -->
-    <script
-      src="https://kit.fontawesome.com/fd7fb2445c.js"
-      crossorigin="anonymous"
-    ></script>
-    <script src="/resources/js/jquery-3.3.1.min.js"></script>
-    <script src="/resources/js/bootstrap.min.js"></script>
-    <script src="/resources/js/jquery.nice-select.min.js"></script>
-    <script src="/resources/js/jquery-ui.min.js"></script>
-    <script src="/resources/js/jquery.slicknav.js"></script>
-    <script src="/resources/js/mixitup.min.js"></script>
-    <script src="/resources/js/owl.carousel.min.js"></script>
-    <script src="/resources/js/main.js"></script>
+ <!-- Js Plugins -->
+    <script src="https://kit.fontawesome.com/fd7fb2445c.js" crossorigin="anonymous"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/jquery-3.3.1.min.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/jquery.nice-select.min.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/jquery-ui.min.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/jquery.slicknav.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/mixitup.min.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/owl.carousel.min.js"></script>
+   <!--  <script src="${pageContext.request.contextPath}/resources/js/main.js"></script>  --> 
+    
   </body>
 </html>

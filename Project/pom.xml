@@ -231,16 +231,20 @@
 		    <version>2.3.2</version>
 		</dependency>
 		
-		
-		<!-- 마이sqlDB https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+		<!-- 테스트용 mysql -->
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.15</version>
+    		<groupId>mysql</groupId>
+    		<artifactId>mysql-connector-java</artifactId>
+    		<version>8.0.15</version>
 		</dependency>
-		        
-		        
-		        
+		
+		<!-- 테스트용 log4 -->
+		<dependency>
+			<groupId>org.bgee.log4jdbc-log4j2</groupId>
+			<artifactId>log4jdbc-log4j2-jdbc4.1</artifactId>
+			<version>1.16</version>
+		</dependency>
+		
 	</dependencies>
     <build>
         <plugins>

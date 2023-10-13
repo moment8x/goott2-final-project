@@ -35,6 +35,6 @@ public class Product {
 	private String introduction_detail;
 	private String table_of_contents;
 	private int notification_subscription;
-	private int best_seller_status;
+	private int bestSeller_status;
 	private String category_key;
 }
