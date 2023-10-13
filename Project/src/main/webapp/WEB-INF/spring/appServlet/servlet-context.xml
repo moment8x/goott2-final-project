@@ -13,13 +13,23 @@
 	<annotation-driven />
 
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
-	<resources mapping="/resources/**" location="/resources/" />
-	
+	<resources mapping="/resources/**" location="/resources/**" />
 	<resources mapping="/css/**" location="/resources/css/" />
 	<resources mapping="/js/**" location="/resources/js/" />
 	<resources mapping="/img/**" location="/resources/img/" />
 	<resources mapping="/sass/**" location="/resources/sass/" />
 	<resources mapping="/fonts/**" location="/resources/fonts/" />
+	
+	<resources mapping="/detail/css/**" location="/resources/css/" />
+	<resources mapping="/detail/js/**" location="/resources/js/" />
+	<resources mapping="/detail/img/**" location="/resources/img/" />
+	<resources mapping="/detail/sass/**" location="/resources/sass/" />
+	<resources mapping="/detail/fonts/**" location="/resources/fonts/" />
+	
+	
+	
+
+
 	
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -39,4 +49,6 @@
 	
 	<!-- 아래의 패키지를 스캔하여 객체 확보 -->
 	<context:component-scan base-package="com.project.controller" />
+	<context:component-scan base-package="com.project" />
+	<context:component-scan base-package="com.project.dao" />
 </beans:beans>
