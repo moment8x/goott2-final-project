@@ -1,3 +1,0 @@
-INDEX VERSION 1.4+D:\lecture\project\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
-449384428.index
-1403975306.index

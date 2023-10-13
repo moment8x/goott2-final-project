@@ -12,9 +12,9 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Rating {
-	private String productId;
+	private String product_id;
 	private float rating;
-	private int participationCount;
-	private int highestRating;
-	private int lowestRating;
+	private int participation_count;
+	private int highest_rating;
+	private int lowest_rating;
 }

@@ -13,6 +13,6 @@ import lombok.ToString;
 @ToString
 public class TermAndCondition {
 	private int key;
-	private String termsType;
-	private String termsContent;
+	private String terms_type;
+	private String terms_content;
 }

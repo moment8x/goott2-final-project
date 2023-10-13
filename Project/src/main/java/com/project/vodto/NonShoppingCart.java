@@ -1,5 +1,7 @@
 package com.project.vodto;
 
+import java.sql.Timestamp;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,5 +14,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class NonShoppingCart {
-	private int nonMemberId;
+	private String non_member_id;
+	private Timestamp non_member_expiration_period;
 }

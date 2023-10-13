@@ -14,18 +14,18 @@ import lombok.ToString;
 @Setter
 @ToString
 public class NonOrderHistory {
-	private int nonOrderNo;
-	private String nonMemberId;
-	private String invoiceNumber;
-	private String recipientName;
-	private String recipientPhoneNumber;
-	private Timestamp orderTime;
-	private String zipcode;
-	private String shippingAddress;
-	private String detailShippingAddress;
-	private String deliveryStatus;
-	private String deliveryMessage;
-	private Timestamp nonDeleteDate;
-	private String nonPassword;
-	private String nonEmail;
+	private int non_order_no;
+	private String non_member_id;
+	private String invoice_number;
+	private String recipient_name;
+	private String recipient_phone_number;
+	private Timestamp order_time;
+	private String zip_code;
+	private String shipping_address;
+	private String detail_shipping_address;
+	private String delivery_status;
+	private String delivery_message;
+	private Timestamp nonDelete_date;
+	private String non_password;
+	private String non_email;
 }

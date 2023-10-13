@@ -75,8 +75,8 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
           <li>
             <a href="#">신상품</a>
             <ul class="header__menu__dropdown">
-              <li><a href="detail/?no=S000208698551">Shop Details</a></li>
-              <li><a href="./shoping-cart.html">Shoping Cart</a></li>
+              <li><a href="./shop-details.html">Shop Details</a></li>
+              <li><a href="/shoppingCart/shoppingCart">Shopping Cart</a></li>
               <li><a href="./checkout.html">Check Out</a></li>
               <li><a href="./blog-details.html">Blog Details</a></li>
             </ul>
@@ -140,8 +140,8 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                 <li>
                   <a href="#">신상품</a>
                   <ul class="header__menu__dropdown">
-                    <li><a href="detail/?no=S000208698551">Shop Details</a></li>
-                    <li><a href="./shoping-cart.html">Shoping Cart</a></li>
+                    <li><a href="./shop-details.html">Shop Details</a></li>
+                    <li><a href="/shoppingCart/shoppingCart">Shopping Cart</a></li>
                     <li><a href="./checkout.html">Check Out</a></li>
                     <li><a href="./blog-details.html">Blog Details</a></li>
                   </ul>

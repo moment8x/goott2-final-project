@@ -12,6 +12,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class CouponCategory {
-	private String categoryKey;
-	private String couponNumber;
+	private String category_key;
+	private String coupon_number;
 }

@@ -12,7 +12,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class BoardCategory {
-	private int categoryId;
-	private String categoryName;
+	private int category_id;
+	private String category_name;
 	private String subcategory;
 }

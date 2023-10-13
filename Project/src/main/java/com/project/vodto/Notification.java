@@ -15,11 +15,11 @@ import lombok.ToString;
 @ToString
 public class Notification {
 	private int key;
-	private String memberId;
+	private String member_id;
 	private String link;
-	private String notificationTitle;
-	private String notificationContent;
+	private String notification_title;
+	private String notification_content;
 	private Timestamp date;
-	private Timestamp expirationDate;
-	private int readStatus;
+	private Timestamp expiration_date;
+	private int read_status;
 }

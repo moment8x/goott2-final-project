@@ -42,6 +42,20 @@
 		<beans:property name="maxUploadSize" value="5242880"></beans:property>
 	</beans:bean>
 	
+	<!--
+		인터셉터 객체 등록 
+	 -->	
+	<beans:bean id="headerCartInterceptor"
+		class="com.project.interceptor.kjs.HeaderCartInterceptor">
+	</beans:bean>
+	
+	<interceptors>
+		<interceptor>
+			<mapping path="/"/>
+			<beans:ref bean="headerCartInterceptor"/>
+		</interceptor>
+	</interceptors>
+	
 	<!-- 아래의 패키지를 스캔하여 객체 확보 -->
 	<context:component-scan base-package="com.project.controller" />
 	<context:component-scan base-package="com.project" />

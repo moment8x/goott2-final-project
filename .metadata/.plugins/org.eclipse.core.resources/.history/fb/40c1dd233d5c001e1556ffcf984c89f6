@@ -1,5 +1,0 @@
-package com.project.service.member;
-
-public interface Member {
-
-}
