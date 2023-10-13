@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.project.mappers.listMapper">
+  	<!-- 리스트 목록 가져오기 -->
+  	<select id="selectProductCategories" resultType="com.project.vodto.ProductCategory">
+  		select * from product_categories where category_key like CONCAT(#{key}, "__") 
+  	</select>
+  	
+  	<!-- 리스트 상품정보 가져오기 -->
+  	<select id="selectProductForList" resultType="com.project.vodto.Product">
+  		select * from products where category_key like CONCAT(#{key}, "%") limit #{startRowIndex}, #{viewProductPerPage}
+  	</select>
+  	
+  	<!-- 키로 해당 카테고리 정보 가져오기 -->
+  	<select id="selectProductCategory" resultType="com.project.vodto.ProductCategory">
+  		select * from product_categories where category_key = #{key}
+  	</select>
+  	
+  	<!-- 전체 상품 갯수 조회 -->
+  	<select id="selectProductCount" resultType="int">
+  		select count(*) from products where category_key like CONCAT(#{key}, "%")
+  	</select>
+  </mapper>
