@@ -1,4 +1,4 @@
-GitRepositoriesView.GitDirectories=D\:\\lecture\\project\\.git;
-GitRepositoriesView.GitDirectories.relative=.git;
+GitRepositoriesView.GitDirectories=D\:\\lecture\\project\\.git;D\:\\lecture\\project\\goott2-final-project\\.git;
+GitRepositoriesView.GitDirectories.relative=D\:\\lecture\\project\\.git;.git;
 core_autoIgnoreDerivedResources=false
 eclipse.preferences.version=1

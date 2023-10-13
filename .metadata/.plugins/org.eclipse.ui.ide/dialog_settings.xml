@@ -102,4 +102,13 @@
 		<item value="org.springsource.sts.package:3.9.18.202109140905-RELEASE-e421"/>
 		<item value="org.springsource.sts:3.9.18.202109140905-RELEASE"/>
 	</list>
+	<section name="SmartImportWizard">
+		<item key="SmartImportRootWizardPage.STORE_HIDE_ALREADY_OPEN" value="false"/>
+		<item key="SmartImportRootWizardPage.STORE_CLOSE_IMPORTED" value="false"/>
+		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
+		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
+		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="D:\lecture\project\goott2-final-project"/>
+		</list>
+	</section>
 </section>

@@ -1,11 +1,5 @@
 INDEX VERSION 1.131
-D:\lecture\project\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\329212774.index
+D:\lecture\project\goott2-final-project\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1403975306.index
 \Project\src\main\java
-D:\lecture\project\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\337801693.index
-\Project\src\main\java
-D:\lecture\project\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2680687301.index
-\testtesttest\src\main\java
-D:\lecture\project\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2283175006.index
-\testes\src\main\java
-D:\lecture\project\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1403975306.index
+D:\lecture\project\goott2-final-project\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\337801693.index
 \Project\src\main\java
