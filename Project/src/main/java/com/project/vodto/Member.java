@@ -34,7 +34,7 @@ public class Member {
 	private int coupon_count;
 	private int profile_image;
 	private int remember;
-	private Timestamp lastLogin_date;
+	private Timestamp last_login_date;
 	private String refund_bank;
 	private String refund_account;
 	private String dormant_accout;

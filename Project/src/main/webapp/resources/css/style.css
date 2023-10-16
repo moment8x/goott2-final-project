@@ -112,7 +112,6 @@ ol {
 -----------------------*/
 
 .section-title {
-  margin-bottom: 50px;
   text-align: center;
 }
 
@@ -141,7 +140,7 @@ ol {
 }
 
 .spad {
-  padding-top: 100px;
+
   padding-bottom: 100px;
 }
 
@@ -1267,7 +1266,6 @@ ol {
 
 .product__discount__title {
   text-align: left;
-  margin-bottom: 65px;
 }
 
 .product__discount__title h2 {
@@ -1623,7 +1621,10 @@ ol {
   color: #252525;
   font-weight: 700;
 }
-
+.product__pagination{
+	position: relative;
+	right: 500px;
+}
 .product__pagination,
 .blog__pagination {
   padding-top: 10px;
@@ -1707,7 +1708,7 @@ ol {
 
 .product__details__text .product__details__price {
   font-size: 30px;
-  color: #dd2222;
+  color: #312c2c;
   font-weight: 600;
   margin-bottom: 15px;
 }

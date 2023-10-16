@@ -27,7 +27,7 @@ public class Product {
 	private String illustrator;
 	private String publisher;
 	private Timestamp publication_date;
-	private int page_coutn;
+	private int page_count;
 	private String size;
 	private int total_volume;
 	private String author_introduction;
