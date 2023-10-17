@@ -2,6 +2,7 @@ package com.project.controller.jmj;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
@@ -46,7 +47,7 @@ public class myPageController {
 		
 		System.out.println("주문 내역");
 		String memberId = "abc1234";
-//		String orderNo = req.getParameter("orderNo");
+		
 //		System.out.println(orderListNo);
 
 		List<MyPageOrderList> lst= null;
@@ -54,14 +55,16 @@ public class myPageController {
 		try {
 //			List<Integer> list = mService.getOrderNo(memberId);
 			lst = mService.getOrderHistory(memberId);
-//			List<Integer> orderNo = mService.getOrderNo(memberId);
+			List<Integer> orderNo = mService.getOrderNo(memberId);
 //			int result = mService.getOrderProductCount(orderNo);
 			
+			
+
 			System.out.println("list : " + lst);
-//			System.out.println("orderNo : " + orderNo);
+			System.out.println("orderNo : " + orderNo);
 //			System.out.println(orderNo);
 			model.addAttribute("orderList", lst);
-			
+
 //			model.addAttribute("orderProductCount", result);
 //			System.out.println(lst);
 		} catch (SQLException | NamingException e) {
@@ -73,5 +76,15 @@ public class myPageController {
 	@RequestMapping("detailOrderList")
 	public void getDetailOrderList() {
 		System.out.println("주문 상세 내역");
+	}
+	
+	@RequestMapping("checkPwd")
+	public void checkPwd() {
+		System.out.println("비밀번호 확인");
+	}
+	
+	@RequestMapping("/checkPwd/userInfo")
+	public void setUserInfo() {
+		System.out.println("회원 정보 수정");
 	}
 }

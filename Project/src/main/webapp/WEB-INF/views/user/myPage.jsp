@@ -51,7 +51,7 @@ body > section.blog.spad > div > div > div.col-lg-4.col-md-5 > div{
 									class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 									href="#">회원</a>
 									<ul class="dropdown-menu">
-										<li><a class="dropdown-item" href="#">회원정보</a></li>
+										<li><a class="dropdown-item" href="checkPwd">회원정보</a></li>
 										<li><a class="dropdown-item" href="address">배송주소록</a></li>
 									</ul></li>
 							</ul>

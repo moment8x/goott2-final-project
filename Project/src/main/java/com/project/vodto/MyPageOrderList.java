@@ -24,4 +24,6 @@ public class MyPageOrderList {
 //	products
 	private String product_image; //상품 이미지
 	private String product_name; //상품 이름
+	
+	private int totalOrderCnt; //주문한 상품 총 갯수
 }

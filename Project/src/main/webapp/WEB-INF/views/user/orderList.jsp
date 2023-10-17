@@ -79,7 +79,7 @@ body > section.blog.spad > div > div > div.col-sm-8 > section{
 									class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 									href="#">회원</a>
 									<ul class="dropdown-menu">
-										<li><a class="dropdown-item" href="#">회원정보</a></li>
+										<li><a class="dropdown-item" href="checkPwd">회원정보</a></li>
 										<li><a class="dropdown-item" href="address">배송주소록</a></li>
 									</ul></li>
 							</ul>
@@ -148,14 +148,14 @@ body > section.blog.spad > div > div > div.col-sm-8 > section{
 													<c:otherwise>
 														<td class="shoping__cart__item" id="productImg"><a
 															href="#"><img src="${order.product_image }"
-																alt="${order.product_name }" /></a></td>
+																alt="${order.product_name }" /></a> </td>
 													</c:otherwise>
 													</c:choose>
 														<td class="shoping__cart__item"><a href="#"><p class="orderName">${order.product_name }</p></a></td>
 														<td class="shoping__cart__item" id="totalPayments">${order.actual_payment_amount }</td>
 														<td class="shoping__cart__quantity">
 															<div class="quantity">
-																<span>${orderProductCount }</span>
+																<span>${order.totalOrderCnt }</span>
 															</div>
 														</td>
 														<td class="shoping__cart__item" id="deliveryStatus">${order.delivery_status }</td>
@@ -166,7 +166,6 @@ body > section.blog.spad > div > div > div.col-sm-8 > section{
 											</table>
 												</c:forEach>
 										${orderList }
-										${orderProductCount }
 									
 									</div>
 								</div>
