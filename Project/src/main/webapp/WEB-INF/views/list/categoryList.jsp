@@ -13,22 +13,33 @@
 <title>Insert title here</title>
 <script type="text/javascript">
 	$(function() {
+		let view = "${sort}";
+		let sort = "${view}";
+		let queryString = "view=" + view + "&sort="+sort;
+		
 		$(".filter__option").on("click", function() {
 			let cliked = $(event.target);
-			if(cliked.attr("class") == "icon_grid-2x2"){
+			if(cliked.hasClass("icon_grid-2x2")){
 				$('.grid_list').show();
 				$('.list-group').hide();
+				view = "grid";
 			} else {
 				$('.grid_list').hide();
 				$('.list-group').show();
+				view = "list";
 			}
+			
+			queryString = "view=" + view + "&sort="+sort;
+			
 		})
 		
 		$(".filter__sort").on("change", function() {
-			let changed = $(event.target);
+			let changed = $(".vi")
+			console.log(changed + "!!!!");
 			$.ajax({
-			    url: '/list/categoryList/'+"${key }"+ "/" + changed.val(),
+			    url: '/list/categoryList/'+"${key }",
 			    type: 'GET',
+			    data: queryString,
 			    dataType: 'json',
 			    async:false,
 			    succes: function(data){
@@ -38,8 +49,8 @@
 			        // 전송에 실패하면 이 콜백 함수를 실행
 			    }
 			});
-		})
-	})
+		});
+	});
 </script>
 <style type="text/css">
 .product__pagination{
@@ -232,9 +243,10 @@
 							</div>
 						</div>
 					</div>
+					<div>`${queryString }`!!!!!!!!!!!!!!!!!</div>
 					<div class="product__pagination">
 						<c:if test="${paging_info.pageNo > 1}">					
-							<a href="/list/categoryList/${key }?page=${paging_info.pageNo - 1}"><i class="fa fa-long-arrow-left"></i></a>
+							<a href="/list/categoryList/${key }?page=${paging_info.pageNo - 1}&${queryString}"><i class="fa fa-long-arrow-left"></i></a>
 						</c:if>
 						<c:choose>
 						<c:when test="${paging_info.totalPagingBlockCnt > paging_info.endNumOfCurrentPagingBlock }">
@@ -244,7 +256,7 @@
 						</c:when>
 						<c:otherwise>
 							<c:forEach var="i" begin="${paging_info.startNumOfCurrentPagingBlock}" end="${paging_info.totalPagingBlockCnt }" step="1">
-								<a href="/list/categoryList/${key }?page=${i}">${i}</a> 
+								<a href="/list/categoryList/${key }?page=${i}&${queryString}">${i}</a> 
 							</c:forEach>
 						</c:otherwise>
 						</c:choose>

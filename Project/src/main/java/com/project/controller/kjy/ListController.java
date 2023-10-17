@@ -51,8 +51,9 @@ public class ListController {
 		return "list/category";
 	}
 	
-	@RequestMapping(value = {"/categoryList/{key}", "/categoryList/{key}/{sort}"}, method=RequestMethod.GET)
-	public String goList(Model model, @PathVariable(name="key") String key,@PathVariable(name = "sort", required = false) String sort , @RequestParam(value="page", defaultValue = "1") int page) {
+	@RequestMapping("/categoryList/{key}")
+	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page
+			,@RequestParam(value="sort", defaultValue="new") String sort, @RequestParam(value="view", defaultValue="icon_grid-2x2") String viewOption) {
 		// 상위 분류 페이지 + 현재 페이지 정보
 		String before_key = key.substring(0, key.length()-2);
 		try {
@@ -61,6 +62,8 @@ public class ListController {
 			model.addAttribute("beforeCategory", before_category);
 			model.addAttribute("nowCategory", now_category);
 			model.addAttribute("key", key);
+			model.addAttribute("sort", sort);
+			model.addAttribute("view", viewOption);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

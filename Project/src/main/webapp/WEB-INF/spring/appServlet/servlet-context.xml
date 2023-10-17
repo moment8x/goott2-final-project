@@ -14,11 +14,24 @@
 
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
 	<resources mapping="/resources/**" location="/resources/**" />
+	
 	<resources mapping="/css/**" location="/resources/css/" />
 	<resources mapping="/js/**" location="/resources/js/" />
 	<resources mapping="/img/**" location="/resources/img/" />
 	<resources mapping="/sass/**" location="/resources/sass/" />
 	<resources mapping="/fonts/**" location="/resources/fonts/" />
+	
+	<resources mapping="list/category/css/**" location="/resources/css/" />
+	<resources mapping="list/category/js/**" location="/resources/js/" />
+	<resources mapping="list/category/img/**" location="/resources/img/" />
+	<resources mapping="list/category/sass/**" location="/resources/sass/" />
+	<resources mapping="list/category/fonts/**" location="/resources/fonts/" />
+	
+		<resources mapping="list/categoryList/css/**" location="/resources/css/" />
+	<resources mapping="list/categoryList/js/**" location="/resources/js/" />
+	<resources mapping="list/categoryList/img/**" location="/resources/img/" />
+	<resources mapping="list/categoryList/sass/**" location="/resources/sass/" />
+	<resources mapping="list/categoryList/fonts/**" location="/resources/fonts/" />
 	
 	<resources mapping="user/css/**" location="/resources/css/" />
 	<resources mapping="user/js/**" location="/resources/js/" />
