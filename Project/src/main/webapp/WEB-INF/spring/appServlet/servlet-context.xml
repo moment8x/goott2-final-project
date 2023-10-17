@@ -26,6 +26,12 @@
 	<resources mapping="user/sass/**" location="/resources/sass/" />
 	<resources mapping="user/fonts/**" location="/resources/fonts/" />
 	
+	<resources mapping="user/userInfo/css/**" location="/resources/css/" />
+	<resources mapping="user/userInfo/js/**" location="/resources/js/" />
+	<resources mapping="user/userInfo/img/**" location="/resources/img/" />
+	<resources mapping="user/userInfo/sass/**" location="/resources/sass/" />
+	<resources mapping="user/userInfo/fonts/**" location="/resources/fonts/" />
+	
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<beans:property name="prefix" value="/WEB-INF/views/" />
@@ -58,6 +64,5 @@
 	
 	<!-- 아래의 패키지를 스캔하여 객체 확보 -->
 	<context:component-scan base-package="com.project.controller" />
-	<context:component-scan base-package="com.project" />
-	<context:component-scan base-package="com.project.dao" />
+
 </beans:beans>

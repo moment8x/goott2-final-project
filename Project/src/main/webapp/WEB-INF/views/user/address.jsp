@@ -127,7 +127,7 @@ body > section.blog.spad > div > div > div.col-lg-4.col-md-5 > div{
 									class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 									href="#">회원</a>
 									<ul class="dropdown-menu">
-										<li><a class="dropdown-item" href="checkPwd">회원정보</a></li>
+										<li><a class="dropdown-item" href="userInfo">회원정보</a></li>
 										<li><a class="dropdown-item" href="address">배송주소록</a></li>
 									</ul></li>
 							</ul>
@@ -218,7 +218,7 @@ body > section.blog.spad > div > div > div.col-lg-4.col-md-5 > div{
 		</div>
 	</section>
 
-	<!-- The Modal -->
+	<!-- 배송지 추가 모달 -->
 	<div class="modal" id="addAddrModal">
 		<div class="modal-dialog">
 			<div class="modal-content">

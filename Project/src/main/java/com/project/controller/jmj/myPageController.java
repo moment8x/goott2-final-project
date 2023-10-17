@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -78,12 +79,12 @@ public class myPageController {
 		System.out.println("주문 상세 내역");
 	}
 	
-	@RequestMapping("checkPwd")
+	@RequestMapping("userInfo")
 	public void checkPwd() {
 		System.out.println("비밀번호 확인");
 	}
 	
-	@RequestMapping("/checkPwd/userInfo")
+	@RequestMapping(value = "userInfoModify", method = RequestMethod.POST)
 	public void setUserInfo() {
 		System.out.println("회원 정보 수정");
 	}

@@ -29,7 +29,7 @@
 									class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 									href="#">회원</a>
 									<ul class="dropdown-menu">
-										<li><a class="dropdown-item" href="checkPwd">회원정보</a></li>
+										<li><a class="dropdown-item" href="userInfo">회원정보</a></li>
 										<li><a class="dropdown-item" href="address">배송주소록</a></li>
 									</ul></li>
 							</ul>
@@ -55,7 +55,7 @@
 				<div class="col-sm-8">
 						<div class="checkout__form">
                 <h4>비밀번호 확인</h4>
-                <form action="checkPwd/userInfo" method="post">
+                <form action="userInfoModify" method="post">
                     <div class="row">
                         <div class="col-lg-8 col-md-6">
                             <div class="checkout__input">
