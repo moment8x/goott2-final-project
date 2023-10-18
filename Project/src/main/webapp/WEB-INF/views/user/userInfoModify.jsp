@@ -1,35 +1,45 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>회원정보 수정</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script type="text/javascript">
-//도로명주소API 
-function goPopup() {
-	// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
-	var pop = window.open("jusoPopup", "pop",
-			"width=570,height=420, scrollbars=yes, resizable=yes");
+	$(function() {
+		// 새 배송지 등록 모달열기
+		$('.addAddr').click(function() {
+			$('#addAddrModal').show()
+		})
+		//새 배송지 등록 모달창 닫기
+		$('.addAddrModalClose').click(function() {
+			$('#addAddrModal').hide()
+		})
+	})
+	//도로명주소API 
+	function goPopup() {
+		// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
+		var pop = window.open("jusoPopup", "pop",
+				"width=570,height=420, scrollbars=yes, resizable=yes");
 
-	// 모바일 웹인 경우, 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrMobileLinkUrl.do)를 호출하게 됩니다.
-	//var pop = window.open("/popup/jusoPopup.jsp","pop","scrollbars=yes, resizable=yes"); 
-}
-/** API 서비스 제공항목 확대 (2017.02) **/
-function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
-		roadAddrPart2, engAddr, jibunAddr, zipNo, admCd, rnMgtSn, bdMgtSn,
-		detBdNmList, bdNm, bdKdcd, siNm, sggNm, emdNm, liNm, rn, udrtYn,
-		buldMnnm, buldSlno, mtYn, lnbrMnnm, lnbrSlno, emdNo) {
-	// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
-	let address1 = document.querySelector("#zipNo")
-	address1.value = zipNo;
+		// 모바일 웹인 경우, 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrMobileLinkUrl.do)를 호출하게 됩니다.
+		//var pop = window.open("/popup/jusoPopup.jsp","pop","scrollbars=yes, resizable=yes"); 
+	}
+	/** API 서비스 제공항목 확대 (2017.02) **/
+	function jusoCallBack(roadAddrPart1, addrDetail, zipNo) {
+		// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
+		let address1 = document.querySelector("#zipNo")
+		address1.value = zipNo;
 
-	let address2 = document.querySelector("#roadAddrPart1")
-	address2.value = roadAddrPart1;
+		let address2 = document.querySelector("#roadAddrPart1")
+		address2.value = roadAddrPart1;
 
-	let address3 = document.querySelector("#addrDetail")
-	address3.value = addrDetail;
-}
+		let address3 = document.querySelector("#addrDetail")
+		address3.value = addrDetail;
+	}
 </script>
 </head>
 <body>
@@ -77,72 +87,114 @@ function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
 				<div class="col-sm-8">
 					<div class="checkout__form">
 						<h4>회원정보 수정</h4>
-						<form action="#">
+						${userInfo }
+						<form action="#" method="post">
 							<div class="row">
 								<div class="col-lg-8 col-md-6">
 									<div class="checkout__input">
 										<p>회원 등급</p>
-										<span>아기사슴</span>
+										<input type="text" name="userGrade" value="${userInfo.membershipGrade }" readonly>
 									</div>
 									<div class="checkout__input">
 										<p>아이디</p>
-										<input type="text">
+										<input type="text" name="memberId" value="${userInfo.memberId }" readonly>
 									</div>
 									<div class="checkout__input">
 										<p>새 비밀번호</p>
-										<input type="password">
+										<input type="password" name="userPwd">
 									</div>
 									<div class="checkout__input">
 										<p>새 비밀번호 확인</p>
-										<input type="password">
+										<input type="password" name="newUserPwd">
 									</div>
 									<div class="checkout__input">
 										<p>이름</p>
-										<input type="text">
+										<input type="text" name="userName" value="${userInfo.name }" readonly>
 									</div>
-									<div class="checkout__input">
-										<p>생년월일 / 성별</p>
-										<span>생년월일 / 성별</span>
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="checkout__input">
+												<p>생년월일</p>
+												<input type="text" name="userBirth" value="${userInfo.dateOfBirth }" readonly>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="checkout__input">
+												<p>성별</p>
+												<input type="text" name="gender" value="${userInfo.gender }" readonly>
+											</div>
+										</div>
 									</div>
 									<div class="checkout__input">
 										<p>이메일 주소</p>
-										<span>이메일 주소</span>
+										<input type="text" name="userEmail" value="${userInfo.email }" readonly>
 										<button type="button" class="btn btn-outline-success">변경</button>
 									</div>
 									<div class="checkout__input">
 										<p>휴대폰 번호</p>
-										<span>휴대폰 번호</span>
+										<input type="text" name="userPhoneNumber" value="${userInfo.phoneNumber }" readonly>
 										<button type="button" class="btn btn-outline-success">변경</button>
 									</div>
 									<div class="checkout__input">
 										<p>우편번호</p>
-										<input type="text">
+										<span><button type="button" class="site-btn addAddr">주소검색</button></span> <input type="text" name="zipNo" value="${userInfo.zipCode }" readonly>
 									</div>
 									<div class="checkout__input">
-										<p>
-											주소<span><button type="button" class="btn btn-outline-success addAddr">새 배송지 등록</button></span>
-										</p>
-										<input type="text">
+										<p>주소</p>
+										<input type="text" name="addr" value="${userInfo.address }" readonly>
 									</div>
 									<div class="checkout__input">
 										<p>상세주소</p>
-										<input type="text">
+										<input type="text" value="${userInfo.detailedAddress }" name="detailAddr">
 									</div>
-
+							
+									<c:choose>
+										<c:when test="${fn:contains(userInfo.identityVerificationStatus, 'Y')} ">
+													<div class="checkout__input">
+												<p>본인인증 여부</p>
+												<input type="checkbox" name="authentication" checked disabled>
+												</div>						
+										</c:when>
+										<c:otherwise>
+												<div class="checkout__input">
+												<p>본인인증 여부</p>
+												<input type="checkbox" name="authentication" disabled>
+												<button>본인 인증</button>
+											</div>		
+										</c:otherwise>
+									</c:choose>
+									
+	
+									<div class="checkout__input">
+										<div>환불계좌</div>
+										<select>
+											<c:if test="${userInfo.refundBank } == '카카오뱅크'">
+												<option>카카오뱅크</option>											
+											</c:if>
+											<option>국민은행</option>
+											<option>신한은행</option>
+											<option>농협</option>
+										</select> <input type="text" name="refundAccount" value="${userInfo.refundAccount }">
+										<button>변경</button>
+									</div>
 								</div>
 
 							</div>
+							<button type="submit" class="site-btn">수정</button>
+							<button type="button" class="site-btn">취소</button>
+						</form>
+						<div class="checkout__input">
+										<p>회원 탈퇴</p>
+										<button>탈퇴</button>
+									</div>
 					</div>
-					<button type="submit" class="site-btn">수정</button>
-					<button type="button" class="site-btn">취소</button>
-					</form>
 				</div>
 			</div>
 		</div>
-		</div>
+
 
 	</section>
-<!-- 배송지 추가 모달 -->
+	<!-- 배송지 추가 모달 -->
 	<div class="modal" id="addAddrModal">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -156,18 +208,18 @@ function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
 
 				<!-- Modal body -->
 				<form action="#" id="inputAddrInfo" method="post">
-					
-						<div>
-							<button type="button" class="site-btn" onclick="goPopup();">주소
-								찾기</button>
-						</div>
+
+					<div>
+						<button type="button" class="site-btn" onclick="goPopup();">주소
+							찾기</button>
+					</div>
 					<div>
 						<input type="text" class="form-control" id="zipNo"
 							placeholder="우편번호" name="zipNo" readonly>
 					</div>
 					<div>
 						<input type="text" class="form-control" id="roadAddrPart1"
-							placeholder="주소"name="roadAddrPart1" readonly>
+							placeholder="주소" name="roadAddrPart1" readonly>
 					</div>
 					<div>
 						<input type="text" class="form-control" id="addrDetail"

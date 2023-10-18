@@ -39,8 +39,8 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public Member getMyInfo(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return mDao.selectMyInfo(memberId);
 	}
 
 	@Override
@@ -95,13 +95,6 @@ public class MemberServiceImpl implements MemberService {
 	public int getOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException {
 		
 		return mDao.selectOrderProductCount(orderNo);
-	}
-
-	// 주문번호 가져오기 위한 임시 메서드
-	@Override
-	public List<Integer> getOrderNo(String memberId) {
-	
-		return mDao.selectOrderNo(memberId);
 	}
 
 }

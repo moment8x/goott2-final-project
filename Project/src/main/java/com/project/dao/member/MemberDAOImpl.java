@@ -28,8 +28,8 @@ public class MemberDAOImpl implements MemberDAO {
 
 	@Override
 	public Member selectMyInfo(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
+
+		return ses.selectOne(ns+ ".getMemberInfo", memberId);
 	}
 
 	@Override
@@ -56,10 +56,5 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectOne(ns + ".getProductCount", orderNo);
 	}
 
-	@Override
-	public List<Integer> selectOrderNo(String memberId) {
-		
-		return ses.selectList(ns + ".getOrderNo", memberId);
-	}
 
 }

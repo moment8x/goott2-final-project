@@ -28,6 +28,4 @@ public interface MemberDAO {
 	// 주문건당 상품 총 갯수 가져오기
 	int selectOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException;
 	
-	//
-	List<Integer> selectOrderNo(String memberId);
 }

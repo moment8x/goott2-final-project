@@ -56,13 +56,9 @@ public class myPageController {
 		try {
 //			List<Integer> list = mService.getOrderNo(memberId);
 			lst = mService.getOrderHistory(memberId);
-			List<Integer> orderNo = mService.getOrderNo(memberId);
 //			int result = mService.getOrderProductCount(orderNo);
-			
-			
 
 			System.out.println("list : " + lst);
-			System.out.println("orderNo : " + orderNo);
 //			System.out.println(orderNo);
 			model.addAttribute("orderList", lst);
 
@@ -85,7 +81,15 @@ public class myPageController {
 	}
 	
 	@RequestMapping(value = "userInfoModify", method = RequestMethod.POST)
-	public void setUserInfo() {
+	public void modifyUserInfo(Model model) {
 		System.out.println("회원 정보 수정");
+		String memberId = "abc1234";
+		try {
+			Member userInfo = mService.getMyInfo(memberId);
+			System.out.println(userInfo);
+			model.addAttribute("userInfo", userInfo);
+		} catch (SQLException | NamingException e) {
+			e.printStackTrace();
+		}
 	}
 }

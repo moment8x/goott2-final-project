@@ -18,12 +18,13 @@
 		where member_id = #{memberId} group by o.order_no;
 	</select>
 
-	<select id="getOrderNo" resultType="int">
-		select order_no from order_history where member_id = #{memberId}
-	</select>
-
 	<select id="getProductCount" resultType="int">
 		select count(*) from
 		detailed_order_items where order_no = #{orderNo}
+	</select>
+	
+	<select id="getMemberInfo" resultType="com.project.vodto.Member">
+		select member_id, name, phone_number, gender, date_of_birth, zip_code, address, detailed_address, email, 
+		identity_verification_status, profile_image, refund_bank, refund_account, membership_grade from member where member_id = #{memberId}
 	</select>
 </mapper>
