@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>   
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,6 +19,8 @@
 		//새 배송지 등록 모달창 닫기
 		$('.addAddrModalClose').click(function() {
 			$('#addAddrModal').hide()
+			
+		
 		})
 	})
 	//도로명주소API 
@@ -87,17 +91,18 @@
 				<div class="col-sm-8">
 					<div class="checkout__form">
 						<h4>회원정보 수정</h4>
-						${userInfo }
 						<form action="#" method="post">
 							<div class="row">
 								<div class="col-lg-8 col-md-6">
 									<div class="checkout__input">
 										<p>회원 등급</p>
-										<input type="text" name="userGrade" value="${userInfo.membershipGrade }" readonly>
+										<input type="text" name="userGrade"
+											value="${userInfo.membershipGrade }" readonly>
 									</div>
 									<div class="checkout__input">
 										<p>아이디</p>
-										<input type="text" name="memberId" value="${userInfo.memberId }" readonly>
+										<input type="text" name="memberId"
+											value="${userInfo.memberId }" readonly>
 									</div>
 									<div class="checkout__input">
 										<p>새 비밀번호</p>
@@ -109,74 +114,84 @@
 									</div>
 									<div class="checkout__input">
 										<p>이름</p>
-										<input type="text" name="userName" value="${userInfo.name }" readonly>
+										<input type="text" name="userName" value="${userInfo.name }"
+											readonly>
 									</div>
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="checkout__input">
 												<p>생년월일</p>
-												<input type="text" name="userBirth" value="${userInfo.dateOfBirth }" readonly>
+												<input type="text" name="userBirth"
+													value="${userInfo.dateOfBirth }" readonly>
 											</div>
 										</div>
 										<div class="col-lg-6">
 											<div class="checkout__input">
 												<p>성별</p>
-												<input type="text" name="gender" value="${userInfo.gender }" readonly>
+												<input type="text" name="gender" value="${userInfo.gender }"
+													readonly>
 											</div>
 										</div>
 									</div>
 									<div class="checkout__input">
 										<p>이메일 주소</p>
-										<input type="text" name="userEmail" value="${userInfo.email }" readonly>
+										<input type="text" name="userEmail" value="${userInfo.email }"
+											readonly>
 										<button type="button" class="btn btn-outline-success">변경</button>
 									</div>
 									<div class="checkout__input">
 										<p>휴대폰 번호</p>
-										<input type="text" name="userPhoneNumber" value="${userInfo.phoneNumber }" readonly>
+										<input type="text" name="userPhoneNumber"
+											value="${userInfo.phoneNumber }" readonly>
 										<button type="button" class="btn btn-outline-success">변경</button>
 									</div>
 									<div class="checkout__input">
 										<p>우편번호</p>
-										<span><button type="button" class="site-btn addAddr">주소검색</button></span> <input type="text" name="zipNo" value="${userInfo.zipCode }" readonly>
+										<span><button type="button" class="site-btn addAddr">주소검색</button></span>
+										<input type="text" name="zipNo" value="${userInfo.zipCode }"
+											readonly>
 									</div>
 									<div class="checkout__input">
 										<p>주소</p>
-										<input type="text" name="addr" value="${userInfo.address }" readonly>
+										<input type="text" name="addr" value="${userInfo.address }"
+											readonly>
 									</div>
 									<div class="checkout__input">
 										<p>상세주소</p>
-										<input type="text" value="${userInfo.detailedAddress }" name="detailAddr">
+										<input type="text" value="${userInfo.detailedAddress }"
+											name="detailAddr">
 									</div>
-							
-									<c:choose>
-										<c:when test="${fn:contains(userInfo.identityVerificationStatus, 'Y')} ">
-													<div class="checkout__input">
-												<p>본인인증 여부</p>
-												<input type="checkbox" name="authentication" checked disabled>
-												</div>						
-										</c:when>
-										<c:otherwise>
-												<div class="checkout__input">
-												<p>본인인증 여부</p>
+									<div class="checkout__input">
+										<p>본인인증 여부</p>
+										<c:choose>
+											<c:when
+												test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
+												<input type="checkbox" name="authentication" checked
+													disabled>
+											</c:when>
+											<c:otherwise>
 												<input type="checkbox" name="authentication" disabled>
 												<button>본인 인증</button>
-											</div>		
-										</c:otherwise>
-									</c:choose>
-									
-	
-									<div class="checkout__input">
-										<div>환불계좌</div>
-										<select>
-											<c:if test="${userInfo.refundBank } == '카카오뱅크'">
-												<option>카카오뱅크</option>											
-											</c:if>
-											<option>국민은행</option>
-											<option>신한은행</option>
-											<option>농협</option>
-										</select> <input type="text" name="refundAccount" value="${userInfo.refundAccount }">
-										<button>변경</button>
+											</c:otherwise>
+										</c:choose>
 									</div>
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="checkout__input">
+												<p>은행</p>
+												<input type="text" name="refundBank"
+													value="${userInfo.refundBank }" >
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="checkout__input">
+												<p>환불계좌</p>
+												<input type="text" name="refundAccount" value="${userInfo.refundAccount }"
+													>
+											</div>
+										</div>
+									</div>
+										<button>변경</button>
 								</div>
 
 							</div>
@@ -184,9 +199,9 @@
 							<button type="button" class="site-btn">취소</button>
 						</form>
 						<div class="checkout__input">
-										<p>회원 탈퇴</p>
-										<button>탈퇴</button>
-									</div>
+							<p>회원 탈퇴</p>
+							<button>탈퇴</button>
+						</div>
 					</div>
 				</div>
 			</div>
