@@ -2,7 +2,6 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>   
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,8 +18,11 @@
 		//새 배송지 등록 모달창 닫기
 		$('.addAddrModalClose').click(function() {
 			$('#addAddrModal').hide()
-			
-		
+		})
+
+		// 새 비밀번호 입력 후
+		$('#newPwdCheck').blur(function() {
+			validUserPwd();
 		})
 	})
 	//도로명주소API 
@@ -44,7 +46,60 @@
 		let address3 = document.querySelector("#addrDetail")
 		address3.value = addrDetail;
 	}
+
+	//에러메세지
+	function PrintMsg(focusId, msgId, msg, isFocus) {
+		let divMsg = `<div class='msg'>\${msg}</div>`;
+		if (isFocus == true) {
+			$(`#\${focusId}`).focus();
+		}else if(isFocus == false) {
+			divMsg = `<div class='trueMsg'>\${msg}</div>`;
+		}
+		$(divMsg).insertAfter($(`#\${msgId}`));
+		$('.msg').hide(5000);
+		$('.trueMsg').hide(5000);
+	}
+
+	//이메일변경 버튼을 눌렀을 때
+	function changeEmail() {
+		$('.newEmail').show();
+	}
+
+	//이메일변경 인증번호 발송 버튼 눌렀을 때
+	function sendMail() {
+		$('.emailCode').show();
+		
+		
+	}
+
+	//비밀번호 유효성검사
+	function validUserPwd() {
+		let isValidPwd = false;
+		
+		if ($('#newPwd').val().length, $('#newPwdCheck').val().length >= 6 && $('#newPwd').val() != $('#newPwdCheck').val()) {
+			$('#newPwd').val('');
+			$('#newPwdCheck').val('');
+			PrintMsg('newPwd', 'newPwdCheck', '비밀번호가 일치하지 않습니다. 다시 입력 해주세요.', true);
+		} else if($('#newPwd').val().length, $('#newPwdCheck').val().length < 6){
+			$('#newPwd').val('');
+			$('#newPwdCheck').val('');
+			PrintMsg('newPwd', 'newPwdCheck', '6자 이상 입력해주세요.', true);
+		}else if($('#newPwd').val().length, $('#newPwdCheck').val().length >= 6 && $('#newPwd').val() == $('#newPwdCheck').val()) {
+			PrintMsg('', 'newPwdCheck', '비밀번호가 일치합니다.', false);
+			isValidPwd = true;
+		}
+		return isValidPwd;
+	}
 </script>
+<style type="text/css">
+.msg{
+	color: tomato;
+	font-weight: bold;
+}
+.trueMsg{
+	font-weight: bold;
+}
+</style>
 </head>
 <body>
 	<jsp:include page="../header.jsp"></jsp:include>
@@ -105,12 +160,12 @@
 											value="${userInfo.memberId }" readonly>
 									</div>
 									<div class="checkout__input">
-										<p>새 비밀번호</p>
-										<input type="password" name="userPwd">
+										<label for="newPwd" class="form-label">새 비밀번호</label> <input
+											type="password" id="newPwd" name="newPwd" placeholder="비밀번호를 6자 이상 입력해주세요.">
 									</div>
 									<div class="checkout__input">
-										<p>새 비밀번호 확인</p>
-										<input type="password" name="newUserPwd">
+										<label for="newPwdCheck" class="form-label">새 비밀번호 확인</label>
+										<input type="password" id="newPwdCheck" name="newPwdCheck">
 									</div>
 									<div class="checkout__input">
 										<p>이름</p>
@@ -135,10 +190,23 @@
 									</div>
 									<div class="checkout__input">
 										<p>이메일 주소</p>
-										<input type="text" name="userEmail" value="${userInfo.email }"
-											readonly>
-										<button type="button" class="btn btn-outline-success">변경</button>
+										<input type="text" id="userEmail" name="userEmail"
+											value="${userInfo.email }" readonly>
+										<button type="button" class="btn btn-outline-success"
+											onclick="changeEmail();">변경</button>
 									</div>
+									<div class="checkout__input newEmail" style="display: none;">
+										<input type="text" id="newEmail" name="newEmail" value=""
+											placeholder="변경할 이메일을 입력해주세요.">
+										<button type="button" class="btn btn-outline-success"
+											onclick="sendMail();">인증번호 발송</button>
+									</div>
+									<div class="checkout__input emailCode" style="display: none;">
+										<input type="text" id="emailCode" name="emailCode" value=""
+											placeholder="인증코드를 입력해주세요.">
+										<button type="button" class="btn btn-outline-success">인증</button>
+									</div>
+
 									<div class="checkout__input">
 										<p>휴대폰 번호</p>
 										<input type="text" name="userPhoneNumber"
@@ -180,18 +248,18 @@
 											<div class="checkout__input">
 												<p>은행</p>
 												<input type="text" name="refundBank"
-													value="${userInfo.refundBank }" >
+													value="${userInfo.refundBank }">
 											</div>
 										</div>
 										<div class="col-lg-6">
 											<div class="checkout__input">
 												<p>환불계좌</p>
-												<input type="text" name="refundAccount" value="${userInfo.refundAccount }"
-													>
+												<input type="text" name="refundAccount"
+													value="${userInfo.refundAccount }">
 											</div>
 										</div>
 									</div>
-										<button>변경</button>
+									<button>변경</button>
 								</div>
 
 							</div>
