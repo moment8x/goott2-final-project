@@ -4,13 +4,16 @@ package com.project.controller.jmj;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +22,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
 import com.project.vodto.MyPageOrderList;
+
+import okhttp3.ResponseBody;
 
 @Controller
 @RequestMapping("/user/*")
@@ -31,22 +36,6 @@ public class myPageController {
 	public void myPage(Model model) {
 		
 		System.out.println("마이페이지");
-		
-	}
-	
-	@RequestMapping("address")
-	public void addr() {
-		System.out.println("배송지 목록");
-	}
-	
-	@RequestMapping("jusoPopup")
-	public void findAddr() {
-		System.out.println("주소 검색");
-	}
-	
-	@RequestMapping("orderList")
-	public void getOrderList(Model model, HttpServletRequest req) {
-		
 		System.out.println("주문 내역");
 		String memberId = "abc1234";
 		
@@ -71,6 +60,22 @@ public class myPageController {
 		} 
 	}
 	
+	@RequestMapping("address")
+	public void addr() {
+		System.out.println("배송지 목록");
+	}
+	
+	@RequestMapping("jusoPopup")
+	public void findAddr() {
+		System.out.println("주소 검색");
+	}
+	
+	@RequestMapping("orderList")
+	public void getOrderList(Model model, HttpServletRequest req) {
+		
+		
+	}
+	
 	@RequestMapping("detailOrderList")
 	public void getDetailOrderList() {
 		System.out.println("주문 상세 내역");
@@ -92,6 +97,16 @@ public class myPageController {
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@RequestMapping(value = "sendMail", method = RequestMethod.POST)
+	public ResponseEntity<String> sendMail(String newEmail){
+		String code = UUID.randomUUID().toString();
+		
+		System.out.println(newEmail + " 로 " + code + " 전송");
+		
+		
+		return null;
 	}
 
 }

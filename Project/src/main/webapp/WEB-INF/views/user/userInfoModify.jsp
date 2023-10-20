@@ -47,7 +47,7 @@
 		address3.value = addrDetail;
 	}
 
-	//에러메세지
+	// 유효성 검사 메세지
 	function PrintMsg(focusId, msgId, msg, isFocus) {
 		let divMsg = `<div class='msg'>\${msg}</div>`;
 		if (isFocus == true) {
@@ -67,9 +67,26 @@
 
 	//이메일변경 인증번호 발송 버튼 눌렀을 때
 	function sendMail() {
-		$('.emailCode').show();
-		
-		
+			if($('#newEmail').val() != ''){
+			//이메일을 보내고
+			$.ajax({
+					url : '/user/sendMail', // 데이터를 수신받을 서버 주소
+					type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+					data : {
+						"newEmail" : $('#newEmail').val()
+					},
+					dataType : 'text',
+					async : false,
+					success : function(data) {
+						console.log(data);
+					}
+				});
+			$('.emailCode').show();		
+			}else{
+				$('#newEmail').blur(function () {
+					PrintMsg('newEmail', 'newEmail', '이메일을 입력하고 인증버튼을 눌러주세요.', true)	
+				})
+			}
 	}
 
 	//비밀번호 유효성검사
@@ -196,13 +213,15 @@
 											onclick="changeEmail();">변경</button>
 									</div>
 									<div class="checkout__input newEmail" style="display: none;">
-										<input type="text" id="newEmail" name="newEmail" value=""
+									<label for="newEmail" class="form-label"></label>
+										<input type="text" id="newEmail" name="newEmail" 
 											placeholder="변경할 이메일을 입력해주세요.">
 										<button type="button" class="btn btn-outline-success"
 											onclick="sendMail();">인증번호 발송</button>
 									</div>
 									<div class="checkout__input emailCode" style="display: none;">
-										<input type="text" id="emailCode" name="emailCode" value=""
+									<label for="emailCode" class="form-label"></label>
+										<input type="text" id="emailCode" name="emailCode"
 											placeholder="인증코드를 입력해주세요.">
 										<button type="button" class="btn btn-outline-success">인증</button>
 									</div>

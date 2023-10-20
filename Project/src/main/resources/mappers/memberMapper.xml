@@ -7,15 +7,15 @@
 	<select id="getOrderList"
 		resultType="com.project.vodto.MyPageOrderList">
 	SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, o.member_id,
-		max(pay.actual_payment_amount) as totalPayments, max(prod.product_image) as product_image, max(prod.product_name) as product_name, count(d.order_no) as totalOrderCnt
+		max(pay.actual_payment_amount) as actualPaymentAmount, max(prod.product_image) as product_image,  max(prod.product_name) as product_name, count(d.order_no) as totalOrderCnt
 		FROM products prod
 		inner JOIN  detailed_order_items d
         on prod.product_id = d.product_id
 		inner JOIN payments pay
-        on d.order_no = pay.order_no
+        on pay.order_no = d.order_no
         inner join order_history o
-        on pay.order_no = o.order_no
-		where member_id = #{memberId} group by o.order_no;
+        on d.order_no = o.order_no
+		where member_id = #{memberId}  group by order_no
 	</select>
 
 	<select id="getProductCount" resultType="int">
