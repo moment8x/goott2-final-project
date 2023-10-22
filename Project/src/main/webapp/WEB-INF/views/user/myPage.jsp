@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -50,6 +51,34 @@
 <!-- Template css -->
 <link id="color-link" rel="stylesheet" type="text/css"
 	href="/resources/assets/css/style.css" />
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<script type="text/javascript">
+	//도로명주소API 
+	function goPopup() {
+		// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
+		var pop = window.open("jusoPopup", "pop",
+				"width=570,height=420, scrollbars=yes, resizable=yes");
+
+		// 모바일 웹인 경우, 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrMobileLinkUrl.do)를 호출하게 됩니다.
+		//var pop = window.open("/popup/jusoPopup.jsp","pop","scrollbars=yes, resizable=yes"); 
+	}
+	/** API 서비스 제공항목 확대 (2017.02) **/
+	function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
+			roadAddrPart2, engAddr, jibunAddr, zipNo, admCd, rnMgtSn, bdMgtSn,
+			detBdNmList, bdNm, bdKdcd, siNm, sggNm, emdNm, liNm, rn, udrtYn,
+			buldMnnm, buldSlno, mtYn, lnbrMnnm, lnbrSlno, emdNo) {
+		// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
+		let newZipNo = document.querySelector("#newZipNo")
+		newZipNo.value = zipNo;
+
+		let newAddr = document.querySelector("#newAddr")
+		newAddr.value = roadAddrPart1;
+
+		let newAddrDatail = document.querySelector("#newAddrDatail")
+		newAddrDatail.value = addrDetail;
+	}
+</script>
 <style>
 #deliveryStatus {
 	display: flex;
@@ -873,47 +902,47 @@
 									</div>
 									<div class="order-contain">
 										<div class="order-box dashboard-bg-box">
-											
-												${orderList }
+
+											${orderList }
 
 											<div class="product-order-detail">
-											<c:forEach var="order" items="${orderList }">
-												<a href="#" class="order-image">
-													<img src="${order.productImage }"
-													class="blur-up lazyload" alt="${order.productName }" id="productImg"/>
-												</a>
-
-												<div class="order-wrap">
-													<h3>${order.orderNo }</h3>
-													<p class="text-content">${order.orderTime }</p>
-													<a href="#">
-														<h3>${order.productName }</h3>
+												<c:forEach var="order" items="${orderList }">
+													<a href="#" class="order-image"> <img
+														src="${order.productImage }" class="blur-up lazyload"
+														alt="${order.productName }" id="productImg" />
 													</a>
-													<ul class="product-size">
-														<li>
-															<div class="size-box">
-																<h6 class="text-content">총 수량 :</h6>
-																<h5>${order.totalOrderCnt }</h5>
-															</div>
-														</li>
 
-														
+													<div class="order-wrap">
+														<h3>${order.orderNo }</h3>
+														<p class="text-content">${order.orderTime }</p>
+														<a href="#">
+															<h3>${order.productName }</h3>
+														</a>
+														<ul class="product-size">
+															<li>
+																<div class="size-box">
+																	<h6 class="text-content">총 수량 :</h6>
+																	<h5>${order.totalOrderCnt }</h5>
+																</div>
+															</li>
 
-														<li>
-															<div class="size-box">
-																<h6 class="text-content">총 결제금액 :</h6>
-																<h5>${order.actualPaymentAmount }</h5>
-															</div>
-														</li>
 
-														<li>
-															<div class="size-box">
-																<h6 class="text-content">Quantity :</h6>
-																<h5>250 G</h5>
-															</div>
-														</li>
-													</ul>
-												</div>
+
+															<li>
+																<div class="size-box">
+																	<h6 class="text-content">총 결제금액 :</h6>
+																	<h5>${order.actualPaymentAmount }</h5>
+																</div>
+															</li>
+
+															<li>
+																<div class="size-box">
+																	<h6 class="text-content">Quantity :</h6>
+																	<h5>250 G</h5>
+																</div>
+															</li>
+														</ul>
+													</div>
 												</c:forEach>
 											</div>
 										</div>
@@ -925,7 +954,7 @@
 								<div class="dashboard-address">
 									<div class="title title-flex">
 										<div>
-											<h2>My Address Book</h2>
+											<h2>배송주소록</h2>
 											<span class="title-leaf"> <svg
 													class="icon-width bg-gray">
                             <use
@@ -937,223 +966,11 @@
 										<button
 											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
 											data-bs-toggle="modal" data-bs-target="#add-address">
-											<i data-feather="plus" class="me-2"></i> Add New Address
+											<i data-feather="plus" class="me-2"></i> 배송지 추가
 										</button>
 									</div>
 
 									<div class="row g-sm-4 g-3">
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
-											<div class="address-box">
-												<div>
-													<div class="form-check">
-														<input class="form-check-input" type="radio" name="jack"
-															id="flexRadioDefault2" checked />
-													</div>
-
-													<div class="label">
-														<label>Home</label>
-													</div>
-
-													<div class="table-responsive address-table">
-														<table class="table">
-															<tbody>
-																<tr>
-																	<td colspan="2">Jack Jennas</td>
-																</tr>
-
-																<tr>
-																	<td>Address :</td>
-																	<td>
-																		<p>8424 James Lane South San Francisco, CA 94080</p>
-																	</td>
-																</tr>
-
-																<tr>
-																	<td>Pin Code :</td>
-																	<td>+380</td>
-																</tr>
-
-																<tr>
-																	<td>Phone :</td>
-																	<td>+ 812-710-3798</td>
-																</tr>
-															</tbody>
-														</table>
-													</div>
-												</div>
-
-												<div class="button-group">
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#editProfile">
-														<i data-feather="edit"></i> Edit
-													</button>
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#removeProfile">
-														<i data-feather="trash-2"></i> Remove
-													</button>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
-											<div class="address-box">
-												<div>
-													<div class="form-check">
-														<input class="form-check-input" type="radio" name="jack"
-															id="flexRadioDefault3" />
-													</div>
-
-													<div class="label">
-														<label>Office</label>
-													</div>
-
-													<div class="table-responsive address-table">
-														<table class="table">
-															<tbody>
-																<tr>
-																	<td colspan="2">Terry S. Sutton</td>
-																</tr>
-
-																<tr>
-																	<td>Address :</td>
-																	<td>
-																		<p>2280 Rose Avenue Kenner, LA 70062</p>
-																	</td>
-																</tr>
-
-																<tr>
-																	<td>Pin Code :</td>
-																	<td>+25</td>
-																</tr>
-
-																<tr>
-																	<td>Phone :</td>
-																	<td>+ 504-228-0969</td>
-																</tr>
-															</tbody>
-														</table>
-													</div>
-												</div>
-
-												<div class="button-group">
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#editProfile">
-														<i data-feather="edit"></i> Edit
-													</button>
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#removeProfile">
-														<i data-feather="trash-2"></i> Remove
-													</button>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
-											<div class="address-box">
-												<div>
-													<div class="form-check">
-														<input class="form-check-input" type="radio" name="jack"
-															id="flexRadioDefault4" />
-													</div>
-
-													<div class="label">
-														<label>Neighbour</label>
-													</div>
-
-													<div class="table-responsive address-table">
-														<table class="table">
-															<tbody>
-																<tr>
-																	<td colspan="2">Juan M. McKeon</td>
-																</tr>
-
-																<tr>
-																	<td>Address :</td>
-																	<td>
-																		<p>1703 Carson Street Lexington, KY 40593</p>
-																	</td>
-																</tr>
-
-																<tr>
-																	<td>Pin Code :</td>
-																	<td>+78</td>
-																</tr>
-
-																<tr>
-																	<td>Phone :</td>
-																	<td>+ 859-257-0509</td>
-																</tr>
-															</tbody>
-														</table>
-													</div>
-												</div>
-
-												<div class="button-group">
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#editProfile">
-														<i data-feather="edit"></i> Edit
-													</button>
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#removeProfile">
-														<i data-feather="trash-2"></i> Remove
-													</button>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
-											<div class="address-box">
-												<div>
-													<div class="form-check">
-														<input class="form-check-input" type="radio" name="jack"
-															id="flexRadioDefault5" />
-													</div>
-
-													<div class="label">
-														<label>Home 2</label>
-													</div>
-
-													<div class="table-responsive address-table">
-														<table class="table">
-															<tbody>
-																<tr>
-																	<td colspan="2">Gary M. Bailey</td>
-																</tr>
-
-																<tr>
-																	<td>Address :</td>
-																	<td>
-																		<p>2135 Burning Memory Lane Philadelphia, PA 19135</p>
-																	</td>
-																</tr>
-
-																<tr>
-																	<td>Pin Code :</td>
-																	<td>+26</td>
-																</tr>
-
-																<tr>
-																	<td>Phone :</td>
-																	<td>+ 215-335-9916</td>
-																</tr>
-															</tbody>
-														</table>
-													</div>
-												</div>
-
-												<div class="button-group">
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#editProfile">
-														<i data-feather="edit"></i> Edit
-													</button>
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#removeProfile">
-														<i data-feather="trash-2"></i> Remove
-													</button>
-												</div>
-											</div>
-										</div>
-
 										<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
 											<div class="address-box">
 												<div>
@@ -1380,7 +1197,7 @@
 								role="tabpanel" aria-labelledby="pills-profile-tab">
 								<div class="dashboard-profile">
 									<div class="title">
-										<h2>My Profile</h2>
+										<h2>회원정보 수정</h2>
 										<span class="title-leaf"> <svg
 												class="icon-width bg-gray">
                           <use xlink:href="../assets/svg/leaf.svg#leaf"></use>
@@ -1388,111 +1205,94 @@
 										</span>
 									</div>
 
-									<div class="profile-detail dashboard-bg-box">
-										<div class="dashboard-title">
-											<h3>Profile Name</h3>
-										</div>
-										<div class="profile-name-detail">
-											<div class="d-sm-flex align-items-center d-block">
-												<h3>Vicki E. Pope</h3>
-												<div class="product-rating profile-rating">
-													<ul class="rating">
-														<li><i data-feather="star" class="fill"></i></li>
-														<li><i data-feather="star" class="fill"></i></li>
-														<li><i data-feather="star" class="fill"></i></li>
-														<li><i data-feather="star"></i></li>
-														<li><i data-feather="star"></i></li>
-													</ul>
-												</div>
-											</div>
-
-											<a href="javascript:void(0)" data-bs-toggle="modal"
-												data-bs-target="#editProfile">Edit</a>
-										</div>
-
-										<div class="location-profile">
-											<ul>
-												<li>
-													<div class="location-box">
-														<i data-feather="map-pin"></i>
-														<h6>Downers Grove, IL</h6>
-													</div>
-												</li>
-
-												<li>
-													<div class="location-box">
-														<i data-feather="mail"></i>
-														<h6>vicki.pope@gmail.com</h6>
-													</div>
-												</li>
-
-												<li>
-													<div class="location-box">
-														<i data-feather="check-square"></i>
-														<h6>Licensed for 2 years</h6>
-													</div>
-												</li>
-											</ul>
-										</div>
-
-										<div class="profile-description">
-											<p>Residences can be classified by and how they are
-												connected to neighbouring residences and land. Different
-												types of housing tenure can be used for the same physical
-												type.</p>
-										</div>
-									</div>
-
 									<div class="profile-about dashboard-bg-box">
 										<div class="row">
 											<div class="col-xxl-7">
 												<div class="dashboard-title mb-3">
-													<h3>Profile About</h3>
+													<h3>${userInfo.memberId }</h3>
 												</div>
 
 												<div class="table-responsive">
 													<table class="table">
 														<tbody>
 															<tr>
-																<td>Gender :</td>
+																<td>비밀번호 :</td>
+																<td>●●●●●● <span data-bs-toggle="modal"
+																	data-bs-target="#editProfile">변경</span>
+																</td>
+															</tr>
+															<tr>
+																<td>
+																	<form action="">
+																		<div class="form-floating mb-4 theme-form-floating">
+																			<input type="text" class="form-control"
+																				id="newaddrName" name="newaddrName"
+																				placeholder="배송지 이름을 입력해주세요." /> <label
+																				for="newaddrName">새 비밀번호</label>
+																		</div>
+																	</form>
+																</td>
+															</tr>
+															<tr>
+																<td>
+																	<form action="">
+																		<div class="form-floating mb-4 theme-form-floating">
+																			<input type="text" class="form-control"
+																				id="newaddrName" name="newaddrName"
+																				placeholder="배송지 이름을 입력해주세요." /> <label
+																				for="newaddrName">새 비밀번호</label>
+																		</div>
+																	</form>
+																</td>
+															</tr>
+															<tr>
+																<td>이름 :</td>
+																<td>${userInfo.name }</td>
+															</tr>
+															<tr>
+																<td>생년월일 :</td>
+																<td>${userInfo.dateOfBirth }</td>
+															</tr>
+															<tr>
+																<td>성별 :</td>
+																<td>${userInfo.gender }</td>
+															</tr>
+															<tr>
+																<td>휴대폰 번호 :</td>
+																<td>${userInfo.phoneNumber }<span
+																	data-bs-toggle="modal" data-bs-target="#editProfile">Edit</span></td>
+															</tr>
+															<tr>
+																<td>이메일 :</td>
+																<td>vicki.pope@gmail.com <span
+																	data-bs-toggle="modal" data-bs-target="#editProfile">Edit</span>
+																</td>
+															</tr>
+															<tr>
+																<td>우편번호 :</td>
 																<td>Female</td>
 															</tr>
 															<tr>
-																<td>Birthday :</td>
-																<td>21/05/1997</td>
+																<td>주소 :</td>
+																<td>Female</td>
 															</tr>
 															<tr>
-																<td>Phone Number :</td>
-																<td><a href="javascript:void(0)"> +91 846 - 547
-																		- 210</a></td>
+																<td>상세주소 :</td>
+																<td>Female</td>
 															</tr>
 															<tr>
-																<td>Address :</td>
-																<td>549 Sulphur Springs Road, Downers, IL</td>
-															</tr>
-														</tbody>
-													</table>
-												</div>
-
-												<div class="dashboard-title mb-3">
-													<h3>Login Details</h3>
-												</div>
-
-												<div class="table-responsive">
-													<table class="table">
-														<tbody>
-															<tr>
-																<td>Email :</td>
-																<td><a href="javascript:void(0)">vicki.pope@gmail.com
-																		<span data-bs-toggle="modal"
-																		data-bs-target="#editProfile">Edit</span>
-																</a></td>
-															</tr>
-															<tr>
-																<td>Password :</td>
-																<td><a href="javascript:void(0)">●●●●●● <span
-																		data-bs-toggle="modal" data-bs-target="#editProfile">Edit</span>
-																</a></td>
+																<td>본인인증 :</td>
+																<td><c:choose>
+																		<c:when
+																			test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
+																			<input type="checkbox" name="authentication" checked
+																				disabled>
+																		</c:when>
+																		<c:otherwise>
+																			<input type="checkbox" name="authentication" disabled>
+																			<button>본인 인증</button>
+																		</c:otherwise>
+																	</c:choose></td>
 															</tr>
 														</tbody>
 													</table>
@@ -1713,51 +1513,51 @@
 			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">Add a new
-						address</h5>
+					<h5 class="modal-title" id="exampleModalLabel">배송지 추가</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
 				<div class="modal-body">
-					<form>
+					<form action="#" id="inputAddrInfo" method="post">
 						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control" id="fname"
-								placeholder="Enter First Name" /> <label for="fname">First
-								Name</label>
+							<input type="text" class="form-control" id="newaddrName"
+								name="newaddrName" placeholder="배송지 이름을 입력해주세요." /> <label
+								for="newaddrName">배송지명</label>
 						</div>
-					</form>
 
-					<form>
 						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control" id="lname"
-								placeholder="Enter Last Name" /> <label for="lname">Last
-								Name</label>
+							<input type="text" class="form-control" id="recipientName"
+								name="recipientName" placeholder="이름을 입력해주세요." /> <label
+								for="recipientName">받는 분</label>
 						</div>
-					</form>
 
-					<form>
 						<div class="form-floating mb-4 theme-form-floating">
-							<input type="email" class="form-control" id="email"
-								placeholder="Enter Email Address" /> <label for="email">Email
-								Address</label>
+							<input type="email" class="form-control"
+								id="recipientPhoneNumber" name="recipientPhoneNumber"
+								placeholder="연락처를 입력해주세요." /> <label for="recipientPhoneNumber">연락처</label>
 						</div>
-					</form>
 
-					<form>
-						<div class="form-floating mb-4 theme-form-floating">
-							<textarea class="form-control" placeholder="Leave a comment here"
-								id="address" style="height: 100px"></textarea>
-							<label for="address">Enter Address</label>
+						<div>
+							<button type="button"
+								class="btn theme-bg-color btn-md text-white"
+								onclick="goPopup();">주소 검색</button>
 						</div>
-					</form>
 
-					<form>
 						<div class="form-floating mb-4 theme-form-floating">
-							<input type="email" class="form-control" id="pin"
-								placeholder="Enter Pin Code" /> <label for="pin">Pin
-								Code</label>
+							<input type="text" class="form-control" id="newZipNo"
+								name="newZipNo" placeholder="우편번호" readonly />
+						</div>
+
+						<div class="form-floating mb-4 theme-form-floating">
+							<input type="text" class="form-control" id="newAddr"
+								name="newAddr" placeholder="주소" readonly />
+						</div>
+
+						<div class="form-floating mb-4 theme-form-floating">
+							<input type="text" class="form-control" id="newAddrDatail"
+								name="newAddrDatail" placeholder="상세 주소" />
 						</div>
 					</form>
 				</div>

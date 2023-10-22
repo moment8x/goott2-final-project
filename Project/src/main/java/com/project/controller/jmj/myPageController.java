@@ -44,14 +44,18 @@ public class myPageController {
 		List<MyPageOrderList> lst= null;
 		
 		try {
-//			List<Integer> list = mService.getOrderNo(memberId);
 			lst = mService.getOrderHistory(memberId);
-//			int result = mService.getOrderProductCount(orderNo);
+			Member userInfo = mService.getMyInfo(memberId);
 
 			System.out.println("list : " + lst);
-//			System.out.println(orderNo);
 			model.addAttribute("orderList", lst);
-
+			
+			System.out.println(userInfo);
+			model.addAttribute("userInfo", userInfo);
+			
+//			int result = mService.getOrderProductCount(orderNo);
+//			List<Integer> list = mService.getOrderNo(memberId);
+//			System.out.println(orderNo);
 //			model.addAttribute("orderProductCount", result);
 //			System.out.println(lst);
 		} catch (SQLException | NamingException e) {
