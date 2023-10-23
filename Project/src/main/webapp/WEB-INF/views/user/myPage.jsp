@@ -78,6 +78,63 @@
 		let newAddrDatail = document.querySelector("#newAddrDatail")
 		newAddrDatail.value = addrDetail;
 	}
+
+	$(function() {
+		//비밀번호 변경 아이콘 클릭시
+		$('.fa-regular.fa-pen-to-square.fa-xl.editPwd').click(function() {
+			$('.newPwdEdit').show();
+		})
+		$('.fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber').click(function() {
+			$('.newPhoneNumberEdit').show();
+		})
+		$('.fa-regular.fa-pen-to-square.fa-xl.editEmail').click(function() {
+			$('.newEmailEdit').show();
+		})
+
+		// 새 비밀번호 입력 후
+		$('#newPwdCheck').blur(function() {
+			validUserPwd();
+		})
+	})
+
+	// 유효성 검사 메세지
+	function PrintMsg(focusId, msgId, msg, isFocus) {
+		let tdMsg = `<span class='msg'>\${msg}</span>`;
+		if (isFocus == true) {
+			$(`#\${focusId}`).focus();
+		} else if (isFocus == false) {
+			tdMsg = `<td class='trueMsg'>\${msg}</td>`;
+		}
+		$(tdMsg).insertAfter($(`#\${msgId}`));
+		$('.msg').hide(5000);
+		$('.trueMsg').hide(5000);
+	}
+
+	//비밀번호 유효성검사
+	function validUserPwd() {
+		let isValidPwd = false;
+
+		if ($('#newPwd').val().length, $('#newPwdCheck').val().length >= 6
+				&& $('#newPwd').val() != $('#newPwdCheck').val()) {
+			$('#newPwd').val('');
+			$('#newPwdCheck').val('');
+			PrintMsg('newPwd', 'newPwdCheck', '비밀번호가 일치하지 않습니다.', true);
+			$('.fa-regular.fa-circle-check.fa-lg').hide();
+		} else if ($('#newPwd').val().length,
+				$('#newPwdCheck').val().length < 5) {
+			$('#newPwd').val('');
+			$('#newPwdCheck').val('');
+			PrintMsg('newPwd', 'newPwdCheck', '6자 이상 입력해주세요.', true);
+			$('.fa-regular.fa-circle-check.fa-lg').hide();
+		} else if ($('#newPwd').val().length,
+				$('#newPwdCheck').val().length >= 6
+						&& $('#newPwd').val() == $('#newPwdCheck').val()) {
+			PrintMsg('', 'newPwdCheck', '', false);
+			$('.fa-regular.fa-circle-check.fa-lg').show();
+			isValidPwd = true;
+		}
+		return isValidPwd;
+	}
 </script>
 <style>
 #deliveryStatus {
@@ -86,6 +143,27 @@
 
 #productImg {
 	width: 184px;
+}
+
+.newPwdEdit, .fa-regular.fa-circle-check.fa-lg, .newPhoneNumberEdit, .newEmailEdit {
+	display: none;
+}
+
+.fa-regular.fa-pen-to-square.fa-xl.editPwd, .fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber, .fa-regular.fa-pen-to-square.fa-xl.editEmail{
+	cursor: pointer;
+}
+
+.msg {
+	color: tomato;
+	font-weight: bold;
+}
+
+.trueMsg {
+	font-weight: bold;
+}
+.modifyBtn{
+	display: flex;
+	justify-content: center;
 }
 </style>
 </head>
@@ -131,7 +209,7 @@
 			<div class="row">
 				<div class="col-12">
 					<div class="breadscrumb-contain">
-						<h2>마이페이지</h2>
+						<h2>MyPage</h2>
 						<nav>
 							<ol class="breadcrumb mb-0">
 								<li class="breadcrumb-item"><a href="index.html"> <i
@@ -161,14 +239,14 @@
 						</div>
 						<div class="profile-box">
 							<div class="cover-image">
-								<img src="../assets/images/inner-page/cover-img.jpg"
+								<img src="/resources/assets/images/deer.png"
 									class="img-fluid blur-up lazyload" alt="" />
 							</div>
 
 							<div class="profile-contain">
 								<div class="profile-image">
 									<div class="position-relative">
-										<img src="../assets/images/inner-page/user/1.jpg"
+										<img src="#"
 											class="blur-up lazyload update_img" alt="" />
 										<div class="cover-icon">
 											<i class="fa-solid fa-pen"> <input type="file"
@@ -179,8 +257,8 @@
 								</div>
 
 								<div class="profile-name">
-									<h3>Vicki E. Pope</h3>
-									<h6 class="text-content">vicki.pope@gmail.com</h6>
+									<h3>${userInfo.memberId }</h3>
+									<h6 class="text-content">${userInfo.membershipGrade }</h6>
 								</div>
 							</div>
 						</div>
@@ -206,14 +284,14 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="pills-wishlist-tab"
-									data-bs-toggle="pill" data-bs-target="#pills-wishlist"
-									type="button" role="tab" aria-controls="pills-wishlist"
+								<button class="nav-link" id="pills-profile-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-profile"
+									type="button" role="tab" aria-controls="pills-profile"
 									aria-selected="false">
-									<i data-feather="heart"></i> 찜
+									<i data-feather="user"></i> 회원정보
 								</button>
 							</li>
-
+							
 							<li class="nav-item" role="presentation">
 								<button class="nav-link" id="pills-address-tab"
 									data-bs-toggle="pill" data-bs-target="#pills-address"
@@ -222,13 +300,40 @@
 									<i data-feather="map-pin"></i> 배송 주소록
 								</button>
 							</li>
-
+							
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-wishlist-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-wishlist"
+									type="button" role="tab" aria-controls="pills-wishlist"
+									aria-selected="false">
+									<i data-feather="heart"></i> 찜
+								</button>
+							</li>
+							
 							<li class="nav-item" role="presentation">
 								<button class="nav-link" id="pills-profile-tab"
 									data-bs-toggle="pill" data-bs-target="#pills-profile"
 									type="button" role="tab" aria-controls="pills-profile"
 									aria-selected="false">
-									<i data-feather="user"></i> 회원정보
+									<i data-feather="help-circle"></i>1:1문의내역
+								</button>
+							</li>
+							
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-profile-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-profile"
+									type="button" role="tab" aria-controls="pills-profile"
+									aria-selected="false">
+									<i data-feather="clipboard"></i>작성한 리뷰
+								</button>
+							</li>
+							
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-profile-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-profile"
+									type="button" role="tab" aria-controls="pills-profile"
+									aria-selected="false">
+									<i data-feather="smile"></i>포인트/쿠폰/적립금 내역
 								</button>
 							</li>
 						</ul>
@@ -1213,89 +1318,124 @@
 												</div>
 
 												<div class="table-responsive">
-													<table class="table">
-														<tbody>
-															<tr>
-																<td>비밀번호 :</td>
-																<td>●●●●●● <span data-bs-toggle="modal"
-																	data-bs-target="#editProfile">변경</span>
-																</td>
-															</tr>
-															<tr>
-																<td>
-																	<form action="">
-																		<div class="form-floating mb-4 theme-form-floating">
-																			<input type="text" class="form-control"
-																				id="newaddrName" name="newaddrName"
-																				placeholder="배송지 이름을 입력해주세요." /> <label
-																				for="newaddrName">새 비밀번호</label>
-																		</div>
-																	</form>
-																</td>
-															</tr>
-															<tr>
-																<td>
-																	<form action="">
-																		<div class="form-floating mb-4 theme-form-floating">
-																			<input type="text" class="form-control"
-																				id="newaddrName" name="newaddrName"
-																				placeholder="배송지 이름을 입력해주세요." /> <label
-																				for="newaddrName">새 비밀번호</label>
-																		</div>
-																	</form>
-																</td>
-															</tr>
-															<tr>
-																<td>이름 :</td>
-																<td>${userInfo.name }</td>
-															</tr>
-															<tr>
-																<td>생년월일 :</td>
-																<td>${userInfo.dateOfBirth }</td>
-															</tr>
-															<tr>
-																<td>성별 :</td>
-																<td>${userInfo.gender }</td>
-															</tr>
-															<tr>
-																<td>휴대폰 번호 :</td>
-																<td>${userInfo.phoneNumber }<span
-																	data-bs-toggle="modal" data-bs-target="#editProfile">Edit</span></td>
-															</tr>
-															<tr>
-																<td>이메일 :</td>
-																<td>vicki.pope@gmail.com <span
-																	data-bs-toggle="modal" data-bs-target="#editProfile">Edit</span>
-																</td>
-															</tr>
-															<tr>
-																<td>우편번호 :</td>
-																<td>Female</td>
-															</tr>
-															<tr>
-																<td>주소 :</td>
-																<td>Female</td>
-															</tr>
-															<tr>
-																<td>상세주소 :</td>
-																<td>Female</td>
-															</tr>
-															<tr>
-																<td>본인인증 :</td>
-																<td><c:choose>
-																		<c:when
-																			test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
-																			<input type="checkbox" name="authentication" checked
-																				disabled>
-																		</c:when>
-																		<c:otherwise>
-																			<input type="checkbox" name="authentication" disabled>
-																			<button>본인 인증</button>
-																		</c:otherwise>
-																	</c:choose></td>
-															</tr>
-														</tbody>
-													</table>
+													<form action="#" method="post">
+														<table class="table">
+															<tbody>
+																<tr>
+																	<td>비밀번호 :</td>
+																	<td>●●●●●●</td>
+																	<td><i class="fa-regular fa-pen-to-square fa-xl editPwd"></i>
+																	</td>
+
+																</tr>
+																<tr class="newPwdEdit">
+																	<td>새 비밀번호 :</td>
+																	<td><input type="password" class="form-control"
+																		id="newPwd" name="newPwd"
+																		placeholder="새 비밀번호를 6자 이상 입력해주세요." /></td>
+																</tr>
+																<tr class="newPwdEdit">
+																	<td>새 비밀번호 확인 :</td>
+																	<td><input type="password" class="form-control"
+																		id="newPwdCheck" name="newPwdCheck"
+																		placeholder="새 비밀번호 확인" /></td>
+																	<td><i class="fa-regular fa-circle-check fa-lg"
+																		style="color: #0e997e;"></i></td>
+																</tr>
+																<tr>
+																	<td>이름 :</td>
+																	<td>${userInfo.name }</td>
+																</tr>
+																<tr>
+																	<td>생년월일 :</td>
+																	<td>${userInfo.dateOfBirth }</td>
+																</tr>
+																<tr>
+																	<td>성별 :</td>
+																	<td>${userInfo.gender }</td>
+																</tr>
+																<tr>
+																	<td>휴대폰 번호 :</td>
+																	<td>${userInfo.phoneNumber }</td>
+																	<td><i class="fa-regular fa-pen-to-square fa-xl editPhoneNumber"></i>
+																	</td>
+																</tr>
+																<tr class="newPhoneNumberEdit">
+																<td>새 휴대폰 번호 :</td>
+																	<td>
+																		<input type="text" class="form-control"
+																		id="newPhoneNumber" name="newPhoneNumber"
+																		placeholder="새 휴대폰 번호를 입력해주세요." />
+																	</td>
+																	<td>
+																		<button type="button"
+																			class="btn theme-bg-color btn-md text-white"
+																			onclick="">확인</button>
+																	</td>
+																</tr>
+																<tr>
+																	<td>이메일 :</td>
+																	<td>${userInfo.email }</td>
+																	<td><i class="fa-regular fa-pen-to-square fa-xl editEmail"></i>
+																	</td>
+																</tr>
+																<tr class="newEmailEdit">
+																<td>새 이메일 :</td>
+																	<td>
+																		<input type="email" class="form-control"
+																		id="newEmail" name="newEmail"
+																		placeholder="새 이메일을 입력해주세요." />
+																	</td>
+																	<td>
+																		<button type="button"
+																			class="btn theme-bg-color btn-md text-white"
+																			onclick="">확인</button>
+																	</td>	
+																</tr>
+																<tr>
+																	<td>우편번호 :</td>
+																	<td>${userInfo.zipCode}</td>
+																	<td>
+																		<button type="button"
+																			class="btn theme-bg-color btn-md text-white"
+																			onclick="goPopup();">주소 검색</button>
+																	</td>
+																</tr>
+																<tr>
+																	<td>주소 :</td>
+																	<td>${userInfo.address}</td>
+																</tr>
+																<tr>
+																	<td>상세주소 :</td>
+																	<td>
+																		<input type="text" class="form-control"
+																		id="newAddrDatail" name="newAddrDatail" value="${userInfo.detailedAddress}"
+																		placeholder="새 비밀번호를 6자 이상 입력해주세요." />
+																	</td>
+																</tr>
+																<tr>
+																	<td>본인인증 :</td>
+																	<td><c:choose>
+																			<c:when
+																				test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
+																				<input type="checkbox" name="authentication" checked
+																					disabled>
+																			</c:when>
+																			<c:otherwise>
+																				<input type="checkbox" name="authentication"
+																					disabled>
+																				<button>본인 인증</button>
+																			</c:otherwise>
+																		</c:choose></td>
+																</tr>
+															</tbody>
+														</table>
+														<div class="modifyBtn">
+															<button type="button"
+																				class="btn theme-bg-color btn-md text-white"
+																				onclick="">수정</button>														
+														</div>
+													</form>
 												</div>
 											</div>
 
