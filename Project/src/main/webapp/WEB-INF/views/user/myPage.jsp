@@ -80,13 +80,11 @@
 	}
 
 	$(function() {
-		//비밀번호 변경 아이콘 클릭시
-		$('.fa-regular.fa-pen-to-square.fa-xl.editPwd').click(function() {
-			$('.newPwdEdit').show();
-		})
-		$('.fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber').click(function() {
-			$('.newPhoneNumberEdit').show();
-		})
+		//변경 아이콘 클릭시
+		$('.fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber').click(
+				function() {
+					$('.newPhoneNumberEdit').show();
+				})
 		$('.fa-regular.fa-pen-to-square.fa-xl.editEmail').click(function() {
 			$('.newEmailEdit').show();
 		})
@@ -98,42 +96,61 @@
 	})
 
 	// 유효성 검사 메세지
-	function PrintMsg(focusId, msgId, msg, isFocus) {
-		let tdMsg = `<span class='msg'>\${msg}</span>`;
+	function printMsg(focusId, msgId, msg, isFocus) {
+		let divMsg = `<div class='msg'>\${msg}</div>`;
 		if (isFocus == true) {
 			$(`#\${focusId}`).focus();
 		} else if (isFocus == false) {
-			tdMsg = `<td class='trueMsg'>\${msg}</td>`;
+			divMsg = `<div class='trueMsg'>\${msg}</div>`;
 		}
-		$(tdMsg).insertAfter($(`#\${msgId}`));
-		$('.msg').hide(5000);
-		$('.trueMsg').hide(5000);
+		$(divMsg).insertAfter($(`#\${msgId}`));
+		$('.msg').hide(10000);
 	}
 
 	//비밀번호 유효성검사
 	function validUserPwd() {
 		let isValidPwd = false;
+		let reg = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$/;
+		let pwd = $('#newPwd').val();
+		let pwdCheck = $('#newPwdCheck').val();
 
-		if ($('#newPwd').val().length, $('#newPwdCheck').val().length >= 6
-				&& $('#newPwd').val() != $('#newPwdCheck').val()) {
+		if (!reg.test(pwd) && !reg.test(pwdCheck)) {
 			$('#newPwd').val('');
 			$('#newPwdCheck').val('');
-			PrintMsg('newPwd', 'newPwdCheck', '비밀번호가 일치하지 않습니다.', true);
 			$('.fa-regular.fa-circle-check.fa-lg').hide();
-		} else if ($('#newPwd').val().length,
-				$('#newPwdCheck').val().length < 5) {
+			printMsg('newPwd', 'newPwdCheck',
+					'영어, 숫자, 특수문자(!@#$%^*+=-)를 1개이상 포함하여 8-15글자로 입력해주세요.', true)
+		} else if (pwd != pwdCheck) {
 			$('#newPwd').val('');
 			$('#newPwdCheck').val('');
-			PrintMsg('newPwd', 'newPwdCheck', '6자 이상 입력해주세요.', true);
 			$('.fa-regular.fa-circle-check.fa-lg').hide();
-		} else if ($('#newPwd').val().length,
-				$('#newPwdCheck').val().length >= 6
-						&& $('#newPwd').val() == $('#newPwdCheck').val()) {
-			PrintMsg('', 'newPwdCheck', '', false);
+			printMsg('newPwd', 'newPwdCheck', '비밀번호가 일치하지 않습니다. 다시 입력해주세요.',
+					true)
+		} else if (reg.test(pwd) && reg.test(pwdCheck) && pwd == pwdCheck) {
+			printMsg('', 'newPwdCheck', '', false);
 			$('.fa-regular.fa-circle-check.fa-lg').show();
 			isValidPwd = true;
 		}
 		return isValidPwd;
+	}
+	
+	function sendMail() {
+		$('.mailCode').show();
+		$.ajax({
+			url : '/user/sendMail', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				tmpMail : $('#newEmail').val()
+			},
+			dataType : 'text',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				
+			},
+			error : function () {
+				}
+			});
 	}
 </script>
 <style>
@@ -145,12 +162,14 @@
 	width: 184px;
 }
 
-.newPwdEdit, .fa-regular.fa-circle-check.fa-lg, .newPhoneNumberEdit, .newEmailEdit {
+.fa-regular.fa-circle-check.fa-lg, .newPhoneNumberEdit, .newEmailEdit, .mailCode {
 	display: none;
 }
 
-.fa-regular.fa-pen-to-square.fa-xl.editPwd, .fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber, .fa-regular.fa-pen-to-square.fa-xl.editEmail{
+.fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber, .fa-regular.fa-pen-to-square.fa-xl.editEmail
+	{
 	cursor: pointer;
+	text-align: center;
 }
 
 .msg {
@@ -161,9 +180,19 @@
 .trueMsg {
 	font-weight: bold;
 }
-.modifyBtn{
+
+.col-12.modifyBtn {
 	display: flex;
 	justify-content: center;
+}
+
+.form-floating.theme-form-floating.editPhoneNumber, .form-floating.theme-form-floating.editEmail
+	{
+	display: flex;
+	justify-content: flex-end;
+}
+.btn.theme-bg-color.btn-md.text-white.delUser{
+
 }
 </style>
 </head>
@@ -246,8 +275,7 @@
 							<div class="profile-contain">
 								<div class="profile-image">
 									<div class="position-relative">
-										<img src="#"
-											class="blur-up lazyload update_img" alt="" />
+										<img src="#" class="blur-up lazyload update_img" alt="" />
 										<div class="cover-icon">
 											<i class="fa-solid fa-pen"> <input type="file"
 												onchange="readURL(this,0)" />
@@ -258,7 +286,10 @@
 
 								<div class="profile-name">
 									<h3>${userInfo.memberId }</h3>
-									<h6 class="text-content">${userInfo.membershipGrade }</h6>
+									<h6 class="text-content">
+										<img width="50" height="50"
+											src="https://img.icons8.com/external-vitaliy-gorbachev-lineal-vitaly-gorbachev/60/external-deer-winter-vitaliy-gorbachev-lineal-vitaly-gorbachev.png"
+											alt="external-deer-winter-vitaliy-gorbachev-lineal-vitaly-gorbachev" />${userInfo.membershipGrade }</h6>
 								</div>
 							</div>
 						</div>
@@ -291,7 +322,7 @@
 									<i data-feather="user"></i> 회원정보
 								</button>
 							</li>
-							
+
 							<li class="nav-item" role="presentation">
 								<button class="nav-link" id="pills-address-tab"
 									data-bs-toggle="pill" data-bs-target="#pills-address"
@@ -300,7 +331,7 @@
 									<i data-feather="map-pin"></i> 배송 주소록
 								</button>
 							</li>
-							
+
 							<li class="nav-item" role="presentation">
 								<button class="nav-link" id="pills-wishlist-tab"
 									data-bs-toggle="pill" data-bs-target="#pills-wishlist"
@@ -309,7 +340,7 @@
 									<i data-feather="heart"></i> 찜
 								</button>
 							</li>
-							
+
 							<li class="nav-item" role="presentation">
 								<button class="nav-link" id="pills-profile-tab"
 									data-bs-toggle="pill" data-bs-target="#pills-profile"
@@ -318,7 +349,7 @@
 									<i data-feather="help-circle"></i>1:1문의내역
 								</button>
 							</li>
-							
+
 							<li class="nav-item" role="presentation">
 								<button class="nav-link" id="pills-profile-tab"
 									data-bs-toggle="pill" data-bs-target="#pills-profile"
@@ -327,7 +358,7 @@
 									<i data-feather="clipboard"></i>작성한 리뷰
 								</button>
 							</li>
-							
+
 							<li class="nav-item" role="presentation">
 								<button class="nav-link" id="pills-profile-tab"
 									data-bs-toggle="pill" data-bs-target="#pills-profile"
@@ -1317,126 +1348,171 @@
 													<h3>${userInfo.memberId }</h3>
 												</div>
 
-												<div class="table-responsive">
-													<form action="#" method="post">
-														<table class="table">
-															<tbody>
-																<tr>
-																	<td>비밀번호 :</td>
-																	<td>●●●●●●</td>
-																	<td><i class="fa-regular fa-pen-to-square fa-xl editPwd"></i>
-																	</td>
+												<div class="input-box">
+													<form class="row g-4" action="#" method="post">
+														<div class="col-12">영어, 숫자, 특수문자 (!@#$%^*+=-) 를 1개이상
+															포함하여 8-15글자로 입력해주세요.</div>
 
-																</tr>
-																<tr class="newPwdEdit">
-																	<td>새 비밀번호 :</td>
-																	<td><input type="password" class="form-control"
-																		id="newPwd" name="newPwd"
-																		placeholder="새 비밀번호를 6자 이상 입력해주세요." /></td>
-																</tr>
-																<tr class="newPwdEdit">
-																	<td>새 비밀번호 확인 :</td>
-																	<td><input type="password" class="form-control"
-																		id="newPwdCheck" name="newPwdCheck"
-																		placeholder="새 비밀번호 확인" /></td>
-																	<td><i class="fa-regular fa-circle-check fa-lg"
-																		style="color: #0e997e;"></i></td>
-																</tr>
-																<tr>
-																	<td>이름 :</td>
-																	<td>${userInfo.name }</td>
-																</tr>
-																<tr>
-																	<td>생년월일 :</td>
-																	<td>${userInfo.dateOfBirth }</td>
-																</tr>
-																<tr>
-																	<td>성별 :</td>
-																	<td>${userInfo.gender }</td>
-																</tr>
-																<tr>
-																	<td>휴대폰 번호 :</td>
-																	<td>${userInfo.phoneNumber }</td>
-																	<td><i class="fa-regular fa-pen-to-square fa-xl editPhoneNumber"></i>
-																	</td>
-																</tr>
-																<tr class="newPhoneNumberEdit">
-																<td>새 휴대폰 번호 :</td>
-																	<td>
-																		<input type="text" class="form-control"
-																		id="newPhoneNumber" name="newPhoneNumber"
-																		placeholder="새 휴대폰 번호를 입력해주세요." />
-																	</td>
-																	<td>
-																		<button type="button"
-																			class="btn theme-bg-color btn-md text-white"
-																			onclick="">확인</button>
-																	</td>
-																</tr>
-																<tr>
-																	<td>이메일 :</td>
-																	<td>${userInfo.email }</td>
-																	<td><i class="fa-regular fa-pen-to-square fa-xl editEmail"></i>
-																	</td>
-																</tr>
-																<tr class="newEmailEdit">
-																<td>새 이메일 :</td>
-																	<td>
-																		<input type="email" class="form-control"
-																		id="newEmail" name="newEmail"
-																		placeholder="새 이메일을 입력해주세요." />
-																	</td>
-																	<td>
-																		<button type="button"
-																			class="btn theme-bg-color btn-md text-white"
-																			onclick="">확인</button>
-																	</td>	
-																</tr>
-																<tr>
-																	<td>우편번호 :</td>
-																	<td>${userInfo.zipCode}</td>
-																	<td>
-																		<button type="button"
-																			class="btn theme-bg-color btn-md text-white"
-																			onclick="goPopup();">주소 검색</button>
-																	</td>
-																</tr>
-																<tr>
-																	<td>주소 :</td>
-																	<td>${userInfo.address}</td>
-																</tr>
-																<tr>
-																	<td>상세주소 :</td>
-																	<td>
-																		<input type="text" class="form-control"
-																		id="newAddrDatail" name="newAddrDatail" value="${userInfo.detailedAddress}"
-																		placeholder="새 비밀번호를 6자 이상 입력해주세요." />
-																	</td>
-																</tr>
-																<tr>
-																	<td>본인인증 :</td>
-																	<td><c:choose>
-																			<c:when
-																				test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
-																				<input type="checkbox" name="authentication" checked
-																					disabled>
-																			</c:when>
-																			<c:otherwise>
-																				<input type="checkbox" name="authentication"
-																					disabled>
-																				<button>본인 인증</button>
-																			</c:otherwise>
-																		</c:choose></td>
-																</tr>
-															</tbody>
-														</table>
-														<div class="modifyBtn">
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="password" class="form-control" id="newPwd"
+																	name="newPwd" placeholder="Full Name" /> <label
+																	for="newPwd">새 비밀번호</label>
+															</div>
+														</div>
+
+														<div class="col-12 newPwdEdit">
+															<div class="form-floating theme-form-floating">
+																<input type="password" class="form-control"
+																	id="newPwdCheck" name="newPwdCheck"
+																	placeholder="Full Name" /> <label for="newPwdCheck">새
+																	비밀번호 확인</label> <i class="fa-regular fa-circle-check fa-lg"
+																	style="color: #0e997e"></i>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control" id="userName"
+																	name="userName" placeholder="이름"
+																	value="${userInfo.name }" readonly /> <label
+																	for="userName">이름</label>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control" id="userBirth"
+																	name="userBirth" value="${userInfo.dateOfBirth }"
+																	placeholder="생년월일" readonly /> <label for="userBirth">생년월일</label>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control" id="userGender"
+																	name="userGender" value="${userInfo.gender }"
+																	placeholder="성별" readonly /> <label for="userGender">성별</label>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div
+																class="form-floating theme-form-floating editPhoneNumber">
+																<input type="text" class="form-control"
+																	id="userPhonNumber" name="userPhonNumber"
+																	value="${userInfo.phoneNumber }" placeholder="휴대폰 번호"
+																	readonly /> <label for="userPhonNumber">휴대폰 번호</label>
+																<i
+																	class="fa-regular fa-pen-to-square fa-xl editPhoneNumber"></i>
+															</div>
+														</div>
+
+														<div class="col-12 newPhoneNumberEdit">
+															<div
+																class="form-floating theme-form-floating editPhoneNumber">
+																<input type="text" class="form-control"
+																	id="newPhoneNumber" name="newPhoneNumber"
+																	placeholder="새 휴대폰 번호" /> <label for="newPhoneNumber">새
+																	휴대폰 번호</label>
+																<button type="button"
+																	class="btn theme-bg-color btn-md text-white" onclick="">
+																	인증?</button>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating editEmail">
+																<input type="email" class="form-control" id="userEmail"
+																	name="userEmail" value="${userInfo.email }"
+																	placeholder="이메일" readonly /> <label for="userEmail">이메일</label>
+																<i class="fa-regular fa-pen-to-square fa-xl editEmail"></i>
+															</div>
+														</div>
+
+														<div class="col-12 newEmailEdit">
+															<div class="form-floating theme-form-floating editEmail">
+																<input type="email" class="form-control" id="newEmail"
+																	name="newEmail" placeholder="이메일" /> <label
+																	for="newEmail">새 이메일</label>
+																<button type="button"
+																	class="btn theme-bg-color btn-md text-white" onclick="sendMail();">인증</button>
+															</div>
+														</div>
+
+														<div class="col-12 mailCode">
+															<div class="form-floating theme-form-floating editEmail">
+																<input type="text" class="form-control" id="emailCode"
+																	name="emailCode" placeholder="인증코드" /> <label
+																	for="emailCode">인증코드</label>
+																<button type="button"
+																	class="btn theme-bg-color btn-md text-white" onclick="">확인</button>
+															</div>
+														</div>
+
+														<div class="col-12">
 															<button type="button"
-																				class="btn theme-bg-color btn-md text-white"
-																				onclick="">수정</button>														
+																class="btn theme-bg-color btn-md text-white"
+																onclick="goPopup();">주소 검색</button>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control" id="zipNo"
+																	name="zipNo" value="${userInfo.zipCode}"
+																	placeholder="우편번호" readonly /> <label for="zipNo">우편번호</label>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control" id="userAddr"
+																	name="userAddr" value="${userInfo.address}"
+																	placeholder="주소" readonly /> <label for="userAddr">주소</label>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control"
+																	id="newAddrDatail" name="newAddrDatail"
+																	value="${userInfo.detailedAddress}" placeholder="상세주소" />
+																<label for="newAddrDatail">상세주소</label>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="forgot-box">
+																<div class="form-check ps-0 m-0 remember-box">
+																	<c:choose>
+																		<c:when
+																			test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
+																			<input class="checkbox_animated check-box"
+																				type="checkbox" id="authentication" checked disabled />
+																			<label class="form-check-label" for="authentication">본인인증</label>
+																		</c:when>
+																		<c:otherwise>
+																			<input class="checkbox_animated check-box"
+																				type="checkbox" id="authentication" disabled />
+																			<label class="form-check-label" for="authentication">본인인증</label>
+																			<button>본인 인증</button>
+																		</c:otherwise>
+																	</c:choose>
+																</div>
+															</div>
+														</div>
+
+														<div class="col-12 modifyBtn">
+															<button class="btn theme-bg-color btn-md text-white"
+																type="submit">수정</button>													
 														</div>
 													</form>
+													<div>
+														<button class="btn theme-bg-color btn-md text-white delUser"
+																type="button">탈퇴</button>
+													</div>
 												</div>
+
 											</div>
 
 											<div class="col-xxl-5">
@@ -1543,7 +1619,7 @@
 	<jsp:include page="../footer.jsp"></jsp:include>
 	<!-- Footer Section End -->
 
-	<!-- Deal Box Modal Start -->
+	<!-- Deal Box Modal Start
 	<div class="modal fade theme-modal deal-modal" id="deal-box"
 		tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div
@@ -1565,7 +1641,7 @@
 							<li class="list-1">
 								<div class="deal-offer-contain">
 									<a href="shop-left-sidebar.html" class="deal-image"> <img
-										src="../assets/images/vegetable/product/10.png"
+										src="resources/assets/images/vegetable/product/10.png"
 										class="blur-up lazyload" alt="" />
 									</a> <a href="shop-left-sidebar.html" class="deal-contain">
 										<h5>Blended Instant Coffee 50 g Buy 1 Get 1 Free</h5>
@@ -1581,7 +1657,7 @@
 							<li class="list-2">
 								<div class="deal-offer-contain">
 									<a href="shop-left-sidebar.html" class="deal-image"> <img
-										src="../assets/images/vegetable/product/11.png"
+										src="resources/assets/images/vegetable/product/11.png"
 										class="blur-up lazyload" alt="" />
 									</a> <a href="shop-left-sidebar.html" class="deal-contain">
 										<h5>Blended Instant Coffee 50 g Buy 1 Get 1 Free</h5>
@@ -1597,7 +1673,7 @@
 							<li class="list-3">
 								<div class="deal-offer-contain">
 									<a href="shop-left-sidebar.html" class="deal-image"> <img
-										src="../assets/images/vegetable/product/12.png"
+										src="resources/assets/images/vegetable/product/12.png"
 										class="blur-up lazyload" alt="" />
 									</a> <a href="shop-left-sidebar.html" class="deal-contain">
 										<h5>Blended Instant Coffee 50 g Buy 1 Get 1 Free</h5>
@@ -1613,7 +1689,7 @@
 							<li class="list-1">
 								<div class="deal-offer-contain">
 									<a href="shop-left-sidebar.html" class="deal-image"> <img
-										src="../assets/images/vegetable/product/13.png"
+										src="resources/assets/images/vegetable/product/13.png"
 										class="blur-up lazyload" alt="" />
 									</a> <a href="shop-left-sidebar.html" class="deal-contain">
 										<h5>Blended Instant Coffee 50 g Buy 1 Get 1 Free</h5>
@@ -1631,7 +1707,7 @@
 			</div>
 		</div>
 	</div>
-	<!-- Deal Box Modal End -->
+	Deal Box Modal End -->
 
 	<!-- Tap to top start -->
 	<div class="theme-option">

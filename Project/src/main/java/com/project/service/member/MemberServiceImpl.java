@@ -97,4 +97,10 @@ public class MemberServiceImpl implements MemberService {
 		return mDao.selectOrderProductCount(orderNo);
 	}
 
+	@Override
+	public List<String> getEmail() throws SQLException, NamingException {
+
+		return mDao.getEmail();
+	}
+
 }
