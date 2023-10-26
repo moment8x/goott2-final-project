@@ -133,24 +133,31 @@
 		}
 		return isValidPwd;
 	}
-	
+
 	function sendMail() {
-		$('.mailCode').show();
+		let isValidEamil = false;
 		$.ajax({
 			url : '/user/sendMail', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
-				tmpMail : $('#newEmail').val()
+				tmpEmail : $('#newEmail').val()
 			},
-			dataType : 'text',
 			async : false,
+			dataType : 'json',
 			success : function(data) {
 				console.log(data);
-				
-			},
-			error : function () {
+				if (data === null) {
+					$('.mailCode').show();
+					printMsg("", "newEmail", "사용가능한 이메일 입니다.", false)
+				}else{
+					
+					$('#newEmail').val('');
+					printMsg("newEmail", "newEmail", "중복된 이메일 입니다.", true)
 				}
-			});
+			},
+			error : function() {
+			}
+		});
 	}
 </script>
 <style>
@@ -162,7 +169,8 @@
 	width: 184px;
 }
 
-.fa-regular.fa-circle-check.fa-lg, .newPhoneNumberEdit, .newEmailEdit, .mailCode {
+.fa-regular.fa-circle-check.fa-lg, .newPhoneNumberEdit, .newEmailEdit,
+	.mailCode {
 	display: none;
 }
 
@@ -191,8 +199,9 @@
 	display: flex;
 	justify-content: flex-end;
 }
-.btn.theme-bg-color.btn-md.text-white.delUser{
 
+.btn.theme-bg-color.btn-md.text-white.delUser {
+	
 }
 </style>
 </head>
@@ -1395,7 +1404,7 @@
 																	placeholder="성별" readonly /> <label for="userGender">성별</label>
 															</div>
 														</div>
-
+														
 														<div class="col-12">
 															<div
 																class="form-floating theme-form-floating editPhoneNumber">
@@ -1436,7 +1445,8 @@
 																	name="newEmail" placeholder="이메일" /> <label
 																	for="newEmail">새 이메일</label>
 																<button type="button"
-																	class="btn theme-bg-color btn-md text-white" onclick="sendMail();">인증</button>
+																	class="btn theme-bg-color btn-md text-white"
+																	onclick="sendMail();">인증</button>
 															</div>
 														</div>
 
@@ -1453,7 +1463,7 @@
 														<div class="col-12">
 															<button type="button"
 																class="btn theme-bg-color btn-md text-white"
-																onclick="goPopup();">주소 검색</button>
+																onclick="goPopup();">주소 찾기</button>
 														</div>
 
 														<div class="col-12">
@@ -1481,35 +1491,36 @@
 															</div>
 														</div>
 
-														<div class="col-12">
-															<div class="forgot-box">
-																<div class="form-check ps-0 m-0 remember-box">
-																	<c:choose>
-																		<c:when
-																			test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
-																			<input class="checkbox_animated check-box"
-																				type="checkbox" id="authentication" checked disabled />
-																			<label class="form-check-label" for="authentication">본인인증</label>
-																		</c:when>
-																		<c:otherwise>
-																			<input class="checkbox_animated check-box"
-																				type="checkbox" id="authentication" disabled />
-																			<label class="form-check-label" for="authentication">본인인증</label>
-																			<button>본인 인증</button>
-																		</c:otherwise>
-																	</c:choose>
-																</div>
+													<div class="col-12">
+														<div class="forgot-box">
+															<div class="form-check ps-0 m-0 remember-box">
+																<c:choose>
+																	<c:when
+																		test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
+																		<input class="checkbox_animated check-box"
+																			type="checkbox" id="authentication" checked disabled />
+																		<label class="form-check-label" for="authentication">본인인증</label>
+																	</c:when>
+																	<c:otherwise>
+																		<input class="checkbox_animated check-box"
+																			type="checkbox" id="authentication" disabled />
+																		<label class="form-check-label" for="authentication">본인인증</label>
+																		<button>본인 인증</button>
+																	</c:otherwise>
+																</c:choose>
 															</div>
 														</div>
+													</div>
 
-														<div class="col-12 modifyBtn">
-															<button class="btn theme-bg-color btn-md text-white"
-																type="submit">수정</button>													
-														</div>
-													</form>
+													<div class="col-12 modifyBtn">
+														<button class="btn theme-bg-color btn-md text-white"
+															type="submit">수정</button>
+													</div>
+												</form>
 													<div>
-														<button class="btn theme-bg-color btn-md text-white delUser"
-																type="button">탈퇴</button>
+														<button
+															class="btn theme-bg-color btn-md text-white delUser"
+															type="button">탈퇴</button>
 													</div>
 												</div>
 

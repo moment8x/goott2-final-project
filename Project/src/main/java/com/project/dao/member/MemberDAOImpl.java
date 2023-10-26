@@ -57,9 +57,9 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public List<String> getEmail() throws SQLException, NamingException {
+	public Member duplicateUserEmail(String email) throws SQLException, NamingException {
 		
-		return ses.selectList(ns + ".getEmail");
+		return ses.selectOne(ns + ".getEmail", email);
 	}
 
 

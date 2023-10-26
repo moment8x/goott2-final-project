@@ -98,9 +98,9 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public List<String> getEmail() throws SQLException, NamingException {
+	public Member duplicateUserEmail(String email) throws SQLException, NamingException {
 
-		return mDao.getEmail();
+		return mDao.duplicateUserEmail(email);
 	}
 
 }

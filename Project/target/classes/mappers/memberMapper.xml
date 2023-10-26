@@ -28,7 +28,7 @@
 		identity_verification_status, profile_image, refund_bank, refund_account, membership_grade from member where member_id = #{memberId}
 	</select>
 	
-	<select id="getEmail" resultType="String">
-		select email from member
+	<select id="getEmail" resultType="com.project.vodto.Member">
+		select * from member where email = #{email}
 	</select>
 </mapper>
