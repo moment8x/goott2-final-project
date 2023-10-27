@@ -47,7 +47,7 @@ public interface MemberService {
 	//주문건당 총 상품 갯수 가져오기
 	int getOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException;
 	
-	// 주문번호 가져오기
-	List<Integer> getOrderNo(String memberId) throws SQLException, NamingException;
+	// 이메일 중복검사
+	Member duplicateUserEmail(String email) throws SQLException, NamingException;
 
 }
