@@ -13,11 +13,7 @@
 
 
 	<div class="container">
-
-	</div>
-	
-	<div>
-		<p>Principal : <sec:authentication property="principal"/></p>
+		<a href="http://localhost:8081/detail/S000208719388">결제 테스트용 링크</a>
 	</div>
 
 	<jsp:include page="./footer.jsp"></jsp:include>

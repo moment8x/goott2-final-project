@@ -38,6 +38,14 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script>
+	$(function() {
+
+		$("#non_order_no").val(orderId);
+		$("#non_member_id").val("1232123");
+		$("#zip_code").val("12321");
+		
+		
+	});
 	var IMP = window.IMP;
 	IMP.init("${impKey}") // 예: 'imp00000000a'
 	let isPaid = false;
@@ -45,24 +53,19 @@
 	function getOrderId() {
 
 		console.log(orderId);
+		console.log($("#non_order_no").val());
 	}
 
-	function getProducts() {
-		$.ajax({
-			url : "/order/products/" + boardNo + "/" + pageNo, // 데이터를 수신받을 서버 주소
-			type : "get", // 통신방식(GET, POST, PUT, DELETE)
-			dataType : "json",
-			async : false, // 데이터가 오면 실행해야해서
-			success : function(data) {
-				console.log(data);
-				console.log(data.replyList);
-				displayAllReplies(data.replyList);
-			},
-			error : function() {
-				alert("error 발생"); // http status로 부정적인 응답 받았을 때 error에 걸림
-			}
-		});
-	}
+	//function paidCheck() {
+
+	//console.log("함수호출 전", isPaid);
+	//kg_pay();
+	//isPaid = kg_pay();
+	//console.log(isPaid);
+
+	//return isPaid;
+
+	//}
 
 	function identify() {
 		// IMP.certification(param, callback) 호출
@@ -83,8 +86,9 @@
 							}
 						});
 	}
-	function kg_pay() {
 
+	function kg_pay() {
+		console.log("!!");
 		IMP.request_pay({ // 결제 정보 채우기
 			pg : "html5_inicis",
 			pay_method : "card",
@@ -105,9 +109,10 @@
 					url : '/pay/verify/' + rsp.imp_uid,
 					type : "POST",
 					data : rsp.imp_uid,
+					async : false,
 				}).done(function(data) {
 					console.log(data);
-					
+
 					// 결제 내역 저장 ajax
 					obj = {
 						"payment_number" : rsp.imp_uid, // 결제번호
@@ -120,18 +125,31 @@
 						"actual_payment_amount" : data.response.amount, // 실 결제 금액
 						"payment_time" : data.response.paidAt,// 결제 시각
 						"amount_to_pay" : rsp.paid_amount,
+						
+						// 선택한 상품 보내줘야함
 					};
 
 					$.ajax({
-						url : "/pay/output",
+						url : "/pay/output/" + rsp.imp_uid,
 						type : "POST",
 						contentType : "application/json",
 						data : JSON.stringify(obj),
+						async : false,
 						success : function(result) {
-							alert("결제 완료");
+							isPaid = true;
+							console.log("ajax 결과 : ", isPaid);
+
+							if (isPaid) {
+								$("#temp").submit();
+							}
+
+							//return true;
+							// alert("결제 완료");
+
 						},
 						error : function(error) {
-							alert("결제 실패" + error);
+							//cancelPayment(data);
+							alert("위조된 금액" + error);
 						}
 					})
 				})
@@ -139,14 +157,83 @@
 				alert("결제에 실패하였습니다. 에러 내용: " + rsp.error_msg);
 			}
 		})
+	}
+	function cancelPayment() {
+		rc = {
+			"imp_uid" : "imp_651936891989",
+			"amount" : 100,
+			"checksum" : 200,
+			"reason" : "테스트 결제 환불",
+		}
+		$.ajax({
+			url : "/pay/cancel",
+			type : "POST",
+			contentType : "application/json",
+			data : JSON.stringify(rc),
+			success : function(result) {
+				console.log(result);
+				alert("취소 완료");
+			},
+			error : function(error) {
+				alert("취소 실패" + error);
 
+			}
+
+		})
 	}
 
-	function paidCheck() {
-		isPaid = false;
-		kg_pay();
-		return isPaid;
+	function checkPayMethod() {
+		
+		if($("input[name='payMethod']").is(':checked')) {
+		// 전체 radio 중에서 하나라도 체크되어 있는지 확인
+		// 아무것도 선택안되어있으면, false
+			
+		let payMethod = $("input[name='payMethod']:checked").val();
+		// score의 라디오 중 체크된 것의 값만 가져옴
+		// 아무것도 선택안되어있으면, undefined
+		console.log(payMethod);
+		if (payMethod == "bkt") {
+			obj = {
+				"payment_number" : "bkt_123456789014", // 결제번호 생성 코드 필요
+				"non_order_no" : orderId, // 주문번호
+				"payment_method" : payMethod, // 결제수단
+				"total_amount" : 0, // 총 상품 금액, 수정 필요
+				"shipping_fee" : 0, // 배송비
+				"used_points" : 0, // 사용한 포인트
+				"used_reward" : 0, // 사용한 적립금
+				"actual_payment_amount" : 0, // 실 결제 금액(무통장입금은 default 0)
+				
+				
+			};
 
+			$.ajax({
+				url : "/pay/output/" + "bkt_123456789012",
+				type : "POST",
+				contentType : "application/json",
+				data : JSON.stringify(obj),
+				async : false,
+				success : function(result) {
+					isPaid = true;
+					console.log("ajax 결과 : ", isPaid);
+
+					if (isPaid) {
+						$("#temp").submit();
+					}
+
+					//return true;
+					// alert("결제 완료");
+
+				},
+				error : function(error) {
+					//cancelPayment(data);
+					alert("결제 실패" + error);
+
+				}
+			})
+		} else {
+			kg_pay();
+		}
+		}
 	}
 </script>
 </head>
@@ -170,7 +257,7 @@
 			<div class="checkout__form">
 				<h4>비회원 주문/결제</h4>
 				<!--  <form action="#"> -->
-				<form action="orderComplete" method="post">
+				<form action="orderComplete" method="post" id="temp">
 					<div class="row">
 						<div class="col-lg-8 col-md-6">
 							<!-- <div class="row">
@@ -191,7 +278,10 @@
 									</div>
 								</div> 
 							</div> -->
-
+							<input type="hidden" name="non_order_no" id="non_order_no"
+								value=""> <input type="hidden" name="non_member_id"
+								value="" id="non_member_id"><input type="hidden"
+								name="zip_code" value="" id="zip_code">
 							<div class="col-lg-6">
 								<div class="checkout__input">
 									<p>
@@ -245,7 +335,7 @@
 								<p>
 									배송메시지<span>*</span>
 								</p>
-								<input type="text">
+								<input type="text" name="delivery_message">
 							</div>
 							<!-- Shoping Cart Section Begin -->
 							<section class="shoping-cart spad">
@@ -321,25 +411,36 @@
 							</section>
 
 
-
+							<h4>결제수단</h4>
 							<div class="checkout__input__checkbox">
-								<label for="acc"> Create an account? <input
-									type="checkbox" id="acc"> <span class="checkmark"></span>
+								<label for="acc">신용카드<input type="radio" id="acc"
+									name="payMethod"> <span class="checkmark"></span>
+								</label> <label for="diff-acc">간편결제(네이버페이,카카오페이)<input
+									type="radio" id="diff-acc" name="payMethod"> <span
+									class="checkmark"></span>
+								</label> <label for="bank-transfers">무통장 입금<input type="radio"
+									id="bank-transfers" name="payMethod" value="bkt"> <span
+									class="checkmark"></span>
 								</label>
 							</div>
-							<p>Create an account by entering the information below. If
+							<!--  <p>Create an account by entering the information below. If
 								you are a returning customer please login at the top of the page</p>
 							<div class="checkout__input">
 								<p>
 									Account Password<span>*</span>
 								</p>
 								<input type="text">
-							</div>
+							</div> 
 							<div class="checkout__input__checkbox">
-								<label for="diff-acc"> Ship to a different address? <input
+								<label for="diff-acc">간편결제(네이버페이,카카오페이)<input
 									type="checkbox" id="diff-acc"> <span class="checkmark"></span>
 								</label>
 							</div>
+							<div class="checkout__input__checkbox">
+								<label for="diff-acc2">무통장 입금<input
+									type="checkbox" id="diff-acc"> <span class="checkmark"></span>
+								</label>
+							</div>-->
 							<div class="checkout__input">
 								<p>
 									Order notes<span>*</span>
@@ -348,6 +449,7 @@
 									placeholder="Notes about your order, e.g. special notes for delivery.">
 							</div>
 						</div>
+
 						<div class="col-lg-4 col-md-6">
 							<div class="checkout__order">
 								<h4>주문상세</h4>
@@ -385,11 +487,16 @@
 										id="paypal"> <span class="checkmark"></span>
 									</label>
 								</div> -->
-								<button type="submit" class="site-btn"
-									onclick="return paidCheck();">결제하기</button>
-								<!--  <button type="button" class="site-btn" onclick="identify()">본인
-									인증</button> -->
+								<button type="button" class="site-btn"
+									onclick="checkPayMethod()">결제하기</button>
+								<!--<button type="submit" class="site-btn"
+									onclick="return paidCheckTest();">페이지이동테스트</button>
+									<button type="button" class="site-btn"
+									onclick="payTest()">테스트</button>
+								 
 								<button type="button" onclick="getOrderId();">test</button>
+								<button type="button" onclick="getOrderId();">test</button>-->
+								<button type="submit">test</button>
 							</div>
 						</div>
 					</div>

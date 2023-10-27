@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ksh.mappers.OrderMapper">
+	<insert id="insertNewPayment">
+		INSERT INTO payments (payment_number, non_order_no,
+		payment_method, total_amount, shipping_fee, used_points, used_reward,
+		actual_payment_amount, payment_time, card_name, card_number)
+		VALUES(#{payment_number}, #{non_order_no}, #{payment_method},
+		#{total_amount}, #{shipping_fee},
+		#{used_points}, #{used_reward},
+		#{actual_payment_amount},
+		#{payment_time},#{card_name},#{card_number})
+	</insert>
+
+	<insert id="insertDetailOrderItem" parameterType="java.util.Map">
+		INSERT INTO deer.detailed_order_items
+		(non_order_no, product_id,
+		product_price)
+		VALUES
+		<foreach item="item" index="index" collection="list"
+			separator=",">
+			(#{item.non_order_no}, #{item.product_id},
+			#{item.product_price})
+		</foreach>
+	</insert>
+
+	<insert id="insertNewOrderHistory">
+		INSERT INTO deer.non_order_history (non_order_no,
+		non_member_id, recipient_name, recipient_phone_number, zip_code,
+		shipping_address, detailed_shipping_address, delivery_message,
+		non_password, non_email, delivery_status)
+		VALUES(#{non_order_no},
+		#{non_member_id}, #{recipient_name}, #{recipient_phone_number},
+		#{zip_code}, #{shipping_address}, #{detailed_shipping_address},
+		#{delivery_message}, #{non_password}, #{non_email},
+		#{delivery_status})
+	</insert>
+
+	<select id="getPaymentDetail">
+		select p.non_order_no,
+		p.total_amount, p.actual_payment_amount, d.product_id, d.product_price
+		, n.recipient_name, n.recipient_phone_number, n.shipping_address
+		from payments p inner join detailed_order_items d inner join
+		non_order_history n
+		on p.non_order_no = d.non_order_no and p.non_order_no = n.non_order_no
+		where p.non_order_no = #{non_order_no};
+	</select>
+	
+	<select id="getProductInfo" resultType="com.project.vodto.Product">
+		select * from Product where product_id = #{product_id};
+	</select>
+	
+
+</mapper>
