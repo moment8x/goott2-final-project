@@ -14,7 +14,7 @@ import com.project.vodto.NonShoppingCart;
 @Service
 public class NonMemberServiceImpl implements NonMemberService {
 	@Inject
-	NonShoppingCartDAO nscDao;
+	private NonShoppingCartDAO nscDao;
 	
 	@Override
 	public Boolean saveNonMemberId(String nonMemberId, Timestamp sessionLimit) throws SQLException, NamingException {

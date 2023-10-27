@@ -14,6 +14,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class NonShoppingCart {
-	private String non_member_id;
-	private Timestamp non_member_expiration_period;
+	private String nonMemberId;
+	private Timestamp nonMemberExpirationPeriod;
 }

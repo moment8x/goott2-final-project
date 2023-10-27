@@ -273,7 +273,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                 </div>
 
                                                 <div class="button-group">
-                                                    <a href="cart.html" class="btn btn-sm cart-button">View Cart</a>
+                                                    <a href="/shoppingCart/shoppingCart" class="btn btn-sm cart-button">View Cart</a>
                                                     <a href="checkout.html" class="btn btn-sm cart-button theme-bg-color
                                                     text-white">Checkout</a>
                                                 </div>
@@ -301,7 +301,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                 </li>
 
                                                 <li class="product-box-contain">
-                                                    <a href="sign-up.html">Register</a>
+                                                    <a href="/register/register">Register</a>
                                                 </li>
 
                                                 <li class="product-box-contain">
@@ -871,7 +871,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                         <a class="dropdown-item" href="about-us.html">About Us</a>
                                                     </li>
                                                     <li>
-                                                        <a class="dropdown-item" href="cart.html">Cart</a>
+                                                        <a class="dropdown-item" href="/shoppingCart/shoppingCart">Cart</a>
                                                     </li>
                                                     <li>
                                                         <a class="dropdown-item" href="contact-us.html">Contact</a>

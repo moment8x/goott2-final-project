@@ -19,7 +19,7 @@ public class ProductDAOImpl implements ProductDAO {
 	
 	
 	@Override
-	public Product selectProduct(String product_id) throws SQLException, NamingException {
-		return session.selectOne(ns + ".selectProduct", product_id);
+	public Product selectProduct(String productId) throws SQLException, NamingException {
+		return session.selectOne(ns + ".selectProduct", productId);
 	}
 }

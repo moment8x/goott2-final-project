@@ -18,6 +18,7 @@ public class Member {
 	private String password;
 	private String name;
 	private String phoneNumber;
+	private String cellPhoneNumber;
 	private Timestamp registertaionDate;
 	private char gender;
 	private String dateOfBirth;
@@ -26,8 +27,6 @@ public class Member {
 	private String detailedAddress;
 	private String email;
 	private char identityVerificationStatus;
-	private char adultVerificationStatus;
-	private char reciveAdvertising;
 	private String membershipGrade;
 	private int totalPoints;
 	private int totalReward;
@@ -39,4 +38,5 @@ public class Member {
 	private String refundAccount;
 	private String dormantAccout;
 	private String memberToken;
+	private String permission;
 }

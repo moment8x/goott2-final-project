@@ -26,9 +26,9 @@ import com.project.vodto.ShoppingCart;
 @Service
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 	@Inject
-	ShoppingCartDAO scDao;
+	private ShoppingCartDAO scDao;
 	@Inject
-	ProductDAO pDao;
+	private ProductDAO pDao;
 	
 	/**
 	 * @MethodName : getShoppingCart
@@ -61,8 +61,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 		List<Product> items = new ArrayList<Product>();
 		// 저장
 		for (int i = 0; i < list.size(); i++) {
-			System.out.println(list.get(i).getProduct_id());
-			items.add(pDao.selectProduct(list.get(i).getProduct_id()));
+			System.out.println(list.get(i).getProductId());
+			items.add(pDao.selectProduct(list.get(i).getProductId()));
 		}
 		
 		result.put("list", list);
@@ -96,7 +96,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 			// 회원일 시
 		} else {
 			// 비회원일 시
-			int check = scDao.deleteItem(memberId, productId);
+			int check = scDao.deleteItemNon(memberId, productId);
 			if (check > 0)	{
 				System.out.println("삭제된 row의 수 : " + check);
 				result = true;
@@ -105,6 +105,51 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 		
 		System.out.println("======= 장바구니 서비스단 끝 =======");
 		
+		return result;
+	}
+
+	@Override
+	public boolean dellteItems(String memberId, boolean loginCheck, List<String> items)
+			throws SQLException, NamingException {
+		System.out.println("======= 장바구니 서비스단 - 장바구니 선택 아이템 삭제 =======");
+		boolean result = false;
+		
+		if (loginCheck) {
+			// 회원일 시
+		} else {
+			// 비회원일 시
+			int check = 0;
+			for (int i = 0; i < items.size(); i++) {
+				check += scDao.deleteItemNon(memberId, items.get(i));
+			}
+			if (check > 0) {
+				System.out.println("삭제된 row의 수 : " + check);
+				result = true;
+			}
+		}
+		
+		System.out.println("======= 장바구니 서비스단 끝 =======");
+		
+		return result;
+	}
+
+	@Override
+	public boolean insertItem(String memberId, boolean loginCheck, String productId)
+			throws SQLException, NamingException {
+		System.out.println("======= 장바구니 서비스단 - 장바구니에 아이템 추가 =======");
+		boolean result = false;
+		
+		if (loginCheck) {
+			// 회원일 시
+		} else {
+			// 비회원일 시
+			if (scDao.insertShoppingCartNon(memberId, productId) == 1) {
+				System.out.println("아이템 추가 성공");
+				result = true;
+			}
+		}
+		
+		System.out.println("======= 장바구니 서비스단 끝 =======");
 		return result;
 	}
 }
