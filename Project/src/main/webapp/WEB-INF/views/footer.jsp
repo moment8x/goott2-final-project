@@ -83,7 +83,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <div class="main-footer section-b-space section-t-space">
@@ -246,6 +245,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <div class="sub-footer section-small-space">
@@ -315,6 +315,7 @@
     <script src="/resources/assets/js/slick/slick.js"></script>
     <script src="/resources/assets/js/slick/custom_slick.js"></script>
 
+
     <!-- Quantity js -->
     <script src="/resources/assets/js/quantity.js"></script>
     <!-- script js -->
@@ -323,6 +324,7 @@
     <!-- feather icon js-->
     <script src="/resources/assets/js/feather/feather.min.js"></script>
     <script src="/resources/assets/js/feather/feather-icon.js"></script>
+
 
     </body>
 </html>

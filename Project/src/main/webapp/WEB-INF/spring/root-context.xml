@@ -68,6 +68,7 @@
 		<property name="dataSource" ref="dataSource"></property>
 	</bean>
 	
+	
 	<!-- 어노테이션으로 트랜잭션 설정 -->
 	<tx:annotation-driven/>
 	
@@ -81,4 +82,5 @@
 	<context:component-scan base-package="com.project.service"/>
 	<context:component-scan base-package="com.project.dao"/>
 	<context:component-scan base-package="com.project.persistence"/>
+
 </beans>

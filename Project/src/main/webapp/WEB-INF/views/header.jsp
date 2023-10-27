@@ -41,6 +41,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 
   <!-- Header Start -->
     <header class="pb-md-4 pb-0">
+
         <div class="header-top">
             <div class="container-fluid-lg">
                 <div class="row">
@@ -134,7 +135,6 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                 </div>
             </div>
         </div>
-
         <div class="top-nav top-header sticky-header">
             <div class="container-fluid-lg">
                 <div class="row">
@@ -307,12 +307,18 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                 <li class="product-box-contain">
                                                     <a href="forgot.html">Forgot Password</a>
                                                 </li>
+                                                
+                                              <li class="product-box-contain">
+                                                    <a href="/user/myPage">My Page</a>
+                                                </li>
+                                              
                                             </ul>
                                         </div>
                                     </li>
                                 </ul>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -716,7 +722,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                 <a class="nav-link dropdown-toggle ps-xl-2 ps-0"
                                                     href="javascript:void(0)" data-bs-toggle="dropdown">Mega Menu</a>
 
+
                                                   <div class="dropdown-menu dropdown-menu-2">
+
 
                                                     <div class="row">
                                                         <div class="dropdown-column col-xl-3">
@@ -971,7 +979,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                             <li class="list-1">
                                 <div class="deal-offer-contain">
                                     <a href="shop-left-sidebar.html" class="deal-image">
+
                                         <img src="/resources/assets/images/vegetable/product/10.png" class="blur-up lazyload"
+
                                             alt="">
                                     </a>
 
@@ -985,7 +995,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                             <li class="list-2">
                                 <div class="deal-offer-contain">
                                     <a href="shop-left-sidebar.html" class="deal-image">
+
                                         <img src="/resources/assets/images/vegetable/product/11.png" class="blur-up lazyload"
+
                                             alt="">
                                     </a>
 
@@ -999,7 +1011,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                             <li class="list-3">
                                 <div class="deal-offer-contain">
                                     <a href="shop-left-sidebar.html" class="deal-image">
+
                                         <img src="/resources/assets/images/vegetable/product/12.png" class="blur-up lazyload"
+
                                             alt="">
                                     </a>
 
@@ -1013,7 +1027,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                             <li class="list-1">
                                 <div class="deal-offer-contain">
                                     <a href="shop-left-sidebar.html" class="deal-image">
+
                                         <img src="/resources/assets/images/vegetable/product/13.png" class="blur-up lazyload"
+
                                             alt="">
                                     </a>
 
@@ -1036,6 +1052,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     
     <!-- latest jquery -->
     <script src="/resources/assets/js/jquery-3.6.0.min.js"></script>
+
     <!-- jquery ui-->
     <script src="/resources/assets/js/jquery-ui.min.js"></script>
     <!-- Bootstrap js-->
@@ -1057,5 +1074,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     <!-- script js -->
     <script src="/resources/assets/js/script.js"></script>
 
+
 </html>
+
 

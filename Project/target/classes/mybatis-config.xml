@@ -5,6 +5,7 @@
 
 <configuration>
 	<settings>
+
 		<setting name="mapUnderscoreToCamelCase" value="true" />
 	</settings>
 
@@ -12,6 +13,7 @@
 		<typeAlias type="com.project.vodto.Product" alias="product" />
 		<typeAlias type="com.project.vodto.Board" alias="Board" />
 	</typeAliases>
+
 
 
 
