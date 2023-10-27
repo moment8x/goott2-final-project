@@ -28,8 +28,8 @@ public class MemberDAOImpl implements MemberDAO {
 
 	@Override
 	public Member selectMyInfo(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
+
+		return ses.selectOne(ns+ ".getMemberInfo", memberId);
 	}
 
 	@Override
@@ -57,9 +57,9 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public List<Integer> selectOrderNo(String memberId) {
+	public Member duplicateUserEmail(String email) throws SQLException, NamingException {
 		
-		return ses.selectList(ns + ".getOrderNo", memberId);
+		return ses.selectOne(ns + ".getEmail", email);
 	}
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------

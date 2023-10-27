@@ -34,7 +34,7 @@
     <link id="color-link" rel="stylesheet" type="text/css" href="/resources/assets/css/style.css">
 </head>
   <body>
-  	<!-- Footer Section Start -->
+     <!-- Footer Section Start -->
     <footer class="section-t-space">
         <div class="container-fluid-lg">
             <div class="service-section">
@@ -245,6 +245,44 @@
                         </div>
                     </div>
                 </div>
+
+                                <div class="service-detail">
+                                    <h5>Every Fresh Products</h5>
+                                </div>
+                            </div>
+
+                            <div class="service-box">
+                                <div class="service-image">
+                                    <img src="/resources/assets/svg/delivery.svg" class="blur-up lazyload" alt="">
+                                </div>
+
+                                <div class="service-detail">
+                                    <h5>Free Delivery For Order Over $50</h5>
+                                </div>
+                            </div>
+
+                            <div class="service-box">
+                                <div class="service-image">
+                                    <img src="/resources/assets/svg/discount.svg" class="blur-up lazyload" alt="">
+                                </div>
+
+                                <div class="service-detail">
+                                    <h5>Daily Mega Discounts</h5>
+                                </div>
+                            </div>
+
+                            <div class="service-box">
+                                <div class="service-image">
+                                    <img src="/resources/assets/svg/market.svg" class="blur-up lazyload" alt="">
+                                </div>
+
+                                <div class="service-detail">
+                                    <h5>Best Price On The Market</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="sub-footer section-small-space">
@@ -286,7 +324,7 @@
     </footer>
     <!-- Footer Section End -->
   
-  	<!-- Tap to top start -->
+     <!-- Tap to top start -->
     <div class="theme-option">
         <div class="back-to-top">
             <a id="back-to-top" href="#">
@@ -295,6 +333,7 @@
         </div>
     </div>
     <!-- Tap to top end -->
+
   
    <!-- latest jquery
     <script src="/resources/assets/js/jquery-3.6.0.min.js"></script>-->
@@ -313,9 +352,16 @@
     <script src="/resources/assets/js/slick/slick.js"></script>
     <script src="/resources/assets/js/slick/custom_slick.js"></script>
 
+
     <!-- Quantity js -->
     <script src="/resources/assets/js/quantity.js"></script>
     <!-- script js -->
     <script src="/resources/assets/js/script.js"></script>
+
+    <!-- feather icon js-->
+    <script src="/resources/assets/js/feather/feather.min.js"></script>
+    <script src="/resources/assets/js/feather/feather-icon.js"></script>
+
+
     </body>
 </html>

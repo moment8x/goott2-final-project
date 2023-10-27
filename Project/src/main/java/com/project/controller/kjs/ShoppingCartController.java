@@ -210,4 +210,10 @@ public class ShoppingCartController {
 		System.out.println("======= 장바구니 컨트롤러단 끝 =======");
 		return result;
 	}
+	
+	@RequestMapping(value="/insert" ,  method=RequestMethod.POST)
+	public ResponseEntity<String> test(@RequestParam("id") String id){
+		System.out.println(id + "야이야이야 내나이가 어때서");
+		return ResponseEntity.ok("Success");
+	}
 }

@@ -1,6 +1,7 @@
 package com.project.vodto;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,11 +19,15 @@ public class PaymentDTO {
 	private int order_no;
 	private String non_order_no;
 	private String payment_method;
-	private String total_amount;
+	private int total_amount;
 	private int shipping_fee;
 	private int used_reward;
 	private int used_points;
-	private String actual_payment_amount;
+	private int actual_payment_amount;
 	private Timestamp payment_time;
-	private String amount_to_pay;
+	private int amount_to_pay;
+	private List<String> product_id;
+	private List<Integer> product_price;
+	private String card_name;
+	private String card_number;
 }

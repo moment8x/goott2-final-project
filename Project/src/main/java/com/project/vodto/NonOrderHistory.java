@@ -14,7 +14,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class NonOrderHistory {
-	private int non_order_no;
+	private String non_order_no;
 	private String non_member_id;
 	private String invoice_number;
 	private String recipient_name;
@@ -22,10 +22,10 @@ public class NonOrderHistory {
 	private Timestamp order_time;
 	private String zip_code;
 	private String shipping_address;
-	private String detail_shipping_address;
+	private String detailed_shipping_address;
 	private String delivery_status;
 	private String delivery_message;
-	private Timestamp nonDelete_date;
+	private Timestamp non_deleted_date;
 	private String non_password;
 	private String non_email;
 }

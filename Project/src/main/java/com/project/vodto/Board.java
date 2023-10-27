@@ -14,9 +14,9 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Board {
-   private int post_no;
+   private int postNo;
    private String author;
-   private Timestamp created_date;
+   private Timestamp createdDate;
    private String title;
    private String content;
    private int file;

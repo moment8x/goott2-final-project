@@ -9,16 +9,7 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script type="text/javascript">
-	$(function() {
-		//주문 내역 삭제 모달 열기
-		$('.delOrderList').click(function() {
-			$('#delOrderListModal').show()
-		})
-		//주문 내역 삭제 모달 닫기
-		$('.delOrderListClose').click(function() {
-			$('#delOrderListModal').hide()
-		})
-	})
+	
 </script>
 <style type="text/css">
 #orderHistory {
@@ -79,7 +70,7 @@ body > section.blog.spad > div > div > div.col-sm-8 > section{
 									class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 									href="#">회원</a>
 									<ul class="dropdown-menu">
-										<li><a class="dropdown-item" href="#">회원정보</a></li>
+										<li><a class="dropdown-item" href="userInfo">회원정보</a></li>
 										<li><a class="dropdown-item" href="address">배송주소록</a></li>
 									</ul></li>
 							</ul>
@@ -135,30 +126,30 @@ body > section.blog.spad > div > div > div.col-sm-8 > section{
 									<div class="shoping__cart__table">
 										<c:forEach var="order" items="${orderList }">
 											<table id="orderList">
-												<th>${order.order_no }<a
-													href="detailOrderList?order_no=${order.order_no }"><p>상세보기</p></a></th>
-												<th colspan="3">${order.order_time }</th>
+												<th>${order.orderNo }<a
+													href="detailOrderList?order_no=${order.orderNo }"><p>상세보기</p></a></th>
+												<th colspan="3">${order.orderTime }</th>
 												<th colspan="2"></th>
 												<tbody>
 													<tr>
 													<c:choose>
-													<c:when test="${order.product_image == '' }">
+													<c:when test="${order.productImage == '' }">
 													<td class="shoping__cart__item" id="productImg"><i class="fa-regular fa-image fa-2xl" ></i></td>
 													</c:when>
 													<c:otherwise>
 														<td class="shoping__cart__item" id="productImg"><a
-															href="#"><img src="${order.product_image }"
-																alt="${order.product_name }" /></a></td>
+															href="#"><img src="${order.productImage }"
+																alt="${order.productName }" /></a> </td>
 													</c:otherwise>
 													</c:choose>
-														<td class="shoping__cart__item"><a href="#"><p class="orderName">${order.product_name }</p></a></td>
-														<td class="shoping__cart__item" id="totalPayments">${order.actual_payment_amount }</td>
+														<td class="shoping__cart__item"><a href="#"><p class="orderName">${order.productName }</p></a></td>
+														<td class="shoping__cart__item" id="totalPayments">${order.actualPaymentAmount }</td>
 														<td class="shoping__cart__quantity">
 															<div class="quantity">
-																<span>${orderProductCount }</span>
+																<span>${order.totalOrderCnt }</span>
 															</div>
 														</td>
-														<td class="shoping__cart__item" id="deliveryStatus">${order.delivery_status }</td>
+														<td class="shoping__cart__item" id="deliveryStatus">${order.deliveryStatus }</td>
 														<td class="shoping__cart__item__close delOrderList"><span
 															class="icon_close"></span></td>
 													</tr>
@@ -166,7 +157,6 @@ body > section.blog.spad > div > div > div.col-sm-8 > section{
 											</table>
 												</c:forEach>
 										${orderList }
-										${orderProductCount }
 									
 									</div>
 								</div>
@@ -178,28 +168,6 @@ body > section.blog.spad > div > div > div.col-sm-8 > section{
 		</div>
 
 	</section>
-	<!-- The Modal -->
-	<div class="modal" id="delOrderListModal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-
-				<!-- Modal body -->
-				<div class="modal-body">
-					<p>주문,배송 목록에서 삭제하시겠습니까?</p>
-					<p>삭제된 주문은 주문배송 목록에서 노출되지 않으며, 복구가 불가능합니다.</p>
-					<p>교환/반품 신청은 고객센터를 통해 문의해주세요.</p>
-				</div>
-
-				<!-- Modal footer -->
-				<div class="modal-footer">
-					<button type="button" class="btn btn-danger delOrderListClose"
-						data-bs-dismiss="modal">취소</button>
-					<button type="button" class="btn btn-outline-success" onclick="">삭제</button>
-				</div>
-
-			</div>
-		</div>
-	</div>
 
 	<jsp:include page="../footer.jsp"></jsp:include>
 </body>

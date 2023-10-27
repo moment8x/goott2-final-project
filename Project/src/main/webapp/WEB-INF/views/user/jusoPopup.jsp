@@ -67,7 +67,7 @@ function init(){
 	<form id="form" name="form" method="post">
 		<input type="hidden" id="confmKey" name="confmKey" value=""/>
 		<input type="hidden" id="returnUrl" name="returnUrl" value=""/>
-		<input type="hidden" id="resultType" name="resultType" value=""/> // resultType항목 추가(2016.10.06)
+		<input type="hidden" id="resultType" name="resultType" value=""/> 
 		<!-- 해당시스템의 인코딩타입이 EUC-KR일경우에만 추가 START--> 
 		<!-- 
 		<input type="hidden" id="encodingType" name="encodingType" value="EUC-KR"/>
