@@ -1,6 +1,11 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java,windows,eclipse
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,windows,eclipse
 
+/classes/
+/test-classes/
+.classpath
+MANIFEST.MF
+
 ### Eclipse ###
 .metadata
 bin/
@@ -61,7 +66,7 @@ local.properties
 
 # Uncomment this line if you wish to ignore the project description file.
 # Typically, this file would be tracked if it contains build/dependency configurations:
-#.project
+.project
 
 ### Eclipse Patch ###
 # Spring Boot Tooling
@@ -124,3 +129,7 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/java,windows,eclipse
 Project/target/m2e-wtp/web-resources/META-INF/maven/com.project/controller/pom.properties
 Project/src/main/webapp/WEB-INF/spring/root-context.xml
+Project/.settings
+Project/.classpath
+Project/src/main/webapp/config/config.properties
+Project/target/m2e-wtp/web-resources/META-INF/MANIFEST.MF

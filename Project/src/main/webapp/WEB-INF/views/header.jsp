@@ -18,18 +18,19 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     />
 
     <!-- Css Styles -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" type="text/css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/elegant-icons.css" type="text/css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/nice-select.css" type="text/css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/jquery-ui.min.css" type="text/css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/owl.carousel.min.css" type="text/css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/slicknav.min.css" type="text/css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/font-awesome.min.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/elegant-icons.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/nice-select.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/jquery-ui.min.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/owl.carousel.min.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/slicknav.min.css" type="text/css" />
+    <link rel="stylesheet" href="/resources/css/style.css" type="text/css" />
    
   </head>
 
   <body>
+  <c:set var="contextPath" value="<%=request.getContextPath() %>" />
     <!-- Page Preloder 
     <div id="preloder">
       <div class="loader"></div>
@@ -197,11 +198,11 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                 <div id="drop_in_category" style="display: flex">
                   <ul>
                     <li>
-                      <a href="/list/category/KOR" style="font-weight: bold"
+                      <a href="${contextPath }/list/category/KOR" style="font-weight: bold"
                         >국내도서 전체</a
                       >
                     </li>
-                    <li><a href="/list/categoryList/KOR01">소설</a></li>
+                    <li><a href="${contextPath }/list/categoryList/KOR01">소설</a></li>
                     <li><a href="/list/categoryList/KOR02">시/에세이</a></li>
                     <li><a href="/list/categoryList/KOR03">인문</a></li>
                     <li><a href="/list/categoryList/KOR04">가정/육아</a></li>
@@ -259,13 +260,13 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     <!-- Hero Section End -->
  <!-- Js Plugins -->
     <script src="https://kit.fontawesome.com/fd7fb2445c.js" crossorigin="anonymous"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/jquery-3.3.1.min.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/jquery.nice-select.min.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/jquery-ui.min.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/jquery.slicknav.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/mixitup.min.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/owl.carousel.min.js"></script>
+    <script src="/resources/js/jquery-3.3.1.min.js"></script>
+    <script src="/resources/js/bootstrap.min.js"></script>
+    <script src="/resources/js/jquery.nice-select.min.js"></script>
+    <script src="/resources/js/jquery-ui.min.js"></script>
+    <script src="/resources/js/jquery.slicknav.js"></script>
+    <script src="/resources/js/mixitup.min.js"></script>
+    <script src="/resources/js/owl.carousel.min.js"></script>
    <!--  <script src="${pageContext.request.contextPath}/resources/js/main.js"></script>  --> 
     
   </body>
