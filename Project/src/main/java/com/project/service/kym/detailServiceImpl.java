@@ -1,6 +1,7 @@
 package com.project.service.kym;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -18,14 +19,15 @@ public class detailServiceImpl implements detailService {
 
 
 	@Override
-	public Map<String, Object> getProductId(String no, String ipAddr) throws Exception {
+	public Map<String, Object> getProductId(String productId, String ipAddr) throws Exception {
 		Map<String, Object> result = new HashMap<String, Object>();
-		Product product = Ddao.selectDetailNO(no);
-		System.out.println(product);
+		Product product = Ddao.selectDetailNO(productId);
+//		System.out.println(product);
 		
 		result.put("product", product);
 
 		return result;
+		
 	}
 	
 	

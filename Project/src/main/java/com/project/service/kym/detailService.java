@@ -8,5 +8,5 @@ import java.util.Map;
 public interface detailService {
 
 
-	Map<String, Object> getProductId(String no, String ipAddr) throws Exception;
+	Map<String, Object> getProductId(String productId, String ipAddr) throws Exception;
 }
