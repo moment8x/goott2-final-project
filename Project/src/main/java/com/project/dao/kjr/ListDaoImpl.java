@@ -10,8 +10,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.PagingInfo;
-import com.project.vodto.Product;
 import com.project.vodto.ProductCategory;
+import com.project.vodtokjy.Products;
 
 @Repository
 public class ListDaoImpl implements ListDao {
@@ -27,11 +27,38 @@ public class ListDaoImpl implements ListDao {
 	}
 
 	@Override
-	public List<Product> selectProductForList(String key, PagingInfo pi) throws Exception {
+	public List<Products> selectProductForListSortByNew(String key, PagingInfo pi, String sortBy) throws Exception {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("key", key);
 		param.put("startRowIndex", pi.getStartRowIndex());
 		param.put("viewProductPerPage", pi.getViewProductPerPage());
+		param.put("sortBy", "publication_date desc");
+
+
+		return ses.selectList(ns+".selectProductForList", param);
+	}
+	@Override
+	public List<Products> selectProductForListSortByPrice(String key, PagingInfo pi, String sortBy) throws Exception {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("key", key);
+		param.put("startRowIndex", pi.getStartRowIndex());
+		param.put("viewProductPerPage", pi.getViewProductPerPage());
+		if ("high".equals(sortBy)) {
+			param.put("sortBy", "selling_price desc");
+		} else if ("low".equals(sortBy)){
+			param.put("sortBy", "selling_price");
+		}
+
+		return ses.selectList(ns+".selectProductForList", param);
+	}
+	
+	@Override
+	public List<Products> selectProductForListSortBySell(String key, PagingInfo pi, String sortBy) throws Exception {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("key", key);
+		param.put("startRowIndex", pi.getStartRowIndex());
+		param.put("viewProductPerPage", pi.getViewProductPerPage());
+
 
 		return ses.selectList(ns+".selectProductForList", param);
 	}
@@ -47,4 +74,5 @@ public class ListDaoImpl implements ListDao {
 		
 		return ses.selectOne(ns+".selectProductCount", key);
 	}
+
 }

@@ -36,14 +36,105 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     <link rel="stylesheet" type="text/css" href="/resources/assets/css/bulk-style.css">
     <!-- Template css -->
     <link id="color-link" rel="stylesheet" type="text/css" href="/resources/assets/css/style.css">
-    
-    
-    
-    
+
   </head>
 
   <!-- Header Start -->
     <header class="pb-md-4 pb-0">
+
+        <div class="header-top">
+            <div class="container-fluid-lg">
+                <div class="row">
+                    <div class="col-xxl-3 d-xxl-block d-none">
+                        <div class="top-left-header">
+                            <i class="iconly-Location icli text-white"></i>
+                            <span class="text-white">1418 Riverwood Drive, CA 96052, US</span>
+                        </div>
+                    </div>
+
+                    <div class="col-xxl-6 col-lg-9 d-lg-block d-none">
+                        <div class="header-offer">
+                            <div class="notification-slider">
+                                <div>
+                                    <div class="timer-notification">
+
+                                        <h6>
+                      					 <strong class="me-1">Deer Books에 오신것을 환영합니다!</strong>
+                   					   </h6>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="timer-notification">
+                                       <h6>
+                       					 사슴을 살려주세요!
+                       					 <a href="shop-left-sidebar.html" class="text-white">Save Life!</a >
+                    				  </h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <ul class="about-list right-nav-about">
+                            <li class="right-nav-list">
+                                <div class="dropdown theme-form-select">
+                                    <button class="btn dropdown-toggle" type="button" id="select-language"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="/resources/assets/images/country/united-states.png"
+                                            class="img-fluid blur-up lazyload" alt="">
+                                        <span>English</span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="select-language">
+                                        <li>
+                                            <a class="dropdown-item" href="javascript:void(0)" id="english">
+                                                <img src="/resources/assets/images/country/united-kingdom.png"
+                                                    class="img-fluid blur-up lazyload" alt="">
+                                                <span>English</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="javascript:void(0)" id="france">
+                                                <img src="/resources/assets/images/country/germany.png"
+                                                    class="img-fluid blur-up lazyload" alt="">
+                                                <span>Germany</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="javascript:void(0)" id="chinese">
+                                                <img src="/resources/assets/images/country/turkish.png"
+                                                    class="img-fluid blur-up lazyload" alt="">
+                                                <span>Turki</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="right-nav-list">
+                                <div class="dropdown theme-form-select">
+                                    <button class="btn dropdown-toggle" type="button" id="select-dollar"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span>USD</span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end sm-dropdown-menu"
+                                        aria-labelledby="select-dollar">
+                                        <li>
+                                            <a class="dropdown-item" id="aud" href="javascript:void(0)">AUD</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" id="eur" href="javascript:void(0)">EUR</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" id="cny" href="javascript:void(0)">CNY</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="top-nav top-header sticky-header">
             <div class="container-fluid-lg">
                 <div class="row">
@@ -56,7 +147,8 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                 </span>
                             </button>
                             <a href="index.html" class="web-logo nav-logo">
-                                <img src="/resources/assets/images/deerBooks_logo.png" class="img-fluid blur-up lazyload" alt="">
+
+                                <img src="/resources/assets/images/deer.png" class="img-fluid blur-up lazyload" alt="">
                             </a>
 
                             <div class="middle-box">
@@ -103,7 +195,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                 </div>
                                             </div>
                                         </div>
-                                    </li>
+
                                     <li class="right-side">
                                         <a href="contact-us.html" class="delivery-login-box">
                                             <div class="delivery-icon">
@@ -119,6 +211,10 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                         <a href="wishlist.html" class="btn p-0 position-relative header-wishlist">
                                             <i data-feather="heart"></i>
                                         </a>
+
+                                    <li class="right-side" data-bs-toggle="modal" data-bs-target="#deal-box">
+                                            <i data-feather="heart"></i>
+
                                     </li>
                                     <li class="right-side">
                                         <div class="onhover-dropdown header-badge">
@@ -199,7 +295,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                             <ul class="user-box-name">
                                                 <li class="product-box-contain">
                                                     <i></i>
-                                                    <a href="login.html">Log In</a>
+
+                                                    <a href="/login/">Log In</a>
+
                                                 </li>
 
                                                 <li class="product-box-contain">
@@ -210,15 +308,17 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                     <a href="forgot.html">Forgot Password</a>
                                                 </li>
                                                 
-                                                <li class="product-box-contain">
+                                              <li class="product-box-contain">
                                                     <a href="/user/myPage">My Page</a>
                                                 </li>
+                                              
                                             </ul>
                                         </div>
                                     </li>
                                 </ul>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -241,396 +341,258 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                         <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
-
-                                <ul class="category-list">
-                                    <li class="onhover-category-list">
-                                        <a href="javascript:void(0)" class="category-name">
-                                            <img src="/resources/assets/svg/1/vegetable.svg" alt="">
-                                            <h6>Vegetables & Fruit</h6>
-                                            <i class="fa-solid fa-angle-right"></i>
-                                        </a>
-
-                                        <div class="onhover-category-box">
-                                            <div class="list-1">
-                                                <div class="category-title-box">
-                                                    <h5>Organic Vegetables</h5>
-                                                </div>
-                                                <ul>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Potato & Tomato</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Cucumber & Capsicum</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Leafy Vegetables</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Root Vegetables</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Beans & Okra</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Cabbage & Cauliflower</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Gourd & Drumstick</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Specialty</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-
-                                            <div class="list-2">
-                                                <div class="category-title-box">
-                                                    <h5>Fresh Fruit</h5>
-                                                </div>
-                                                <ul>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Banana & Papaya</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Kiwi, Citrus Fruit</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Apples & Pomegranate</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Seasonal Fruits</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Mangoes</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Fruit Baskets</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li class="onhover-category-list">
-                                        <a href="javascript:void(0)" class="category-name">
-                                            <img src="/resources/assets/svg/1/cup.svg" alt="">
-                                            <h6>Beverages</h6>
-                                            <i class="fa-solid fa-angle-right"></i>
-                                        </a>
-
-                                        <div class="onhover-category-box w-100">
-                                            <div class="list-1">
-                                                <div class="category-title-box">
-                                                    <h5>Energy & Soft Drinks</h5>
-                                                </div>
-                                                <ul>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Soda & Cocktail Mix</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Soda & Cocktail Mix</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Sports & Energy Drinks</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Non Alcoholic Drinks</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Packaged Water</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Spring Water</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Flavoured Water</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li class="onhover-category-list">
-                                        <a href="javascript:void(0)" class="category-name">
-                                            <img src="/resources/assets/svg/1/meats.svg" alt="">
-                                            <h6>Meats & Seafood</h6>
-                                            <i class="fa-solid fa-angle-right"></i>
-                                        </a>
-
-                                        <div class="onhover-category-box">
-                                            <div class="list-1">
-                                                <div class="category-title-box">
-                                                    <h5>Meat</h5>
-                                                </div>
-                                                <ul>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Fresh Meat</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Frozen Meat</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Marinated Meat</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Fresh & Frozen Meat</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-
-                                            <div class="list-2">
-                                                <div class="category-title-box">
-                                                    <h5>Seafood</h5>
-                                                </div>
-                                                <ul>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Fresh Water Fish</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Dry Fish</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Frozen Fish & Seafood</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Marine Water Fish</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Canned Seafood</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Prawans & Shrimps</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Other Seafood</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li class="onhover-category-list">
-                                        <a href="javascript:void(0)" class="category-name">
-                                            <img src="/resources/assets/svg/1/breakfast.svg" alt="">
-                                            <h6>Breakfast & Dairy</h6>
-                                            <i class="fa-solid fa-angle-right"></i>
-                                        </a>
-
-                                        <div class="onhover-category-box">
-                                            <div class="list-1">
-                                                <div class="category-title-box">
-                                                    <h5>Breakfast Cereals</h5>
-                                                </div>
-                                                <ul>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Oats & Porridge</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Kids Cereal</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Muesli</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Flakes</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Granola & Cereal Bars</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Instant Noodles</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Pasta & Macaroni</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Frozen Non-Veg Snacks</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-
-                                            <div class="list-2">
-                                                <div class="category-title-box">
-                                                    <h5>Dairy</h5>
-                                                </div>
-                                                <ul>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Milk</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Curd</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Paneer, Tofu & Cream</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Butter & Margarine</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Condensed, Powdered Milk</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Buttermilk & Lassi</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Yogurt & Shrikhand</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Flavoured, Soya Milk</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li class="onhover-category-list">
-                                        <a href="javascript:void(0)" class="category-name">
-                                            <img src="/resources/assets/svg/1/frozen.svg" alt="">
-                                            <h6>Frozen Foods</h6>
-                                            <i class="fa-solid fa-angle-right"></i>
-                                        </a>
-
-                                        <div class="onhover-category-box w-100">
-                                            <div class="list-1">
-                                                <div class="category-title-box">
-                                                    <h5>Noodle, Pasta</h5>
-                                                </div>
-                                                <ul>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Instant Noodles</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Hakka Noodles</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Cup Noodles</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Vermicelli</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Instant Pasta</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li class="onhover-category-list">
-                                        <a href="javascript:void(0)" class="category-name">
-                                            <img src="/resources/assets/svg/1/biscuit.svg" alt="">
-                                            <h6>Biscuits & Snacks</h6>
-                                            <i class="fa-solid fa-angle-right"></i>
-                                        </a>
-
-                                        <div class="onhover-category-box">
-                                            <div class="list-1">
-                                                <div class="category-title-box">
-                                                    <h5>Biscuits & Cookies</h5>
-                                                </div>
-                                                <ul>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Salted Biscuits</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Marie, Health, Digestive</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Cream Biscuits & Wafers</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Glucose & Milk Biscuits</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Cookies</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-
-                                            <div class="list-2">
-                                                <div class="category-title-box">
-                                                    <h5>Bakery Snacks</h5>
-                                                </div>
-                                                <ul>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Bread Sticks & Lavash</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Cheese & Garlic Bread</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Puffs, Patties, Sandwiches</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Breadcrumbs & Croutons</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li class="onhover-category-list">
-                                        <a href="javascript:void(0)" class="category-name">
-                                            <img src="/resources/assets/svg/1/grocery.svg" alt="">
-                                            <h6>Grocery & Staples</h6>
-                                            <i class="fa-solid fa-angle-right"></i>
-                                        </a>
-
-                                        <div class="onhover-category-box">
-                                            <div class="list-1">
-                                                <div class="category-title-box">
-                                                    <h5>Grocery</h5>
-                                                </div>
-                                                <ul>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Lemon, Ginger & Garlic</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Indian & Exotic Herbs</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Organic Vegetables</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Organic Fruits</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-
-                                            <div class="list-2">
-                                                <div class="category-title-box">
-                                                    <h5>Organic Staples</h5>
-                                                </div>
-                                                <ul>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Organic Dry Fruits</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Organic Dals & Pulses</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Organic Millet & Flours</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Organic Sugar, Jaggery</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Organic Masalas & Spices</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Organic Rice, Other Rice</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Organic Flours</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">Organic Edible Oil, Ghee</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
+		                  <ul class="category-list">
+		                    <li class="onhover-category-list" >
+		                      <a href="javascript:void(0)" class="category-name">
+		                        <img src="/resources/assets/images/open-book.png" alt="" />
+		                        <h6>국내도서</h6>
+		                        <i class="fa-solid fa-angle-right"></i>
+		                      </a>
+		
+		                      <div class="onhover-category-box" style="width: 600px; height: 550px;">
+		                        <div class="list-1">
+		                          <div class="category-title-box">
+		                            <a href="/list/category/KOR"><h5>국내도서 전체</h5></a>
+		                          </div>
+		                          <ul>
+		                            <li>
+		                              <a href="/list/categoryList/KOR01">소설</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR02"
+		                                >시/에세이</a
+		                              >
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR03">인문</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR04">가정/육아</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR05">요리</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR06"
+		                                >건강</a
+		                              >
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR07">취미/실용/스포츠</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR08">경제/경영</a>
+		                            </li>
+		                            <li>
+		                                <a href="/list/categoryList/KOR09">자기계발</a>
+		                              </li>
+		                              <li>
+		                                <a href="/list/categoryList/KOR10">정치/사회</a>
+		                              </li>
+		                              <li>
+		                                <a href="/list/categoryList/KOR11">역사/문화</a>
+		                              </li>
+		                              <li>
+		                                <a href="/list/categoryList/KOR12">종교</a>
+		                              </li>
+		                              <li>
+		                                <a href="/list/categoryList/KOR13">예술/대중문화</a>
+		                              </li>
+		                              <li>
+		                                <a href="/list/categoryList/KOR14">중/고등 참고서</a>
+		                              </li>
+		                          </ul>
+		                        </div>
+		
+		                        <div class="list-2">
+		                          <div class="category-title-box">
+		                          </div>
+		                          <ul>
+		                            <li>
+		                              <a href="/list/categoryList/KOR15">기술/공학</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR16">외국어</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR17">과학</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR18">취섭/수험서</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR19">여행</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR20">컴퓨터/IT</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR21">잡지</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR22">청소년</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR23">초등 참고서</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR24">유아(0~7세)</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR25">어린이(초등)</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR26">만화</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR27">대학교재</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/KOR28">한국소개도서</a>
+		                            </li>
+		                          </ul>
+		                        </div>
+		                      </div>
+		                    </li>
+		
+		                    <li class="onhover-category-list">
+		                      <a href="javascript:void(0)" class="category-name">
+		                        <img src="/resources/assets/images/open-book.png" alt="" />
+		                        <h6>서양도서</h6>
+		                        <i class="fa-solid fa-angle-right"></i>
+		                      </a>
+		                      <div class="onhover-category-box" style="width: 400px; height: 350px;">
+		                        <div class="list-1">
+		                          <div class="category-title-box">
+		                            <a href="/list/category/ENG"><h5>서양도서 전체</h5></a>
+		                          </div>
+		                          <ul>
+		                            <li>
+		                              <a href="/list/categoryList/ENG01">문학</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/ENG02">취미/실용/여행</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/ENG03">생활/요리/건강</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/ENG04">예술/건축</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/ENG05">인문/사회</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/ENG06">경제/경영</a>
+		                            </li>
+		                            <li>
+		                              <a href="/list/categoryList/ENG07">과학/기술</a>
+		                            </li>
+		                            <li>
+		                                <a href="/list/categoryList/ENG08">어린이ELT</a>
+		                            </li>
+		                          </ul>
+                       			 </div>
+                       			 <div class="list-2">
+			                            <div class="category-title-box">
+			                            </div>
+			                            <ul>
+			                              <li>
+			                                <a href="/list/categoryList/ENG09">유아/아동/청소년</a>
+			                              </li>
+			                              <li>
+			                                <a href="/list/categoryList/ENG10">환국관련도서</a>
+			                              </li>
+			                              <li>
+			                                <a href="/list/categoryList/ENG11">문구/멀티/비도서</a>
+			                              </li>
+			                              <li>
+			                                <a href="/list/categoryList/ENG12">ELT/수험서</a>
+			                              </li>
+			                              <li>
+			                                <a href="/list/categoryList/ENG13">프랑스도서</a>
+			                              </li>
+			                              <li>
+			                                <a href="/list/categoryList/ENG14">독일도서</a>
+			                              </li>
+			                              <li>
+			                                <a href="/list/categoryList/ENG15">스페인도서</a>
+			                              </li>
+			                              <li>
+			                                <a href="/list/categoryList/ENG16">기타도서</a>
+			                              </li>
+			                              <li>
+			                                <a href="/list/categoryList/ENG17">교재</a>
+			                              </li>
+			                            </ul>
+			                          </div>
+			                      </div>
+			                    </li>
+			
+			                    <li class="onhover-category-list">
+			                      <a href="javascript:void(0)" class="category-name">
+			                        <img src="/resources/assets/images/open-book.png" alt="" />
+			                        <h6>일본도서</h6>
+			                        <i class="fa-solid fa-angle-right"></i>
+			                      </a>
+			
+			                      <div class="onhover-category-box" style="width: 400px; height: 300px;">
+			                        <div class="list-1">
+			                          <div class="category-title-box">
+			                            <a href="/list/category/JAP"><h5>일본도서 전체</h5></a>
+			                          </div>
+			                          <ul>
+			                            <li>
+			                              <a href="/list/categoryList/JAP01">잡지</a>
+			                            </li>
+			                            <li>
+			                              <a href="/list/categoryList/JAP02">엔터테인먼트</a>
+			                            </li>
+			                            <li>
+			                              <a href="/list/categoryList/JAP03">만화/애니</a>
+			                            </li>
+			                            <li>
+			                              <a href="/list/categoryList/JAP04">문학</a>
+			                            </li>
+			                            <li>
+			                              <a href="/list/categoryList/JAP05">라이트노벨</a>
+			                            </li>
+			                            <li>
+			                              <a href="/ist/categoryList/JAP06">문고</a>
+			                            </li>
+			                            <li>
+			                                <a href="/list/categoryList/JAP07">신서</a>
+			                            </li>
+			                          </ul>
+			                        </div>
+			                    <div class="list-2">
+			                       <div class="category-title-box">
+			                       </div>
+			                       <ul>
+			                          <li>
+			                           <a href="/list/categoryList/JAP08">아동</a>
+			                         </li>
+			                          <li>
+			                            <a href="/list/categoryList/JAP09">실용서/예술</a>
+			                          </li>
+			                         <li>
+			                            <a href="/list/categoryList/JAP10">인문/사회</a>
+			                          </li>
+			                          <li>
+			                           <a href="/list/categoryList/JAP11">자연/기술과학</a>
+			                          </li>
+			                          <li>
+			                            <a href="/list/categoryList/JAP12">어학/학습</a>
+			                          </li>
+			                          <li>
+			                            <a href="/list/categoryList/JAP13">문구/멀티/기타</a>
+			                          </li>
+			                          <li>
+			                            <a href="/list/categoryList/JAP14">중국도서</a>
+			                          </li>
+			                        </ul>
+			                     </div>
+			                  </ul>
                             </div>
                         </div>
 
@@ -759,7 +721,11 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                             <li class="nav-item dropdown dropdown-mega">
                                                 <a class="nav-link dropdown-toggle ps-xl-2 ps-0"
                                                     href="javascript:void(0)" data-bs-toggle="dropdown">Mega Menu</a>
-                                                                                                    <div class="dropdown-menu dropdown-menu-2">
+
+
+                                                  <div class="dropdown-menu dropdown-menu-2">
+
+
                                                     <div class="row">
                                                         <div class="dropdown-column col-xl-3">
                                                             <h5 class="dropdown-header">Daily Vegetables</h5>
@@ -1013,7 +979,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                             <li class="list-1">
                                 <div class="deal-offer-contain">
                                     <a href="shop-left-sidebar.html" class="deal-image">
-                                        <img src="resources/assets/images/vegetable/product/10.png" class="blur-up lazyload"
+
+                                        <img src="/resources/assets/images/vegetable/product/10.png" class="blur-up lazyload"
+
                                             alt="">
                                     </a>
 
@@ -1027,7 +995,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                             <li class="list-2">
                                 <div class="deal-offer-contain">
                                     <a href="shop-left-sidebar.html" class="deal-image">
-                                        <img src="resources/assets/images/vegetable/product/11.png" class="blur-up lazyload"
+
+                                        <img src="/resources/assets/images/vegetable/product/11.png" class="blur-up lazyload"
+
                                             alt="">
                                     </a>
 
@@ -1041,7 +1011,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                             <li class="list-3">
                                 <div class="deal-offer-contain">
                                     <a href="shop-left-sidebar.html" class="deal-image">
-                                        <img src="resources/assets/images/vegetable/product/12.png" class="blur-up lazyload"
+
+                                        <img src="/resources/assets/images/vegetable/product/12.png" class="blur-up lazyload"
+
                                             alt="">
                                     </a>
 
@@ -1055,7 +1027,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                             <li class="list-1">
                                 <div class="deal-offer-contain">
                                     <a href="shop-left-sidebar.html" class="deal-image">
-                                        <img src="resources/assets/images/vegetable/product/13.png" class="blur-up lazyload"
+
+                                        <img src="/resources/assets/images/vegetable/product/13.png" class="blur-up lazyload"
+
                                             alt="">
                                     </a>
 
@@ -1072,20 +1046,24 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
         </div>
     </div>
     <!-- Deal Box Modal End -->
+
     
     <!-- Header End -->
     
-    <!-- latest jquery
-    <script src="/resources/assets/js/jquery-3.6.0.min.js"></script>-->
+    <!-- latest jquery -->
+    <script src="/resources/assets/js/jquery-3.6.0.min.js"></script>
+
     <!-- jquery ui-->
     <script src="/resources/assets/js/jquery-ui.min.js"></script>
     <!-- Bootstrap js-->
     <script src="/resources/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="/resources/assets/js/bootstrap/popper.min.js"></script>
     <script src="/resources/assets/js/bootstrap/bootstrap-notify.min.js"></script>
+
     <!-- feather icon js-->
     <script src="/resources/assets/js/feather/feather.min.js"></script>
     <script src="/resources/assets/js/feather/feather-icon.js"></script>
+
     <!-- Lazyload Js -->
     <script src="/resources/assets/js/lazysizes.min.js"></script>
     <!-- Slick js-->
@@ -1095,4 +1073,8 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     <script src="/resources/assets/js/quantity.js"></script>
     <!-- script js -->
     <script src="/resources/assets/js/script.js"></script>
+
+
 </html>
+
+

@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 
 import com.project.dao.kjr.ListDao;
 import com.project.vodto.PagingInfo;
-import com.project.vodto.Product;
 import com.project.vodto.ProductCategory;
+import com.project.vodtokjy.Products;
 
 @Service
 public class ListServiceImpl implements ListService {
@@ -28,9 +28,23 @@ public class ListServiceImpl implements ListService {
 
 	// 리스트페이지 상품 가져오기
 	@Override
-	public Map<String, Object> getProductForList(String Key, int page) throws Exception {
+	public Map<String, Object> getProductForList(String Key, int page, String sortBy) throws Exception {
 		PagingInfo pagingInfo = getPagingInfo(Key, page);
-		List <Product> lst = lDao.selectProductForList(Key, pagingInfo);
+		List <Products> lst = null;
+		switch (sortBy) {
+		case "new": 
+			lst = lDao.selectProductForListSortByNew(Key, pagingInfo, sortBy);
+			break;
+		case "sell": 
+			lst = lDao.selectProductForListSortBySell(Key, pagingInfo, sortBy);
+			break;
+		case "high": 
+			lst = lDao.selectProductForListSortByPrice(Key, pagingInfo, sortBy);
+			break;
+		case "low": 
+			lst = lDao.selectProductForListSortByPrice(Key, pagingInfo, sortBy);
+			break;
+		}
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("list_product", lst);
 		map.put("paging_info", pagingInfo);
@@ -50,6 +64,8 @@ public class ListServiceImpl implements ListService {
 		int ProductCounts = lDao.selectProductCount(key);
 		
 		PagingInfo pagingInfo = new PagingInfo(ProductCounts, 12, page, 10);
+		System.out.println(pagingInfo.getStartRowIndex() + "start");
 		return pagingInfo;
 	}
+
 }

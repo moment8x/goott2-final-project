@@ -14,13 +14,8 @@
 
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
 	<resources mapping="/resources/**" location="/resources/" />
-	
- 	<resources mapping="/assets/**" location="/assets/" />
-	<!--<resources mapping="user/assets/js/**" location="/assets/resources/js/" />
-	<resources mapping="user/assets/img/**" location="/resources/img/" />
-	<resources mapping="user/assets/sass/**" location="/resources/sass/" />
-	<resources mapping="user/assets/fonts/**" location="/resources/fonts/" /> -->
-	
+
+
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<beans:property name="prefix" value="/WEB-INF/views/" />
@@ -37,19 +32,7 @@
 		<beans:property name="maxUploadSize" value="5242880"></beans:property>
 	</beans:bean>
 	
-	<!--
-		인터셉터 객체 등록 
-	 -->	
-	<beans:bean id="headerCartInterceptor"
-		class="com.project.interceptor.kjs.HeaderCartInterceptor">
-	</beans:bean>
 	
-	<interceptors>
-		<interceptor>
-			<mapping path="/"/>
-			<beans:ref bean="headerCartInterceptor"/>
-		</interceptor>
-	</interceptors>
 	
 	<!-- 아래의 패키지를 스캔하여 객체 확보 -->
 	<context:component-scan base-package="com.project.controller" />

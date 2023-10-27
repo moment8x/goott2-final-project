@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,6 +14,10 @@
 
 	<div class="container">
 
+	</div>
+	
+	<div>
+		<p>Principal : <sec:authentication property="principal"/></p>
 	</div>
 
 	<jsp:include page="./footer.jsp"></jsp:include>

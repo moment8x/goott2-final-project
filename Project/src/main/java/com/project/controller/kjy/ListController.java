@@ -14,6 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,14 +24,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.service.kjy.ListService;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.Product;
 import com.project.vodto.ProductCategory;
+import com.project.vodtokjy.Products;
 
 @Controller
 @RequestMapping("/list/*")
 public class ListController {
+	private String sortBy = "new";
+	private int page = 1;
 	@Inject
 	private ListService lService;
 	
@@ -51,16 +58,18 @@ public class ListController {
 		return "list/category";
 	}
 	
-	@RequestMapping(value = {"/categoryList/{key}", "/categoryList/{key}/{sort}"}, method=RequestMethod.GET)
-	public String goList(Model model, @PathVariable(name="key") String key,@PathVariable(name = "sort", required = false) String sort , @RequestParam(value="page", defaultValue = "1") int page) {
+	@RequestMapping("/categoryList/{key}")
+	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page) {
+		this.page = page;
 		// 상위 분류 페이지 + 현재 페이지 정보
-		String before_key = key.substring(0, key.length()-2);
+		String categoryLang = key.substring(0, 3);
 		try {
-			ProductCategory before_category = lService.getCategoryInfo(before_key);
+			ProductCategory categoryLanguage = lService.getCategoryInfo(categoryLang);
 			ProductCategory now_category = lService.getCategoryInfo(key);
-			model.addAttribute("beforeCategory", before_category);
+			model.addAttribute("categoryLang", categoryLanguage);
 			model.addAttribute("nowCategory", now_category);
 			model.addAttribute("key", key);
+			model.addAttribute("page", page);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -79,11 +88,12 @@ public class ListController {
 		
 		// 상품 가져오기
 		try {
-			Map<String, Object> map = lService.getProductForList(key, page);
+			Map<String, Object> map = lService.getProductForList(key, page, sortBy);
 			List<Product> lst = (List<Product>)map.get("list_product");
 			PagingInfo paging = (PagingInfo)map.get("paging_info");
 			model.addAttribute("products", lst);
 			model.addAttribute("paging_info", paging);
+			model.addAttribute("sortBy", sortBy);		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -91,5 +101,21 @@ public class ListController {
 		}
 		
 		return "/list/categoryList";
+	}
+	@RequestMapping("/sort")
+	public ResponseEntity<Map<String, Object>> getSort(Model model, @RequestParam("key") String key, @RequestParam("sortBy") String sortBy) {
+		this.sortBy = sortBy;
+		ResponseEntity<Map<String, Object>> result = null;
+		try {
+			Map<String, Object> map = lService.getProductForList(key, page, sortBy);
+			
+			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.OK);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			result = new ResponseEntity<Map<String,Object>>(HttpStatus.CONFLICT);
+		}
+		
+		return result;
 	}
 }
