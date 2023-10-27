@@ -1,5 +1,6 @@
 package com.project.controller.ksh;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,9 +74,9 @@ public class OrderController {
 		
 		System.out.println("결제 완료하고 주문 내역 저장하기");
 		System.out.println(noh.toString());
-
+		Map<String, Object> paymentDetail = new HashMap<String, Object>();
 		
-		ResponseEntity<String> result = null;
+		
 
 //		System.out.println(pd.toString());
 //		System.out.println(itemList.toString());
@@ -89,9 +90,12 @@ public class OrderController {
 		try {
 			// 주문내역 테이블 저장
 			if(os.saveOrderHistory(noh)) {
-				result = new ResponseEntity<String>("success", HttpStatus.OK);
-				// 결제랑 주문상세 조회
-				//os.getPaymentDetail(noh.getNon_order_no());
+				
+//				 결제랑 주문상세 조회
+				
+				os.getPaymentDetail(noh.getNon_order_no());
+				
+				
 				// 상품 재고 차감
 				
 				// 포인트랑 적립금이랑 쿠폰 차감은 어디서할지?
@@ -100,7 +104,7 @@ public class OrderController {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			result = new ResponseEntity<String>(HttpStatus.CONFLICT);
+			
 			
 		}
 		
