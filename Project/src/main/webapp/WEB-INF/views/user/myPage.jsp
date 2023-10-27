@@ -69,14 +69,42 @@
 			detBdNmList, bdNm, bdKdcd, siNm, sggNm, emdNm, liNm, rn, udrtYn,
 			buldMnnm, buldSlno, mtYn, lnbrMnnm, lnbrSlno, emdNo) {
 		// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
-		let newZipNo = document.getElementsByClassName(".newZipNo")
-		newZipNo.value = zipNo;
 
-		let newAddr = document.getElementsByClassName(".newAdd")
-		newAddr.value = roadAddrPart1;
+		//회원정보 수정 주소찾기
+		let newZipNo = null;
+		let newAddr = null
+		let newAddrDetail = null
+		
+		if(document.querySelector("#zipNo")){
+			newZipNo = (document.querySelector("#zipNo")
+			newZipNo.value = zipNo;
+		}
+		if(document.getElementsByClassName("#userAddr")){
+			newAddr = document.getElementsByClassName("#userAddr")
+			newAddr.value = roadAddrPart1;
+		}
+		if(document.getElementsByClassName("#addrDetail")){
+			newAddrDetail = document.getElementsByClassName("#addrDetail")
+			newAddrDetail.value = addrDetail
+		}
+		
+		// 배송지 추가 주소찾기
+		let addZipNo = null
+		let addAddr = null
+		let addAddrDetail = null
 
-		let newAddrDatail = document.getElementsByClassName(".newAddrDatail")
-		newAddrDatail.value = addrDetail;
+		if(document.querySelector("#addZipNo")){
+			addZipNo = document.querySelector("#addZipNo")
+			addZipNo.value = zipNo;
+		}
+		if(document.getElementsByClassName("#addAddr")){
+			addAddr = document.getElementsByClassName("#addAddr")
+			addAddr.value = roadAddrPart1;
+		}
+		if(document.getElementsByClassName("#addAddrDetail")){
+			addAddrDetail = document.getElementsByClassName("#addAddrDetail")
+			addAddrDetail.value = addrDetail
+		}
 	}
 
 	$(function() {
@@ -142,22 +170,30 @@
 	//이메일 중복검사
 	function validEamil() {
 		let isValidEamil = false;
+		let regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+		let tmpEmail : $('#newEmail').val()
+		
 		$.ajax({
-			url : '/user/sendMail', // 데이터를 수신받을 서버 주소
+			url : '/user/validEamil', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
-				tmpEmail : $('#newEmail').val()
+				tmpEmail
 			},
 			async : false,
 			success : function(data) {
 				console.log(data);
-				if(data === false) {
+				if(data === false && regExp.test(tmpEmail) {
 					$('.mailCode').show();
 					printMsg("", "newEmail", "사용가능한 이메일 입니다.", false)
 					isValidEamil = true
-				}else if (data === true){
+				}else if (data){
 					$('#newEmail').val('');
 					printMsg("newEmail", "newEmail", "중복된 이메일 입니다.", true)
+					$('.trueMsg').hide();
+					isValidEamil = false
+				}else if(!regExp.test(tmpEmail)){
+					$('#newEmail').val('');
+					printMsg("newEmail", "newEmail", "이메일 형식에 맞지 않습니다.", true)
 					$('.trueMsg').hide();
 					isValidEamil = false
 				}
@@ -1237,9 +1273,9 @@
 														<div class="col-12">
 															<div class="form-floating theme-form-floating">
 																<input type="text" class="form-control"
-																	id="newAddrDatail" name="newAddrDatail"
+																	id="addrDetail" name="addrDetail"
 																	value="${userInfo.detailedAddress}" placeholder="상세주소" />
-																<label for="newAddrDatail">상세주소</label>
+																<label for="addrDetail">상세주소</label>
 															</div>
 														</div>
 
@@ -1685,18 +1721,18 @@
 						</div>
 
 						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control newZipNo" id="newZipNo"
-								name="newZipNo" placeholder="우편번호" readonly />
+							<input type="text" class="form-control addZipNo" id="addZipNo"
+								name="addZipNo" placeholder="우편번호" readonly />
 						</div>
 
 						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control newAddr" id="newAddr"
-								name="newAddr" placeholder="주소" readonly />
+							<input type="text" class="form-control addAddr" id="addAddr"
+								name="addAddr" placeholder="주소" readonly />
 						</div>
 
 						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control newAddrDatail" id="newAddrDatail"
-								name="newAddrDatail" placeholder="상세 주소" />
+							<input type="text" class="form-control addAddrDetail" id="addAddrDetail"
+								name="newAddrDetail" placeholder="상세 주소" /><label for="addAddrDetail">상세주소</label>
 						</div>
 					</form>
 				</div>

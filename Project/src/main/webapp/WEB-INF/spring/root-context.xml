@@ -65,24 +65,6 @@
 		<property name="dataSource" ref="dataSource"></property>
 	</bean>
 	
-	<!-- javax mail bean -->
-	 <bean id="mailSender" class = "org.springframework.mail.javamail.JavaMailSenderImpl">
-      <property name="host" value="smtp.gmail.com"></property>
-      <property name="port" value="587"></property>
-      <property name="username" value="m1nzze0ng11@gamil.com"></property>
-      <property name="password" value="fofvysnhwqibdgul"></property>
-      <property name="defaultEncoding" value="utf-8" />
-      <property name="javaMailProperties">
-         <props>
-            <prop key="mail.transport.protocol">smtp</prop>
-             <prop key="mail.smtp.auth">true</prop>
-             <prop key="mail.smtp.starttls.enable">true</prop>
-             <prop key="mail.debug">true</prop>
-             <prop key="mail.smtp.ssl.trust">smtp.gmail.com</prop>
-            <prop key="mail.smtp.ssl.protocols">TLSv1.2</prop>
-         </props>
-      </property>
-   </bean>
 	
 	<!-- 어노테이션으로 트랜잭션 설정 -->
 	<tx:annotation-driven/>
