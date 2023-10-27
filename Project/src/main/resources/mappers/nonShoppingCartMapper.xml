@@ -5,6 +5,6 @@
 
 <mapper namespace="com.project.mappers.nonShoppingCartMapper">
 	<insert id="insertNonMember">
-		INSERT INTO non_shopping_cart VALUES(#{non_member_id}, #{non_member_expiration_period})
+		INSERT INTO non_shopping_cart VALUES(#{nonMemberId}, #{nonMemberExpirationPeriod})
 	</insert>
 </mapper>

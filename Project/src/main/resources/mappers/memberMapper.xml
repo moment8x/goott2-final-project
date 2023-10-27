@@ -26,4 +26,26 @@
 		select count(*) from
 		detailed_order_items where order_no = #{orderNo}
 	</select>
+	
+	<!-- =========================== 김진솔 =========================== -->
+	<select id="getId" resultType="_int">
+		SELECT count(member_id) FROM member WHERE member_id = #{memberId}  
+	</select>
+	<insert id="insertMember">
+		<choose>
+			<when test='#{phoneNumber} != null and #{cellPhoneNumber} != null'>
+				INSERT INTO member(member_id, password, name, phone_number, cell_phone_number, date_of_birth, email, gender) 
+				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender})
+			</when>
+			<when test="#{phoneNumber} != null and #{cellPhoheNumber} == null">
+				INSERT INTO member(member_id, password, name, phone_number, date_of_birth, email, gender) 
+				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{dateOfBirth}, #{email}, #{gender})
+			</when>
+			<otherwise>
+				INSERT INTO member(member_id, password, name, cell_phone_number, date_of_birth, email, gender) 
+				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender})
+			</otherwise>
+		</choose>
+	</insert>
+	<!-- =========================== 김진솔 끝 =========================== -->
 </mapper>

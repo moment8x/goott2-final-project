@@ -24,7 +24,7 @@ public class MemberServiceImpl implements MemberService {
 	
 	@Inject
 	private MemberDAO mDao;
-
+	// --------------------------------------- 장민정 시작 ---------------------------------------
 	@Override
 	public Boolean signUp(Member member) throws SQLException, NamingException {
 		// TODO Auto-generated method stub
@@ -103,5 +103,33 @@ public class MemberServiceImpl implements MemberService {
 	
 		return mDao.selectOrderNo(memberId);
 	}
+	// --------------------------------------- 장민정 끝 ----------------------------------------
+	// --------------------------------------- 김진솔 시작 ---------------------------------------
+	@Override
+	public boolean checkedDuplication(String memberId) throws SQLException, NamingException {
+		System.out.println("======= 회원가입 서비스단 - 회원 정보 조회 =======");
+		boolean result = false;
+		// 회원 정보 조회
+		if (mDao.selectId(memberId) == 0) {
+			result = true;
+		}
+		
+		System.out.println("======= 회원가입 서비스단 끝 =======");
+		return true;
+	}
 
+	@Override
+	public boolean insertMember(Member member) throws SQLException, NamingException {
+		System.out.println("======= 회원가입 서비스단 - 회원가입 =======");
+		boolean result = false;
+		
+		// 회원 가입
+		if (mDao.insertMember(member) == 1) {
+			result = true;
+		};
+		System.out.println("member : " + member.toString());
+		System.out.println("======= 회원가입 서비스단 끝 =======");
+		return result;
+	}
+	// --------------------------------------- 김진솔 끝 ----------------------------------------
 }

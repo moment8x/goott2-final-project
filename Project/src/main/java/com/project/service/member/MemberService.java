@@ -17,6 +17,7 @@ import com.project.vodto.PointLog;
 import com.project.vodto.ShippingAddress;
 
 public interface MemberService {
+	// ----------------------------------- 장민정 시작 -----------------------------------
 	// 회원가입
 	Boolean signUp(Member member) throws SQLException, NamingException;
 	// 특정 회원 정보 전체 가져오기(mypage 메인 가져오기)
@@ -49,5 +50,11 @@ public interface MemberService {
 	
 	// 주문번호 가져오기
 	List<Integer> getOrderNo(String memberId) throws SQLException, NamingException;
-
+	// ------------------------------------ 장민정 끝 -----------------------------------
+	// ----------------------------------- 김진솔 시작 -----------------------------------
+	// 회원 아이디 중복 조회
+	boolean checkedDuplication(String memberId) throws SQLException, NamingException;
+	// 회원 가입
+	boolean insertMember(Member member) throws SQLException, NamingException;
+	// ------------------------------------ 김진솔 끝 -----------------------------------
 }
