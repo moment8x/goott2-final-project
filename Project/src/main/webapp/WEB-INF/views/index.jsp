@@ -12,7 +12,7 @@
 
 
 	<div class="container">
-		
+		<a href="http://localhost:8081/detail/S000208719388">결제 테스트용 링크</a>
 	</div>
 
 	<jsp:include page="./footer.jsp"></jsp:include>

@@ -77,4 +77,6 @@
 	<!-- 아래의 패키지를 조사(scan)하여 패키지 안의 객체를 관리 -->
 	<context:component-scan base-package="com.project.service"/>
 	<context:component-scan base-package="com.project.dao"/>
+	<context:component-scan base-package="com.project.persistence"/>
+	
 </beans>

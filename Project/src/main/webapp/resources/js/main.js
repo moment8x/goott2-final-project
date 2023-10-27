@@ -7,7 +7,7 @@
     Created: Colorlib
 ---------------------------------------------------------  */
 
-
+"use strict";
 
 // 동적태그 드랍다운
 function kor() {
@@ -26,7 +26,6 @@ function jap() {
   output += `<ul style="padding-top: 60px">어학/학습</a></li><li><a href="#">문구/멀티/기타</a></li><li><a href="#">중국도서</a></li></ul>`;
   $("#drop_in_category").html(output);
 }
-
 
 (function ($) {
   /*------------------
