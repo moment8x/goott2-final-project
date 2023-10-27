@@ -36,7 +36,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     <link rel="stylesheet" type="text/css" href="/resources/assets/css/bulk-style.css">
     <!-- Template css -->
     <link id="color-link" rel="stylesheet" type="text/css" href="/resources/assets/css/style.css">
-    
+
   </head>
 
   <!-- Header Start -->
@@ -56,6 +56,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                             <div class="notification-slider">
                                 <div>
                                     <div class="timer-notification">
+
                                         <h6>
                       					 <strong class="me-1">Deer Books에 오신것을 환영합니다!</strong>
                    					   </h6>
@@ -146,6 +147,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                 </span>
                             </button>
                             <a href="index.html" class="web-logo nav-logo">
+
                                 <img src="/resources/assets/images/deer.png" class="img-fluid blur-up lazyload" alt="">
                             </a>
 
@@ -193,9 +195,26 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                 </div>
                                             </div>
                                         </div>
+
+                                    <li class="right-side">
+                                        <a href="contact-us.html" class="delivery-login-box">
+                                            <div class="delivery-icon">
+                                                <i data-feather="phone-call"></i>
+                                            </div>
+                                            <div class="delivery-detail">
+                                                <h6>24/7 Delivery</h6>
+                                                <h5>+91 888 104 2340</h5>
+                                            </div>
+                                        </a>
                                     </li>
+                                    <li class="right-side">
+                                        <a href="wishlist.html" class="btn p-0 position-relative header-wishlist">
+                                            <i data-feather="heart"></i>
+                                        </a>
+
                                     <li class="right-side" data-bs-toggle="modal" data-bs-target="#deal-box">
                                             <i data-feather="heart"></i>
+
                                     </li>
                                     <li class="right-side">
                                         <div class="onhover-dropdown header-badge">
@@ -276,7 +295,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                             <ul class="user-box-name">
                                                 <li class="product-box-contain">
                                                     <i></i>
+
                                                     <a href="/login/">Log In</a>
+
                                                 </li>
 
                                                 <li class="product-box-contain">
@@ -694,7 +715,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                             <li class="nav-item dropdown dropdown-mega">
                                                 <a class="nav-link dropdown-toggle ps-xl-2 ps-0"
                                                     href="javascript:void(0)" data-bs-toggle="dropdown">Mega Menu</a>
-                                                                                                    <div class="dropdown-menu dropdown-menu-2">
+
+                                                  <div class="dropdown-menu dropdown-menu-2">
+
                                                     <div class="row">
                                                         <div class="dropdown-column col-xl-3">
                                                             <h5 class="dropdown-header">Daily Vegetables</h5>
@@ -915,6 +938,13 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                 </div>
                             </div>
                         </div>
+
+                        <div class="header-nav-right">
+                            <button class="btn deal-button" data-bs-toggle="modal" data-bs-target="#deal-box">
+                                <i data-feather="zap"></i>
+                                <span>Deal Today</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1000,6 +1030,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
         </div>
     </div>
     <!-- Deal Box Modal End -->
+
     
     <!-- Header End -->
     
@@ -1012,6 +1043,10 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     <script src="/resources/assets/js/bootstrap/popper.min.js"></script>
     <script src="/resources/assets/js/bootstrap/bootstrap-notify.min.js"></script>
 
+    <!-- feather icon js-->
+    <script src="/resources/assets/js/feather/feather.min.js"></script>
+    <script src="/resources/assets/js/feather/feather-icon.js"></script>
+
     <!-- Lazyload Js -->
     <script src="/resources/assets/js/lazysizes.min.js"></script>
     <!-- Slick js-->
@@ -1021,4 +1056,6 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     <script src="/resources/assets/js/quantity.js"></script>
     <!-- script js -->
     <script src="/resources/assets/js/script.js"></script>
+
 </html>
+
