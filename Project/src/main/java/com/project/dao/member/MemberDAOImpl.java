@@ -19,7 +19,7 @@ public class MemberDAOImpl implements MemberDAO {
 	private SqlSession ses;
 
 	private static String ns = "com.project.mappers.memberMapper";
-
+	// ---------------------------------------- 장민정 시작 ----------------------------------------
 	@Override
 	public boolean insertSignUp(Member member) throws SQLException, NamingException {
 		// TODO Auto-generated method stub
@@ -28,8 +28,8 @@ public class MemberDAOImpl implements MemberDAO {
 
 	@Override
 	public Member selectMyInfo(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
+
+		return ses.selectOne(ns+ ".getMemberInfo", memberId);
 	}
 
 	@Override
@@ -57,9 +57,23 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public List<Integer> selectOrderNo(String memberId) {
+	public Member duplicateUserEmail(String email) throws SQLException, NamingException {
 		
-		return ses.selectList(ns + ".getOrderNo", memberId);
+		return ses.selectOne(ns + ".getEmail", email);
+	}
+	// ---------------------------------------- 장민정 끝 -----------------------------------------
+	// ---------------------------------------- 김진솔 시작 ----------------------------------------
+	@Override
+	public int selectId(String memberId) throws SQLException, NamingException {
+		System.out.println("======= 회원가입 DAO - 아이디 중복 조회 =======");
+		return ses.selectOne(ns + ".getId", memberId);
 	}
 
+	@Override
+	public int insertMember(Member member) throws SQLException, NamingException {
+		System.out.println("======= 회원가입 DAO - 회원 가입 =======");
+		
+		return ses.insert(ns + ".insertMember", member);
+	}
+	// ---------------------------------------- 김진솔 끝 -----------------------------------------
 }
