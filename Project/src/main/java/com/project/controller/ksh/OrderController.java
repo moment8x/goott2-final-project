@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,10 +23,9 @@ import com.project.vodto.Product;
 @RequestMapping(value = "/order/*")
 public class OrderController {
 
-	int count = 0;
+
 	
-	@Inject
-	private PaymentController pc;
+
 
 	@Inject
 	private OrderService os;
@@ -59,19 +59,14 @@ public class OrderController {
 			} 
 		}
 		model.addAttribute("impKey", "imp77460302");
+		model.addAttribute("orderId",orderId);
 		
 		return "order/requestOrder";
 	}
 	
 	
-	
-
-	
-	
-	
-
 	@RequestMapping(value = "orderComplete", method = RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> orderComplete(NonOrderHistory noh, Model model) {
+	public void orderComplete(NonOrderHistory noh, Model model) {
 
 		// 비회원 주문 결제 완료하고 주문 내역 창 띄우기
 		
@@ -79,23 +74,24 @@ public class OrderController {
 		System.out.println("결제 완료하고 주문 내역 저장하기");
 		System.out.println(noh.toString());
 
-		PaymentDTO pd = pc.pdto;
-		List<DetailOrderItem> itemList = pc.itemListdto;
+		
+		ResponseEntity<String> result = null;
 
-		System.out.println(pd.toString());
-		System.out.println(itemList.toString());
-		if (pd.getPayment_method() != null) {
-			if (pd.getPayment_method().equals("bkt")) {
-				noh.setDelivery_status("입금확인중");
-				pd.setPayment_method("무통장입금");
-			}
-		}
+//		System.out.println(pd.toString());
+//		System.out.println(itemList.toString());
+//		if (pd.getPayment_method() != null) {
+//			if (pd.getPayment_method().equals("bkt")) {
+//				noh.setDelivery_status("입금확인중");
+//				pd.setPayment_method("무통장입금");
+//			}
+//		}
 		
 		try {
 			// 주문내역 테이블 저장
 			if(os.saveOrderHistory(noh)) {
+				result = new ResponseEntity<String>("success", HttpStatus.OK);
 				// 결제랑 주문상세 조회
-				os.getPaymentDetail(noh.getNon_order_no());
+				//os.getPaymentDetail(noh.getNon_order_no());
 				// 상품 재고 차감
 				
 				// 포인트랑 적립금이랑 쿠폰 차감은 어디서할지?
@@ -104,12 +100,60 @@ public class OrderController {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			result = new ResponseEntity<String>(HttpStatus.CONFLICT);
 			
 		}
 		
-		return null;
+		
 		
 	}
+	
+	
+
+	
+	
+	
+
+//	@RequestMapping(value = "orderComplete", method = RequestMethod.POST)
+//	public ResponseEntity<Map<String, Object>> orderComplete(NonOrderHistory noh, Model model) {
+//
+//		// 비회원 주문 결제 완료하고 주문 내역 창 띄우기
+//		
+//		
+//		System.out.println("결제 완료하고 주문 내역 저장하기");
+//		System.out.println(noh.toString());
+//
+//
+//
+////		System.out.println(pd.toString());
+////		System.out.println(itemList.toString());
+////		if (pd.getPayment_method() != null) {
+////			if (pd.getPayment_method().equals("bkt")) {
+////				noh.setDelivery_status("입금확인중");
+////				pd.setPayment_method("무통장입금");
+////			}
+////		}
+//		
+//		try {
+//			// 주문내역 테이블 저장
+//			if(os.saveOrderHistory(noh)) {
+//				
+//				// 결제랑 주문상세 조회
+//				//os.getPaymentDetail(noh.getNon_order_no());
+//				// 상품 재고 차감
+//				
+//				// 포인트랑 적립금이랑 쿠폰 차감은 어디서할지?
+//			}
+//			
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			
+//		}
+//		
+//		return orderComplete;
+//		
+//	}
 
 	@RequestMapping(value = "get/", method = RequestMethod.GET)
 	public void getOrderHistory(@RequestParam("orderId") String orderId) {

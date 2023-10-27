@@ -22,7 +22,8 @@
 	IMP.init("${impKey}") // 예: 'imp00000000a'
 	console.log("${requestScope.impKey}");
 	let isPaid = false;
-	let orderId = new URLSearchParams(location.search).get('orderId');
+	let orderId = ('${requestScope.orderId}');
+	console.log(orderId);
 	function getOrderId() {
 
 		console.log(orderId);
