@@ -121,224 +121,338 @@
 <body>
 	<jsp:include page="../header.jsp"></jsp:include>
 
-	<section class="blog spad">
-		<div class="container">
+	<!-- User Dashboard Section Start -->
+	<section class="user-dashboard-section section-b-space">
+		<div class="container-fluid-lg">
 			<div class="row">
-				<div class="col-lg-4 col-md-5">
-					<div class="blog__sidebar">
-
-						<div class="blog__sidebar__item">
-							<ul class="nav flex-column">
-								<li class="nav-item"><a class="nav-link" href="orderList">주문내역</a></li>
-							</ul>
-
-							<ul class="nav nav-pills">
-								<li class="nav-item dropdown"><a
-									class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
-									href="#">회원</a>
-									<ul class="dropdown-menu">
-										<li><a class="dropdown-item" href="userInfo">회원정보</a></li>
-										<li><a class="dropdown-item" href="address">배송주소록</a></li>
-									</ul></li>
-							</ul>
-							<ul class="nav nav-pills">
-								<li class="nav-item dropdown"><a
-									class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
-									href="#">활동내역</a>
-									<ul class="dropdown-menu">
-										<li><a class="dropdown-item" href="#">찜</a></li>
-										<li><a class="dropdown-item" href="#">작성한 리뷰</a></li>
-										<li><a class="dropdown-item" href="#">포인트</a></li>
-										<li><a class="dropdown-item" href="#">적립금</a></li>
-										<li><a class="dropdown-item" href="#">쿠폰</a></li>
-										<li><a class="dropdown-item" href="#">1:1 문의 내역</a></li>
-									</ul></li>
-							</ul>
-
+				<div class="col-xxl-3 col-lg-4">
+					<div class="dashboard-left-sidebar">
+						<div class="close-button d-flex d-lg-none">
+							<button class="close-sidebar">
+								<i class="fa-solid fa-xmark"></i>
+							</button>
 						</div>
-					</div>
-				</div>
+						<div class="profile-box">
+							<div class="cover-image">
+								<img src="/resources/assets/images/deer.png"
+									class="img-fluid blur-up lazyload" alt="" />
+							</div>
 
-
-				<div class="col-sm-8">
-					<div class="checkout__form">
-						<h4>회원정보 수정</h4>
-						<form action="#" method="post">
-							<div class="row">
-								<div class="col-lg-8 col-md-6">
-									<div class="checkout__input">
-										<p>회원 등급</p>
-										<input type="text" name="userGrade"
-											value="${userInfo.membershipGrade }" readonly>
-									</div>
-									<div class="checkout__input">
-										<p>아이디</p>
-										<input type="text" name="memberId"
-											value="${userInfo.memberId }" readonly>
-									</div>
-									<div class="checkout__input">
-										<label for="newPwd" class="form-label">새 비밀번호</label> <input
-											type="password" id="newPwd" name="newPwd" placeholder="비밀번호를 6자 이상 입력해주세요.">
-									</div>
-									<div class="checkout__input">
-										<label for="newPwdCheck" class="form-label">새 비밀번호 확인</label>
-										<input type="password" id="newPwdCheck" name="newPwdCheck">
-									</div>
-									<div class="checkout__input">
-										<p>이름</p>
-										<input type="text" name="userName" value="${userInfo.name }"
-											readonly>
-									</div>
-									<div class="row">
-										<div class="col-lg-6">
-											<div class="checkout__input">
-												<p>생년월일</p>
-												<input type="text" name="userBirth"
-													value="${userInfo.dateOfBirth }" readonly>
-											</div>
-										</div>
-										<div class="col-lg-6">
-											<div class="checkout__input">
-												<p>성별</p>
-												<input type="text" name="gender" value="${userInfo.gender }"
-													readonly>
-											</div>
+							<div class="profile-contain">
+								<div class="profile-image">
+									<div class="position-relative">
+										<img src="#" class="blur-up lazyload update_img" alt="" />
+										<div class="cover-icon">
+											<i class="fa-solid fa-pen"> <input type="file"
+												onchange="readURL(this,0)" />
+											</i>
 										</div>
 									</div>
-									<div class="checkout__input">
-										<p>이메일 주소</p>
-										<input type="text" id="userEmail" name="userEmail"
-											value="${userInfo.email }" readonly>
-										<button type="button" class="btn btn-outline-success"
-											onclick="changeEmail();">변경</button>
-									</div>
-									<div class="checkout__input newEmail" style="display: none;">
-									<label for="newEmail" class="form-label"></label>
-										<input type="text" id="newEmail" name="newEmail" 
-											placeholder="변경할 이메일을 입력해주세요.">
-										<button type="button" class="btn btn-outline-success"
-											onclick="sendMail();">인증번호 발송</button>
-									</div>
-									<div class="checkout__input emailCode" style="display: none;">
-									<label for="emailCode" class="form-label"></label>
-										<input type="text" id="emailCode" name="emailCode"
-											placeholder="인증코드를 입력해주세요.">
-										<button type="button" class="btn btn-outline-success">인증</button>
-									</div>
-
-									<div class="checkout__input">
-										<p>휴대폰 번호</p>
-										<input type="text" name="userPhoneNumber"
-											value="${userInfo.phoneNumber }" readonly>
-										<button type="button" class="btn btn-outline-success">변경</button>
-									</div>
-									<div class="checkout__input">
-										<p>우편번호</p>
-										<span><button type="button" class="site-btn addAddr">주소검색</button></span>
-										<input type="text" name="zipNo" value="${userInfo.zipCode }"
-											readonly>
-									</div>
-									<div class="checkout__input">
-										<p>주소</p>
-										<input type="text" name="addr" value="${userInfo.address }"
-											readonly>
-									</div>
-									<div class="checkout__input">
-										<p>상세주소</p>
-										<input type="text" value="${userInfo.detailedAddress }"
-											name="detailAddr">
-									</div>
-									<div class="checkout__input">
-										<p>본인인증 여부</p>
-										<c:choose>
-											<c:when
-												test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
-												<input type="checkbox" name="authentication" checked
-													disabled>
-											</c:when>
-											<c:otherwise>
-												<input type="checkbox" name="authentication" disabled>
-												<button>본인 인증</button>
-											</c:otherwise>
-										</c:choose>
-									</div>
-									<div class="row">
-										<div class="col-lg-6">
-											<div class="checkout__input">
-												<p>은행</p>
-												<input type="text" name="refundBank"
-													value="${userInfo.refundBank }">
-											</div>
-										</div>
-										<div class="col-lg-6">
-											<div class="checkout__input">
-												<p>환불계좌</p>
-												<input type="text" name="refundAccount"
-													value="${userInfo.refundAccount }">
-											</div>
-										</div>
-									</div>
-									<button>변경</button>
 								</div>
 
+								<div class="profile-name">
+									<h3>${userInfo.memberId }</h3>
+									<h6 class="text-content">
+										<img width="50" height="50"
+											src="https://img.icons8.com/external-vitaliy-gorbachev-lineal-vitaly-gorbachev/60/external-deer-winter-vitaliy-gorbachev-lineal-vitaly-gorbachev.png"
+											alt="external-deer-winter-vitaliy-gorbachev-lineal-vitaly-gorbachev" />${userInfo.membershipGrade }</h6>
+								</div>
 							</div>
-							<button type="submit" class="site-btn">수정</button>
-							<button type="button" class="site-btn">취소</button>
-						</form>
-						<div class="checkout__input">
-							<p>회원 탈퇴</p>
-							<button>탈퇴</button>
+						</div>
+
+						<ul class="nav nav-pills user-nav-pills" id="pills-tab"
+							role="tablist">
+							<li class="nav-item" role="presentation">
+								<button class="nav-link active" id="pills-dashboard-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-dashboard"
+									type="button" role="tab" aria-controls="pills-dashboard"
+									aria-selected="true">
+									<i data-feather="home"></i> Home
+								</button>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-order-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-order"
+									type="button" role="tab" aria-controls="pills-order"
+									aria-selected="false">
+									<i data-feather="shopping-bag"></i>주문내역
+								</button>
+							</li>
+
+							<li class="nav-item" role="presentation">
+							<a href="userInfoModify"><button class="nav-link" id="pills-profile-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-profile"
+									type="button" role="tab" aria-controls="pills-profile"
+									aria-selected="false">
+									<i data-feather="user"></i> 회원정보
+								</button></a>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-address-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-address"
+									type="button" role="tab" aria-controls="pills-address"
+									aria-selected="false">
+									<i data-feather="map-pin"></i> 배송 주소록
+								</button>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-wishlist-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-wishlist"
+									type="button" role="tab" aria-controls="pills-wishlist"
+									aria-selected="false">
+									<i data-feather="heart"></i> 찜
+								</button>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-profile-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-profile"
+									type="button" role="tab" aria-controls="pills-profile"
+									aria-selected="false">
+									<i data-feather="help-circle"></i>1:1문의내역
+								</button>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-profile-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-profile"
+									type="button" role="tab" aria-controls="pills-profile"
+									aria-selected="false">
+									<i data-feather="clipboard"></i>작성한 리뷰
+								</button>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-profile-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-profile"
+									type="button" role="tab" aria-controls="pills-profile"
+									aria-selected="false">
+									<i data-feather="smile"></i>포인트/쿠폰/적립금 내역
+								</button>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-xxl-9 col-lg-8">
+					<button
+						class="btn left-dashboard-show btn-animation btn-md fw-bold d-block mb-4 d-lg-none">
+						Show Menu</button>
+					<div class="dashboard-right-sidebar">
+						<div class="tab-content" id="pills-tabContent">
+							<div class="tab-pane fade show active" id="pills-dashboard"
+								role="tabpanel" aria-labelledby="pills-dashboard-tab">
+								<div class="dashboard-home">
+									<div class="title">
+										<h2>마이페이지</h2>
+										<span class="title-leaf"> <svg
+												class="icon-width bg-gray">
+                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+                        </svg>
+										</span>
+									</div>
+
+
+								</div>
+							</div>
+
+							
+							<div class="tab-pane fade show" id="pills-profile"
+								role="tabpanel" aria-labelledby="pills-profile-tab">
+								<div class="dashboard-profile">
+									<div class="title">
+										<h2>회원정보 수정</h2>
+										<span class="title-leaf"> <svg
+												class="icon-width bg-gray">
+                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+                        </svg>
+										</span>
+									</div>
+
+									<div class="profile-about dashboard-bg-box">
+										<div class="row">
+											<div class="col-xxl-7">
+												<div class="dashboard-title mb-3">
+													<h3>${userInfo.memberId }</h3>
+												</div>
+
+												<div class="input-box">
+													<form class="row g-4" action="#" method="post">
+														<div class="col-12">영어, 숫자, 특수문자 (!@#$%^*+=-) 를 1개이상
+															포함하여 8-15글자로 입력해주세요.</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="password" class="form-control" id="newPwd"
+																	name="newPwd" placeholder="Full Name" /> <label
+																	for="newPwd">새 비밀번호</label>
+															</div>
+														</div>
+
+														<div class="col-12 newPwdEdit">
+															<div class="form-floating theme-form-floating">
+																<input type="password" class="form-control"
+																	id="newPwdCheck" name="newPwdCheck"
+																	placeholder="Full Name" /> <label for="newPwdCheck">새
+																	비밀번호 확인</label> <i class="fa-regular fa-circle-check fa-lg"
+																	style="color: #0e997e"></i>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control" id="userName"
+																	name="userName" placeholder="이름"
+																	value="${userInfo.name }" readonly /> <label
+																	for="userName">이름</label>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control" id="userBirth"
+																	name="userBirth" value="${userInfo.dateOfBirth }"
+																	placeholder="생년월일" readonly /> <label for="userBirth">생년월일</label>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control" id="userGender"
+																	name="userGender" value="${userInfo.gender }"
+																	placeholder="성별" readonly /> <label for="userGender">성별</label>
+															</div>
+														</div>
+														
+														<div class="col-12">
+															<div
+																class="form-floating theme-form-floating editPhoneNumber">
+																<input type="text" class="form-control"
+																	id="userPhonNumber" name="userPhonNumber"
+																	value="${userInfo.phoneNumber }" placeholder="휴대폰 번호"
+																	readonly /> <label for="userPhonNumber">휴대폰 번호</label>
+																<i
+																	class="fa-regular fa-pen-to-square fa-xl editPhoneNumber"></i>
+															</div>
+														</div>
+
+														<div class="col-12 newPhoneNumberEdit">
+															<div
+																class="form-floating theme-form-floating editPhoneNumber">
+																<input type="text" class="form-control"
+																	id="newPhoneNumber" name="newPhoneNumber"
+																	placeholder="새 휴대폰 번호" /> <label for="newPhoneNumber">새
+																	휴대폰 번호</label>
+																<button type="button"
+																	class="btn theme-bg-color btn-md text-white" onclick="">
+																	인증?</button>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating editEmail">
+																<input type="email" class="form-control" id="userEmail"
+																	name="userEmail" value="${userInfo.email }"
+																	placeholder="이메일" readonly /> <label for="userEmail">이메일</label>
+																<i class="fa-regular fa-pen-to-square fa-xl editEmail"></i>
+															</div>
+														</div>
+
+														<div class="col-12 newEmailEdit">
+															<div class="form-floating theme-form-floating editEmail">
+																<input type="email" class="form-control" id="newEmail"
+																	name="newEmail" placeholder="이메일" /> <label
+																	for="newEmail">새 이메일</label>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<button type="button"
+																class="btn theme-bg-color btn-md text-white"
+																onclick="goPopup();">주소 찾기</button>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control" id="zipNo"
+																	name="zipNo" value="${userInfo.zipCode}"
+																	placeholder="우편번호" readonly /> <label for="zipNo">우편번호</label>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control" id="userAddr"
+																	name="userAddr" value="${userInfo.address}"
+																	placeholder="주소" readonly /> <label for="userAddr">주소</label>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control"
+																	id="newAddrDatail" name="newAddrDatail"
+																	value="${userInfo.detailedAddress}" placeholder="상세주소" />
+																<label for="newAddrDatail">상세주소</label>
+															</div>
+														</div>
+
+													<div class="col-12">
+														<div class="forgot-box">
+															<div class="form-check ps-0 m-0 remember-box">
+																<c:choose>
+																	<c:when
+																		test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
+																		<input class="checkbox_animated check-box"
+																			type="checkbox" id="authentication" checked disabled />
+																		<label class="form-check-label" for="authentication">본인인증</label>
+																	</c:when>
+																	<c:otherwise>
+																		<input class="checkbox_animated check-box"
+																			type="checkbox" id="authentication" disabled />
+																		<label class="form-check-label" for="authentication">본인인증</label>
+																		<button>본인 인증</button>
+																	</c:otherwise>
+																</c:choose>
+															</div>
+														</div>
+													</div>
+
+													<div class="col-12 modifyBtn">
+														<button class="btn theme-bg-color btn-md text-white"
+															type="submit">수정</button>
+													</div>
+												</form>
+													<div>
+														<button
+															class="btn theme-bg-color btn-md text-white delUser"
+															type="button">탈퇴</button>
+													</div>
+												</div>
+
+											</div>
+
+											<div class="col-xxl-5">
+												<div class="profile-image">
+													<img
+														src="resources/assets/images/inner-page/dashboard-profile.png"
+														class="img-fluid blur-up lazyload" alt="" />
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>												
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-
-
 	</section>
-	<!-- 배송지 추가 모달 -->
-	<div class="modal" id="addAddrModal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-
-				<!-- Modal Header -->
-				<div class="modal-header">
-					<h4 class="modal-title">배송지 추가</h4>
-					<button type="button" class="btn-close addAddrModalClose"
-						data-bs-dismiss="modal"></button>
-				</div>
-
-				<!-- Modal body -->
-				<form action="#" id="inputAddrInfo" method="post">
-
-					<div>
-						<button type="button" class="site-btn" onclick="goPopup();">주소
-							찾기</button>
-					</div>
-					<div>
-						<input type="text" class="form-control" id="zipNo"
-							placeholder="우편번호" name="zipNo" readonly>
-					</div>
-					<div>
-						<input type="text" class="form-control" id="roadAddrPart1"
-							placeholder="주소" name="roadAddrPart1" readonly>
-					</div>
-					<div>
-						<input type="text" class="form-control" id="addrDetail"
-							placeholder="상세주소" name="addrDetail">
-					</div>
-					<!-- Modal footer -->
-					<div class="modal-footer">
-						<button type="submit" class="btn btn-outline-success">저장</button>
-						<button type="button"
-							class="btn btn-outline-danger addAddrModalClose"
-							data-bs-dismiss="modal">취소</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-
+	<!-- User Dashboard Section End -->
 
 	<jsp:include page="../footer.jsp"></jsp:include>
 </body>

@@ -69,13 +69,13 @@
 			detBdNmList, bdNm, bdKdcd, siNm, sggNm, emdNm, liNm, rn, udrtYn,
 			buldMnnm, buldSlno, mtYn, lnbrMnnm, lnbrSlno, emdNo) {
 		// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
-		let newZipNo = document.querySelector("#newZipNo")
+		let newZipNo = document.getElementsByClassName(".newZipNo")
 		newZipNo.value = zipNo;
 
-		let newAddr = document.querySelector("#newAddr")
+		let newAddr = document.getElementsByClassName(".newAdd")
 		newAddr.value = roadAddrPart1;
 
-		let newAddrDatail = document.querySelector("#newAddrDatail")
+		let newAddrDatail = document.getElementsByClassName(".newAddrDatail")
 		newAddrDatail.value = addrDetail;
 	}
 
@@ -92,6 +92,11 @@
 		// 새 비밀번호 입력 후
 		$('#newPwdCheck').blur(function() {
 			validUserPwd();
+		})
+		
+		//이메일 변경시 중복검사
+		$('#newEmail').blur(function () {
+			validEamil();
 		})
 	})
 
@@ -134,7 +139,8 @@
 		return isValidPwd;
 	}
 
-	function sendMail() {
+	//이메일 중복검사
+	function validEamil() {
 		let isValidEamil = false;
 		$.ajax({
 			url : '/user/sendMail', // 데이터를 수신받을 서버 주소
@@ -143,21 +149,23 @@
 				tmpEmail : $('#newEmail').val()
 			},
 			async : false,
-			dataType : 'json',
 			success : function(data) {
 				console.log(data);
-				if (data === null) {
+				if(data === false) {
 					$('.mailCode').show();
 					printMsg("", "newEmail", "사용가능한 이메일 입니다.", false)
-				}else{
-					
+					isValidEamil = true
+				}else if (data === true){
 					$('#newEmail').val('');
 					printMsg("newEmail", "newEmail", "중복된 이메일 입니다.", true)
+					$('.trueMsg').hide();
+					isValidEamil = false
 				}
 			},
 			error : function() {
 			}
 		});
+		return isValidEamil
 	}
 </script>
 <style>
@@ -324,7 +332,7 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="pills-profile-tab"
+							<button class="nav-link" id="pills-profile-tab"
 									data-bs-toggle="pill" data-bs-target="#pills-profile"
 									type="button" role="tab" aria-controls="pills-profile"
 									aria-selected="false">
@@ -393,7 +401,7 @@
 										<h2>마이페이지</h2>
 										<span class="title-leaf"> <svg
 												class="icon-width bg-gray">
-                          <use xlink:href="../assets/svg/leaf.svg#leaf"></use>
+                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 									</div>
@@ -402,9 +410,9 @@
 										<div class="row g-sm-4 g-3">
 											<div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
 												<div class="totle-contain">
-													<img src="../assets/images/svg/order.svg"
+													<img src="resources/assets/images/svg/order.svg"
 														class="img-1 blur-up lazyload" alt="" /> <img
-														src="../assets/images/svg/order.svg"
+														src="resources/assets/images/svg/order.svg"
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>포인트</h5>
@@ -415,9 +423,9 @@
 
 											<div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
 												<div class="totle-contain">
-													<img src="../assets/images/svg/pending.svg"
+													<img src="resources/assets/images/svg/pending.svg"
 														class="img-1 blur-up lazyload" alt="" /> <img
-														src="../assets/images/svg/pending.svg"
+														src="resources/assets/images/svg/pending.svg"
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>적립금</h5>
@@ -428,9 +436,9 @@
 
 											<div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
 												<div class="totle-contain">
-													<img src="../assets/images/svg/wishlist.svg"
+													<img src="resources/assets/images/svg/wishlist.svg"
 														class="img-1 blur-up lazyload" alt="" /> <img
-														src="../assets/images/svg/wishlist.svg"
+														src="resources/assets/images/svg/wishlist.svg"
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>쿠폰</h5>
@@ -458,7 +466,7 @@
 																			<div class="product border-0">
 																				<a href="product-left-thumbnail.html"
 																					class="product-image"> <img
-																					src="../assets/images/vegetable/product/1.png"
+																					src="resources/assets/images/vegetable/product/1.png"
 																					class="img-fluid blur-up lazyload" alt="" />
 																				</a>
 																				<div class="product-detail">
@@ -571,7 +579,7 @@
 										<h2>My Wishlist History</h2>
 										<span class="title-leaf title-leaf-gray"> <svg
 												class="icon-width bg-gray">
-                          <use xlink:href="../assets/svg/leaf.svg#leaf"></use>
+                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 									</div>
@@ -581,7 +589,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="../assets/images/cake/product/2.png"
+															src="resources/assets/images/cake/product/2.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -641,7 +649,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="../assets/images/cake/product/3.png"
+															src="resources/assets/images/cake/product/3.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -701,7 +709,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="../assets/images/cake/product/4.png"
+															src="resources/assets/images/cake/product/4.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -763,7 +771,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="../assets/images/cake/product/5.png"
+															src="resources/assets/images/cake/product/5.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -824,7 +832,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="../assets/images/cake/product/6.png"
+															src="resources/assets/images/cake/product/6.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -886,7 +894,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="../assets/images/cake/product/7.png"
+															src="resources/assets/images/cake/product/7.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -947,7 +955,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="../assets/images/cake/product/2.png"
+															src="resources/assets/images/cake/product/2.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -1013,7 +1021,7 @@
 										<h2>주문내역</h2>
 										<span class="title-leaf title-leaf-gray"> <svg
 												class="icon-width bg-gray">
-                          <use xlink:href="../assets/svg/leaf.svg#leaf"></use>
+                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 
@@ -1094,250 +1102,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="tab-pane fade show" id="pills-address"
-								role="tabpanel" aria-labelledby="pills-address-tab">
-								<div class="dashboard-address">
-									<div class="title title-flex">
-										<div>
-											<h2>배송주소록</h2>
-											<span class="title-leaf"> <svg
-													class="icon-width bg-gray">
-                            <use
-														xlink:href="../assets/svg/leaf.svg#leaf"></use>
-                          </svg>
-											</span>
-										</div>
-
-										<button
-											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
-											data-bs-toggle="modal" data-bs-target="#add-address">
-											<i data-feather="plus" class="me-2"></i> 배송지 추가
-										</button>
-									</div>
-
-									<div class="row g-sm-4 g-3">
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
-											<div class="address-box">
-												<div>
-													<div class="form-check">
-														<input class="form-check-input" type="radio" name="jack"
-															id="flexRadioDefault1" />
-													</div>
-
-													<div class="label">
-														<label>Home 2</label>
-													</div>
-
-													<div class="table-responsive address-table">
-														<table class="table">
-															<tbody>
-																<tr>
-																	<td colspan="2">Gary M. Bailey</td>
-																</tr>
-
-																<tr>
-																	<td>Address :</td>
-																	<td>
-																		<p>2135 Burning Memory Lane Philadelphia, PA 19135</p>
-																	</td>
-																</tr>
-
-																<tr>
-																	<td>Pin Code :</td>
-																	<td>+26</td>
-																</tr>
-
-																<tr>
-																	<td>Phone :</td>
-																	<td>+ 215-335-9916</td>
-																</tr>
-															</tbody>
-														</table>
-													</div>
-												</div>
-
-												<div class="button-group">
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#editProfile">
-														<i data-feather="edit"></i> Edit
-													</button>
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#removeProfile">
-														<i data-feather="trash-2"></i> Remove
-													</button>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="tab-pane fade show" id="pills-card" role="tabpanel"
-								aria-labelledby="pills-card-tab">
-								<div class="dashboard-card">
-									<div class="title title-flex">
-										<div>
-											<h2>My Card Details</h2>
-											<span class="title-leaf"> <svg
-													class="icon-width bg-gray">
-                            <use
-														xlink:href="../assets/svg/leaf.svg#leaf"></use>
-                          </svg>
-											</span>
-										</div>
-
-										<button
-											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
-											data-bs-toggle="modal" data-bs-target="#editCard">
-											<i data-feather="plus" class="me-2"></i> Add New Card
-										</button>
-									</div>
-
-									<div class="row g-4">
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
-											<div class="payment-card-detail">
-												<div class="card-details">
-													<div class="card-number">
-														<h4>XXXX - XXXX - XXXX - 2548</h4>
-													</div>
-
-													<div class="valid-detail">
-														<div class="title">
-															<span>valid</span> <span>thru</span>
-														</div>
-														<div class="date">
-															<h3>08/05</h3>
-														</div>
-														<div class="primary">
-															<span class="badge bg-pill badge-light">primary</span>
-														</div>
-													</div>
-
-													<div class="name-detail">
-														<div class="name">
-															<h5>Audrey Carol</h5>
-														</div>
-														<div class="card-img">
-															<img src="../assets/images/payment-icon/1.jpg"
-																class="img-fluid blur-up lazyloaded" alt="" />
-														</div>
-													</div>
-												</div>
-
-												<div class="edit-card">
-													<a data-bs-toggle="modal" data-bs-target="#editCard"
-														href="javascript:void(0)"><i class="far fa-edit"></i>
-														edit</a> <a href="javascript:void(0)" data-bs-toggle="modal"
-														data-bs-target="#removeProfile"><i
-														class="far fa-minus-square"></i> delete</a>
-												</div>
-											</div>
-
-											<div class="edit-card-mobile">
-												<a data-bs-toggle="modal" data-bs-target="#editCard"
-													href="javascript:void(0)"><i class="far fa-edit"></i>
-													edit</a> <a href="javascript:void(0)"><i
-													class="far fa-minus-square"></i> delete</a>
-											</div>
-										</div>
-
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
-											<div class="payment-card-detail">
-												<div class="card-details card-visa">
-													<div class="card-number">
-														<h4>XXXX - XXXX - XXXX - 1536</h4>
-													</div>
-
-													<div class="valid-detail">
-														<div class="title">
-															<span>valid</span> <span>thru</span>
-														</div>
-														<div class="date">
-															<h3>12/23</h3>
-														</div>
-														<div class="primary">
-															<span class="badge bg-pill badge-light">primary</span>
-														</div>
-													</div>
-
-													<div class="name-detail">
-														<div class="name">
-															<h5>Leah Heather</h5>
-														</div>
-														<div class="card-img">
-															<img src="../assets/images/payment-icon/2.jpg"
-																class="img-fluid blur-up lazyloaded" alt="" />
-														</div>
-													</div>
-												</div>
-
-												<div class="edit-card">
-													<a data-bs-toggle="modal" data-bs-target="#editCard"
-														href="javascript:void(0)"><i class="far fa-edit"></i>
-														edit</a> <a href="javascript:void(0)" data-bs-toggle="modal"
-														data-bs-target="#removeProfile"><i
-														class="far fa-minus-square"></i> delete</a>
-												</div>
-											</div>
-
-											<div class="edit-card-mobile">
-												<a data-bs-toggle="modal" data-bs-target="#editCard"
-													href="javascript:void(0)"><i class="far fa-edit"></i>
-													edit</a> <a href="javascript:void(0)"><i
-													class="far fa-minus-square"></i> delete</a>
-											</div>
-										</div>
-
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
-											<div class="payment-card-detail">
-												<div class="card-details dabit-card">
-													<div class="card-number">
-														<h4>XXXX - XXXX - XXXX - 1366</h4>
-													</div>
-
-													<div class="valid-detail">
-														<div class="title">
-															<span>valid</span> <span>thru</span>
-														</div>
-														<div class="date">
-															<h3>05/21</h3>
-														</div>
-														<div class="primary">
-															<span class="badge bg-pill badge-light">primary</span>
-														</div>
-													</div>
-
-													<div class="name-detail">
-														<div class="name">
-															<h5>mark jecno</h5>
-														</div>
-														<div class="card-img">
-															<img src="../assets/images/payment-icon/3.jpg"
-																class="img-fluid blur-up lazyloaded" alt="" />
-														</div>
-													</div>
-												</div>
-
-												<div class="edit-card">
-													<a data-bs-toggle="modal" data-bs-target="#editCard"
-														href="javascript:void(0)"><i class="far fa-edit"></i>
-														edit</a> <a href="javascript:void(0)" data-bs-toggle="modal"
-														data-bs-target="#removeProfile"><i
-														class="far fa-minus-square"></i> delete</a>
-												</div>
-											</div>
-
-											<div class="edit-card-mobile">
-												<a data-bs-toggle="modal" data-bs-target="#editCard"
-													href="javascript:void(0)"><i class="far fa-edit"></i>
-													edit</a> <a href="javascript:void(0)"><i
-													class="far fa-minus-square"></i> delete</a>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
+							
 							<div class="tab-pane fade show" id="pills-profile"
 								role="tabpanel" aria-labelledby="pills-profile-tab">
 								<div class="dashboard-profile">
@@ -1345,7 +1110,7 @@
 										<h2>회원정보 수정</h2>
 										<span class="title-leaf"> <svg
 												class="icon-width bg-gray">
-                          <use xlink:href="../assets/svg/leaf.svg#leaf"></use>
+                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 									</div>
@@ -1444,19 +1209,6 @@
 																<input type="email" class="form-control" id="newEmail"
 																	name="newEmail" placeholder="이메일" /> <label
 																	for="newEmail">새 이메일</label>
-																<button type="button"
-																	class="btn theme-bg-color btn-md text-white"
-																	onclick="sendMail();">인증</button>
-															</div>
-														</div>
-
-														<div class="col-12 mailCode">
-															<div class="form-floating theme-form-floating editEmail">
-																<input type="text" class="form-control" id="emailCode"
-																	name="emailCode" placeholder="인증코드" /> <label
-																	for="emailCode">인증코드</label>
-																<button type="button"
-																	class="btn theme-bg-color btn-md text-white" onclick="">확인</button>
 															</div>
 														</div>
 
@@ -1529,7 +1281,7 @@
 											<div class="col-xxl-5">
 												<div class="profile-image">
 													<img
-														src="../assets/images/inner-page/dashboard-profile.png"
+														src="resources/assets/images/inner-page/dashboard-profile.png"
 														class="img-fluid blur-up lazyload" alt="" />
 												</div>
 											</div>
@@ -1537,6 +1289,252 @@
 									</div>
 								</div>
 							</div>
+							
+							<div class="tab-pane fade show" id="pills-address"
+								role="tabpanel" aria-labelledby="pills-address-tab">
+								<div class="dashboard-address">
+									<div class="title title-flex">
+										<div>
+											<h2>배송주소록</h2>
+											<span class="title-leaf"> <svg
+													class="icon-width bg-gray">
+                            <use
+														xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+                          </svg>
+											</span>
+										</div>
+
+										<button
+											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
+											data-bs-toggle="modal" data-bs-target="#add-address">
+											<i data-feather="plus" class="me-2"></i> 배송지 추가
+										</button>
+									</div>
+
+									<div class="row g-sm-4 g-3">
+										<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
+											<div class="address-box">
+												<div>
+													<div class="form-check">
+														<input class="form-check-input" type="radio" name="jack"
+															id="flexRadioDefault1" />
+													</div>
+
+													<div class="label">
+														<label>Home 2</label>
+													</div>
+
+													<div class="table-responsive address-table">
+														<table class="table">
+															<tbody>
+																<tr>
+																	<td colspan="2">Gary M. Bailey</td>
+																</tr>
+
+																<tr>
+																	<td>Address :</td>
+																	<td>
+																		<p>2135 Burning Memory Lane Philadelphia, PA 19135</p>
+																	</td>
+																</tr>
+
+																<tr>
+																	<td>Pin Code :</td>
+																	<td>+26</td>
+																</tr>
+
+																<tr>
+																	<td>Phone :</td>
+																	<td>+ 215-335-9916</td>
+																</tr>
+															</tbody>
+														</table>
+													</div>
+												</div>
+
+												<div class="button-group">
+													<button class="btn btn-sm add-button w-100"
+														data-bs-toggle="modal" data-bs-target="#editProfile">
+														<i data-feather="edit"></i> Edit
+													</button>
+													<button class="btn btn-sm add-button w-100"
+														data-bs-toggle="modal" data-bs-target="#removeProfile">
+														<i data-feather="trash-2"></i> Remove
+													</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="tab-pane fade show" id="pills-card" role="tabpanel"
+								aria-labelledby="pills-card-tab">
+								<div class="dashboard-card">
+									<div class="title title-flex">
+										<div>
+											<h2>My Card Details</h2>
+											<span class="title-leaf"> <svg
+													class="icon-width bg-gray">
+                            <use
+														xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+                          </svg>
+											</span>
+										</div>
+
+										<button
+											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
+											data-bs-toggle="modal" data-bs-target="#editCard">
+											<i data-feather="plus" class="me-2"></i> Add New Card
+										</button>
+									</div>
+
+									<div class="row g-4">
+										<div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
+											<div class="payment-card-detail">
+												<div class="card-details">
+													<div class="card-number">
+														<h4>XXXX - XXXX - XXXX - 2548</h4>
+													</div>
+
+													<div class="valid-detail">
+														<div class="title">
+															<span>valid</span> <span>thru</span>
+														</div>
+														<div class="date">
+															<h3>08/05</h3>
+														</div>
+														<div class="primary">
+															<span class="badge bg-pill badge-light">primary</span>
+														</div>
+													</div>
+
+													<div class="name-detail">
+														<div class="name">
+															<h5>Audrey Carol</h5>
+														</div>
+														<div class="card-img">
+															<img src="resources/assets/images/payment-icon/1.jpg"
+																class="img-fluid blur-up lazyloaded" alt="" />
+														</div>
+													</div>
+												</div>
+
+												<div class="edit-card">
+													<a data-bs-toggle="modal" data-bs-target="#editCard"
+														href="javascript:void(0)"><i class="far fa-edit"></i>
+														edit</a> <a href="javascript:void(0)" data-bs-toggle="modal"
+														data-bs-target="#removeProfile"><i
+														class="far fa-minus-square"></i> delete</a>
+												</div>
+											</div>
+
+											<div class="edit-card-mobile">
+												<a data-bs-toggle="modal" data-bs-target="#editCard"
+													href="javascript:void(0)"><i class="far fa-edit"></i>
+													edit</a> <a href="javascript:void(0)"><i
+													class="far fa-minus-square"></i> delete</a>
+											</div>
+										</div>
+
+										<div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
+											<div class="payment-card-detail">
+												<div class="card-details card-visa">
+													<div class="card-number">
+														<h4>XXXX - XXXX - XXXX - 1536</h4>
+													</div>
+
+													<div class="valid-detail">
+														<div class="title">
+															<span>valid</span> <span>thru</span>
+														</div>
+														<div class="date">
+															<h3>12/23</h3>
+														</div>
+														<div class="primary">
+															<span class="badge bg-pill badge-light">primary</span>
+														</div>
+													</div>
+
+													<div class="name-detail">
+														<div class="name">
+															<h5>Leah Heather</h5>
+														</div>
+														<div class="card-img">
+															<img src="resources/assets/images/payment-icon/2.jpg"
+																class="img-fluid blur-up lazyloaded" alt="" />
+														</div>
+													</div>
+												</div>
+
+												<div class="edit-card">
+													<a data-bs-toggle="modal" data-bs-target="#editCard"
+														href="javascript:void(0)"><i class="far fa-edit"></i>
+														edit</a> <a href="javascript:void(0)" data-bs-toggle="modal"
+														data-bs-target="#removeProfile"><i
+														class="far fa-minus-square"></i> delete</a>
+												</div>
+											</div>
+
+											<div class="edit-card-mobile">
+												<a data-bs-toggle="modal" data-bs-target="#editCard"
+													href="javascript:void(0)"><i class="far fa-edit"></i>
+													edit</a> <a href="javascript:void(0)"><i
+													class="far fa-minus-square"></i> delete</a>
+											</div>
+										</div>
+
+										<div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
+											<div class="payment-card-detail">
+												<div class="card-details dabit-card">
+													<div class="card-number">
+														<h4>XXXX - XXXX - XXXX - 1366</h4>
+													</div>
+
+													<div class="valid-detail">
+														<div class="title">
+															<span>valid</span> <span>thru</span>
+														</div>
+														<div class="date">
+															<h3>05/21</h3>
+														</div>
+														<div class="primary">
+															<span class="badge bg-pill badge-light">primary</span>
+														</div>
+													</div>
+
+													<div class="name-detail">
+														<div class="name">
+															<h5>mark jecno</h5>
+														</div>
+														<div class="card-img">
+															<img src="resources/assets/images/payment-icon/3.jpg"
+																class="img-fluid blur-up lazyloaded" alt="" />
+														</div>
+													</div>
+												</div>
+
+												<div class="edit-card">
+													<a data-bs-toggle="modal" data-bs-target="#editCard"
+														href="javascript:void(0)"><i class="far fa-edit"></i>
+														edit</a> <a href="javascript:void(0)" data-bs-toggle="modal"
+														data-bs-target="#removeProfile"><i
+														class="far fa-minus-square"></i> delete</a>
+												</div>
+											</div>
+
+											<div class="edit-card-mobile">
+												<a data-bs-toggle="modal" data-bs-target="#editCard"
+													href="javascript:void(0)"><i class="far fa-edit"></i>
+													edit</a> <a href="javascript:void(0)"><i
+													class="far fa-minus-square"></i> delete</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							
 
 							<div class="tab-pane fade show" id="pills-security"
 								role="tabpanel" aria-labelledby="pills-security-tab">
@@ -1631,93 +1629,7 @@
 	<!-- Footer Section End -->
 
 	<!-- Deal Box Modal Start
-	<div class="modal fade theme-modal deal-modal" id="deal-box"
-		tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div
-			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-			<div class="modal-content">
-				<div class="modal-header">
-					<div>
-						<h5 class="modal-title w-100" id="deal_today">Deal Today</h5>
-						<p class="mt-1 text-content">Recommended deals for you.</p>
-					</div>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close">
-						<i class="fa-solid fa-xmark"></i>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="deal-offer-box">
-						<ul class="deal-offer-list">
-							<li class="list-1">
-								<div class="deal-offer-contain">
-									<a href="shop-left-sidebar.html" class="deal-image"> <img
-										src="resources/assets/images/vegetable/product/10.png"
-										class="blur-up lazyload" alt="" />
-									</a> <a href="shop-left-sidebar.html" class="deal-contain">
-										<h5>Blended Instant Coffee 50 g Buy 1 Get 1 Free</h5>
-										<h6>
-											$52.57
-											<del>57.62</del>
-											<span>500 G</span>
-										</h6>
-									</a>
-								</div>
-							</li>
-
-							<li class="list-2">
-								<div class="deal-offer-contain">
-									<a href="shop-left-sidebar.html" class="deal-image"> <img
-										src="resources/assets/images/vegetable/product/11.png"
-										class="blur-up lazyload" alt="" />
-									</a> <a href="shop-left-sidebar.html" class="deal-contain">
-										<h5>Blended Instant Coffee 50 g Buy 1 Get 1 Free</h5>
-										<h6>
-											$52.57
-											<del>57.62</del>
-											<span>500 G</span>
-										</h6>
-									</a>
-								</div>
-							</li>
-
-							<li class="list-3">
-								<div class="deal-offer-contain">
-									<a href="shop-left-sidebar.html" class="deal-image"> <img
-										src="resources/assets/images/vegetable/product/12.png"
-										class="blur-up lazyload" alt="" />
-									</a> <a href="shop-left-sidebar.html" class="deal-contain">
-										<h5>Blended Instant Coffee 50 g Buy 1 Get 1 Free</h5>
-										<h6>
-											$52.57
-											<del>57.62</del>
-											<span>500 G</span>
-										</h6>
-									</a>
-								</div>
-							</li>
-
-							<li class="list-1">
-								<div class="deal-offer-contain">
-									<a href="shop-left-sidebar.html" class="deal-image"> <img
-										src="resources/assets/images/vegetable/product/13.png"
-										class="blur-up lazyload" alt="" />
-									</a> <a href="shop-left-sidebar.html" class="deal-contain">
-										<h5>Blended Instant Coffee 50 g Buy 1 Get 1 Free</h5>
-										<h6>
-											$52.57
-											<del>57.62</del>
-											<span>500 G</span>
-										</h6>
-									</a>
-								</div>
-							</li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+	
 	Deal Box Modal End -->
 
 	<!-- Tap to top start -->
@@ -1773,17 +1685,17 @@
 						</div>
 
 						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control" id="newZipNo"
+							<input type="text" class="form-control newZipNo" id="newZipNo"
 								name="newZipNo" placeholder="우편번호" readonly />
 						</div>
 
 						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control" id="newAddr"
+							<input type="text" class="form-control newAddr" id="newAddr"
 								name="newAddr" placeholder="주소" readonly />
 						</div>
 
 						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control" id="newAddrDatail"
+							<input type="text" class="form-control newAddrDatail" id="newAddrDatail"
 								name="newAddrDatail" placeholder="상세 주소" />
 						</div>
 					</form>

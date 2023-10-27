@@ -98,21 +98,31 @@ public class myPageController {
 		System.out.println("비밀번호 확인");
 	}
 
+	@RequestMapping("userInfoModify")
+	public void userInfoModify() {
+		System.out.println("회원정보");
+	}
 
 	@RequestMapping(value = "sendMail", method = RequestMethod.POST)
-	public @ResponseBody Member sendMail(@RequestParam("tmpEmail") String email) {
+	public @ResponseBody boolean sendMail(@RequestParam("tmpEmail") String email) {
 		System.out.println("이메일 중복검사");
-		Member newEmail  = null;
+		
+		boolean result = false;
+		
 		try {
-			 newEmail = mService.duplicateUserEmail(email);
+			Member newEmail = mService.duplicateUserEmail(email);
 			System.out.println(newEmail);
+			
+			if(newEmail != null) {//이메일이 중복
+				result = true;
+			}
 
 		} catch (SQLException | NamingException e) {
 
 			e.printStackTrace();
 		}
 
-		return newEmail;
+		return result;
 
 	}
 
