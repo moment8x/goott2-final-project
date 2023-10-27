@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -139,5 +140,11 @@ public class ShoppingCartController {
 		
 		System.out.println("======= 장바구니 컨트롤러단 끝 =======");
 		return result;
+	}
+	
+	@RequestMapping(value="/insert" ,  method=RequestMethod.POST)
+	public ResponseEntity<String> test(@RequestParam("id") String id){
+		System.out.println(id + "야이야이야 내나이가 어때서");
+		return ResponseEntity.ok("Success");
 	}
 }

@@ -13,8 +13,8 @@
 <title>Insert title here</title>
 <script type="text/javascript">
 	$(function() {
-		let view = "${sort}";
-		let sort = "${view}";
+		let sort = "${sort}";
+		let view = "${view}";
 		let queryString = "view=" + view + "&sort="+sort;
 		
 		$(".filter__option").on("click", function() {
@@ -36,19 +36,7 @@
 		$(".filter__sort").on("change", function() {
 			let changed = $(".vi")
 			console.log(changed + "!!!!");
-			$.ajax({
-			    url: '/list/categoryList/'+"${key }",
-			    type: 'GET',
-			    data: queryString,
-			    dataType: 'json',
-			    async:false,
-			    succes: function(data){
-			        // 전송에 성공하면 이 콜백 함수를 실행 (data 에는 응답받은 데이터가 저장된다)
-			    },
-			    error: function(){
-			        // 전송에 실패하면 이 콜백 함수를 실행
-			    }
-			});
+			
 		});
 	});
 </script>
@@ -271,5 +259,13 @@
 	<!-- Product Section End -->
 
 	<jsp:include page="../footer.jsp"></jsp:include>
+	
+	<link rel="stylesheet" href="https://unpkg.com/feather-icons@4.28.0/dist/feather.min.css">
+	
+	<script src="https://unpkg.com/feather-icons@4.28.0/dist/feather.min.js"></script>
+	
+	    <!-- Quantity js -->
+    <script src="../assets/js/quantity-2.js"></script>
+	
 </body>
 </html>
