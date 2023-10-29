@@ -6,6 +6,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.kkb.SearchMemberRequest;
+import com.project.vodto.kkb.SearchMemberResponse;
 
 @Repository
 public class AdminMemberDAOImpl implements AdminMemberDAO {
@@ -18,9 +19,17 @@ public class AdminMemberDAOImpl implements AdminMemberDAO {
 	}
 
 	@Override
-	public List<SearchMemberRequest> findByInfo(SearchMemberRequest member) throws Exception {
+	public int countAll() throws Exception {
+		
+		return ses.selectOne(ns + ".countAll");
+	}
+	
+	@Override
+	public List<SearchMemberResponse> findByInfo(SearchMemberRequest member) throws Exception {
 		
 		return ses.selectList(ns + ".findByInfo", member);
 	}
+
+	
 
 }

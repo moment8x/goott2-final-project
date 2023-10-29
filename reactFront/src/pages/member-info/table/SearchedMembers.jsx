@@ -1,6 +1,8 @@
 import React, { memo, useMemo } from 'react';
 import Card from '@/components/ui/Card';
 import Icon from '@/components/ui/Icon';
+import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
 import Tooltip from '@/components/ui/Tooltip';
 import { useTable, useRowSelect, useSortBy, usePagination } from 'react-table';
 
@@ -180,8 +182,15 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
   return (
     <>
       <Card>
-        <div className="md:flex justify-between items-center mb-6">
+        <div className="md:flex items-center mb-6">
           <h4 className="card-title font-black">{title}</h4>
+          <Button className="btn-secondary ml-5 p-[7px] pointer-events-none">
+            <div className="space-x-1 rtl:space-x-reverse">
+              <span>총 회원 수</span>
+              <Badge label="10000" className="bg-white text-slate-900 " />
+              <span>명</span>
+            </div>
+          </Button>
         </div>
         <div className="overflow-x-auto -mx-6">
           <div className="inline-block min-w-full align-middle">

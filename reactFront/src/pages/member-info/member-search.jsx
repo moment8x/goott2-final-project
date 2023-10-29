@@ -19,10 +19,10 @@ const privacy = [
 
 const grade = [
   { value: '', label: '전체' },
-  { value: '아기사슴', label: '등급1' },
-  { value: '사슴', label: '등급2' },
-  { value: 'grade3', label: '등급3' },
-  { value: 'grade4', label: '등급4' },
+  { value: '등급1', label: '등급1' },
+  { value: '등급2', label: '등급2' },
+  { value: '등급3', label: '등급3' },
+  { value: '등급4', label: '등급4' },
 ];
 
 const anniversary = [
@@ -102,6 +102,8 @@ const MemberSearch = ({ setSearchedInfo }) => {
     ageEnd: '',
     registrationDateStart: '',
     registrationDateEnd: '',
+    dateOfBirthStart: '',
+    dateOfBirthEnd: '',
     name: '',
     email: '',
     memberId: '',
@@ -109,9 +111,28 @@ const MemberSearch = ({ setSearchedInfo }) => {
     phoneNumber: '',
     cellPhoneNumber: '',
     gender: '',
-    dateOfBirthStart: '',
-    dateOfBirthEnd: '',
     address: '',
+    detailedAddress: '',
+    orderAmountStart: '',
+    orderAmountEnd: '',
+    actualPaymentAmountStart: '',
+    actualPaymentAmountEnd: '',
+    orderCountStart: '',
+    orderCountEnd: '',
+    actualOrderCountStart: '',
+    actualOrderCountEnd: '',
+    orderDateStart: '',
+    orderDateEnd: '',
+    paymentDateStart: '',
+    paymentDateEnd: '',
+    orderItem: '',
+    totalRewardsStart: '',
+    totalRewardsEnd: '',
+    totalPointsStart: '',
+    totalPointsEnd: '',
+    lastLoginDateStart: '',
+    lastLoginDateEnd: '',
+    dormantAccount: 'N',
   });
 
   // 성별
@@ -190,11 +211,19 @@ const MemberSearch = ({ setSearchedInfo }) => {
     console.log('handleInputValueChange:', e.target.value);
   };
 
+  const handleCheckbox = (e) => {
+    setChecked(!checked);
+    setSearchMember({
+      ...searchMember,
+      [e.target.name]: e.target.checked ? 'Y' : 'N',
+    });
+  };
+
   // 검색 버튼
   const handleSubmit = (e) => {
     console.log('searchMember:', searchMember);
     e.preventDefault();
-    fetch(' http://localhost:8081/admin/members/member-info', {
+    fetch(' http://localhost:8081/admin/members/search', {
       // http://localhost:8081/
       method: 'POST',
       headers: {
@@ -468,7 +497,7 @@ const MemberSearch = ({ setSearchedInfo }) => {
                       <tr>
                         <td className="table-td">휴면 회원</td>
                         <td>
-                          <Checkbox label="" value={checked} onChange={() => setChecked(!checked)} />
+                          <Checkbox value={checked} name="dormantAccount" onChange={handleCheckbox} />
                         </td>
                       </tr>
                     </tbody>

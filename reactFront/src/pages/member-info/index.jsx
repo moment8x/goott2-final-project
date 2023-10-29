@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MemberSearch from './member-search';
-import SearchedMember from './table/SearchedMember';
+import SearchedMembers from './table/SearchedMembers';
 
 const MemberInfo = () => {
   const [searchedInfo, setSearchedInfo] = useState([
@@ -22,7 +22,7 @@ const MemberInfo = () => {
     <>
       <div className="space-y-5">
         <MemberSearch setSearchedInfo={setSearchedInfo} />
-        <SearchedMember data={searchedInfo} />
+        <SearchedMembers data={searchedInfo} />
       </div>
     </>
   );
