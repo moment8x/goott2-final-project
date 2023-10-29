@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@DependsOn("memberCountListener")
 public class AdminMemberServiceImpl implements AdminMemberService {
 
 	public final AdminMemberDAO adminMemberRepository;
@@ -34,6 +36,19 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		result.put("total", totalCount);
 		
 		return result;
+	}
+	
+	@EventListener(ContextRefreshedEvent.class)
+	public void updateMemberCount(ContextRefreshedEvent e) throws Exception {
+		
+		// Root WebApplicationContext 초기화 시에만 체크
+		if (e.getApplicationContext().getParent() == null) {
+			int updateCount = adminMemberRepository.countAll();	
+			System.out.println("context refresh");
+			
+			// 전체 회원 수를 조회하는 이벤트 발행
+	        publisher.publishEvent(new TotalMemberCountEvent(updateCount));
+		}
 	}
 	
 	
@@ -70,20 +85,6 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		
 		return result;
 	}
-	
-	@EventListener({ContextRefreshedEvent.class})
-	public void updateMemberCount(ContextRefreshedEvent e) throws Exception {
-		
-		// Root WebApplicationContext 초기화 시에만 체크
-		if (e.getApplicationContext().getParent() == null) {
-			int updateCount = adminMemberRepository.countAll();	
-			System.out.println("context refresh");
-			
-			// 전체 회원 수를 조회하는 이벤트 발행
-	        publisher.publishEvent(new TotalMemberCountEvent(updateCount));
-		}
-	}
-	
 	
 	private String detectRegion(SearchMemberResponse param) {
 		List<String> regions = 
