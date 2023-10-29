@@ -31,4 +31,7 @@ public interface MemberDAO {
 	//이메일 중복검사
 	Member duplicateUserEmail(String tmpEmail) throws SQLException, NamingException;
 	
+	//전화번호 중복검사
+	Member duplicatePhoneNumber(String phoneNumber) throws SQLException, NamingException;
+	
 }

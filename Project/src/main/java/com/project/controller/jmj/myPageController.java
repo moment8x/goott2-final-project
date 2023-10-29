@@ -82,15 +82,14 @@ public class myPageController {
 		System.out.println("회원정보");
 	}
 
-	@RequestMapping(value = "validEamil", method = RequestMethod.POST)
-	public @ResponseBody boolean sendMail(@RequestParam("tmpEmail") String email) {
-		System.out.println("이메일 중복검사");
+	@RequestMapping(value = "duplicateUserEmail", method = RequestMethod.POST)
+	public @ResponseBody boolean duplicateUserEmail(@RequestParam("tmpEmail") String email) {
 		
 		boolean result = false;
 		
 		try {
 			Member newEmail = mService.duplicateUserEmail(email);
-			System.out.println(newEmail);
+			System.out.println("이메일 중복 검사" + newEmail);
 			
 			if(newEmail != null) {//이메일이 중복
 				result = true;
@@ -103,6 +102,25 @@ public class myPageController {
 
 		return result;
 
+	}
+	
+	@RequestMapping(value = "duplicatePhoneNumber", method = RequestMethod.POST)
+	public @ResponseBody boolean duplicatePhoneNumber(@RequestParam("newPhoneNumber") String phoneNumber) {
+		
+		boolean result = false;
+		
+		try {
+			Member newPhoneNumber = mService.duplicatePhoneNumber(phoneNumber);
+			System.out.println("전화번호 중복 검사" + newPhoneNumber);
+			
+			if(newPhoneNumber != null) { //전화번호 중복
+				result = true;
+			}
+		} catch (SQLException | NamingException e) {
+			
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 }

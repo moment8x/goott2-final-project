@@ -103,4 +103,10 @@ public class MemberServiceImpl implements MemberService {
 		return mDao.duplicateUserEmail(email);
 	}
 
+	@Override
+	public Member duplicatePhoneNumber(String phoneNumber) throws SQLException, NamingException {
+		return mDao.duplicatePhoneNumber(phoneNumber);
+		
+	}
+
 }

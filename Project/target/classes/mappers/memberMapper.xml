@@ -24,11 +24,14 @@
 	</select>
 	
 	<select id="getMemberInfo" resultType="com.project.vodto.Member">
-		select member_id, name, phone_number, gender, date_of_birth, zip_code, address, detailed_address, email, 
-		identity_verification_status, profile_image, refund_bank, refund_account, membership_grade from member where member_id = #{memberId}
+		select * from member where member_id = #{memberId}
 	</select>
 	
 	<select id="getEmail" resultType="com.project.vodto.Member">
 		select * from member where email = #{email}
+	</select>
+	
+	<select id="getPhoneNumber" resultType="com.project.vodto.Member">
+		select phone_Number from member where phone_number = #{phoneNumber}
 	</select>
 </mapper>
