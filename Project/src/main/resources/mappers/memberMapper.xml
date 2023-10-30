@@ -42,4 +42,23 @@
 	<update id="updateAuthentication">
 		update member set identity_verification_status = 'Y' where member_id = #{memberId}
 	</update>
+	
+	<update id="updatePwd">
+		update member set password=sha1(md5(#{password})) where member_id=#{memberId}
+	</update>
+	<update id="updatePhoneNumber">
+		update member set phone_number=#{phoneNumber} where member_id=#{memberId}
+	</update>
+	<update id="updatecellPhoneNumber">
+		update member set cell_phone_number=#{cellPhoneNumber} where member_id=#{memberId}
+	</update>
+	<update id="updateAddr">
+		update member set zip_code=#{zipCode}, address=#{address}, detailed_address=#{detailedAddress} where member_id=#{memberId}
+	</update>
+	<update id="updateEmail">
+		update member set email=#{email} where member_id=#{memberId}
+	</update>
+	<update id="updateRefund">
+		update member set refund_bank=#{refundBank}, refund_account=#{refundAccount} where member_id=#{memberId}
+	</update>
 </mapper>

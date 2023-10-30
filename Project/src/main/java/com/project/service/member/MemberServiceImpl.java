@@ -44,9 +44,26 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public Member setMyInfo(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean setMyInfo(String memberId, Member modifyMemberInfo) throws SQLException, NamingException {
+		boolean result = true;
+		
+		if(modifyMemberInfo.getPassword() != null) {
+			mDao.updatePwd(memberId, modifyMemberInfo);			
+		}else if(modifyMemberInfo.getPhoneNumber() != null) {
+			mDao.updatePhoneNumber(memberId, modifyMemberInfo);
+		}else if(modifyMemberInfo.getCellPhoneNumber() != null) {
+			mDao.updateCellPhoneNumber(memberId, modifyMemberInfo);
+		}else if(modifyMemberInfo.getEmail() != null) {
+			mDao.updateEmail(memberId, modifyMemberInfo);
+		}else if(modifyMemberInfo.getAddress() != null) {
+			mDao.updateAddr(memberId, modifyMemberInfo);
+		}else if(modifyMemberInfo.getRefundBank() != null) {
+			mDao.updateRefund(memberId, modifyMemberInfo);
+		}else {
+			result =false;
+		}
+		 
+		return result;
 	}
 
 	@Override

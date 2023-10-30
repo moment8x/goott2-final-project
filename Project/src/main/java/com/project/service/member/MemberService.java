@@ -24,7 +24,7 @@ public interface MemberService {
 	// 특정 회원 정보 수정(select)
 	Member getMyInfo(String memberId) throws SQLException, NamingException;
 	// 특정 회원 정보 수정(update)
-	Member setMyInfo(String memberId) throws SQLException, NamingException;
+	boolean setMyInfo(String memberId, Member modifyMemberInfo) throws SQLException, NamingException;
 	// 특정 회원 탈퇴
 	Boolean withdraw(String memberId) throws SQLException, NamingException;
 	// 배송지 목록 조회

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -154,6 +155,24 @@ public class myPageController {
 		}
 		
 		return result;
+	}
+	
+	@RequestMapping(value = "modifyUser", method = RequestMethod.POST)
+	public void modifyUserInfo(@ModelAttribute Member modifyMemberInfo) {
+		System.out.println("회원정보 수정");
+		
+		String memberId = "agim15";
+		
+		try {
+			boolean userInfo = mService.setMyInfo(memberId, modifyMemberInfo);
+			if(userInfo) {
+				System.out.println("회원정보 수정완료");
+			}
+		} catch (SQLException | NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(modifyMemberInfo.toString());
 	}
 
 
