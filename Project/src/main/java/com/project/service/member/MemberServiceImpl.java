@@ -109,4 +109,18 @@ public class MemberServiceImpl implements MemberService {
 		
 	}
 
+	@Override
+	public Member duplicateCellPhone(String cellPhoneNumber) throws SQLException, NamingException {
+		
+		return mDao.duplicateCellPhone(cellPhoneNumber);
+	}
+
+	@Override
+	public int updateAuthentication(String memberId) throws SQLException, NamingException {
+		
+		return mDao.updateAuthentication(memberId);
+	}
+
+
+
 }

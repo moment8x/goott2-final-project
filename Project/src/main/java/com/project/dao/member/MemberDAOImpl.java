@@ -68,5 +68,17 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectOne(ns + ".getPhoneNumber", phoneNumber);
 	}
 
+	@Override
+	public Member duplicateCellPhone(String cellPhoneNumber) {
+		
+		return ses.selectOne(ns + ".getCellPhoneNumber", cellPhoneNumber);
+	}
+
+	@Override
+	public int updateAuthentication(String memberId) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".updateAuthentication", memberId);
+	}
+
 
 }

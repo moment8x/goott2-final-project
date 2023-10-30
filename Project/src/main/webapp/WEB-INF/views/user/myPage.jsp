@@ -53,6 +53,11 @@
 	href="/resources/assets/css/style.css" />
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+
+<script type="text/javascript"
+	src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+
 <script type="text/javascript">
 	//도로명주소API 
 	function goPopup() {
@@ -105,14 +110,55 @@
 			addAddrDetail = document.querySelector("#addAddrDetail")
 			addAddrDetail.value = addrDetail
 		}
+		
+		let updateAddr = true;
+		
+		return updateAddr;
 	}
+	
+	let IMP = window.IMP;      // 생략 가능
+	IMP.init("imp54017066"); // 예: imp00000000
+	
+	// 본인인증
+	function identify() {
+	      // IMP.certification(param, callback) 호출
+	      IMP
+	            .certification(
+	                  { // param
+	                     pg : 'MIIiasTest',//본인인증 설정이 2개이상 되어 있는 경우 필수 
+	                     merchant_uid : "ORD20180131-0000011", 
+	                     m_redirect_url : "http://localhost:8081/user/myPage", // 모바일환경에서 popup:false(기본값) 인 경우 필수, 예: https://www.myservice.com/payments/complete/mobile
+	                     popup : false
+	                  // PC환경에서는 popup 파라미터가 무시되고 항상 true 로 적용됨
+	                  },
+	                  function(rsp) { // callback
+	                     if (rsp.success) {
+	                        console.log(rsp);
+	                        $.ajax({
+	                			url : '/user/identityVerificationStatus', // 데이터를 수신받을 서버 주소
+	                			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+	                			dataType : 'json',
+	                			async : false,
+	                			success : function(data) {
+	                				console.log(data);
+	                				if(data == true){
+	                					location.href = "/user/myPage"
+	                				}
+	                			},
+	                			error : function() {
+	                			}
+	                		});
+	                     } else {
+	                        console.log("본인인증에 실패하였습니다. 에러 내용: " + rsp.error_msg);
+	                     }
+	                  });
+	   }
 
 	$(function() {
 		//전화번호변경 아이콘 클릭시
-		$('.fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber').click(
-				function() {
-					$('.newPhoneNumberEdit').show();
-				})
+		$('.fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber').click(function() {
+			$('.newPhoneNumberEdit').show();
+		})
 		//핸드폰번호 변경 아이콘 클릭시
 		$('.fa-regular.fa-pen-to-square.fa-xl.editCellPhoneNumber').click(function() {
 			$('.newCellPhoneNumberEdit').show();
@@ -144,6 +190,11 @@
 		$('#newUserPhonNumber').blur(function () {
 			duplicatePhoneNumber();
 		})
+		
+		//휴대폰번호 중복검사
+		$('#newCellPhoneNumber').blur(function() {
+			duplicateCellPhone();
+		})
 	})
 
 	// 유효성 검사 메세지
@@ -158,6 +209,14 @@
 		$('.msg').hide(10000);
 	}
 
+	//환불계좌 변경시
+	function changeRefund() {
+			let isValidRefund = true
+			let newRefundAccount = $('#newRefundAccount').val();
+			let newRefundBank =  $("select[name=refundBank] option:selected").text(); //text값 가져오기		 
+			
+			return isValidRefund;
+	}
 	//비밀번호 유효성검사
 	function validUserPwd() {
 		let isValidPwd = false;
@@ -184,7 +243,7 @@
 		}
 		return isValidPwd;
 	}
-
+	
 	//이메일 중복검사
 	function duplicateUserEmail() {
 		let isValidEamil = false;
@@ -224,7 +283,7 @@
 	function duplicatePhoneNumber() {
 		let isValidPhoneNumber = false;
 		let newPhoneNumber = $('#newUserPhonNumber').val();
-		let regPhone = /^(\d{2,3})(\d{3,4})(\d{4})$/;
+		let regPhone = /^\d{2,3}-\d{3,4}-\d{4}$/;
 		
 		$.ajax({
 			url : '/user/duplicatePhoneNumber', // 데이터를 수신받을 서버 주소
@@ -245,8 +304,6 @@
 					printMsg("newUserPhonNumber", "newUserPhonNumber", "전화번호 형식에 맞지 않습니다.", true)
 					$('.trueMsg').hide();
 				}else if(data == false && regPhone.test(newPhoneNumber)){
-					//사용가능한 전화번호면 문자열제거 자동으로 -붙이기
-					newPhoneNumber.replace(/[^0-9]/g, '').replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`); 
 					printMsg("", "newUserPhonNumber", "사용가능한 전화번호 입니다.", false)
 					isValidPhoneNumber = true					
 				}
@@ -256,6 +313,43 @@
 		});
 		return isValidPhoneNumber
 	}
+	
+	//휴대폰번호 유효성 검사
+	function duplicateCellPhone() {
+		let isValidCellPhone = false;
+		let newCellPhone = $('#newCellPhoneNumber').val();
+		let regCellPhone = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
+		
+		$.ajax({
+			url : '/user/duplicateCellPhone', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				newCellPhone
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data){//휴대폰번호 중복
+					$('#newCellPhoneNumber').val('');		
+					$('.trueMsg').hide();
+					printMsg("newCellPhoneNumber", "newCellPhoneNumber", "중복된 휴대폰번호 입니다.", true)
+				}else if(!regCellPhone.test(newCellPhone)){ //정규식에 맞지않음
+					$('#newCellPhoneNumber').val('');		
+					$('.trueMsg').hide();
+					printMsg("newCellPhoneNumber", "newCellPhoneNumber", "휴대폰번호 형식에 맞지 않습니다.", true)
+				}else if(data == false && regCellPhone.test(newCellPhone)){
+					printMsg("", "newCellPhoneNumber", "사용가능한 휴대폰번호 입니다.", false)
+					isValidCellPhone = true;					
+				}
+			},
+			error : function() {
+			}
+		});
+		return isValidCellPhone
+	}
+	
+	
 </script>
 <style>
 #deliveryStatus {
@@ -266,15 +360,16 @@
 	width: 184px;
 }
 
-.fa-regular.fa-circle-check.fa-lg, .newPhoneNumberEdit, .newEmailEdit, .newCellPhoneNumberEdit,
-	.mailCode, .editNewUserPwd, .editRefund {
+.fa-regular.fa-circle-check.fa-lg, .newPhoneNumberEdit, .newEmailEdit,
+	.newCellPhoneNumberEdit, .mailCode, .editNewUserPwd, .editRefund, .btn.theme-bg-color.btn-md.text-white.updatePwd
+	{
 	display: none;
 }
 
-.fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber, .fa-regular.fa-pen-to-square.fa-xl.editEmail, .fa-regular.fa-pen-to-square.fa-xl.editCellPhoneNumber
-	{
+.fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber, .fa-regular.fa-pen-to-square.fa-xl.editEmail,
+	.fa-regular.fa-pen-to-square.fa-xl.editCellPhoneNumber, .fa-regular.fa-pen-to-square.fa-xl.refund,
+	.fa-regular.fa-pen-to-square.fa-xl.editUserPwd {
 	cursor: pointer;
-	text-align: center;
 }
 
 .msg {
@@ -289,17 +384,19 @@
 .col-12.modifyBtn {
 	display: flex;
 	justify-content: center;
+	gap: 10px;
 }
 
-.form-floating.theme-form-floating.editPhoneNumber, .form-floating.theme-form-floating.editEmail, 
-.form-floating.theme-form-floating.editCellPhoneNumber, .form-floating.theme-form-floating.pwd"
-	{
+.form-floating
+.theme-form-floating
+.editPhoneNumber, .form-floating
+.theme-form-floating
+.editEmail, .form-floating
+.theme-form-floating
+.editCellPhoneNumber, .form-floating
+.theme-form-floating
+.pwd {
 	display: flex;
-	justify-content: flex-end;
-}
-
-.btn.theme-bg-color.btn-md.text-white.delUser {
-	
 }
 </style>
 </head>
@@ -422,7 +519,7 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-							<button class="nav-link" id="pills-profile-tab"
+								<button class="nav-link" id="pills-profile-tab"
 									data-bs-toggle="pill" data-bs-target="#pills-profile"
 									type="button" role="tab" aria-controls="pills-profile"
 									aria-selected="false">
@@ -491,7 +588,8 @@
 										<h2>마이페이지</h2>
 										<span class="title-leaf"> <svg
 												class="icon-width bg-gray">
-                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+                          <use
+													xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 									</div>
@@ -669,7 +767,8 @@
 										<h2>My Wishlist History</h2>
 										<span class="title-leaf title-leaf-gray"> <svg
 												class="icon-width bg-gray">
-                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+                          <use
+													xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 									</div>
@@ -1111,7 +1210,8 @@
 										<h2>주문내역</h2>
 										<span class="title-leaf title-leaf-gray"> <svg
 												class="icon-width bg-gray">
-                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+                          <use
+													xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 
@@ -1192,7 +1292,7 @@
 									</div>
 								</div>
 							</div>
-							
+
 							<div class="tab-pane fade show" id="pills-profile"
 								role="tabpanel" aria-labelledby="pills-profile-tab">
 								<div class="dashboard-profile">
@@ -1200,7 +1300,8 @@
 										<h2>회원정보 수정</h2>
 										<span class="title-leaf"> <svg
 												class="icon-width bg-gray">
-                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+                          <use
+													xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 									</div>
@@ -1214,25 +1315,24 @@
 
 												<div class="input-box">
 													<form class="row g-4" action="#" method="post">
-													
+
 														<div class="col-12">
 															<div class="form-floating theme-form-floating pwd">
 																<input type="password" class="form-control" id="userPwd"
-																	name="userPwd" value="●●●●●●●●"  readonly/> <label
-																	for="userPwd">비밀번호</label>
-																	<i
+																	name="userPwd" value="●●●●●●●●" readonly /> <label
+																	for="userPwd">비밀번호</label> <i
 																	class="fa-regular fa-pen-to-square fa-xl editUserPwd"></i>
 															</div>
 														</div>
-														
+
 
 														<div class="col-12 editNewUserPwd">
 															<div class="form-floating theme-form-floating">
 																<input type="password" class="form-control" id="newPwd"
 																	name="newPwd" placeholder="새 비밀번호" /> <label
 																	for="newPwd">새 비밀번호</label>
-																	<div class="col-12">영어, 숫자, 특수문자 (!@#$%^*+=-) 를 1개이상
-																		포함하여 8-15글자로 입력해주세요.</div>
+																<div class="col-12">영어, 숫자, 특수문자 (!@#$%^*+=-) 를
+																	1개이상 포함하여 8-15글자로 입력해주세요.</div>
 															</div>
 														</div>
 
@@ -1240,9 +1340,10 @@
 															<div class="form-floating theme-form-floating">
 																<input type="password" class="form-control"
 																	id="newPwdCheck" name="newPwdCheck"
-																	placeholder="새 비밀번호 확인 "/> <label for="newPwdCheck">새
+																	placeholder="새 비밀번호 확인 " /> <label for="newPwdCheck">새
 																	비밀번호 확인</label> <i class="fa-regular fa-circle-check fa-lg"
 																	style="color: #0e997e"></i>
+
 															</div>
 														</div>
 
@@ -1265,53 +1366,53 @@
 
 														<div class="col-12">
 															<div class="form-floating theme-form-floating">
-															<c:choose>
-															<c:when test="${fn:contains(userInfo.gender,'F')}">
-																<input type="text" class="form-control" id="userGender"
-																	name="userGender" value="여자"
-																	placeholder="성별" readonly /> <label for="userGender">성별</label>
-															</c:when>
-															<c:otherwise>
-																<input type="text" class="form-control" id="userGender"
-																	name="userGender" value="남자"
-																	placeholder="성별" readonly /> <label for="userGender">성별</label>
-															</c:otherwise>
-															</c:choose>
+																<c:choose>
+																	<c:when test="${fn:contains(userInfo.gender,'F')}">
+																		<input type="text" class="form-control"
+																			id="userGender" name="userGender" value="여자"
+																			placeholder="성별" readonly />
+																		<label for="userGender">성별</label>
+																	</c:when>
+																	<c:otherwise>
+																		<input type="text" class="form-control"
+																			id="userGender" name="userGender" value="남자"
+																			placeholder="성별" readonly />
+																		<label for="userGender">성별</label>
+																	</c:otherwise>
+																</c:choose>
 															</div>
 														</div>
-														
+
 														<div class="col-12">
 															<div
 																class="form-floating theme-form-floating editPhoneNumber">
 																<input type="text" class="form-control"
 																	id="userPhonNumber" name="userPhonNumber"
 																	value="${userInfo.phoneNumber }" placeholder="전화번호"
-																	readonly /> <label for="userPhonNumber">전화번호</label>
-																<i
+																	readonly /> <label for="userPhonNumber">전화번호</label> <i
 																	class="fa-regular fa-pen-to-square fa-xl editPhoneNumber"></i>
 															</div>
 														</div>
-														
+
 														<div class="col-12 newPhoneNumberEdit">
-															<div
-																class="form-floating theme-form-floating">
+															<div class="form-floating theme-form-floating">
 																<input type="text" class="form-control"
 																	id="newUserPhonNumber" name="newUserPhonNumber"
-																	 placeholder="새 전화번호"
-																	 /> <label for="newUserPhonNumber">새 전화번호</label>
-																<h5>- 없이 입력해주세요.</h5>
-																
+																	placeholder="새 전화번호" /> <label for="newUserPhonNumber">새
+																	전화번호</label>
+																<h5>-포함해서 입력해주세요.</h5>
+
 															</div>
 														</div>
-														
+
 														<div class="col-12">
 															<div
 																class="form-floating theme-form-floating editCellPhoneNumber">
 																<input type="text" class="form-control"
 																	id="cellPhoneNumber" name="cellPhoneNumber"
-																	value="${userInfo.cellPhoneNumber }" placeholder="휴대폰 번호"
-																	readonly /> <label for="cellPhoneNumber">휴대폰 번호</label>
-																<i
+																	value="${userInfo.cellPhoneNumber }"
+																	placeholder="휴대폰 번호" readonly /> <label
+																	for="cellPhoneNumber">휴대폰 번호</label> <i
 																	class="fa-regular fa-pen-to-square fa-xl editCellPhoneNumber"></i>
 															</div>
 														</div>
@@ -1321,11 +1422,9 @@
 																class="form-floating theme-form-floating editCellPhoneNumber">
 																<input type="text" class="form-control"
 																	id="newCellPhoneNumber" name="newCellPhoneNumber"
-																	placeholder="새 휴대폰 번호" /> <label for="newCellPhoneNumber">새
-																	휴대폰 번호</label>
-																<button type="button"
-																	class="btn theme-bg-color btn-md text-white" onclick="">
-																	인증?</button>
+																	placeholder="새 휴대폰 번호" /> <label
+																	for="newCellPhoneNumber">새 휴대폰 번호</label>
+																<h5>-포함해서 입력해주세요.</h5>
 															</div>
 														</div>
 
@@ -1343,6 +1442,7 @@
 																<input type="email" class="form-control" id="newEmail"
 																	name="newEmail" placeholder="이메일" /> <label
 																	for="newEmail">새 이메일</label>
+
 															</div>
 														</div>
 
@@ -1370,37 +1470,34 @@
 
 														<div class="col-12">
 															<div class="form-floating theme-form-floating">
-																<input type="text" class="form-control"
-																	id="addrDetail" name="addrDetail"
-																	value="${userInfo.detailedAddress}" placeholder="상세주소" />
-																<label for="addrDetail">상세주소</label>
+																<input type="text" class="form-control" id="addrDetail"
+																	name="addrDetail" value="${userInfo.detailedAddress}"
+																	placeholder="상세주소" /> <label for="addrDetail">상세주소</label>
 															</div>
 														</div>
-														
+
 														<div class="col-12">
 															<div class="form-floating theme-form-floating">
-																<input type="text" class="form-control"
-																	id="refundBank" name="refundBank"
-																	value="${userInfo.refundBank}" placeholder="환불은행" readonly/>
-																<label for="refundBank">환불은행</label>
-																<i
-																	class="fa-regular fa-pen-to-square fa-xl refund"></i>
+																<input type="text" class="form-control" id="refundBank"
+																	name="refundBank" value="${userInfo.refundBank}"
+																	placeholder="환불은행" readonly /> <label for="refundBank">환불은행</label>
+																<i class="fa-regular fa-pen-to-square fa-xl refund"></i>
 															</div>
 														</div>
-														
+
 														<div class="col-12">
 															<div class="form-floating theme-form-floating">
 																<input type="text" class="form-control"
 																	id="refundAccount" name="refundAccount"
-																	value="${userInfo.refundAccount}" placeholder="환불계좌" readonly />
-																<label for="refundAccount">환불계좌</label>
+																	value="${userInfo.refundAccount}" placeholder="환불계좌"
+																	readonly /> <label for="refundAccount">환불계좌</label>
 															</div>
 														</div>
-														
+
 														<div class="col-12 editRefund">
 															<div class="form-floating theme-form-floating">
-																<select class="form-select" id="floatingSelect1"
-																	aria-label="Floating label select example">
+																<select class="form-select" id="floatingSelect2 newRefundBank" name="refundBank"
+																	aria-label="Floating label select example" onchange="changeRefund();">
 																	<option selected>환불받으실 은행을 선택해주세요.</option>
 																	<option value="kb">KB국민은행</option>
 																	<option value="shinhan">신한은행</option>
@@ -1409,26 +1506,29 @@
 																	<option value="sc">SC제일은행</option>
 																	<option value="city">씨티은행</option>
 																	<option value="nh">NH농협은행</option>
-																	<option value="suheyp">수협은행</option>
+																	<option value="suhyup">수협은행</option>
 																	<option value="kBank">케이뱅크</option>
 																	<option value="kakao">카카오뱅크</option>
 																	<option value="toss">토스뱅크</option>
-																	<option value="deagu">대구은행</option>
-																	<option value="busan">부산은행</option>
-																	<option value="kyengnam">경남은행</option>
-																	<option value="gwangju">광주은행</option>
-																	<option value="jeonbuk">전북은행</option>
-																	<option value="jeju">제주은행</option>		
+																	<option value="dgb">대구은행</option>
+																	<option value="busan">BNK부산은행</option>
+																	<option value="bnk">경남은행</option>
+																	<option value="kwangju">광주은행</option>
+																	<option value="jb">전북은행</option>
+																	<option value="jeju">제주은행</option>
+																	<option value="postBank">우체국</option>
+																	<option value="sec">새마을금고</option>
 																</select> <label for="floatingSelect">환불은행</label>
 															</div>
 														</div>
-														
+
 														<div class="col-12 editRefund">
 															<div class="form-floating theme-form-floating">
 																<input type="text" class="form-control"
-																	id="refundAccount" name="refundAccount"
-																	 placeholder="환불계좌" />
-																<label for="refundAccount">환불계좌</label>
+																	id="newRefundAccount" name="newRefundAccount"
+																	placeholder="환불계좌" /> <label for="newRefundAccount">환불계좌</label>
+																	<i class="fa-regular fa-circle-check fa-lg validrefundAccount"
+																	style="color: #0e997e"></i>
 															</div>
 														</div>
 
@@ -1443,24 +1543,24 @@
 																			<label class="form-check-label" for="authentication">본인인증</label>
 																		</c:when>
 																		<c:otherwise>
-																			
-																			<button>본인 인증</button>
+																			<button class="btn theme-bg-color btn-md text-white"
+																				type="button" onclick="identify();">본인인증</button>
 																		</c:otherwise>
 																	</c:choose>
 																</div>
 															</div>
 														</div>
 
-													<div class="col-12 modifyBtn">
-														<button class="btn theme-bg-color btn-md text-white"
-															type="submit">수정</button>
-													</div>
-												</form>
-													<div>
-														<button
-															class="btn theme-bg-color btn-md text-white delUser"
-															type="button">탈퇴</button>
-													</div>
+														<div class="col-12 modifyBtn">
+															<button class="btn theme-bg-color btn-md text-white"
+																type="submit">수정</button>
+															<button
+																class="btn theme-bg-color btn-md text-white delUser"
+																type="button">탈퇴</button>
+
+														</div>
+													</form>
+
 												</div>
 
 											</div>
@@ -1476,7 +1576,7 @@
 									</div>
 								</div>
 							</div>
-							
+
 							<div class="tab-pane fade show" id="pills-address"
 								role="tabpanel" aria-labelledby="pills-address-tab">
 								<div class="dashboard-address">
@@ -1721,7 +1821,7 @@
 								</div>
 							</div>
 
-							
+
 
 							<div class="tab-pane fade show" id="pills-security"
 								role="tabpanel" aria-labelledby="pills-security-tab">
@@ -1882,8 +1982,9 @@
 						</div>
 
 						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control addAddrDetail" id="addAddrDetail"
-								name="newAddrDetail" placeholder="상세 주소" /><label for="addAddrDetail">상세주소</label>
+							<input type="text" class="form-control addAddrDetail"
+								id="addAddrDetail" name="newAddrDetail" placeholder="상세 주소" /><label
+								for="addAddrDetail">상세주소</label>
 						</div>
 					</form>
 				</div>

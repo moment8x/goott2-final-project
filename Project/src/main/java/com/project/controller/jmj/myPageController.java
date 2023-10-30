@@ -30,7 +30,7 @@ public class myPageController {
 	public void myPage(Model model) {
 
 		System.out.println("마이페이지");
-		String memberId = "ahong53";
+		String memberId = "agim15";
 
 //		System.out.println(orderListNo);
 
@@ -77,9 +77,24 @@ public class myPageController {
 		System.out.println("비밀번호 확인");
 	}
 
-	@RequestMapping("userInfoModify")
-	public void userInfoModify() {
-		System.out.println("회원정보");
+	@RequestMapping(value = "identityVerificationStatus", method = RequestMethod.POST)
+	public @ResponseBody boolean identityVerificationStatus() {
+		System.out.println("본인인증 업데이트");
+		String memberId = "agim15";
+		
+		boolean result = false;
+		try {
+			int identityVerificationStatus = mService.updateAuthentication(memberId);
+			
+			if(identityVerificationStatus == 1) {
+				result = true;
+			}
+			
+		} catch (SQLException | NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	@RequestMapping(value = "duplicateUserEmail", method = RequestMethod.POST)
@@ -122,5 +137,24 @@ public class myPageController {
 		}
 		return result;
 	}
+	
+	@RequestMapping(value = "duplicateCellPhone", method = RequestMethod.POST)
+	public @ResponseBody boolean duplicateCellPhone(@RequestParam("newCellPhone") String cellPhoneNumber) {
+		
+		boolean result  = false;
+		
+		try {
+			Member newCellPhoneNumber = mService.duplicateCellPhone(cellPhoneNumber);
+			System.out.println("휴대폰번호 중복검사" + newCellPhoneNumber);
+			if(newCellPhoneNumber != null) {//휴대폰번호 중복검사
+				result = true;
+			}
+		} catch (SQLException | NamingException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+
 
 }

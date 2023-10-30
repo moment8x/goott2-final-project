@@ -34,4 +34,10 @@ public interface MemberDAO {
 	//전화번호 중복검사
 	Member duplicatePhoneNumber(String phoneNumber) throws SQLException, NamingException;
 	
+	//핸드폰번호 중복검사
+	Member duplicateCellPhone(String cellPhoneNumber) throws SQLException, NamingException;
+	
+	//본인인증 성공시
+	int updateAuthentication(String memberId) throws SQLException, NamingException;
+	
 }

@@ -34,4 +34,12 @@
 	<select id="getPhoneNumber" resultType="com.project.vodto.Member">
 		select phone_Number from member where phone_number = #{phoneNumber}
 	</select>
+	
+	<select id="getCellPhoneNumber" resultType="com.project.vodto.Member">
+		select cell_phone_number from member where cell_phone_number = #{cellPhoneNumber}
+	</select>
+	
+	<update id="updateAuthentication">
+		update member set identity_verification_status = 'Y' where member_id = #{memberId}
+	</update>
 </mapper>
