@@ -102,6 +102,12 @@ public class MemberServiceImpl implements MemberService {
 
 		return mDao.duplicateUserEmail(email);
 	}
+	
+	@Override
+	public List<Integer> getOrderNo(String memberId) throws SQLException, NamingException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
 	@Override

@@ -16,13 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.project.etc.kym.GetUserIPAddr;
-import com.project.service.kym.ReviewService;
 import com.project.service.kym.detailService;
 
 @Controller
 @RequestMapping("/detail/*")
 @CrossOrigin(origins="*")
-public class detailController {
+public class detailController {/*
     private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
 	
 	
@@ -53,6 +52,6 @@ public class detailController {
 //		return "redirect:/detail.jsp";
 		
 	}
-    
+    */
 
 }

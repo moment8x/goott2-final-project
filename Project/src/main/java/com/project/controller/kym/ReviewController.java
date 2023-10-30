@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
-import com.project.service.kym.ReviewService;
 import com.project.vodto.Board;
 
 @Controller
@@ -27,7 +26,7 @@ import com.project.vodto.Board;
 public class ReviewController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
-
+    /*
     @Inject
     private ReviewService rService;
     
@@ -76,5 +75,5 @@ public class ReviewController {
 		}
 
 		return result;
-	}
+	}*/
 }
