@@ -32,27 +32,28 @@ public class detailController {
     @Inject
     private ReviewService rService;
 	
-//    @RequestMapping("/{productId}")
-//	public void detailAll(@PathVariable("productId") String productId, Model model, HttpServletRequest req) throws Exception {
-//		System.out.println(productId + "항목을 조회합시다");
-//		Map<String, Object> result = detailService.getProductId(productId, GetUserIPAddr.getIp(req));
-//		System.out.println("1" + result);
-//		model.addAttribute("Product", result.get("product"));
-//
-//	
-//		
-//    }
-    
-	@RequestMapping("/detail/*")
-	public void detailAll(@RequestParam("productId") String productId, Model model, HttpServletRequest req) throws Exception {
-		System.out.println(productId + "항목을 조회합시다2");
+    @RequestMapping("{productId}")
+	public String detailAll(@PathVariable("productId") String productId, Model model, HttpServletRequest req) throws Exception {
+		System.out.println(productId + "항목을 조회합시다");
 		Map<String, Object> result = detailService.getProductId(productId, GetUserIPAddr.getIp(req));
 		System.out.println("1" + result);
 		model.addAttribute("Product", result.get("product"));
 
-//		return "redirect:/detail.jsp";
+		return "detail";
+	
 		
-	}
+    }
+    
+//	@RequestMapping("/detail/*")
+//	public void detailAll(@RequestParam("productId") String productId, Model model, HttpServletRequest req) throws Exception {
+//		System.out.println(productId + "항목을 조회합시다2");
+//		Map<String, Object> result = detailService.getProductId(productId, GetUserIPAddr.getIp(req));
+//		System.out.println("1" + result);
+//		model.addAttribute("Product", result.get("product"));
+//
+////		return "redirect:/detail.jsp";
+//		
+//	}
     
 
 }

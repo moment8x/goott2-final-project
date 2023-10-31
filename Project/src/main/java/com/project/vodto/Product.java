@@ -20,14 +20,13 @@ public class Product {
 	private int supplyPrice;
 	private int sellingPrice;
 	private String isbn;
-	private String productImage;
 	private String productInfoImage;
 	private String authorTranslator;
 	private String originalAuthor;
 	private String illustrator;
 	private String publisher;
 	private Timestamp publicationDate;
-	private int pageCount;
+	private String pageCount;
 	private String size;
 	private int totalVolume;
 	private String authorIntroduction;
@@ -37,5 +36,4 @@ public class Product {
 	private int notificationSubscription;
 	private int bestSellerStatus;
 	private String categoryKey;
-	private int currentQuantity;
 }
