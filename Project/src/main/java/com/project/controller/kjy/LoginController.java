@@ -43,8 +43,8 @@ public class LoginController {
 	@Inject
 	private LoginService loginService;
 	
-	@Inject
-	private BCryptPasswordEncoder passwordEncoder;
+//	@Inject
+//	private BCryptPasswordEncoder passwordEncoder;
 	
 	@RequestMapping("/")
 	public String goLogin() {

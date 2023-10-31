@@ -1,7 +1,9 @@
 package com.project.dao.member;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
@@ -61,12 +63,24 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectOne(ns + ".getEmail", email);
 	}
+	
+	@Override
+	public List<Integer> selectOrderNo(String memberId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
 	@Override
-	public int selectId(String memberId) throws SQLException, NamingException {
+	public boolean selectId(String memberId) throws SQLException, NamingException {
 		System.out.println("======= 회원가입 DAO - 아이디 중복 조회 =======");
-		return ses.selectOne(ns + ".getId", memberId);
+		boolean result = false;	// 중복x
+		
+		if (ses.selectOne(ns + ".getId", memberId) != null) {
+			result = true;	// 중복. 존재함
+		}
+		
+		return result;
 	}
 
 	@Override
@@ -74,6 +88,16 @@ public class MemberDAOImpl implements MemberDAO {
 		System.out.println("======= 회원가입 DAO - 회원 가입 =======");
 		
 		return ses.insert(ns + ".insertMember", member);
+	}
+	
+	@Override
+	public Member selectMember(String memberId, String password) throws SQLException, NamingException {
+		System.out.println("======= 회원가입 DAO - 로그인 비밀번호 체크 =======");
+		Map<String, String> param = new HashMap<String, String>();
+		param.put("memberId", memberId);
+		param.put("password", password);
+		
+		return ses.selectOne(ns + ".login", param);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
 }

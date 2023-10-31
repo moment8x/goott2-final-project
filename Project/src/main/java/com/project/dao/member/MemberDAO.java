@@ -37,8 +37,10 @@ public interface MemberDAO {
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
-	int selectId(String memberId) throws SQLException, NamingException;
+	boolean selectId(String memberId) throws SQLException, NamingException;
 	// 회원 가입
 	int insertMember(Member member) throws SQLException, NamingException;
+	// 로그인(비밀번호 체크)
+	Member selectMember(String memberId, String password) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
 }

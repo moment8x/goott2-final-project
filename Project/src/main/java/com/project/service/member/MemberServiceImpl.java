@@ -112,20 +112,20 @@ public class MemberServiceImpl implements MemberService {
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
 	@Override
 	public boolean checkedDuplication(String memberId) throws SQLException, NamingException {
-		System.out.println("======= 회원가입 서비스단 - 회원 정보 조회 =======");
+		System.out.println("======= 멤버(회원가입, 로그인) 서비스단 - 회원 정보 조회 =======");
 		boolean result = false;
 		// 회원 정보 조회
-		if (mDao.selectId(memberId) == 0) {
-			result = true;
+		if (!mDao.selectId(memberId)) {
+			result = true;	// 중복된 아이디가 없을 때
 		}
 		
-		System.out.println("======= 회원가입 서비스단 끝 =======");
-		return true;
+		System.out.println("======= 멤버(회원가입, 로그인) 서비스단 끝 =======");
+		return result;
 	}
 
 	@Override
 	public boolean insertMember(Member member) throws SQLException, NamingException {
-		System.out.println("======= 회원가입 서비스단 - 회원가입 =======");
+		System.out.println("======= 멤버(회원가입) 서비스단 - 회원가입 =======");
 		boolean result = false;
 		
 		// 회원 가입
@@ -133,8 +133,24 @@ public class MemberServiceImpl implements MemberService {
 			result = true;
 		};
 		System.out.println("member : " + member.toString());
-		System.out.println("======= 회원가입 서비스단 끝 =======");
+		System.out.println("======= 멤버(회원가입) 서비스단 끝 =======");
 		return result;
 	}
-	// --------------------------------------- 김진솔 끝 ----------------------------------------
+	
+	@Override
+	public Member login(String memberId, String password) throws SQLException, NamingException {
+		System.out.println("======= 멤버(로그인) 서비스단 - 로그인 =======");
+		Member result = null;
+		
+		// Pwd 확인
+		result = mDao.selectMember(memberId, password);
+		
+		if (result != null) {
+			System.out.println(result.toString());
+		}
+		
+		System.out.println("======= 멤버(로그인) 서비스단 끝 =======");
+		return result;
+	}
+	// --------------------------------------- 김진솔 끝 ----------------------------------------	
 }

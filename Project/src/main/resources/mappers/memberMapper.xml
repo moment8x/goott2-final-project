@@ -32,8 +32,8 @@
 		select * from member where email = #{email}
 	</select>
 	<!-- =========================== 김진솔 =========================== -->
-	<select id="getId" resultType="_int">
-		SELECT count(member_id) FROM member WHERE member_id = #{memberId}  
+	<select id="getId" resultType="com.project.vodto.Member">
+		SELECT member_id FROM member WHERE member_id = #{memberId}  
 	</select>
 	<insert id="insertMember">
 		<choose>
@@ -51,5 +51,8 @@
 			</otherwise>
 		</choose>
 	</insert>
+	<select id="login" resultType="com.project.vodto.Member">
+		SELECT * FROM member WHERE member_id = #{memberId} AND password = sha1(md5(#{password}))
+	</select>
 	<!-- =========================== 김진솔 끝 =========================== -->
 </mapper>
