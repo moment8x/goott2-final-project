@@ -6,7 +6,7 @@
   
     <mapper namespace="com.project.mappers.listMapper">
     	<!-- 로그인 하는 유저의 정보가 DB에 있는지 조회 -->
-    	<select id="selectLoginUser" resultType="com.project.vodtokjy.Member">
+    	<select id="selectLoginUser" resultType="com.project.vodto.kjy.Member">
     		select * from member where member_id = #{username} and password = sha1(md5(#{password}))
     	</select>
   	</mapper>
