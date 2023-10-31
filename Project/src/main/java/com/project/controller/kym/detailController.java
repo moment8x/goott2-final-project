@@ -31,6 +31,8 @@ public class detailController {
 	
     @Inject
     private ReviewService rService;
+    
+    
 	
 //    @RequestMapping("/{productId}")
 //	public void detailAll(@PathVariable("productId") String productId, Model model, HttpServletRequest req) throws Exception {
