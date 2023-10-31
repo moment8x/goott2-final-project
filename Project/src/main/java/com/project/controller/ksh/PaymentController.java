@@ -28,21 +28,24 @@ import com.project.service.ksh.payment.OrderService;
 import com.project.vodto.PaymentDTO;
 import com.project.vodto.CancelDatas;
 import com.project.vodto.DetailOrderItem;
-
+import com.siot.IamportRestClient.IamportClient;
+import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.request.CancelData;
+import com.siot.IamportRestClient.response.IamportResponse;
 
 @RestController
 @RequestMapping("/pay/*")
 public class PaymentController {
 
-//	private IamportClient api;
+	private IamportClient api;
 	public PaymentDTO pdto;
 	public List<DetailOrderItem> itemListdto;
 
-//	public PaymentController() {
-//		// REST API 키와 REST API secret 를 아래처럼 순서대로 입력한다.
-//		this.api = new IamportClient("6208485383120734",
-//				"LhGS6esknLSY3r3YH0Dtvh65MXPpP27VLL8F6FKcavXsrJKrmkuvUcjUxjLWYTTvZLeCxAMJXSjSaHcU");
-//	}
+	public PaymentController() {
+		// REST API 키와 REST API secret 를 아래처럼 순서대로 입력한다.
+		this.api = new IamportClient("6208485383120734",
+				"LhGS6esknLSY3r3YH0Dtvh65MXPpP27VLL8F6FKcavXsrJKrmkuvUcjUxjLWYTTvZLeCxAMJXSjSaHcU");
+	}
 
 	@Inject
 	private OrderService os;
@@ -55,14 +58,14 @@ public class PaymentController {
 //	}
 
 	@ResponseBody
-//	@RequestMapping(value = "verify/{imp_uid}")
-//	public IamportResponse<com.siot.IamportRestClient.response.Payment> paymentByImpUid(Model model, Locale locale,
-//			HttpSession session, @PathVariable(value = "imp_uid") String imp_uid)
-//			throws IamportResponseException, IOException {
-//		System.out.println("결제 정보 검증");
-//		return api.paymentByImpUid(imp_uid);
-//
-//	}
+	@RequestMapping(value = "verify/{imp_uid}")
+	public IamportResponse<com.siot.IamportRestClient.response.Payment> paymentByImpUid(Model model, Locale locale,
+			HttpSession session, @PathVariable(value = "imp_uid") String imp_uid)
+			throws IamportResponseException, IOException {
+		System.out.println("결제 정보 검증");
+		return api.paymentByImpUid(imp_uid);
+
+	}
 
 	@RequestMapping(value = "output", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> nonPaymentOutput(@RequestBody PaymentDTO pd) {
@@ -101,17 +104,17 @@ public class PaymentController {
 		return result;
 	}
 
-//	@ResponseBody
-//	@RequestMapping(value = "cancel", method = RequestMethod.POST)
-//	public IamportResponse<com.siot.IamportRestClient.response.Payment> cancelPaymentByImpUid(@RequestBody CancelDatas rc)
-//			throws IamportResponseException, IOException {
-//		System.out.println("결제 취소");
-//		// 주문내역에 환불가능 금액이 있으면 좋을듯
-//		CancelData cancelData = new CancelData(rc.getImp_uid(), true, rc.getAmount());
-//		// 서버와 포트원 서버간에 환불 가능 금액을 검증하기 위해서 checksum 입력 권장
-//		cancelData.setChecksum(rc.getChecksum());	// 환불 가능 금액
-//		cancelData.setReason(rc.getReason()); // 환불 사유
-//		return api.cancelPaymentByImpUid(cancelData);
-//
-//	}
+	@ResponseBody
+	@RequestMapping(value = "cancel", method = RequestMethod.POST)
+	public IamportResponse<com.siot.IamportRestClient.response.Payment> cancelPaymentByImpUid(@RequestBody CancelDatas rc)
+			throws IamportResponseException, IOException {
+		System.out.println("결제 취소");
+		// 주문내역에 환불가능 금액이 있으면 좋을듯
+		CancelData cancelData = new CancelData(rc.getImp_uid(), true, rc.getAmount());
+		// 서버와 포트원 서버간에 환불 가능 금액을 검증하기 위해서 checksum 입력 권장
+		cancelData.setChecksum(rc.getChecksum());	// 환불 가능 금액
+		cancelData.setReason(rc.getReason()); // 환불 사유
+		return api.cancelPaymentByImpUid(cancelData);
+
+	}
 }

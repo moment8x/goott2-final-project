@@ -39,7 +39,7 @@
 		#{delivery_status})
 	</insert>
 
-	<select id="getPaymentDetail" resultType="com.project.vodto.OrderInfo">
+	<select id="getPaymentDetail">
 		select p.non_order_no,
 		p.total_amount, p.actual_payment_amount, d.product_id, d.product_price
 		, n.recipient_name, n.recipient_phone_number, n.shipping_address

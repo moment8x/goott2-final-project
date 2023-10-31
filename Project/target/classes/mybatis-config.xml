@@ -14,5 +14,8 @@
 		<typeAlias type="com.project.vodto.Board" alias="Board" />
 	</typeAliases>
 
+
+
+
 </configuration>
 
