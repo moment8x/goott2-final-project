@@ -6,16 +6,16 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodtokjy.LoginDTO;
-import com.project.vodtokjy.Member;
+import com.project.vodtokjy.Memberkjy;
 
 @Repository
 public class LoginDaoImpl implements LoginDao {
 	@Inject
 	private SqlSession ses;
-	private String ns = "com.project.mappers.listMapper";
+	private String ns = "com.project.mappers.loginMapper";
 
 	@Override
-	public Member selectLogin(LoginDTO loginDTO) throws Exception {
+	public Memberkjy selectLogin(LoginDTO loginDTO) throws Exception {
 		
 		return ses.selectOne(ns+".selectLoginUser", loginDTO);
 	}

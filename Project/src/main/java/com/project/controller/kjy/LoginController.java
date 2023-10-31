@@ -1,5 +1,7 @@
 package com.project.controller.kjy;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,7 +15,9 @@ import java.security.SecureRandom;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -33,7 +37,7 @@ import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import com.project.service.kjy.LoginService;
 import com.project.vodtokjy.LoginDTO;
-import com.project.vodtokjy.Member;
+import com.project.vodtokjy.Memberkjy;
 
 
 @Controller
@@ -47,19 +51,25 @@ public class LoginController {
 //	private BCryptPasswordEncoder passwordEncoder;
 	
 	@RequestMapping("/")
-	public String goLogin() {
+	public String goLogin(HttpServletRequest request, HttpServletResponse response) {
+//	
 		
 		return "/login/login";
 	}
 	
 	@RequestMapping(value="/", method=RequestMethod.POST)
-	public ModelAndView loginProcess(LoginDTO loginDTO, ModelAndView model, HttpServletRequest request) {
+	public ModelAndView loginProcess(LoginDTO loginDTO, ModelAndView model, HttpServletRequest request, HttpServletResponse response) {
 		System.out.println(loginDTO.toString());
 		try {
-			Member loginMember = loginService.getLogin(loginDTO);
+			Memberkjy loginMember = loginService.getLogin(loginDTO);
 			if(loginMember != null) {
-				if(loginDTO.getRemember())
-				request.getSession().setAttribute("loginMember", loginMember);
+					request.getSession().setAttribute("loginMember", loginMember);
+					if(loginDTO.getRemember() != null) {
+						Cookie cookie = new Cookie("al", loginMember.getMember_id());
+						cookie.setMaxAge(60 * 60 * 24* 7);
+						cookie.setPath("/");
+						response.addCookie(cookie);
+					}
 				model.addObject("loginMember", loginMember);
 				model.addObject("status", "로그인 성공");
 				model.setViewName("/index");

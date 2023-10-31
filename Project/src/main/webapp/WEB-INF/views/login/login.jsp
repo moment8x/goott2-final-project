@@ -146,8 +146,8 @@
                                     <div class="forgot-box">
                                         <div class="form-check ps-0 m-0 remember-box">
                                             <input class="checkbox_animated check-box" type="checkbox"
-                                                id="flexCheckDefault">
-                                            <label class="form-check-label" for="flexCheckDefault" name="remember">자동 로그인</label>
+                                                id="flexCheckDefault" name="remember">
+                                            <label class="form-check-label" for="flexCheckDefault">자동 로그인</label>
                                         </div>
                                         <a href="forgot.html" class="forgot-password">아이디/비밀번호 찾기</a>
                                     </div>
