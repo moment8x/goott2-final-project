@@ -18,8 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,12 +30,11 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.google.gson.JsonObject;
+
 import com.project.service.kjy.LoginService;
 import com.project.vodtokjy.LoginDTO;
 import com.project.vodtokjy.Member;
 
-import okhttp3.internal.framed.Header;
 
 @Controller
 @RequestMapping("/login/*")
