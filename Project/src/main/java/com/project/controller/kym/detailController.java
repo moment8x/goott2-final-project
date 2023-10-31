@@ -52,7 +52,6 @@ public class detailController {
 		System.out.println("1" + result);
 		model.addAttribute("Product", result.get("product"));
 
-//		return "redirect:/detail.jsp";
 		
 	}
     
