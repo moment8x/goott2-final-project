@@ -252,7 +252,6 @@
 			<artifactId>iamport-rest-client-java</artifactId>
 			<version>0.2.14</version>
 		</dependency>
-
 		
 		<!-- spring-security -->
 		<dependency>
@@ -283,9 +282,6 @@
     		<version>4.2.3.RELEASE</version>
 		</dependency>
 		
-
-		
-	
 	</dependencies>
 	<build>
 		<plugins>
