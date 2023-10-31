@@ -20,7 +20,7 @@ import com.project.service.kym.ReviewService;
 import com.project.service.kym.detailService;
 
 @Controller
-@RequestMapping("/detail/*")
+@RequestMapping("/details/*")
 public class ReactDetailController {
 	
 	@Inject
