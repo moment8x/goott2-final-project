@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>정보 수정 완료</title>
+<title>Dear Books</title>
 <style type="text/css">
 .info {
 

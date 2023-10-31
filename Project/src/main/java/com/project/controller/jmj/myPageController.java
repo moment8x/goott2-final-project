@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
 import com.project.vodto.MyPageOrderList;
+import com.project.vodto.ShippingAddress;
 
 @Controller
 @RequestMapping("/user/*")
@@ -31,7 +33,7 @@ public class myPageController {
 	public void myPage(Model model) {
 
 		System.out.println("마이페이지");
-		String memberId = "agim15";
+		String memberId = "agim79";
 
 //		System.out.println(orderListNo);
 
@@ -39,7 +41,9 @@ public class myPageController {
 
 		try {
 //			lst = mService.getOrderHistory(memberId);
+//			mService.getShippingAddress(memberId);
 			Member userInfo = mService.getMyInfo(memberId);
+			
 
 //			System.out.println("list : " + lst);
 //			model.addAttribute("orderList", lst);
@@ -53,9 +57,14 @@ public class myPageController {
 		}
 	}
 
+	@RequestMapping(value = "myPage", method = RequestMethod.POST)
+	public void myPage(@ModelAttribute ShippingAddress addShippingAddress) {
+		System.out.println(addShippingAddress.toString());
+	}
+	
 	@RequestMapping("address")
-	public void addr() {
-		System.out.println("배송지 목록");
+	public void deliveryList() {
+		
 	}
 
 	@RequestMapping("jusoPopup")
@@ -81,7 +90,7 @@ public class myPageController {
 	@RequestMapping(value = "identityVerificationStatus", method = RequestMethod.POST)
 	public @ResponseBody boolean identityVerificationStatus() {
 		System.out.println("본인인증 업데이트");
-		String memberId = "agim15";
+		String memberId = "agim79";
 		
 		boolean result = false;
 		try {
@@ -161,7 +170,7 @@ public class myPageController {
 	public void modifyUserInfo(@ModelAttribute Member modifyMemberInfo) {
 		System.out.println("회원정보 수정");
 		
-		String memberId = "agim15";
+		String memberId = "agim79";
 		
 		try {
 			boolean userInfo = mService.setMyInfo(memberId, modifyMemberInfo);
@@ -174,6 +183,49 @@ public class myPageController {
 		}
 		System.out.println(modifyMemberInfo.toString());
 	}
+	
+	@RequestMapping(value = "withdrawal")
+	public void deleteUser() {
+		System.out.println("탈퇴하러 가기");
 
+	}
+
+	@RequestMapping(value = "withdrawal", method = RequestMethod.POST)
+	public void withdrawMember() {
+		
+		String memberId = "agim79";
+		
+		System.out.println(memberId + " 탈퇴시도");
+		
+		try {
+			boolean delUser = mService.withdraw(memberId);
+			if(delUser) {
+				System.out.println(memberId + "탈퇴 완");
+				//로그아웃처리해야함
+			}
+		} catch (SQLException | NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	@RequestMapping(value = "addShippingAddress", method = RequestMethod.POST)
+	public @ResponseBody boolean addShippingAddress(@ModelAttribute ShippingAddress tmpAddr) {
+		System.out.println("배송지 추가" + tmpAddr.toString());
+		String memberId = "agim79";
+		boolean result = false;
+		try {
+			if(mService.insertShippingAddress(memberId, tmpAddr)) {
+				System.out.println("배송지 추가 완료");
+				result = true;
+			}
+			
+		} catch (SQLException | NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
 
 }

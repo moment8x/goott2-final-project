@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.project.vodto.Member;
 import com.project.vodto.MyPageOrderList;
+import com.project.vodto.ShippingAddress;
 
 @Repository
 public interface MemberDAO {
@@ -18,10 +19,8 @@ public interface MemberDAO {
 //	MemberMypage selectMypage(String memberId) throws SQLException, NamingException;
 	// 특정 회원 정보 전체 가져오기
 	Member selectMyInfo(String memberId) throws SQLException, NamingException;
-	// 특정 회원 정보 수정(update)
-//	int updateMyInfo(String memberId, Member modifyMemberInfo) throws SQLException, NamingException;
-	// 특정 회원 탈퇴(기록 저장 및 삭제)
-	boolean updateWithdraw(String memberId) throws SQLException, NamingException;
+	// 특정 회원 탈퇴(기록 저장)
+	int updateWithdraw(String memberId) throws SQLException, NamingException;
 	// 주문건당 주문 내역 가져오기
 	List<MyPageOrderList> selectOrderHistory (String memberId) throws SQLException, NamingException;
 	
@@ -41,21 +40,27 @@ public interface MemberDAO {
 	int updateAuthentication(String memberId) throws SQLException, NamingException;
 	
 	//비밀번호 변경
-	int updatePwd(String memberId, Member modifyMemberInfo);
+	int updatePwd(String memberId, Member modifyMemberInfo) throws SQLException, NamingException;
 	
 	//전화번호 변경
-	int updatePhoneNumber(String memberId, Member modifyMemberInfo);
+	int updatePhoneNumber(String memberId, Member modifyMemberInfo) throws SQLException, NamingException;
 	
 	// 핸드폰번호 변경
-	int updateCellPhoneNumber(String memberId, Member modifyMemberInfo);
+	int updateCellPhoneNumber(String memberId, Member modifyMemberInfo) throws SQLException, NamingException;
 	
 	//이메일 변경
-	int updateEmail(String memberId, Member modifyMemberInfo);
+	int updateEmail(String memberId, Member modifyMemberInfo) throws SQLException, NamingException;
 	
 	//회원정보 주소 변경
-	int updateAddr(String memberId, Member modifyMemberInfo);
+	int updateAddr(String memberId, Member modifyMemberInfo) throws SQLException, NamingException;
 	
 	//환불정보 변경
-	int updateRefund(String memberId, Member modifyMemberInfo);
+	int updateRefund(String memberId, Member modifyMemberInfo) throws SQLException, NamingException;
+	
+	//배송주소록 불러오기
+	List<ShippingAddress> getShippingAddress(String memberId) throws SQLException, NamingException;
+	
+	//배송지 추가
+	int addShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
 	
 }

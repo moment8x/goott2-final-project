@@ -12,7 +12,7 @@
 <meta name="author" content="Fastkart" />
 <link rel="icon" href="/resources/assets/images/favicon/1.png"
 	type="image/x-icon" />
-<title>마이페이지</title>
+<title>Dear Books</title>
 
 <!-- Google font -->
 <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -23,7 +23,7 @@
 	href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&display=swap"
 	rel="stylesheet" />
 <link
-	href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+	href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100;ㅇ0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
 	rel="stylesheet" />
 
 <!-- bootstrap css -->
@@ -260,7 +260,6 @@
 			error : function() {
 			}
 		});
-		return isValidEamil
 	}
 	
 	//전화번호 유효성 검사
@@ -294,7 +293,6 @@
 			error : function() {
 			}
 		});
-		return isValidPhoneNumber
 	}
 	
 	//휴대폰번호 유효성 검사
@@ -328,7 +326,34 @@
 			error : function() {
 			}
 		});
-		return isValidCellPhone
+	}
+	
+	function addShippingAddress() {
+		let zipCode = $('#addZipNo').val()
+		let address = $('#addAddr').val()
+		let detailAddress = $('#addAddrDetail').val()
+		
+		$.ajax({
+			url : '/user/addShippingAddress', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				zipCode,
+				address,
+				detailAddress
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data == true){
+					$('#addZipNo').val('')
+					$('#addAddr').val('')
+					$('#addAddrDetail').val('')
+				}
+			},
+			error : function() {
+			}
+		});
 	}
 	
 	
@@ -345,7 +370,7 @@
 
 .newPhoneNumberEdit, .newEmailEdit, .newCellPhoneNumberEdit,
 	.editNewUserPwd, .editRefund, #successPwd, #successPhoneNumber,
-	#successCellPhoneNumber, #successEmail{
+	#successCellPhoneNumber, #successEmail {
 	display: none;
 }
 
@@ -379,6 +404,10 @@
 .theme-form-floating
 .pwd {
 	display: flex;
+}
+
+#authenticationMsg {
+	font-size: 18px;
 }
 </style>
 </head>
@@ -571,7 +600,7 @@
 										<span class="title-leaf"> <svg
 												class="icon-width bg-gray">
                           <use
-													xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 									</div>
@@ -580,9 +609,9 @@
 										<div class="row g-sm-4 g-3">
 											<div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
 												<div class="totle-contain">
-													<img src="resources/assets/images/svg/order.svg"
+													<img src="/resources/assets/images/svg/order.svg"
 														class="img-1 blur-up lazyload" alt="" /> <img
-														src="resources/assets/images/svg/order.svg"
+														src="/resources/assets/images/svg/order.svg"
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>포인트</h5>
@@ -593,9 +622,9 @@
 
 											<div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
 												<div class="totle-contain">
-													<img src="resources/assets/images/svg/pending.svg"
+													<img src="/resources/assets/images/svg/pending.svg"
 														class="img-1 blur-up lazyload" alt="" /> <img
-														src="resources/assets/images/svg/pending.svg"
+														src="/resources/assets/images/svg/pending.svg"
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>적립금</h5>
@@ -606,9 +635,9 @@
 
 											<div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
 												<div class="totle-contain">
-													<img src="resources/assets/images/svg/wishlist.svg"
+													<img src="/resources/assets/images/svg/wishlist.svg"
 														class="img-1 blur-up lazyload" alt="" /> <img
-														src="resources/assets/images/svg/wishlist.svg"
+														src="/resources/assets/images/svg/wishlist.svg"
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>쿠폰</h5>
@@ -636,7 +665,7 @@
 																			<div class="product border-0">
 																				<a href="product-left-thumbnail.html"
 																					class="product-image"> <img
-																					src="resources/assets/images/vegetable/product/1.png"
+																					src="/resources/assets/images/vegetable/product/1.png"
 																					class="img-fluid blur-up lazyload" alt="" />
 																				</a>
 																				<div class="product-detail">
@@ -750,7 +779,7 @@
 										<span class="title-leaf title-leaf-gray"> <svg
 												class="icon-width bg-gray">
                           <use
-													xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 									</div>
@@ -760,7 +789,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/2.png"
+															src="/resources/assets/images/cake/product/2.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -820,7 +849,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/3.png"
+															src="/resources/assets/images/cake/product/3.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -880,7 +909,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/4.png"
+															src="/resources/assets/images/cake/product/4.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -942,7 +971,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/5.png"
+															src="/resources/assets/images/cake/product/5.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -1003,7 +1032,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/6.png"
+															src="/resources/assets/images/cake/product/6.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -1065,7 +1094,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/7.png"
+															src="/resources/assets/images/cake/product/7.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -1126,7 +1155,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/2.png"
+															src="/resources/assets/images/cake/product/2.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -1193,7 +1222,7 @@
 										<span class="title-leaf title-leaf-gray"> <svg
 												class="icon-width bg-gray">
                           <use
-													xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 
@@ -1283,7 +1312,7 @@
 										<span class="title-leaf"> <svg
 												class="icon-width bg-gray">
                           <use
-													xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 									</div>
@@ -1335,40 +1364,40 @@
 															</div>
 														</form>
 
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control" id="userName"
+																	placeholder="이름" value="${userInfo.name }" readonly />
+																<label for="userName">이름</label>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<input type="text" class="form-control" id="userBirth"
+																	value="${userInfo.dateOfBirth }" placeholder="생년월일"
+																	readonly /> <label for="userBirth">생년월일</label>
+															</div>
+														</div>
+
+														<div class="col-12">
+															<div class="form-floating theme-form-floating">
+																<c:choose>
+																	<c:when test="${fn:contains(userInfo.gender,'F')}">
+																		<input type="text" class="form-control"
+																			id="userGender" value="여자" placeholder="성별" readonly />
+																		<label for="userGender">성별</label>
+																	</c:when>
+																	<c:otherwise>
+																		<input type="text" class="form-control"
+																			id="userGender" value="남자" placeholder="성별" readonly />
+																		<label for="userGender">성별</label>
+																	</c:otherwise>
+																</c:choose>
+															</div>
+														</div>
 														<form class="row g-4" action="modifyUser" method="post">
-															<div class="col-12">
-																<div class="form-floating theme-form-floating">
-																	<input type="text" class="form-control" id="userName"
-																		placeholder="이름" value="${userInfo.name }" readonly />
-																	<label for="userName">이름</label>
-																</div>
-															</div>
-
-															<div class="col-12">
-																<div class="form-floating theme-form-floating">
-																	<input type="text" class="form-control" id="userBirth"
-																		value="${userInfo.dateOfBirth }" placeholder="생년월일"
-																		readonly /> <label for="userBirth">생년월일</label>
-																</div>
-															</div>
-
-															<div class="col-12">
-																<div class="form-floating theme-form-floating">
-																	<c:choose>
-																		<c:when test="${fn:contains(userInfo.gender,'F')}">
-																			<input type="text" class="form-control"
-																				id="userGender" value="여자" placeholder="성별" readonly />
-																			<label for="userGender">성별</label>
-																		</c:when>
-																		<c:otherwise>
-																			<input type="text" class="form-control"
-																				id="userGender" value="남자" placeholder="성별" readonly />
-																			<label for="userGender">성별</label>
-																		</c:otherwise>
-																	</c:choose>
-																</div>
-															</div>
-
 															<div class="col-12">
 																<div
 																	class="form-floating theme-form-floating editPhoneNumber">
@@ -1458,7 +1487,7 @@
 																<button type="button"
 																	class="btn theme-bg-color btn-md text-white"
 																	onclick="goPopup();">주소 찾기</button>
-																
+
 															</div>
 
 															<div class="col-12">
@@ -1484,9 +1513,9 @@
 																		value="${userInfo.detailedAddress}" placeholder="상세주소" />
 																	<label for="addrDetail">상세주소</label>
 																	<div id="successAddr">
-																	<button class="btn theme-bg-color btn-md text-white"
-																		type="submit">변경</button>
-																</div>
+																		<button class="btn theme-bg-color btn-md text-white"
+																			type="submit">변경</button>
+																	</div>
 																</div>
 															</div>
 														</form>
@@ -1496,8 +1525,7 @@
 																<div class="form-floating theme-form-floating">
 																	<input type="text" class="form-control" id="refundBank"
 																		value="${userInfo.refundBank}" placeholder="환불은행"
-																		readonly /> <label for="refundBank">환불은행</label> <i
-																		class="fa-regular fa-pen-to-square fa-xl refund"></i>
+																		readonly /> <label for="refundBank">환불은행</label>
 																</div>
 															</div>
 
@@ -1506,7 +1534,8 @@
 																	<input type="text" class="form-control"
 																		id="refundAccount" value="${userInfo.refundAccount}"
 																		placeholder="환불계좌" readonly /> <label
-																		for="refundAccount">환불계좌</label>
+																		for="refundAccount">환불계좌</label> <i
+																		class="fa-regular fa-pen-to-square fa-xl refund"></i>
 																</div>
 															</div>
 
@@ -1550,34 +1579,33 @@
 																	</div>
 																</div>
 															</div>
+														</form>
 
-															<div class="col-12">
-																<div class="forgot-box">
-																	<div class="form-check ps-0 m-0 remember-box">
-																		<c:choose>
-																			<c:when
-																				test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
-																				<input class="checkbox_animated check-box"
-																					type="checkbox" id="authentication" checked
-																					disabled />
-																				<label class="form-check-label" for="authentication">본인인증</label>
-																			</c:when>
-																			<c:otherwise>
-																				<button class="btn theme-bg-color btn-md text-white"
-																					type="button" onclick="identify();">본인인증</button>
-																			</c:otherwise>
-																		</c:choose>
-																	</div>
+														<div class="col-12">
+															<div class="forgot-box">
+																<div class="form-check ps-0 m-0 remember-box">
+																	<c:choose>
+																		<c:when
+																			test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
+																			<input class="checkbox_animated check-box"
+																				type="checkbox" id="authentication" checked disabled />
+																			<label class="form-check-label" for="authentication"><span
+																				id="authenticationMsg">본인인증</span></label>
+																		</c:when>
+																		<c:otherwise>
+																			<button class="btn theme-bg-color btn-md text-white"
+																				type="button" onclick="identify();">본인인증</button>
+																		</c:otherwise>
+																	</c:choose>
 																</div>
 															</div>
+														</div>
 
-															<div class="col-12 modifyBtn">
-																<button
-																	class="btn theme-bg-color btn-md text-white delUser"
-																	type="button">탈퇴</button>
-
-															</div>
-														</form>
+														<div class="col-12 modifyBtn">
+															<button
+																class="btn theme-bg-color btn-md text-white delUser"
+																type="button" onclick="location.href='withdrawal';">탈퇴</button>
+														</div>
 													</div>
 												</div>
 
@@ -1586,7 +1614,7 @@
 											<div class="col-xxl-5">
 												<div class="profile-image">
 													<img
-														src="resources/assets/images/inner-page/dashboard-profile.png"
+														src="/resources/assets/images/inner-page/dashboard-profile.png"
 														class="img-fluid blur-up lazyload" alt="" />
 												</div>
 											</div>
@@ -1604,11 +1632,11 @@
 											<span class="title-leaf"> <svg
 													class="icon-width bg-gray">
                             <use
-														xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+														xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                           </svg>
 											</span>
 										</div>
-
+	
 										<button
 											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
 											data-bs-toggle="modal" data-bs-target="#add-address">
@@ -1670,6 +1698,10 @@
 											</div>
 										</div>
 									</div>
+												<button
+													class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3">
+													<i data-feather=check class="me-2"></i> 기본배송지로 설정
+												</button>
 								</div>
 							</div>
 
@@ -1682,7 +1714,7 @@
 											<span class="title-leaf"> <svg
 													class="icon-width bg-gray">
                             <use
-														xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+														xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                           </svg>
 											</span>
 										</div>
@@ -1719,7 +1751,7 @@
 															<h5>Audrey Carol</h5>
 														</div>
 														<div class="card-img">
-															<img src="resources/assets/images/payment-icon/1.jpg"
+															<img src="/resources/assets/images/payment-icon/1.jpg"
 																class="img-fluid blur-up lazyloaded" alt="" />
 														</div>
 													</div>
@@ -1766,7 +1798,7 @@
 															<h5>Leah Heather</h5>
 														</div>
 														<div class="card-img">
-															<img src="resources/assets/images/payment-icon/2.jpg"
+															<img src="/resources/assets/images/payment-icon/2.jpg"
 																class="img-fluid blur-up lazyloaded" alt="" />
 														</div>
 													</div>
@@ -1813,7 +1845,7 @@
 															<h5>mark jecno</h5>
 														</div>
 														<div class="card-img">
-															<img src="resources/assets/images/payment-icon/3.jpg"
+															<img src="/resources/assets/images/payment-icon/3.jpg"
 																class="img-fluid blur-up lazyloaded" alt="" />
 														</div>
 													</div>
@@ -1956,32 +1988,15 @@
 		<div
 			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
 			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">배송지 추가</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close">
-						<i class="fa-solid fa-xmark"></i>
-					</button>
-				</div>
-				<div class="modal-body">
-					<form action="#" id="inputAddrInfo" method="post">
-						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control" id="newaddrName"
-								name="newaddrName" placeholder="배송지 이름을 입력해주세요." /> <label
-								for="newaddrName">배송지명</label>
-						</div>
-
-						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control" id="recipientName"
-								name="recipientName" placeholder="이름을 입력해주세요." /> <label
-								for="recipientName">받는 분</label>
-						</div>
-
-						<div class="form-floating mb-4 theme-form-floating">
-							<input type="email" class="form-control"
-								id="recipientPhoneNumber" name="recipientPhoneNumber"
-								placeholder="연락처를 입력해주세요." /> <label for="recipientPhoneNumber">연락처</label>
-						</div>
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">배송지 추가</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close">
+							<i class="fa-solid fa-xmark"></i>
+						</button>
+					</div>
+				
+					<div class="modal-body">
 
 						<div>
 							<button type="button"
@@ -1991,27 +2006,27 @@
 
 						<div class="form-floating mb-4 theme-form-floating">
 							<input type="text" class="form-control addZipNo" id="addZipNo"
-								name="addZipNo" placeholder="우편번호" readonly />
+								name="zipCode" placeholder="우편번호" readonly />
 						</div>
 
 						<div class="form-floating mb-4 theme-form-floating">
 							<input type="text" class="form-control addAddr" id="addAddr"
-								name="addAddr" placeholder="주소" readonly />
+								name="address" placeholder="주소" readonly />
 						</div>
 
 						<div class="form-floating mb-4 theme-form-floating">
 							<input type="text" class="form-control addAddrDetail"
-								id="addAddrDetail" name="newAddrDetail" placeholder="상세 주소" /><label
+								id="addAddrDetail" name="detailAddress" placeholder="상세 주소" /><label
 								for="addAddrDetail">상세주소</label>
 						</div>
-					</form>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary btn-md"
-						data-bs-dismiss="modal">Close</button>
-					<button type="button" class="btn theme-bg-color btn-md text-white"
-						data-bs-dismiss="modal">Save changes</button>
-				</div>
+
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary btn-md"
+							data-bs-dismiss="modal">닫기</button>
+						<button type="button" class="btn theme-bg-color btn-md text-white" onclick="addShippingAddress();"
+							data-bs-dismiss="modal">저장</button>
+					</div>
 			</div>
 		</div>
 	</div>

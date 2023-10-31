@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import com.project.vodto.Member;
 import com.project.vodto.MyPageOrderList;
+import com.project.vodto.ShippingAddress;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO {
@@ -35,9 +36,9 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public boolean updateWithdraw(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return false;
+	public int updateWithdraw(String memberId) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".deleteUser", memberId);
 	}
 
 	@Override
@@ -137,6 +138,24 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("refundAccount", modifyMemberInfo.getRefundAccount());
 
 		return ses.update(ns + ".updateRefund", params);
+	}
+
+	@Override
+	public List<ShippingAddress> getShippingAddress(String memberId) {
+		
+		return null;
+	}
+
+	@Override
+	public int addShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("memberId", memberId);
+		params.put("zipCode", tmpAddr.getZipCode());
+		params.put("address", tmpAddr.getAddress());
+		params.put("detailAddress", tmpAddr.getDetailAddress());
+		
+		
+		return ses.insert(ns + ".addShippingAddress", params);
 	}
 
 }

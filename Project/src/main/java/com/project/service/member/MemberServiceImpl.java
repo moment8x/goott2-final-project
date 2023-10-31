@@ -68,14 +68,18 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public Boolean withdraw(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
+		boolean result = false;
+		
+		if(mDao.updateWithdraw(memberId) == 1) {
+			result = true;
+		}
+		return result; 
 	}
 
 	@Override
 	public List<ShippingAddress> getShippingAddress(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return mDao.getShippingAddress(memberId);
 	}
 
 	@Override
@@ -138,6 +142,17 @@ public class MemberServiceImpl implements MemberService {
 		return mDao.updateAuthentication(memberId);
 	}
 
+	@Override
+	public boolean insertShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
+		boolean result = false;
+		
+		if(mDao.addShippingAddress(memberId, tmpAddr) == 1) {
+			result = true;
+		}
+		
+		
+		return result;
+	}
 
 
 }

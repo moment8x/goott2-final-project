@@ -61,4 +61,13 @@
 	<update id="updateRefund">
 		update member set refund_bank=#{refundBank}, refund_account=#{refundAccount} where member_id=#{memberId}
 	</update>
+	
+	<update id="deleteUser">
+		update member set withdraw = 'Y' where member_id = #{memberId}
+	</update>
+	
+	<insert id="addShippingAddress">
+		insert into shipping_address(member_id, zip_code, address, detailed_address)
+ 		values(#{memberId}, #{zipCode}, #{address}, #{detailAddress})
+	</insert>
 </mapper>

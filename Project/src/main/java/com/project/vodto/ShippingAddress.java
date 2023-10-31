@@ -12,10 +12,10 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ShippingAddress {
-	private int addr_no;
-	private String member_id;
-	private String zip_code;
+	private int addrNo;
+	private String memberId;
+	private String zipCode;
 	private String address;
-	private String detail_address;
-	private char basic_addr;
+	private String detailAddress;
+	private char basicAddr;
 }
