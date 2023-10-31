@@ -13,7 +13,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Member {
+public class Memberkjy {
 	private String member_id;
 	private String password;
 	private String name;
