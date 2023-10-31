@@ -38,12 +38,18 @@
 		console.log(data);
 		$.each(data.list_product, function(i, product) {
 			console.log(i);
+			if(product.product_image != null){
+			$('#pImage' + (i+1)).attr("src",product.product_image);				
+			} else {
+				$('#pImage' + (i+1)).attr("src","/resources/assets/images/deer.png");
+			}
 			$('#publisher' + (i+1)).html(product.publisher);
 			$('#pName'+ (i+1)).html(product.product_name);
 			$('#pIntro'+ (i+1)).html(product.introduction_detail);
 			$('#page' + (i+1)).html(product.page_count+"p");
 			$('#sPrice'+ (i+1)).html(product.selling_price.toLocaleString()+"원");
 			$('#cPrice'+ (i+1)).html(product.consumer_price.toLocaleString()+"원");
+		console.log($('#pImage' + (i+1)).attr("src"));
 		})
 
 	}
@@ -222,17 +228,26 @@
 										<div class="product-box-3 h-100 wow fadeInUp">
 											<div class="product-header">
 												<div class="product-image">
-													<a href="/detail/${product.product_id}"> <img
-														src="/resources/assets/images/cake/product/2.png"
+												<c:choose>
+												<c:when test="${product.product_image != null}">
+													<a href="/detail/${product.product_id}"> <img id="pImage${loop.index + 1 }"
+														src="${product.product_image}"
 														class="img-fluid blur-up lazyload" alt="">
 													</a>
-
+													</c:when>
+													<c:otherwise>
+													<a href="/detail/${product.product_id}"> <img id="pImage${loop.index + 1 }"
+														src="/resources/assets/images/deer.png"
+														class="img-fluid blur-up lazyload" alt="">
+													</a>
+													</c:otherwise>
+													</c:choose>
 													<ul class="product-option">
-														<li data-bs-toggle="tooltip" data-bs-placement="top"
-															title="View"><a href="javascript:void(0)"
-															data-bs-toggle="modal" data-bs-target="#view"> <i
-																data-feather="eye"></i>
-														</a></li>
+														
+															<li data-bs-toggle="tooltip" data-bs-placement="top"
+															title="바로 구매"><a href="/order/requestOrder?product_id='${product.product_id }'"><i data-feather="credit-card"></i>
+															</a></li>
+														
 
 														<li  data-bs-toggle="tooltip" data-bs-placement="top"
 															title="장바구니"  onclick="insertShoppingCart('${product.product_id}');"><i data-feather="shopping-cart"></i>
@@ -335,79 +350,6 @@
 							<div class="slider-image">
 								<img src="/resources/assets/images/product/category/1.jpg"
 									class="img-fluid blur-up lazyload" alt="" />
-							</div>
-						</div>
-
-						<div class="col-lg-6">
-							<div class="right-sidebar-modal">
-								<h4 class="title-name">Peanut Butter Bite Premium Butter
-									Cookies 600 g</h4>
-								<h4 class="price">$36.99</h4>
-								<div class="product-rating">
-									<ul class="rating">
-										<li><i data-feather="star" class="fill"></i></li>
-										<li><i data-feather="star" class="fill"></i></li>
-										<li><i data-feather="star" class="fill"></i></li>
-										<li><i data-feather="star" class="fill"></i></li>
-										<li><i data-feather="star"></i></li>
-									</ul>
-									<span class="ms-2">8 Reviews</span> <span
-										class="ms-2 text-danger">6 sold
-										in last 16 hours</span>
-								</div>
-
-								<div class="product-detail">
-									<h4>Product Details :</h4>
-									<p>Candy canes sugar plum tart cotton candy chupa chups
-										sugar plum chocolate I love. Caramels marshmallow icing
-										dessert candy canes I love soufflé I love toffee. Marshmallow
-										pie sweet sweet roll sesame snaps tiramisu jelly bear claw.
-										Bonbon muffin I love carrot cake sugar plum dessert bonbon.</p>
-								</div>
-
-								<ul class="brand-list">
-									<li>
-										<div class="brand-box">
-											<h5>Brand Name:</h5>
-											<h6>Black Forest</h6>
-										</div>
-									</li>
-
-									<li>
-										<div class="brand-box">
-											<h5>Product Code:</h5>
-											<h6>W0690034</h6>
-										</div>
-									</li>
-
-									<li>
-										<div class="brand-box">
-											<h5>Product Type:</h5>
-											<h6>White Cream Cake</h6>
-										</div>
-									</li>
-								</ul>
-
-								<div class="select-size">
-									<h4>Cake Size :</h4>
-									<select class="form-select select-form-size">
-										<option selected>Select Size</option>
-										<option value="1.2">1/2 KG</option>
-										<option value="0">1 KG</option>
-										<option value="1.5">1/5 KG</option>
-										<option value="red">Red Roses</option>
-										<option value="pink">With Pink Roses</option>
-									</select>
-								</div>
-
-								<div class="modal-button">
-									<button onclick="location.href = 'cart.html';"
-										class="btn btn-md add-cart-button icon">
-										Add To Cart</button>
-									<button onclick="location.href = 'product-left.html';"
-										class="btn theme-bg-color view-button icon text-white fw-bold btn-md">
-										View More Details</button>
-								</div>
 							</div>
 						</div>
 					</div>
