@@ -60,7 +60,10 @@ public interface MemberDAO {
 	//배송주소록 불러오기
 	List<ShippingAddress> getShippingAddress(String memberId) throws SQLException, NamingException;
 	
-	//배송지 추가
+	//배송주소록 수정 추가
 	int addShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
+	
+	//배송주소록 수정
+	int shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
 	
 }

@@ -41,16 +41,17 @@ public class myPageController {
 
 		try {
 //			lst = mService.getOrderHistory(memberId);
-//			mService.getShippingAddress(memberId);
+			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
 			Member userInfo = mService.getMyInfo(memberId);
-			
 
 //			System.out.println("list : " + lst);
 //			model.addAttribute("orderList", lst);
 
-			System.out.println(userInfo);
 			model.addAttribute("userInfo", userInfo);
-
+			System.out.println("회원정보 : " + userInfo);
+		
+			model.addAttribute("userAddrList", userAddrList);
+			System.out.println("배송주소록" + userAddrList);
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -212,7 +213,7 @@ public class myPageController {
 	
 	@RequestMapping(value = "addShippingAddress", method = RequestMethod.POST)
 	public @ResponseBody boolean addShippingAddress(@ModelAttribute ShippingAddress tmpAddr) {
-		System.out.println("배송지 추가" + tmpAddr.toString());
+		System.out.println("배송주소록 추가" + tmpAddr.toString());
 		String memberId = "agim79";
 		boolean result = false;
 		try {
@@ -226,6 +227,24 @@ public class myPageController {
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	@RequestMapping(value = "shippingAddrModify", method = RequestMethod.POST)
+	public ShippingAddress shippingAddrModify(@ModelAttribute ShippingAddress tmpAddr) {
+		System.out.println("배송주소록 수정");
+		String memberId = "agim79";
+		
+		ShippingAddress sa = null; 
+		try {
+			if(mService.shippingAddrModify(memberId, tmpAddr)) {
+				System.out.println("배송주소록 수정 완");
+			}
+		} catch (SQLException | NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return sa;
 	}
 
 }

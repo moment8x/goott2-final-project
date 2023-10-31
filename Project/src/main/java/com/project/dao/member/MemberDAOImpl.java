@@ -143,7 +143,7 @@ public class MemberDAOImpl implements MemberDAO {
 	@Override
 	public List<ShippingAddress> getShippingAddress(String memberId) {
 		
-		return null;
+		return ses.selectList(ns + ".getShippingAddress", memberId);
 	}
 
 	@Override
@@ -156,6 +156,18 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		
 		return ses.insert(ns + ".addShippingAddress", params);
+	}
+
+	@Override
+	public int shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("zipCode", tmpAddr.getZipCode());
+		params.put("address", tmpAddr.getAddress());
+		params.put("detailAddress", tmpAddr.getDetailAddress());
+		params.put("detailAddress", tmpAddr.getAddrSeq());
+		
+		return ses.update(ns + ".updateShippingAddress", params);
 	}
 
 }

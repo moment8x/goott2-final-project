@@ -67,7 +67,19 @@
 	</update>
 	
 	<insert id="addShippingAddress">
-		insert into shipping_address(member_id, zip_code, address, detailed_address)
- 		values(#{memberId}, #{zipCode}, #{address}, #{detailAddress})
+		<selectKey resultType="int" keyProperty="addrSeq" order="BEFORE">
+	        select max(addr_seq) + 1 from shipping_address       
+	    </selectKey> 
+		insert into shipping_address(addr_seq, member_id, zip_code, address, detail_address)
+ 		values(#{addrSeq}, #{memberId}, #{zipCode}, #{address}, #{detailAddress})
 	</insert>
+	
+	<select id="getShippingAddress" resultType="com.project.vodto.ShippingAddress">
+		select * from shipping_address where member_id = #{memberId} order by basic_addr desc
+	</select>
+	
+	<update id="updateShippingAddress">
+		update shipping_address set zip_code = #{zipCode}, address = #{address}, detail_address = #{detailAddress} 
+		where member_id = #{memberId} and addr_seq=#{addrSeq}
+	</update>
 </mapper>

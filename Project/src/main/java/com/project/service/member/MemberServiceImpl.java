@@ -150,8 +150,19 @@ public class MemberServiceImpl implements MemberService {
 			result = true;
 		}
 		
-		
 		return result;
+	}
+
+	@Override
+	public boolean shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
+		boolean result = false;
+			
+			if(mDao.shippingAddrModify(memberId, tmpAddr) == 1) {
+				result = true;
+			}
+			
+		return result;
+
 	}
 
 

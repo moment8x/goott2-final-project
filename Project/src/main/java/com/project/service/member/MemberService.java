@@ -59,8 +59,11 @@ public interface MemberService {
 	//본인인증 성공시 
 	int updateAuthentication(String memberId) throws SQLException, NamingException;
 	
-	//배송지 추가
+	//배송주소록 추가
 	boolean insertShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
+	
+	//배송주소록 수정
+	boolean shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
 	
 
 }

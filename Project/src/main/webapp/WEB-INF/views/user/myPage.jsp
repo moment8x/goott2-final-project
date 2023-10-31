@@ -93,7 +93,7 @@
 			newAddrDetail.value = addrDetail
 		}
 		
-		// 배송지 추가 주소찾기
+		// 배송주소록 추가 주소찾기
 		let addZipNo = null
 		let addAddr = null
 		let addAddrDetail = null
@@ -109,6 +109,24 @@
 		if(document.querySelector("#addAddrDetail")){
 			addAddrDetail = document.querySelector("#addAddrDetail")
 			addAddrDetail.value = addrDetail
+		}
+		
+		//배송주소록 수정 주소찾기
+		let shippingZipNoModify = null
+		let shippingAddrModify = null
+		let shippingDetailAddrModify = null
+
+		if(document.querySelector("#shippingZipNoModify")){
+			shippingZipNoModify = document.querySelector("#shippingZipNoModify")
+			shippingZipNoModify.value = zipNo;
+		}
+		if(document.querySelector("#shippingAddrModify")){
+			shippingAddrModify = document.querySelector("#shippingAddrModify")
+			shippingAddrModify.value = roadAddrPart1;
+		}
+		if(document.querySelector("#shippingDetailAddrModify")){
+			shippingDetailAddrModify = document.querySelector("#shippingDetailAddrModify")
+			shippingDetailAddrModify.value = addrDetail
 		}
 	}
 	
@@ -328,6 +346,7 @@
 		});
 	}
 	
+	//배송주소록 추가
 	function addShippingAddress() {
 		let zipCode = $('#addZipNo').val()
 		let address = $('#addAddr').val()
@@ -349,7 +368,48 @@
 					$('#addZipNo').val('')
 					$('#addAddr').val('')
 					$('#addAddrDetail').val('')
+					
+					location.reload()
 				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//배송주소록 수정
+	function shippingAddrModify() {
+		let zipCode = $('#shippingZipNoModify').val()
+		let address = $('#shippingAddrModify').val()
+		let detailAddress = $('#shippingDetailAddrModify').val()
+		let tmpAddrSeq = '${userAddrList.addrSeq}'
+		
+		$.forEach(function(elt, i, array) {
+			
+		}, context)
+		
+		
+		let addrSeq = 
+			
+		$.ajax({
+			url : '/user/shippingAddrModify', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				zipCode,
+				address,
+				detailAddress
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				//if(data == true){
+				//	$('#addZipNo').val('')
+				//	$('#addAddr').val('')
+				//	$('#addAddrDetail').val('')
+					
+				//	location.reload()
+				//}
 			},
 			error : function() {
 			}
@@ -1636,7 +1696,11 @@
                           </svg>
 											</span>
 										</div>
-	
+
+										<button
+											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3">
+											<i data-feather=check class="me-2"></i> 기본배송지로 설정
+										</button>
 										<button
 											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
 											data-bs-toggle="modal" data-bs-target="#add-address">
@@ -1645,63 +1709,64 @@
 									</div>
 
 									<div class="row g-sm-4 g-3">
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
-											<div class="address-box">
-												<div>
-													<div class="form-check">
-														<input class="form-check-input" type="radio" name="jack"
-															id="flexRadioDefault1" />
+										<c:forEach var="addr" items="${userAddrList }">
+											<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
+												<div class="address-box">
+													<div>
+														<div class="form-check">
+															<input class="form-check-input" type="radio" name="jack"
+																id="flexRadioDefault1" />
+														</div>
+
+														<c:if test="${fn:contains(addr.basicAddr,'Y')}">
+															<div class="label">
+																<label>기본배송지</label>
+															</div>
+														</c:if>
+
+
+														<div class="table-responsive address-table">
+															<table class="table">
+																<tbody>
+																	<tr>
+																		<td colspan="2">${userInfo.name}</td>
+																	</tr>
+
+																	<tr>
+																		<td>우편번호 :</td>
+																		<td>
+																			<p>${addr.zipCode }</p>
+																		</td>
+																	</tr>
+
+																	<tr>
+																		<td>주소 :</td>
+																		<td>${addr.address }</td>
+																	</tr>
+
+																	<tr>
+																		<td>상세주소 :</td>
+																		<td>${addr.detailAddress }</td>
+																	</tr>
+																</tbody>
+															</table>
+														</div>
 													</div>
 
-													<div class="label">
-														<label>Home 2</label>
+													<div class="button-group">
+														<button class="btn btn-sm add-button w-100"
+															data-bs-toggle="modal" data-bs-target="#editProfile">
+															<i data-feather="edit"></i> Edit
+														</button>
+														<button class="btn btn-sm add-button w-100"
+															data-bs-toggle="modal" data-bs-target="#removeProfile">
+															<i data-feather="trash-2"></i> Remove
+														</button>
 													</div>
-
-													<div class="table-responsive address-table">
-														<table class="table">
-															<tbody>
-																<tr>
-																	<td colspan="2">Gary M. Bailey</td>
-																</tr>
-
-																<tr>
-																	<td>Address :</td>
-																	<td>
-																		<p>2135 Burning Memory Lane Philadelphia, PA 19135</p>
-																	</td>
-																</tr>
-
-																<tr>
-																	<td>Pin Code :</td>
-																	<td>+26</td>
-																</tr>
-
-																<tr>
-																	<td>Phone :</td>
-																	<td>+ 215-335-9916</td>
-																</tr>
-															</tbody>
-														</table>
-													</div>
-												</div>
-
-												<div class="button-group">
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#editProfile">
-														<i data-feather="edit"></i> Edit
-													</button>
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#removeProfile">
-														<i data-feather="trash-2"></i> Remove
-													</button>
 												</div>
 											</div>
-										</div>
+										</c:forEach>
 									</div>
-												<button
-													class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3">
-													<i data-feather=check class="me-2"></i> 기본배송지로 설정
-												</button>
 								</div>
 							</div>
 
@@ -1988,45 +2053,44 @@
 		<div
 			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
 			<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">배송지 추가</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal"
-							aria-label="Close">
-							<i class="fa-solid fa-xmark"></i>
-						</button>
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">배송지 추가</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa-solid fa-xmark"></i>
+					</button>
+				</div>
+
+				<div class="modal-body">
+
+					<div>
+						<button type="button" class="btn theme-bg-color btn-md text-white"
+							onclick="goPopup();">주소 검색</button>
 					</div>
-				
-					<div class="modal-body">
 
-						<div>
-							<button type="button"
-								class="btn theme-bg-color btn-md text-white"
-								onclick="goPopup();">주소 검색</button>
-						</div>
-
-						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control addZipNo" id="addZipNo"
-								name="zipCode" placeholder="우편번호" readonly />
-						</div>
-
-						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control addAddr" id="addAddr"
-								name="address" placeholder="주소" readonly />
-						</div>
-
-						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control addAddrDetail"
-								id="addAddrDetail" name="detailAddress" placeholder="상세 주소" /><label
-								for="addAddrDetail">상세주소</label>
-						</div>
-
+					<div class="form-floating mb-4 theme-form-floating">
+						<input type="text" class="form-control addZipNo" id="addZipNo"
+							name="zipCode" placeholder="우편번호" readonly />
 					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-md"
-							data-bs-dismiss="modal">닫기</button>
-						<button type="button" class="btn theme-bg-color btn-md text-white" onclick="addShippingAddress();"
-							data-bs-dismiss="modal">저장</button>
+
+					<div class="form-floating mb-4 theme-form-floating">
+						<input type="text" class="form-control addAddr" id="addAddr"
+							name="address" placeholder="주소" readonly />
 					</div>
+
+					<div class="form-floating mb-4 theme-form-floating">
+						<input type="text" class="form-control addAddrDetail"
+							id="addAddrDetail" name="detailAddress" placeholder="상세 주소" /><label
+							for="addAddrDetail">상세주소</label>
+					</div>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-md"
+						data-bs-dismiss="modal">닫기</button>
+					<button type="button" class="btn theme-bg-color btn-md text-white"
+						onclick="addShippingAddress();" data-bs-dismiss="modal">저장</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -2109,13 +2173,14 @@
 	<!-- Location Modal End -->
 
 	<!-- Edit Profile Start -->
+	<c:forEach var="addr" items="${userAddrList }">
 	<div class="modal fade theme-modal" id="editProfile" tabindex="-1"
 		aria-labelledby="exampleModalLabel2" aria-hidden="true">
 		<div
 			class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen-sm-down">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel2">Edit Profile</h5>
+					<h5 class="modal-title" id="exampleModalLabel2">배송지 수정</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<i class="fa-solid fa-xmark"></i>
@@ -2126,8 +2191,19 @@
 						<div class="col-xxl-12">
 							<form>
 								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="pname"
-										value="Jack Jennas" /> <label for="pname">Full Name</label>
+									<input type="text" class="form-control" id="recipientName"
+										value="${userInfo.name }" /> <label for="pname">이름</label>
+								</div>
+							</form>
+						</div>
+
+						<button type="button" class="btn theme-bg-color btn-md text-white"
+							onclick="goPopup();">주소 찾기</button>
+						<div class="col-xxl-6">
+							<form>
+								<div class="form-floating theme-form-floating">
+									<input type="text" class="form-control" id="shippingZipNoModify" name="zipCode"
+										value="${addr.zipCode }" readonly/> <label for="shippingZipNoModify">우편번호</label>
 								</div>
 							</form>
 						</div>
@@ -2135,21 +2211,11 @@
 						<div class="col-xxl-6">
 							<form>
 								<div class="form-floating theme-form-floating">
-									<input type="email" class="form-control" id="email1"
-										value="vicki.pope@gmail.com" /> <label for="email1">Email
-										address</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-xxl-6">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input class="form-control" type="tel" value="4567891234"
-										name="mobile" id="mobile" maxlength="10"
+									<input class="form-control" type="text" value="${addr.address }"
+										name="address" id="shippingAddrModify" maxlength="10"
 										oninput="javascript: if (this.value.length > this.maxLength) this.value =
-                                            this.value.slice(0, this.maxLength);" />
-									<label for="mobile">Email address</label>
+                                            this.value.slice(0, this.maxLength);" readonly/>
+									<label for="shippingAddrModify">주소</label>
 								</div>
 							</form>
 						</div>
@@ -2157,87 +2223,25 @@
 						<div class="col-12">
 							<form>
 								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="address1"
-										value="8424 James Lane South San Francisco" /> <label
-										for="address1">Add Address</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-12">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="address2"
-										value="CA 94080" /> <label for="address2">Add Address
-										2</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-xxl-4">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<select class="form-select" id="floatingSelect1"
-										aria-label="Floating label select example">
-										<option selected>Choose Your Country</option>
-										<option value="kindom">United Kingdom</option>
-										<option value="states">United States</option>
-										<option value="fra">France</option>
-										<option value="china">China</option>
-										<option value="spain">Spain</option>
-										<option value="italy">Italy</option>
-										<option value="turkey">Turkey</option>
-										<option value="germany">Germany</option>
-										<option value="russian">Russian Federation</option>
-										<option value="malay">Malaysia</option>
-										<option value="mexico">Mexico</option>
-										<option value="austria">Austria</option>
-										<option value="hong">Hong Kong SAR, China</option>
-										<option value="ukraine">Ukraine</option>
-										<option value="thailand">Thailand</option>
-										<option value="saudi">Saudi Arabia</option>
-										<option value="canada">Canada</option>
-										<option value="singa">Singapore</option>
-									</select> <label for="floatingSelect">Country</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-xxl-4">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<select class="form-select" id="floatingSelect">
-										<option selected>Choose Your City</option>
-										<option value="kindom">India</option>
-										<option value="states">Canada</option>
-										<option value="fra">Dubai</option>
-										<option value="china">Los Angeles</option>
-										<option value="spain">Thailand</option>
-									</select> <label for="floatingSelect">City</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-xxl-4">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="address3"
-										value="94080" /> <label for="address3">Pin Code</label>
+									<input type="text" class="form-control" id="shippingDetailAddrModify"
+										value="${addr.detailAddress }" /> <label
+										for="shippingDetailAddrModify">상세주소</label>
 								</div>
 							</form>
 						</div>
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-animation btn-md fw-bold"
-						data-bs-dismiss="modal">Close</button>
 					<button type="button" data-bs-dismiss="modal"
-						class="btn theme-bg-color btn-md fw-bold text-light">
-						Save changes</button>
+						class="btn theme-bg-color btn-md fw-bold text-light" onclick="shippingAddrModify();">
+						변경</button>
+					<button type="button" class="btn btn-animation btn-md fw-bold"
+						data-bs-dismiss="modal">닫기</button>
 				</div>
 			</div>
 		</div>
 	</div>
+	</c:forEach>
 	<!-- Edit Profile End -->
 
 	<!-- Edit Card Start -->

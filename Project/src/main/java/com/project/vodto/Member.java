@@ -40,4 +40,5 @@ public class Member {
 	private String dormantAccout; //휴면계정
 	private String memberToken;
 	private String permission; //권한 등급
+	private String withdraw; //탈퇴여부
 }

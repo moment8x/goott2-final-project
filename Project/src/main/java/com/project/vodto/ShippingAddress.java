@@ -12,7 +12,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ShippingAddress {
-	private int addrNo;
+	private int addrSeq;
 	private String memberId;
 	private String zipCode;
 	private String address;
