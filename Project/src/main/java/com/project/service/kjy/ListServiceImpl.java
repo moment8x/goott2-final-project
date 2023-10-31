@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.project.dao.kjr.ListDao;
 import com.project.vodto.PagingInfo;
-import com.project.vodto.ProductCategory;
+import com.project.vodtokjy.ProductCategories;
 import com.project.vodtokjy.Products;
 
 @Service
@@ -21,30 +21,31 @@ public class ListServiceImpl implements ListService {
 	
 	// 리스트페이지 목록 가져오기
 	@Override
-	public List<ProductCategory> getProductCategory(String key) throws Exception {
+	public List<ProductCategories> getProductCategory(String categoryKey) throws Exception {
 		
-		return lDao.selectProductCategories(key);
+		return lDao.selectProductCategories(categoryKey);
 	}
 
 	// 리스트페이지 상품 가져오기
 	@Override
-	public Map<String, Object> getProductForList(String Key, int page, String sortBy) throws Exception {
-		PagingInfo pagingInfo = getPagingInfo(Key, page);
+	public Map<String, Object> getProductForList(String categoryKey, int page, String sortBy) throws Exception {
+		PagingInfo pagingInfo = getPagingInfo(categoryKey, page);
 		List <Products> lst = null;
 		switch (sortBy) {
 		case "new": 
-			lst = lDao.selectProductForListSortByNew(Key, pagingInfo, sortBy);
+			lst = lDao.selectProductForListSortByNew(categoryKey, pagingInfo, sortBy);
 			break;
 		case "sell": 
-			lst = lDao.selectProductForListSortBySell(Key, pagingInfo, sortBy);
+			lst = lDao.selectProductForListSortBySell(categoryKey, pagingInfo, sortBy);
 			break;
 		case "high": 
-			lst = lDao.selectProductForListSortByPrice(Key, pagingInfo, sortBy);
+			lst = lDao.selectProductForListSortByPrice(categoryKey, pagingInfo, sortBy);
 			break;
 		case "low": 
-			lst = lDao.selectProductForListSortByPrice(Key, pagingInfo, sortBy);
+			lst = lDao.selectProductForListSortByPrice(categoryKey, pagingInfo, sortBy);
 			break;
 		}
+		System.out.println("lst : " + lst);
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("list_product", lst);
 		map.put("paging_info", pagingInfo);
@@ -54,7 +55,7 @@ public class ListServiceImpl implements ListService {
 
 	// 키로 해당 카테고리 정보 가져오기
 	@Override
-	public ProductCategory getCategoryInfo(String key) throws Exception {
+	public ProductCategories getCategoryInfo(String key) throws Exception {
 		// TODO Auto-generated method stub
 		return lDao.selectProductCategory(key);
 	}
