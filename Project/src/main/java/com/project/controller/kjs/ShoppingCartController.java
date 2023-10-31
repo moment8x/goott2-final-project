@@ -1,3 +1,4 @@
+
 package com.project.controller.kjs;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -211,9 +212,9 @@ public class ShoppingCartController {
 		return result;
 	}
 	
-	@RequestMapping(value="/insert" ,  method=RequestMethod.POST)
-	public ResponseEntity<String> test(@RequestParam("id") String id){
-		System.out.println(id + "야이야이야 내나이가 어때서");
+	@RequestMapping("/insert")
+	public ResponseEntity<String> test(@RequestParam("product_id") String id){
+		System.out.println(id + "쇼핑카트 다녀감");
 		return ResponseEntity.ok("Success");
 	}
 }
