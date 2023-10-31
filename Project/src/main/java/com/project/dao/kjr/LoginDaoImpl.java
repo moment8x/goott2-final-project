@@ -12,7 +12,7 @@ import com.project.vodto.kjy.Memberkjy;
 public class LoginDaoImpl implements LoginDao {
 	@Inject
 	private SqlSession ses;
-	private String ns = "com.project.mappers.listMapper";
+	private String ns = "com.project.mappers.loginMapper";
 
 	@Override
 	public Memberkjy selectLogin(LoginDTO loginDTO) throws Exception {
