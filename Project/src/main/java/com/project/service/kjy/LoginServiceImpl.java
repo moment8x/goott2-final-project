@@ -6,8 +6,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.project.dao.kjr.LoginDao;
-import com.project.vodtokjy.LoginDTO;
-import com.project.vodtokjy.Member;
+import com.project.vodto.kjy.LoginDTO;
+import com.project.vodto.kjy.Memberkjy;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -15,8 +15,8 @@ public class LoginServiceImpl implements LoginService {
 	private LoginDao loginDao;
 
 	@Override
-	public Member getLogin(LoginDTO loginDTO) throws Exception {
-		Member loginMember = loginDao.selectLogin(loginDTO);
+	public Memberkjy getLogin(LoginDTO loginDTO) throws Exception {
+		Memberkjy loginMember = loginDao.selectLogin(loginDTO);
 		if(loginMember != null) {
 			System.out.println("로그인 성공");
 			System.out.println(loginMember.toString());

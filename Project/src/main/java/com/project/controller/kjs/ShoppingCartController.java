@@ -211,9 +211,9 @@ public class ShoppingCartController {
 		return result;
 	}
 	
-	@RequestMapping(value="/insert" ,  method=RequestMethod.POST)
-	public ResponseEntity<String> test(@RequestParam("id") String id){
-		System.out.println(id + "야이야이야 내나이가 어때서");
+	@RequestMapping("/insert")
+	public ResponseEntity<String> test(@RequestParam("product_id") String id){
+		System.out.println(id + "장바구니 들어옴");
 		return ResponseEntity.ok("Success");
 	}
 }
