@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 
 import com.project.dao.kjr.ListDao;
 import com.project.vodto.PagingInfo;
-import com.project.vodtokjy.ProductCategories;
-import com.project.vodtokjy.Products;
+import com.project.vodto.kjy.ProductCategories;
+import com.project.vodto.kjy.Products;
 
 @Service
 public class ListServiceImpl implements ListService {

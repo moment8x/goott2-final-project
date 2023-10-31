@@ -1,6 +1,6 @@
 package com.project.controller.kjy;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,8 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,12 +34,11 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.google.gson.JsonObject;
-import com.project.service.kjy.LoginService;
-import com.project.vodtokjy.LoginDTO;
-import com.project.vodtokjy.Member;
 
-import okhttp3.internal.framed.Header;
+import com.project.service.kjy.LoginService;
+import com.project.vodto.kjy.LoginDTO;
+import com.project.vodto.kjy.Memberkjy;
+
 
 @Controller
 @RequestMapping("/login/*")
@@ -53,7 +51,8 @@ public class LoginController {
 //	private BCryptPasswordEncoder passwordEncoder;
 	
 	@RequestMapping("/")
-	public String goLogin() {
+	public String goLogin(HttpServletRequest request, HttpServletResponse response) {
+//	
 		
 		return "/login/login";
 	}
@@ -62,15 +61,15 @@ public class LoginController {
 	public ModelAndView loginProcess(LoginDTO loginDTO, ModelAndView model, HttpServletRequest request, HttpServletResponse response) {
 		System.out.println(loginDTO.toString());
 		try {
-			Member loginMember = loginService.getLogin(loginDTO);
+			Memberkjy loginMember = loginService.getLogin(loginDTO);
 			if(loginMember != null) {
-				if(loginDTO.getRemember()) {
-				request.getSession().setAttribute("loginMember", loginMember);
-				Cookie cookie = new Cookie("al", loginMember.getMember_id());
-				cookie.setMaxAge(60 * 60 * 24 * 7);
-				cookie.setPath("/");
-				response.addCookie(cookie);
-				}
+					request.getSession().setAttribute("loginMember", loginMember);
+					if(loginDTO.getRemember() != null) {
+						Cookie cookie = new Cookie("al", loginMember.getMember_id());
+						cookie.setMaxAge(60 * 60 * 24* 7);
+						cookie.setPath("/");
+						response.addCookie(cookie);
+					}
 				model.addObject("loginMember", loginMember);
 				model.addObject("status", "로그인 성공");
 				model.setViewName("/index");

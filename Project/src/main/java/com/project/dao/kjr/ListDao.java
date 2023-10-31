@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.project.vodto.PagingInfo;
 import com.project.vodto.ProductCategory;
-import com.project.vodtokjy.ProductCategories;
-import com.project.vodtokjy.Products;
+import com.project.vodto.kjy.ProductCategories;
+import com.project.vodto.kjy.Products;
 
 public interface ListDao {
 	// 카테고리 목록 가져오는 메서드

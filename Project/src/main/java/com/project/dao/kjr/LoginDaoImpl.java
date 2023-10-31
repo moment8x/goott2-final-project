@@ -5,8 +5,8 @@ import javax.inject.Inject;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
-import com.project.vodtokjy.LoginDTO;
-import com.project.vodtokjy.Member;
+import com.project.vodto.kjy.LoginDTO;
+import com.project.vodto.kjy.Memberkjy;
 
 @Repository
 public class LoginDaoImpl implements LoginDao {
@@ -15,7 +15,7 @@ public class LoginDaoImpl implements LoginDao {
 	private String ns = "com.project.mappers.listMapper";
 
 	@Override
-	public Member selectLogin(LoginDTO loginDTO) throws Exception {
+	public Memberkjy selectLogin(LoginDTO loginDTO) throws Exception {
 		
 		return ses.selectOne(ns+".selectLoginUser", loginDTO);
 	}

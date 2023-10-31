@@ -1,4 +1,4 @@
-package com.project.vodtokjy;
+package com.project.vodto.kjy;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

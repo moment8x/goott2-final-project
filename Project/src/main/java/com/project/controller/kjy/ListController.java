@@ -28,8 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.service.kjy.ListService;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.Product;
-import com.project.vodtokjy.ProductCategories;
-import com.project.vodtokjy.Products;
+import com.project.vodto.kjy.ProductCategories;
+import com.project.vodto.kjy.Products;
 
 @Controller
 @RequestMapping("/list/*")

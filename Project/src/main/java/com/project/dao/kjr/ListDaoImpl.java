@@ -12,8 +12,8 @@ import org.springframework.stereotype.Repository;
 
 import com.project.vodto.PagingInfo;
 import com.project.vodto.ProductCategory;
-import com.project.vodtokjy.ProductCategories;
-import com.project.vodtokjy.Products;
+import com.project.vodto.kjy.ProductCategories;
+import com.project.vodto.kjy.Products;
 
 @Repository
 public class ListDaoImpl implements ListDao {

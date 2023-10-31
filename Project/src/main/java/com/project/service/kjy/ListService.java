@@ -5,8 +5,8 @@ import java.util.Map;
 
 import com.project.vodto.Product;
 import com.project.vodto.ProductCategory;
-import com.project.vodtokjy.ProductCategories;
-import com.project.vodtokjy.Products;
+import com.project.vodto.kjy.ProductCategories;
+import com.project.vodto.kjy.Products;
 
 public interface ListService {
 	// 리스트 페이지 장르 목록 가져오기
