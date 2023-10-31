@@ -71,25 +71,6 @@
 			break;
 		}
 	}
-	
-	function insertShoppingCart(id) {
-		console.log(id);
-			$.ajax({
-				url : '/shoppingCart/insert',
-				type : 'POST',
-				data : {
-					"id" : id
-				},
-				async : false,
-				success : function(data) {
-					// 전송에 성공하면 이 콜백 함수를 실행 (data 에는 응답받은 데이터가 저장된다)
-					console.log(data);
-				},
-				error : function() {
-					// 전송에 실패하면 이 콜백 함수를 실행
-				}
-			});
-	}
 </script>
 </head>
 <body>
@@ -250,7 +231,7 @@
 														
 
 														<li  data-bs-toggle="tooltip" data-bs-placement="top"
-															title="장바구니"  onclick="insertShoppingCart('${product.product_id}');"><i data-feather="shopping-cart"></i>
+															title="장바구니" ><a href="/shoppingCart/insert?product_id='${product.product_id }"><i data-feather="shopping-cart"></i></a>
 														</li>
 
 														<li data-bs-toggle="tooltip" data-bs-placement="top"
