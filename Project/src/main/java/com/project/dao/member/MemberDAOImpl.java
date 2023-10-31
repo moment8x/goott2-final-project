@@ -64,15 +64,9 @@ public class MemberDAOImpl implements MemberDAO {
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
 	@Override
-	public boolean selectId(String memberId) throws SQLException, NamingException {
+	public int selectId(String memberId) throws SQLException, NamingException {
 		System.out.println("======= 회원가입 DAO - 아이디 중복 조회 =======");
-	      boolean result = false;   // 중복x
-	      
-	      if (ses.selectOne(ns + ".getId", memberId) != null) {
-	         result = true;   // 중복
-	      }
-	      
-	      return result;
+		return ses.selectOne(ns + ".getId", memberId);
 	}
 
 	@Override
@@ -82,10 +76,4 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".insertMember", member);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
-
-	@Override
-	public List<Integer> selectOrderNo(String memberId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

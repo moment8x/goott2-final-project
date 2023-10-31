@@ -264,6 +264,16 @@
 
 <body>
 
+    <!-- Loader Start -->
+    <div class="fullpage-loader">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <!-- Loader End -->
 
 	<!-- Include Header -->
     <jsp:include page="../header.jsp"></jsp:include>

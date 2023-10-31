@@ -42,15 +42,6 @@ public class OrderController {
 		return "/order/memberOrder";
 	}
 
-	
-	@RequestMapping(value="requestOrder")
-	public void requestOrder(@RequestParam("product_id") String product_id, Model model) {
-		System.out.println(product_id);
-
-		model.addAttribute("product_id", product_id);
-	}
-	
-	
 	@RequestMapping(value = "nonMemberOrder", method = RequestMethod.POST)
 	public String nonMemberOrder(Model model, @RequestParam String orderId, @RequestParam String orderItem) {
 		

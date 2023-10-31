@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.service.kjy.ListService;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.Product;
-import com.project.vodtokjy.ProductCategories;
+import com.project.vodto.ProductCategory;
 import com.project.vodtokjy.Products;
 
 @Controller
@@ -41,12 +41,12 @@ public class ListController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ListController.class);
 	
-	@RequestMapping("/category/{lang}")
-	public String goCategory(Model model, @PathVariable String lang) {
+	@RequestMapping("/category/{key}")
+	public String goCategory(Model model, @PathVariable String key) {
 		// 리스트 카테고리 가져오기 + 현재 페이지 정보
 		try {
-			List<ProductCategories> lst = lService.getProductCategory(lang);
-			ProductCategories pd = lService.getCategoryInfo(lang);
+			List<ProductCategory> lst = lService.getProductCategory(key);
+			ProductCategory pd = lService.getCategoryInfo(key);
 			model.addAttribute("categories", lst);
 			model.addAttribute("nowCategory", pd);
 		} catch (Exception e) {
@@ -54,23 +54,21 @@ public class ListController {
 			e.printStackTrace();
 		}
 		
-		model.addAttribute("lang", lang);
+		model.addAttribute("lang", key);
 		return "list/category";
 	}
 	
-	@RequestMapping("/categoryList/{lang}/{key}")
-	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page, @PathVariable(name="lang") String lang) {
+	@RequestMapping("/categoryList/{key}")
+	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page) {
 		this.page = page;
-		String categoryKey = lang + "/" + key; 
-		
-		
 		// 상위 분류 페이지 + 현재 페이지 정보
+		String categoryLang = key.substring(0, 3);
 		try {
-			ProductCategories categoryLanguage = lService.getCategoryInfo(lang);
-			ProductCategories nowCategory = lService.getCategoryInfo(categoryKey);;
+			ProductCategory categoryLanguage = lService.getCategoryInfo(categoryLang);
+			ProductCategory now_category = lService.getCategoryInfo(key);
 			model.addAttribute("categoryLang", categoryLanguage);
-			model.addAttribute("nowCategory", nowCategory);
-			model.addAttribute("key", categoryKey);
+			model.addAttribute("nowCategory", now_category);
+			model.addAttribute("key", key);
 			model.addAttribute("page", page);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
@@ -79,7 +77,7 @@ public class ListController {
 		
 		// 카테고리 목록 가져오기
 		try {
-			List<ProductCategories> lstPC= lService.getProductCategory(categoryKey);
+			List<ProductCategory> lstPC= lService.getProductCategory(key);
 			if (lstPC != null) {
 				model.addAttribute("productCategory", lstPC);
 			}
@@ -90,7 +88,7 @@ public class ListController {
 		
 		// 상품 가져오기
 		try {
-			Map<String, Object> map = lService.getProductForList(categoryKey, page, sortBy);
+			Map<String, Object> map = lService.getProductForList(key, page, sortBy);
 			List<Product> lst = (List<Product>)map.get("list_product");
 			PagingInfo paging = (PagingInfo)map.get("paging_info");
 			model.addAttribute("products", lst);
