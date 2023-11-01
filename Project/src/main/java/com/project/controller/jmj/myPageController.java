@@ -7,6 +7,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
@@ -30,32 +32,40 @@ public class myPageController {
 	private MemberService mService;
 
 	@RequestMapping(value = "myPage")
-	public void myPage(Model model) {
+	public void myPage(Model model, HttpServletRequest request) {
 
 		System.out.println("마이페이지");
-		String memberId = "agim79";
 
+		HttpSession session = request.getSession();
+		Member member = (Member)session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
 //		System.out.println(orderListNo);
 
 //		List<MyPageOrderList> lst = null;
-
+//		ShippingAddress sa = mService.getShippingAddr((int)addrSeq, memberId);
+//		model.addAttribute("memberShippingAddr", sa);
+//		System.out.println(sa.toString());
+		
+		
 		try {
 //			lst = mService.getOrderHistory(memberId);
-			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
 			Member userInfo = mService.getMyInfo(memberId);
+			model.addAttribute("userInfo", userInfo);
+			System.out.println("회원정보 : " + userInfo);
 
 //			System.out.println("list : " + lst);
 //			model.addAttribute("orderList", lst);
-
-			model.addAttribute("userInfo", userInfo);
-			System.out.println("회원정보 : " + userInfo);
 		
+			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
 			model.addAttribute("userAddrList", userAddrList);
+			
+			
 			System.out.println("배송주소록" + userAddrList);
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 
 	@RequestMapping(value = "myPage", method = RequestMethod.POST)
@@ -89,9 +99,11 @@ public class myPageController {
 	}
 
 	@RequestMapping(value = "identityVerificationStatus", method = RequestMethod.POST)
-	public @ResponseBody boolean identityVerificationStatus() {
+	public @ResponseBody boolean identityVerificationStatus(HttpServletRequest request) {
 		System.out.println("본인인증 업데이트");
-		String memberId = "agim79";
+		HttpSession session = request.getSession();
+		Member member = (Member)session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
 		
 		boolean result = false;
 		try {
@@ -168,10 +180,11 @@ public class myPageController {
 	}
 	
 	@RequestMapping(value = "modifyUser", method = RequestMethod.POST)
-	public void modifyUserInfo(@ModelAttribute Member modifyMemberInfo) {
+	public void modifyUserInfo(@ModelAttribute Member modifyMemberInfo, HttpServletRequest request) {
 		System.out.println("회원정보 수정");
-		
-		String memberId = "agim79";
+		HttpSession session = request.getSession();
+		Member member = (Member)session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
 		
 		try {
 			boolean userInfo = mService.setMyInfo(memberId, modifyMemberInfo);
@@ -192,9 +205,11 @@ public class myPageController {
 	}
 
 	@RequestMapping(value = "withdrawal", method = RequestMethod.POST)
-	public void withdrawMember() {
+	public String withdrawMember(HttpServletRequest request) {
 		
-		String memberId = "agim79";
+		HttpSession session = request.getSession();
+		Member member = (Member)session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
 		
 		System.out.println(memberId + " 탈퇴시도");
 		
@@ -202,19 +217,25 @@ public class myPageController {
 			boolean delUser = mService.withdraw(memberId);
 			if(delUser) {
 				System.out.println(memberId + "탈퇴 완");
-				//로그아웃처리해야함
+				session.removeAttribute("loginMember");
+				session.invalidate();
+				System.out.println("로그아웃 완");
 			}
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return "redirect:/";
 
 	}
 	
 	@RequestMapping(value = "addShippingAddress", method = RequestMethod.POST)
-	public @ResponseBody boolean addShippingAddress(@ModelAttribute ShippingAddress tmpAddr) {
+	public @ResponseBody boolean addShippingAddress(@ModelAttribute ShippingAddress tmpAddr,  HttpServletRequest request) {
 		System.out.println("배송주소록 추가" + tmpAddr.toString());
-		String memberId = "agim79";
+		HttpSession session = request.getSession();
+		Member member = (Member)session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
 		boolean result = false;
 		try {
 			if(mService.insertShippingAddress(memberId, tmpAddr)) {
@@ -229,13 +250,29 @@ public class myPageController {
 		return result;
 	}
 	
-	@RequestMapping(value = "shippingAddrModify", method = RequestMethod.POST)
-	public ShippingAddress shippingAddrModify(@ModelAttribute ShippingAddress tmpAddr) {
-		System.out.println("배송주소록 수정" + tmpAddr.toString());
-		String memberId = "agim79";
+	@RequestMapping("editShippingAddr")
+	public void editShippingAddr(@RequestParam("addrSeq") int addrSeq, HttpServletRequest request, Model model) {
+		System.out.println(addrSeq + "번 배송지를 수정하자");
 		
-		ShippingAddress sa = null; 
+		HttpSession session = request.getSession();
+		Member member = (Member)session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
+		ShippingAddress sa = mService.getShippingAddr(addrSeq, memberId);
+		model.addAttribute("memberShippingAddr", sa);
+		
+	}
+	
+	@RequestMapping(value = "shippingAddrModify", method = RequestMethod.POST)
+	public void shippingAddrModify(@ModelAttribute ShippingAddress tmpAddr, HttpServletRequest request) {
+		System.out.println("배송주소록 수정" + tmpAddr.toString());
+		HttpSession session = request.getSession();
+		Member member = (Member)session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
+
 		try {
+			
 			if(mService.shippingAddrModify(memberId, tmpAddr)) {
 				System.out.println("배송주소록 수정 완");
 			}
@@ -244,7 +281,6 @@ public class myPageController {
 			e.printStackTrace();
 		}
 		
-		return sa;
 	}
 
 }

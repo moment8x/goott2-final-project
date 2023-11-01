@@ -60,25 +60,6 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	
 	@Override
-	public List<Integer> selectOrderNo(String memberId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	// ---------------------------------------- 장민정 끝 -----------------------------------------
-	// ---------------------------------------- 김진솔 시작 ----------------------------------------
-	@Override
-	public boolean selectId(String memberId) throws SQLException, NamingException {
-		System.out.println("======= 회원가입 DAO - 아이디 중복 조회 =======");
-		boolean result = false;	// 중복x
-		
-		if (ses.selectOne(ns + ".getId", memberId) != null) {
-			result = true;	// 중복. 존재함
-		}
-		
-		return result;
-	}
-
-	@Override
 	public Member duplicatePhoneNumber(String phoneNumber) throws SQLException, NamingException {
 
 		return ses.selectOne(ns + ".getPhoneNumber", phoneNumber);
@@ -169,6 +150,8 @@ public class MemberDAOImpl implements MemberDAO {
 	public int addShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("memberId", memberId);
+		params.put("recipient", tmpAddr.getRecipient());
+		params.put("recipientContact", tmpAddr.getRecipientContact());
 		params.put("zipCode", tmpAddr.getZipCode());
 		params.put("address", tmpAddr.getAddress());
 		params.put("detailAddress", tmpAddr.getDetailAddress());
@@ -181,6 +164,8 @@ public class MemberDAOImpl implements MemberDAO {
 	public int shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("memberId", memberId);
+		params.put("recipient", tmpAddr.getRecipient());
+		params.put("recipientContact", tmpAddr.getRecipientContact());
 		params.put("zipCode", tmpAddr.getZipCode());
 		params.put("address", tmpAddr.getAddress());
 		params.put("detailAddress", tmpAddr.getDetailAddress());
@@ -188,6 +173,31 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.update(ns + ".updateShippingAddress", params);
 	}
+	
+	@Override
+	public ShippingAddress selectShippingAddr(int addrSeq, String memberId) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("addrSeq", addrSeq);
+		
+		
+		return ses.selectOne(ns + ".getShippingAddr", params);
+	}
+	
+	// ---------------------------------------- 장민정 끝 -----------------------------------------
+	// ---------------------------------------- 김진솔 시작 ----------------------------------------
+	@Override
+	public boolean selectId(String memberId) throws SQLException, NamingException {
+		System.out.println("======= 회원가입 DAO - 아이디 중복 조회 =======");
+		boolean result = false;	// 중복x
+		
+		if (ses.selectOne(ns + ".getId", memberId) != null) {
+			result = true;	// 중복. 존재함
+		}
+		
+		return result;
+	}
+
 	public int insertMember(Member member) throws SQLException, NamingException {
 		System.out.println("======= 회원가입 DAO - 회원 가입 =======");
 		
@@ -205,9 +215,6 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
 
-	@Override
-	public List<Integer> selectOrderNo(String memberId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
+
 }

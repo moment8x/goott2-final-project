@@ -347,18 +347,23 @@
 	}
 	
 	//배송주소록 추가
-	function addShippingAddress() {
+	function addShippingAddress(addrSeq) {
 		let zipCode = $('#addZipNo').val()
 		let address = $('#addAddr').val()
 		let detailAddress = $('#addAddrDetail').val()
+		let recipient = $('#recipient').val()
+		let recipientContact = $('#recipientContact').val()
 		
 		$.ajax({
 			url : '/user/addShippingAddress', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
+				addrSeq,
 				zipCode,
 				address,
-				detailAddress
+				detailAddress,
+				recipient,
+				recipientContact
 			},
 			dataType : 'json',
 			async : false,
@@ -368,6 +373,8 @@
 					$('#addZipNo').val('')
 					$('#addAddr').val('')
 					$('#addAddrDetail').val('')
+					$('#recipient').val('')
+					$('#recipientContact').val('')
 					
 					location.reload()
 				}
@@ -382,14 +389,20 @@
 		let zipCode = $('#shippingZipNoModify').val()
 		let address = $('#shippingAddrModify').val()
 		let detailAddress = $('#shippingDetailAddrModify').val()
+		let recipient = $('#recipient').val()
+		let recipientContact = $('#recipientContact').val()
 			
+		alert(addrSeq + "번 배송지를 수정하자");
+		
 		$.ajax({
 			url : '/user/shippingAddrModify', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
 				zipCode,
 				address,
-				detailAddress
+				detailAddress,
+				recipient,
+				recipientContact
 			},
 			dataType : 'json',
 			async : false,
@@ -408,6 +421,22 @@
 		});
 	}
 	
+	function editShippingAddr(addrSeq) {
+		alert(addrSeq + "번 배송지를 수정하자")
+		$.ajax({
+			url : '/user/myPage', // 데이터를 수신받을 서버 주소
+			type : 'GET', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+					addrSeq
+			},
+			async : false,
+			success : function(data) {
+				console.log(data);
+			},
+			error : function() {
+			}
+		});
+	}
 	
 </script>
 <style>
@@ -1721,7 +1750,11 @@
 															<table class="table">
 																<tbody>
 																	<tr>
-																		<td colspan="2">${userInfo.name}</td>
+																		<td colspan="2">${addr.recipient}</td>
+																	</tr>
+																	
+																	<tr>
+																		<td colspan="2">${addr.recipientContact}</td>
 																	</tr>
 
 																	<tr>
@@ -1747,7 +1780,8 @@
 
 													<div class="button-group">
 														<button class="btn btn-sm add-button w-100"
-															data-bs-toggle="modal" data-bs-target="#editProfile">
+															data-bs-toggle="modal" th:attr="data-bs-target=${'#editProfile'+ userAddrList }" 
+															onclick="editShippingAddr(${addr.addrSeq});">
 															<i data-feather="edit"></i> Edit
 														</button>
 														<button class="btn btn-sm add-button w-100"
@@ -2054,7 +2088,19 @@
 				</div>
 
 				<div class="modal-body">
-
+					<div class="form-floating mb-4 theme-form-floating">
+						<input type="text" class="form-control" id="recipient"
+							name="recipient" placeholder="받는사람"  /><label
+							for="recipient">받는사람</label>
+					</div>
+					
+					<div class="form-floating mb-4 theme-form-floating">
+						<input type="text" class="form-control" id="recipientContact"
+							name="recipientContact" placeholder="받는사람 연락처"  /><label
+							for="recipientContact">받는사람 연락처</label>
+							<p>- 포함해서 입력해주세요.</p>
+					</div>
+					
 					<div>
 						<button type="button" class="btn theme-bg-color btn-md text-white"
 							onclick="goPopup();">주소 검색</button>
@@ -2062,12 +2108,14 @@
 
 					<div class="form-floating mb-4 theme-form-floating">
 						<input type="text" class="form-control addZipNo" id="addZipNo"
-							name="zipCode" placeholder="우편번호" readonly />
+							name="zipCode" placeholder="우편번호" readonly /><label
+							for="addAddrDetail">우편번호</label>
 					</div>
 
 					<div class="form-floating mb-4 theme-form-floating">
 						<input type="text" class="form-control addAddr" id="addAddr"
-							name="address" placeholder="주소" readonly />
+							name="address" placeholder="주소" readonly /><label
+							for="addAddrDetail">주소</label>
 					</div>
 
 					<div class="form-floating mb-4 theme-form-floating">
@@ -2165,8 +2213,8 @@
 	<!-- Location Modal End -->
 
 	<!-- Edit Profile Start -->
-	<c:forEach var="addr" items="${userAddrList }">
-	<div class="modal fade theme-modal" id="editProfile" tabindex="-1"
+	
+	<div class="modal fade theme-modal" th:attr="id='editProfile' + ${userAddrList }" tabindex="-1"
 		aria-labelledby="exampleModalLabel2" aria-hidden="true">
 		<div
 			class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen-sm-down">
@@ -2183,9 +2231,14 @@
 						<div class="col-xxl-12">
 							<form>
 								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="recipientName"
-										value="${userInfo.name }" /> <label for="recipientName">이름</label>
-									
+									<input type="text" class="form-control" id="recipientName" name="recipient" placeholder="받는사람"
+										value="${userAddrList.recipient }" /> <label for="recipientName">받는사람</label>
+								</div>
+								
+								<div class="form-floating theme-form-floating">
+									<input type="text" class="form-control" id="editRecipientContact" placeholder="받는사람 연락처"
+										value="${userAddrList.recipientContact }" /> <label for="editRecipientContact">받는사람 연락처</label>
+										<p>- 포함해서 입력해주세요.</p>
 								</div>
 							</form>
 						</div>
@@ -2196,7 +2249,7 @@
 							<form>
 								<div class="form-floating theme-form-floating">
 									<input type="text" class="form-control" id="shippingZipNoModify" name="zipCode"
-										value="${addr.zipCode }" readonly/> <label for="shippingZipNoModify">우편번호</label>
+										value="${userAddrList.zipCode }" readonly/> <label for="shippingZipNoModify">우편번호</label>
 								</div>
 							</form>
 						</div>
@@ -2204,7 +2257,7 @@
 						<div class="col-xxl-6">
 							<form>
 								<div class="form-floating theme-form-floating">
-									<input class="form-control" type="text" value="${addr.address }"
+									<input class="form-control" type="text" value="${userAddrList.address }"
 										name="address" id="shippingAddrModify" maxlength="10"
 										oninput="javascript: if (this.value.length > this.maxLength) this.value =
                                             this.value.slice(0, this.maxLength);" readonly/>
@@ -2217,7 +2270,7 @@
 							<form>
 								<div class="form-floating theme-form-floating">
 									<input type="text" class="form-control" id="shippingDetailAddrModify"
-										value="${addr.detailAddress }" /> <label
+										value="${userAddrList.detailAddress }" /> <label
 										for="shippingDetailAddrModify">상세주소</label>
 								</div>
 							</form>
@@ -2234,7 +2287,6 @@
 			</div>
 		</div>
 	</div>
-	</c:forEach>
 	<!-- Edit Profile End -->
 
 	<!-- Edit Card Start -->

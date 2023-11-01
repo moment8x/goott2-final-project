@@ -67,8 +67,9 @@ public interface MemberDAO {
 	//배송주소록 수정
 	int shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
 	
-	//
-	List<Integer> selectOrderNo(String memberId);
+	//특정회원의 수정할 배송지가져오기
+	ShippingAddress selectShippingAddr(int addrSeq, String memberId);
+	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -78,4 +79,5 @@ public interface MemberDAO {
 	// 로그인(비밀번호 체크)
 	Member selectMember(String memberId, String password) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+	
 }

@@ -165,6 +165,12 @@ public class MemberServiceImpl implements MemberService {
 
 	}
 	
+	@Override
+	public ShippingAddress getShippingAddr(int addrSeq, String memberId) {
+		
+		return mDao.selectShippingAddr(addrSeq, memberId);
+	}
+	
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
 	@Override
@@ -209,4 +215,7 @@ public class MemberServiceImpl implements MemberService {
 		return result;
 	}
 	// --------------------------------------- 김진솔 끝 ----------------------------------------	
+
+
+
 }
