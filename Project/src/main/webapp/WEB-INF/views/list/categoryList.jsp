@@ -13,6 +13,22 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script type="text/javascript">
 	$(function() {
+		$('#payModalBtn').on("click", function() {
+			$.ajax({
+				url : '/list/isLogin',
+				type : 'GET',
+				dataType : 'json',
+				async : false,
+				success : function(data) {
+					payLink(data);
+					
+				},
+				error : function() {
+					// 전송에 실패하면 이 콜백 함수를 실행
+				}
+			});
+		})
+		
 		$('.dropdown-item').on("click", function(evt) {
 			let sortBy = $(this).attr('id');
 			let key = "${key}"
@@ -32,7 +48,18 @@
 		});
 		
 		insertSort();
-	})
+	});
+	
+	function payLink(data) {
+		let pId = $(".product-header").attr("id");
+		if(data.isLogin == "loginOK"){
+			$('#loginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=Y");
+		} else {
+			console.log("안녕은 개뿔");
+			$('#loginPay').attr("href","/login/");
+			$('#noLoginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=N");
+		}
+	}
 
 	function parse(data) {
 		console.log(data);
@@ -207,7 +234,7 @@
 								<c:forEach var="product" items="${products }" varStatus="loop">
 									<div>
 										<div class="product-box-3 h-100 wow fadeInUp">
-											<div class="product-header">
+											<div class="product-header" id="${product.product_id }">
 												<div class="product-image">
 												<c:choose>
 												<c:when test="${product.product_image != null}">
@@ -224,9 +251,8 @@
 													</c:otherwise>
 													</c:choose>
 													<ul class="product-option">
-														
-															<li data-bs-toggle="tooltip" data-bs-placement="top"
-															title="바로 구매"><a href="/order/requestOrder?product_id='${product.product_id }'"><i data-feather="credit-card"></i>
+															<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn"
+															title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i>
 															</a></li>
 														
 
@@ -312,6 +338,8 @@
 			</div>
 	</section>
 	<!-- Shop Section End -->
+	
+	
 
 	<!-- Quick View Modal Box Start -->
 	<div class="modal fade theme-modal view-modal" id="view" tabindex="-1"
@@ -327,10 +355,21 @@
 				</div>
 				<div class="modal-body">
 					<div class="row g-sm-4 g-2">
-						<div class="col-lg-6">
+						<div class="col-lg-6" style="display: flex">
 							<div class="slider-image">
-								<img src="/resources/assets/images/product/category/1.jpg"
+								<img src="https://media.istockphoto.com/id/1437657408/ko/%EB%B2%A1%ED%84%B0/%ED%9D%B0%EC%83%89-%EB%B0%B0%EA%B2%BD%EC%97%90-%EA%B2%A9%EB%A6%AC%EB%90%9C-%EC%88%98%EC%B1%84%ED%99%94-%EC%95%84%EA%B8%B0-%EC%82%AC%EC%8A%B4-%EA%B7%80%EC%97%AC%EC%9A%B4-%EC%82%BC%EB%A6%BC-%EB%8F%99%EB%AC%BC-%EC%86%90%EC%9C%BC%EB%A1%9C-%EA%B7%B8%EB%A6%B0-%EA%B7%B8%EB%A6%BC-%ED%82%A4%EC%A6%88-%EB%94%94%EC%9E%90%EC%9D%B8.jpg?s=1024x1024&w=is&k=20&c=U3NghfcvPpFArhj6oAg9-6iVjW4pINKHcjNHFarbEzk="
 									class="img-fluid blur-up lazyload" alt="" />
+							</div>
+							<div>
+								<c:choose>
+									<c:when test="${sessionScope.loginMember != null }">
+										<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+									</c:when>
+									<c:otherwise>
+										<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+										<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>										
+									</c:otherwise>
+								</c:choose>
 							</div>
 						</div>
 					</div>

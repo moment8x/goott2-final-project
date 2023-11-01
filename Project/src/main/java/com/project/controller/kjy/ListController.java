@@ -4,7 +4,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 
 import java.io.Console;
-
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,11 +23,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.service.kjy.ListService;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.Product;
+import com.project.vodto.kjy.Memberkjy;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
 
@@ -59,7 +61,7 @@ public class ListController {
 	}
 	
 	@RequestMapping("/categoryList/{lang}/{key}")
-	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page, @PathVariable(name="lang") String lang) {
+	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page, @PathVariable(name="lang") String lang, HttpServletRequest request) {
 		this.page = page;
 		String categoryKey = lang + "/" + key; 
 		
@@ -119,5 +121,19 @@ public class ListController {
 		}
 		
 		return result;
+	}
+	@RequestMapping("/isLogin")
+	public ResponseEntity<Map<String, String>> checkLogin(HttpServletRequest request){
+		System.out.println("!!!!!!!!!!!!");
+		ResponseEntity<Map<String, String>> data = null;
+		Map<String, String> loginMap = new HashMap<String, String>();
+		if(request.getSession().getAttribute("loginMe") != null) {
+			loginMap.put("isLogin", "loginOK");
+			data = new ResponseEntity<Map<String,String>>(loginMap, HttpStatus.OK);
+		} else {
+			loginMap.put("isLogin", "noLogin");
+			data = new ResponseEntity<Map<String,String>>(loginMap, HttpStatus.OK);
+		}
+		return data;
 	}
 }

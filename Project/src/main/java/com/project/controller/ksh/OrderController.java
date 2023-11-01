@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,9 +45,10 @@ public class OrderController {
 
 	
 	@RequestMapping(value="requestOrder")
-	public void requestOrder(@RequestParam("product_id") String product_id, Model model) {
-		System.out.println(product_id);
-
+	public void requestOrder(@RequestParam("product_id") String product_id, Model model, HttpServletRequest request) {
+		String orderId = (String) request.getAttribute("orderId");
+		System.out.println("상희쿤 마크2"+orderId);
+		System.out.println("p_id : "+product_id);
 		model.addAttribute("product_id", product_id);
 	}
 	
