@@ -25,7 +25,7 @@ public interface MemberService {
 	// 특정 회원 정보 수정(select)
 	Member getMyInfo(String memberId) throws SQLException, NamingException;
 	// 특정 회원 정보 수정(update)
-	Member setMyInfo(String memberId) throws SQLException, NamingException;
+	boolean setMyInfo(String memberId, Member modifyMemberInfo) throws SQLException, NamingException;
 	// 특정 회원 탈퇴
 	Boolean withdraw(String memberId) throws SQLException, NamingException;
 	// 배송지 목록 조회
@@ -50,6 +50,22 @@ public interface MemberService {
 	
 	// 이메일 중복검사
 	Member duplicateUserEmail(String email) throws SQLException, NamingException;
+	
+	// 전화번호 중복검사
+	Member duplicatePhoneNumber(String phoneNumber) throws SQLException, NamingException;
+	
+	//핸드폰번호 중복검사
+	Member duplicateCellPhone(String cellPhoneNumber) throws SQLException, NamingException;
+	
+	//본인인증 성공시 
+	int updateAuthentication(String memberId) throws SQLException, NamingException;
+	
+	//배송주소록 추가
+	boolean insertShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
+	
+	//배송주소록 수정
+	boolean shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
+	
 
 	// 주문번호 가져오기
 	List<Integer> getOrderNo(String memberId) throws SQLException, NamingException;

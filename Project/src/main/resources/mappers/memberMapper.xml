@@ -24,13 +24,64 @@
 	</select>
 	
 	<select id="getMemberInfo" resultType="com.project.vodto.Member">
-		select member_id, name, phone_number, gender, date_of_birth, zip_code, address, detailed_address, email, 
-		identity_verification_status, profile_image, refund_bank, refund_account, membership_grade from member where member_id = #{memberId}
+		select * from member where member_id = #{memberId}
 	</select>
 	
 	<select id="getEmail" resultType="com.project.vodto.Member">
 		select * from member where email = #{email}
 	</select>
+	
+	<select id="getPhoneNumber" resultType="com.project.vodto.Member">
+		select phone_Number from member where phone_number = #{phoneNumber}
+	</select>
+	
+	<select id="getCellPhoneNumber" resultType="com.project.vodto.Member">
+		select cell_phone_number from member where cell_phone_number = #{cellPhoneNumber}
+	</select>
+	
+	<update id="updateAuthentication">
+		update member set identity_verification_status = 'Y' where member_id = #{memberId}
+	</update>
+	
+	<update id="updatePwd">
+		update member set password=sha1(md5(#{password})) where member_id=#{memberId}
+	</update>
+	<update id="updatePhoneNumber">
+		update member set phone_number=#{phoneNumber} where member_id=#{memberId}
+	</update>
+	<update id="updatecellPhoneNumber">
+		update member set cell_phone_number=#{cellPhoneNumber} where member_id=#{memberId}
+	</update>
+	<update id="updateAddr">
+		update member set zip_code=#{zipCode}, address=#{address}, detailed_address=#{detailedAddress} where member_id=#{memberId}
+	</update>
+	<update id="updateEmail">
+		update member set email=#{email} where member_id=#{memberId}
+	</update>
+	<update id="updateRefund">
+		update member set refund_bank=#{refundBank}, refund_account=#{refundAccount} where member_id=#{memberId}
+	</update>
+	
+	<update id="deleteUser">
+		update member set withdraw = 'Y' where member_id = #{memberId}
+	</update>
+	
+	<insert id="addShippingAddress">
+		<selectKey resultType="int" keyProperty="addrSeq" order="BEFORE">
+	        select max(addr_seq) + 1 from shipping_address       
+	    </selectKey> 
+		insert into shipping_address(addr_seq, member_id, zip_code, address, detail_address)
+ 		values(#{addrSeq}, #{memberId}, #{zipCode}, #{address}, #{detailAddress})
+	</insert>
+	
+	<select id="getShippingAddress" resultType="com.project.vodto.ShippingAddress">
+		select * from shipping_address where member_id = #{memberId} order by basic_addr desc
+	</select>
+	
+	<update id="updateShippingAddress">
+		update shipping_address set zip_code = #{zipCode}, address = #{address}, detail_address = #{detailAddress} 
+		where member_id = #{memberId} and addr_seq=#{addrSeq}
+	</update>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">
 		SELECT member_id FROM member WHERE member_id = #{memberId}  

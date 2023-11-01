@@ -44,21 +44,42 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public Member setMyInfo(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean setMyInfo(String memberId, Member modifyMemberInfo) throws SQLException, NamingException {
+		boolean result = true;
+		
+		if(modifyMemberInfo.getPassword() != null) {
+			mDao.updatePwd(memberId, modifyMemberInfo);			
+		}else if(modifyMemberInfo.getPhoneNumber() != null) {
+			mDao.updatePhoneNumber(memberId, modifyMemberInfo);
+		}else if(modifyMemberInfo.getCellPhoneNumber() != null) {
+			mDao.updateCellPhoneNumber(memberId, modifyMemberInfo);
+		}else if(modifyMemberInfo.getEmail() != null) {
+			mDao.updateEmail(memberId, modifyMemberInfo);
+		}else if(modifyMemberInfo.getAddress() != null) {
+			mDao.updateAddr(memberId, modifyMemberInfo);
+		}else if(modifyMemberInfo.getRefundBank() != null) {
+			mDao.updateRefund(memberId, modifyMemberInfo);
+		}else {
+			result =false;
+		}
+		 
+		return result;
 	}
 
 	@Override
 	public Boolean withdraw(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
+		boolean result = false;
+		
+		if(mDao.updateWithdraw(memberId) == 1) {
+			result = true;
+		}
+		return result; 
 	}
 
 	@Override
 	public List<ShippingAddress> getShippingAddress(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return mDao.getShippingAddress(memberId);
 	}
 
 	@Override
@@ -102,6 +123,48 @@ public class MemberServiceImpl implements MemberService {
 
 		return mDao.duplicateUserEmail(email);
 	}
+	
+	@Override
+	public Member duplicatePhoneNumber(String phoneNumber) throws SQLException, NamingException {
+		return mDao.duplicatePhoneNumber(phoneNumber);
+		
+	}
+
+	@Override
+	public Member duplicateCellPhone(String cellPhoneNumber) throws SQLException, NamingException {
+		
+		return mDao.duplicateCellPhone(cellPhoneNumber);
+	}
+
+	@Override
+	public int updateAuthentication(String memberId) throws SQLException, NamingException {
+		
+		return mDao.updateAuthentication(memberId);
+	}
+
+	@Override
+	public boolean insertShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
+		boolean result = false;
+		
+		if(mDao.addShippingAddress(memberId, tmpAddr) == 1) {
+			result = true;
+		}
+		
+		return result;
+	}
+
+	@Override
+	public boolean shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
+		boolean result = false;
+			
+			if(mDao.shippingAddrModify(memberId, tmpAddr) == 1) {
+				result = true;
+			}
+			
+		return result;
+
+	}
+	
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
 	@Override
@@ -117,7 +180,6 @@ public class MemberServiceImpl implements MemberService {
 	      return result;
 	}
 
-	@Override
 	public boolean insertMember(Member member) throws SQLException, NamingException {
 		System.out.println("======= 회원가입 서비스단 - 회원가입 =======");
 		boolean result = false;
@@ -132,9 +194,5 @@ public class MemberServiceImpl implements MemberService {
 	}
 	// --------------------------------------- 김진솔 끝 ----------------------------------------
 
-	@Override
-	public List<Integer> getOrderNo(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 }
