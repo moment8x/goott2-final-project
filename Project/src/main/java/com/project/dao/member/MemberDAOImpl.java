@@ -165,7 +165,7 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("zipCode", tmpAddr.getZipCode());
 		params.put("address", tmpAddr.getAddress());
 		params.put("detailAddress", tmpAddr.getDetailAddress());
-		params.put("detailAddress", tmpAddr.getAddrSeq());
+		params.put("addrSeq", tmpAddr.getAddrSeq());
 		
 		return ses.update(ns + ".updateShippingAddress", params);
 	}

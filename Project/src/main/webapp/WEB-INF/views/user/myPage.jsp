@@ -382,14 +382,6 @@
 		let zipCode = $('#shippingZipNoModify').val()
 		let address = $('#shippingAddrModify').val()
 		let detailAddress = $('#shippingDetailAddrModify').val()
-		let tmpAddrSeq = '${userAddrList.addrSeq}'
-		
-		$.forEach(function(elt, i, array) {
-			
-		}, context)
-		
-		
-		let addrSeq = 
 			
 		$.ajax({
 			url : '/user/shippingAddrModify', // 데이터를 수신받을 서버 주소
@@ -2192,7 +2184,8 @@
 							<form>
 								<div class="form-floating theme-form-floating">
 									<input type="text" class="form-control" id="recipientName"
-										value="${userInfo.name }" /> <label for="pname">이름</label>
+										value="${userInfo.name }" /> <label for="recipientName">이름</label>
+									
 								</div>
 							</form>
 						</div>

@@ -231,7 +231,7 @@ public class myPageController {
 	
 	@RequestMapping(value = "shippingAddrModify", method = RequestMethod.POST)
 	public ShippingAddress shippingAddrModify(@ModelAttribute ShippingAddress tmpAddr) {
-		System.out.println("배송주소록 수정");
+		System.out.println("배송주소록 수정" + tmpAddr.toString());
 		String memberId = "agim79";
 		
 		ShippingAddress sa = null; 
