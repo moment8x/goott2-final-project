@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import MemberSearch from './member-search';
-import SearchedMembers from './table/SearchedMembers';
+import SearchedMembers from './member-result';
+import MemberInfoModal from './member-modal';
 
 const MemberInfo = () => {
   const [searchedInfo, setSearchedInfo] = useState([

@@ -5,10 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import com.project.dao.kkb.admin.AdminMemberDAO;
@@ -19,38 +15,44 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@DependsOn("memberCountListener")
 public class AdminMemberServiceImpl implements AdminMemberService {
 
-	public final AdminMemberDAO adminMemberRepository;
-	public final MemberCountListener memberCount;
-	private final ApplicationEventPublisher publisher;
+	private final AdminMemberDAO adminMemberRepository;
+//	private final MemberCountListener memberCount;
+//	private final ApplicationEventPublisher publisher;
 	
 	@Override
 	public Map<String, Object> getTotalMemberCount() throws Exception {
-		
-		// DB가 아니라 MemberCountListener에 미리 저장해둔 값 가져옴
-		int totalCount = memberCount.getCurrentCount(); 
-		System.out.println("memberCount.getCurrentCount():"+memberCount.getCurrentCount());
+		int totalCount = adminMemberRepository.countAll();	
 		Map<String, Object> result = new HashMap<>();
 		result.put("total", totalCount);
 		
 		return result;
 	}
+//	@Override
+//	public Map<String, Object> getTotalMemberCount() throws Exception {
+//		// DB가 아니라 MemberCountListener에 미리 저장해둔 값 가져옴
+//		int totalCount = memberCount.getCurrentCount(); 
+//		System.out.println("memberCount.getCurrentCount():"+memberCount.getCurrentCount());
+//		Map<String, Object> result = new HashMap<>();
+//		result.put("total", totalCount);
+//		
+//		return result;
+//	}
 	
-	@EventListener(ContextRefreshedEvent.class)
-	public void updateMemberCount(ContextRefreshedEvent e) throws Exception {
-		
-		// Root WebApplicationContext 초기화 시에만 체크
-		if (e.getApplicationContext().getParent() == null) {
-			int updateCount = adminMemberRepository.countAll();	
-			System.out.println("context refresh");
-			
-			// 전체 회원 수를 조회하는 이벤트 발행
-	        publisher.publishEvent(new TotalMemberCountEvent(updateCount));
-		}
-	}
-	
+//	@EventListener(ContextRefreshedEvent.class)
+//	public void updateMemberCount(ContextRefreshedEvent e) throws Exception {
+//		
+//		// Root WebApplicationContext 초기화 시에만 체크
+//		if (e.getApplicationContext().getParent() == null) {
+//			int updateCount = adminMemberRepository.countAll();	
+//			System.out.println("context refresh");
+//			
+//			// 전체 회원 수를 조회하는 이벤트 발행
+//	        publisher.publishEvent(new TotalMemberCountEvent(updateCount));
+//		}
+//	}
+//	
 	
 	@Override
 	public Map<String, Object> getMemberInfo(SearchMemberRequest member ) throws Exception {
@@ -61,22 +63,22 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		
 		List<SearchMemberResponse> responseList = adminMemberRepository.findByInfo(member);
 		
-		for ( SearchMemberResponse ResponseParam : responseList ) {
+		for ( SearchMemberResponse responseParam : responseList ) {
 			
 			//=== 값 세팅 ===//
 			
-			//가입일
-			ResponseParam.setRegistrationDate(ResponseParam.getRegistrationDate().toString());
-			
 			// 성별
-			Character gender = ResponseParam.getGender().equals('M') ? '남': '여';
-			ResponseParam.setGender(gender);
+			Character gender = responseParam.getGender().equals('M') ? '남': '여';
+			responseParam.setGender(gender);
 			
 			// 나이
-			ResponseParam.setAge(calculateAge(ResponseParam));
+			responseParam.setAge(calculateAge(responseParam));
 			
 			//지역
-			ResponseParam.setRegion(detectRegion(ResponseParam));	
+			if(responseParam.getAddress() != null) {
+				responseParam.setRegion(detectRegion(responseParam));	
+			}
+			
 		}
 	
 		Map<String, Object> result = new HashMap<>();
@@ -123,6 +125,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		
 		return age+"세";
 	}
+
 
 	
 

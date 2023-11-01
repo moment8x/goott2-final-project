@@ -1,6 +1,5 @@
 package com.project.service.kkb.admin;
 
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +13,6 @@ public class MemberCountListener {
 	@EventListener
 	public void handleEvent(TotalMemberCountEvent event) {
 		currentCount = event.getTotalMemberCount();
-		System.out.println("currentCount: "+ currentCount);
+		System.out.println("MemberCountListener currentCount: "+ currentCount);
 	}
 }

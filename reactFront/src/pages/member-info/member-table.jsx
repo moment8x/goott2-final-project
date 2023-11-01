@@ -1,5 +1,5 @@
 import React from 'react';
-import ExampleTwo from './table/SearchedMembers';
+import ExampleTwo from './member-result';
 
 const SearchedMemberTable = () => {
   return (
