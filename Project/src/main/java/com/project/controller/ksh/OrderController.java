@@ -37,10 +37,10 @@ public class OrderController {
 
 	}
 
-	@RequestMapping(value = "requestOrder", method = RequestMethod.GET)
-	public String memberOrder(@RequestParam String orderId,
-			@RequestParam String nonOrder) {
-
+//	@RequestMapping(value = "requestOrder", method = RequestMethod.GET)
+//	public String memberOrder(@RequestParam String orderId,
+//			@RequestParam String nonOrder) {
+//	}
 	
 	@RequestMapping(value="requestOrder")
 	public void requestOrder(@RequestParam("product_id") String product_id, Model model, HttpServletRequest request) {

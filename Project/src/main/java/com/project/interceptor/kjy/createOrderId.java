@@ -14,8 +14,8 @@ public class createOrderId extends HandlerInterceptorAdapter {
 			throws Exception {
 		// TODO Auto-generated method stub
 		String orderId = "";
-		System.out.println("?????"+request.getParameter("isLogin"));
-		if (request.getParameter("isLogin").equals("N")) {
+//		System.out.println("?????"+request.getParameter("isLogin"));
+		if (request.getParameter("isLogin") != null && request.getParameter("isLogin").equals("N") ) {
 			System.out.println("상희쿤");
 	         orderId = "N" + new Date().getTime();
 	         
