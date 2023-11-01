@@ -59,6 +59,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                     <div class="timer-notification">
 
                                         <h6>
+                      					 <!-- <strong class="me-1">Deer Books에 오신것을 환영합니다!</strong>-->
                       					 <strong class="me-1">Deer Books에 오신것을 환영합니다!</strong>
                    					   </h6>
                                     </div>
@@ -295,8 +296,14 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                             <ul class="user-box-name">
                                                 <li class="product-box-contain">
                                                     <i></i>
-
-                                                    <a href="/login/">Log In</a>
+													<c:choose>
+														<c:when test="${sessionScope.loginMember == null }">
+		                                                    <a href="/logintest/main">Log In</a>
+														</c:when>
+														<c:otherwise>
+		                                                    <a href="/logintest/logout">Log out</a>
+														</c:otherwise>
+													</c:choose>
 
                                                 </li>
 

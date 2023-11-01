@@ -37,18 +37,21 @@
 	<beans:bean id="headerCartInterceptor"
 		class="com.project.interceptor.kjs.HeaderCartInterceptor">
 	</beans:bean>
+	<beans:bean id="loginInterceptor"
+		class="com.project.interceptor.kjs.LoginInterceptor">
+	</beans:bean>
 	
 	<interceptors>
 		<interceptor>
 			<mapping path="/"/>
 			<beans:ref bean="headerCartInterceptor"/>
 		</interceptor>
+		<interceptor>
+			<mapping path="/user/myPage"/>
+			<beans:ref bean="loginInterceptor"/>
+		</interceptor>
 	</interceptors>
 	
 	<!-- 아래의 패키지를 스캔하여 객체 확보 -->
 	<context:component-scan base-package="com.project.controller" />
-
-
-	<context:component-scan base-package="com.project" />
-	<context:component-scan base-package="com.project.dao" />
 </beans:beans>

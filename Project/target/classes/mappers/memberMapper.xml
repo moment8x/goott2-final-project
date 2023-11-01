@@ -102,5 +102,8 @@
 			</otherwise>
 		</choose>
 	</insert>
+	<select id="login" resultType="com.project.vodto.Member">
+		SELECT * FROM member WHERE member_id = #{memberId} AND password = sha1(md5(#{password}))
+	</select>
 	<!-- =========================== 김진솔 끝 =========================== -->
 </mapper>

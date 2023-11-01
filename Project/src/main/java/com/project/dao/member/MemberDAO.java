@@ -75,5 +75,7 @@ public interface MemberDAO {
 	boolean selectId(String memberId) throws SQLException, NamingException;
 	// 회원 가입
 	int insertMember(Member member) throws SQLException, NamingException;
+	// 로그인(비밀번호 체크)
+	Member selectMember(String memberId, String password) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
 }
