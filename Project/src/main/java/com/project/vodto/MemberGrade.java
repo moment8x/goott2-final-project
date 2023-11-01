@@ -12,7 +12,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class MemberGrade {
-	private String member_id;
+	private String memberId;
 	private String grade;
-	private int actual_payment;
+	private int actualPayment;
 }

@@ -15,13 +15,15 @@ import lombok.ToString;
 @ToString
 public class Payment {
 	private String payment_number;
-	private int order_no;
-	private int non_order_no;
+	private String order_no;
+	private String non_order_no;
 	private String payment_method;
-	private String total_amount;
+	private int total_amount;
 	private int shipping_fee;
 	private int used_reward;
 	private int used_points;
-	private String actual_payment_amount;
+	private int actual_payment_amount;
 	private Timestamp payment_time;
+	private String card_name;
+	private String card_number;
 }

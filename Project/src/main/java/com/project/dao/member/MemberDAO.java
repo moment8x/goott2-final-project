@@ -12,6 +12,7 @@ import com.project.vodto.MyPageOrderList;
 
 @Repository
 public interface MemberDAO {
+	// ----------------------------------- 장민정 시작 -----------------------------------
 	// 회원가입
 	boolean insertSignUp(Member member) throws SQLException, NamingException;
 	// mypage 첫 화면에 띄울 자료들 가져오기
@@ -28,6 +29,16 @@ public interface MemberDAO {
 	// 주문건당 상품 총 갯수 가져오기
 	int selectOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException;
 	
+	//이메일 중복검사
+	Member duplicateUserEmail(String tmpEmail) throws SQLException, NamingException;
+	
 	//
 	List<Integer> selectOrderNo(String memberId);
+	// ----------------------------------- 장민정 끝 ------------------------------------
+	// ----------------------------------- 김진솔 시작 -----------------------------------
+	// 회원 아이디 중복 조회
+	int selectId(String memberId) throws SQLException, NamingException;
+	// 회원 가입
+	int insertMember(Member member) throws SQLException, NamingException;
+	// ----------------------------------- 김진솔 끝 ------------------------------------
 }
