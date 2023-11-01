@@ -303,17 +303,6 @@
 	</style>
 </head>
 <body>
-    <!-- Loader Start -->
-    <div class="fullpage-loader">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-    <!-- Loader End -->
-
     <jsp:include page="../header.jsp"></jsp:include>
 
     <!-- mobile fix menu start -->

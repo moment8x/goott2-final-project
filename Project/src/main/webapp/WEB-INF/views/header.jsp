@@ -59,6 +59,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                     <div class="timer-notification">
 
                                         <h6>
+                      					 <!-- <strong class="me-1">Deer Books에 오신것을 환영합니다!</strong>-->
                       					 <strong class="me-1">Deer Books에 오신것을 환영합니다!</strong>
                    					   </h6>
                                     </div>
@@ -295,8 +296,14 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                             <ul class="user-box-name">
                                                 <li class="product-box-contain">
                                                     <i></i>
-
-                                                    <a href="/login/">Log In</a>
+													<c:choose>
+														<c:when test="${sessionScope.loginMember == null }">
+		                                                    <a href="/logintest/main">Log In</a>
+														</c:when>
+														<c:otherwise>
+		                                                    <a href="/logintest/logout">Log out</a>
+														</c:otherwise>
+													</c:choose>
 
                                                 </li>
 
@@ -356,50 +363,50 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 		                          </div>
 		                          <ul>
 		                            <li>
-		                              <a href="/list/categoryList/KOR01">소설</a>
+		                              <a href="/list/categoryList/KOR/01">소설</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR02"
+		                              <a href="/list/categoryList/KOR/02"
 		                                >시/에세이</a
 		                              >
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR03">인문</a>
+		                              <a href="/list/categoryList/KOR/03">인문</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR04">가정/육아</a>
+		                              <a href="/list/categoryList/KOR/04">가정/육아</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR05">요리</a>
+		                              <a href="/list/categoryList/KOR/05">요리</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR06"
+		                              <a href="/list/categoryList/KOR/06"
 		                                >건강</a
 		                              >
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR07">취미/실용/스포츠</a>
+		                              <a href="/list/categoryList/KOR/07">취미/실용/스포츠</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR08">경제/경영</a>
+		                              <a href="/list/categoryList/KOR/08">경제/경영</a>
 		                            </li>
 		                            <li>
-		                                <a href="/list/categoryList/KOR09">자기계발</a>
+		                                <a href="/list/categoryList/KOR/09">자기계발</a>
 		                              </li>
 		                              <li>
-		                                <a href="/list/categoryList/KOR10">정치/사회</a>
+		                                <a href="/list/categoryList/KOR/10">정치/사회</a>
 		                              </li>
 		                              <li>
-		                                <a href="/list/categoryList/KOR11">역사/문화</a>
+		                                <a href="/list/categoryList/KOR/11">역사/문화</a>
 		                              </li>
 		                              <li>
-		                                <a href="/list/categoryList/KOR12">종교</a>
+		                                <a href="/list/categoryList/KOR/12">종교</a>
 		                              </li>
 		                              <li>
-		                                <a href="/list/categoryList/KOR13">예술/대중문화</a>
+		                                <a href="/list/categoryList/KOR/13">예술/대중문화</a>
 		                              </li>
 		                              <li>
-		                                <a href="/list/categoryList/KOR14">중/고등 참고서</a>
+		                                <a href="/list/categoryList/KOR/14">중/고등 참고서</a>
 		                              </li>
 		                          </ul>
 		                        </div>
@@ -409,46 +416,46 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 		                          </div>
 		                          <ul>
 		                            <li>
-		                              <a href="/list/categoryList/KOR15">기술/공학</a>
+		                              <a href="/list/categoryList/KOR/15">기술/공학</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR16">외국어</a>
+		                              <a href="/list/categoryList/KOR/16">외국어</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR17">과학</a>
+		                              <a href="/list/categoryList/KOR/17">과학</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR18">취섭/수험서</a>
+		                              <a href="/list/categoryList/KOR/18">취섭/수험서</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR19">여행</a>
+		                              <a href="/list/categoryList/KOR/19">여행</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR20">컴퓨터/IT</a>
+		                              <a href="/list/categoryList/KOR/20">컴퓨터/IT</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR21">잡지</a>
+		                              <a href="/list/categoryList/KOR/21">잡지</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR22">청소년</a>
+		                              <a href="/list/categoryList/KOR/22">청소년</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR23">초등 참고서</a>
+		                              <a href="/list/categoryList/KOR/23">초등 참고서</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR24">유아(0~7세)</a>
+		                              <a href="/list/categoryList/KOR/24">유아(0~7세)</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR25">어린이(초등)</a>
+		                              <a href="/list/categoryList/KOR/25">어린이(초등)</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR26">만화</a>
+		                              <a href="/list/categoryList/KOR/26">만화</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR27">대학교재</a>
+		                              <a href="/list/categoryList/KOR/27">대학교재</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/KOR28">한국소개도서</a>
+		                              <a href="/list/categoryList/KOR/28">한국소개도서</a>
 		                            </li>
 		                          </ul>
 		                        </div>
@@ -468,28 +475,28 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 		                          </div>
 		                          <ul>
 		                            <li>
-		                              <a href="/list/categoryList/ENG01">문학</a>
+		                              <a href="/list/categoryList/ENG/01">문학</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/ENG02">취미/실용/여행</a>
+		                              <a href="/list/categoryList/ENG/02">취미/실용/여행</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/ENG03">생활/요리/건강</a>
+		                              <a href="/list/categoryList/ENG/03">생활/요리/건강</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/ENG04">예술/건축</a>
+		                              <a href="/list/categoryList/ENG/04">예술/건축</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/ENG05">인문/사회</a>
+		                              <a href="/list/categoryList/ENG/05">인문/사회</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/ENG06">경제/경영</a>
+		                              <a href="/list/categoryList/ENG/06">경제/경영</a>
 		                            </li>
 		                            <li>
-		                              <a href="/list/categoryList/ENG07">과학/기술</a>
+		                              <a href="/list/categoryList/ENG/07">과학/기술</a>
 		                            </li>
 		                            <li>
-		                                <a href="/list/categoryList/ENG08">어린이ELT</a>
+		                                <a href="/list/categoryList/ENG/08">어린이ELT</a>
 		                            </li>
 		                          </ul>
                        			 </div>
@@ -498,31 +505,31 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 			                            </div>
 			                            <ul>
 			                              <li>
-			                                <a href="/list/categoryList/ENG09">유아/아동/청소년</a>
+			                                <a href="/list/categoryList/ENG/09">유아/아동/청소년</a>
 			                              </li>
 			                              <li>
-			                                <a href="/list/categoryList/ENG10">환국관련도서</a>
+			                                <a href="/list/categoryList/ENG/10">환국관련도서</a>
 			                              </li>
 			                              <li>
-			                                <a href="/list/categoryList/ENG11">문구/멀티/비도서</a>
+			                                <a href="/list/categoryList/ENG/11">문구/멀티/비도서</a>
 			                              </li>
 			                              <li>
-			                                <a href="/list/categoryList/ENG12">ELT/수험서</a>
+			                                <a href="/list/categoryList/ENG/12">ELT/수험서</a>
 			                              </li>
 			                              <li>
-			                                <a href="/list/categoryList/ENG13">프랑스도서</a>
+			                                <a href="/list/categoryList/ENG/13">프랑스도서</a>
 			                              </li>
 			                              <li>
-			                                <a href="/list/categoryList/ENG14">독일도서</a>
+			                                <a href="/list/categoryList/ENG/14">독일도서</a>
 			                              </li>
 			                              <li>
-			                                <a href="/list/categoryList/ENG15">스페인도서</a>
+			                                <a href="/list/categoryList/ENG/15">스페인도서</a>
 			                              </li>
 			                              <li>
-			                                <a href="/list/categoryList/ENG16">기타도서</a>
+			                                <a href="/list/categoryList/ENG/16">기타도서</a>
 			                              </li>
 			                              <li>
-			                                <a href="/list/categoryList/ENG17">교재</a>
+			                                <a href="/list/categoryList/ENG/17">교재</a>
 			                              </li>
 			                            </ul>
 			                          </div>
@@ -543,25 +550,25 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 			                          </div>
 			                          <ul>
 			                            <li>
-			                              <a href="/list/categoryList/JAP01">잡지</a>
+			                              <a href="/list/categoryList/JAP/01">잡지</a>
 			                            </li>
 			                            <li>
-			                              <a href="/list/categoryList/JAP02">엔터테인먼트</a>
+			                              <a href="/list/categoryList/JAP/02">엔터테인먼트</a>
 			                            </li>
 			                            <li>
-			                              <a href="/list/categoryList/JAP03">만화/애니</a>
+			                              <a href="/list/categoryList/JAP/03">만화/애니</a>
 			                            </li>
 			                            <li>
-			                              <a href="/list/categoryList/JAP04">문학</a>
+			                              <a href="/list/categoryList/JAP/04">문학</a>
 			                            </li>
 			                            <li>
-			                              <a href="/list/categoryList/JAP05">라이트노벨</a>
+			                              <a href="/list/categoryList/JAP/05">라이트노벨</a>
 			                            </li>
 			                            <li>
-			                              <a href="/ist/categoryList/JAP06">문고</a>
+			                              <a href="/ist/categoryList/JAP/06">문고</a>
 			                            </li>
 			                            <li>
-			                                <a href="/list/categoryList/JAP07">신서</a>
+			                                <a href="/list/categoryList/JAP/07">신서</a>
 			                            </li>
 			                          </ul>
 			                        </div>
@@ -570,25 +577,25 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 			                       </div>
 			                       <ul>
 			                          <li>
-			                           <a href="/list/categoryList/JAP08">아동</a>
+			                           <a href="/list/categoryList/JAP/08">아동</a>
 			                         </li>
 			                          <li>
-			                            <a href="/list/categoryList/JAP09">실용서/예술</a>
+			                            <a href="/list/categoryList/JAP/09">실용서/예술</a>
 			                          </li>
 			                         <li>
-			                            <a href="/list/categoryList/JAP10">인문/사회</a>
+			                            <a href="/list/categoryList/JAP/10">인문/사회</a>
 			                          </li>
 			                          <li>
-			                           <a href="/list/categoryList/JAP11">자연/기술과학</a>
+			                           <a href="/list/categoryList/JAP/11">자연/기술과학</a>
 			                          </li>
 			                          <li>
-			                            <a href="/list/categoryList/JAP12">어학/학습</a>
+			                            <a href="/list/categoryList/JAP/12">어학/학습</a>
 			                          </li>
 			                          <li>
-			                            <a href="/list/categoryList/JAP13">문구/멀티/기타</a>
+			                            <a href="/list/categoryList/JAP/13">문구/멀티/기타</a>
 			                          </li>
 			                          <li>
-			                            <a href="/list/categoryList/JAP14">중국도서</a>
+			                            <a href="/list/categoryList/JAP/14">중국도서</a>
 			                          </li>
 			                        </ul>
 			                     </div>

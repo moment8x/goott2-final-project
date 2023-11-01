@@ -14,11 +14,14 @@ import lombok.ToString;
 @Setter
 @ToString
 public class OrderInfo {
+	private String product_id;
 	private String product_name;
 	private String product_image;
 	private String category_key;
 	private int product_quantity;
-	private int product_price;
+	private int current_quantity;
+	private int calculated_price;
+	private int selling_price;
 	private int total_amount;
 	private int actual_payment_amount;
 	private int discount_amount; // 수동으로 넣어줘야함
@@ -27,5 +30,6 @@ public class OrderInfo {
 	private String shipping_address;
 	private String detailed_shipping_address;
 	private String card_name;
+	private String adequacy;
 	
 }

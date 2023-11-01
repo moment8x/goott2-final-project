@@ -6,7 +6,9 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="google-signin-client_id" content="868189545870-s003dih3cpr96cotlbo38r5tti76sj5d.apps.googleusercontent.com">
 <script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" charset="utf-8"></script>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
     <script
       src="https://code.jquery.com/jquery-3.4.1.js"
       integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
@@ -24,33 +26,14 @@
 		width: 50%
 	}
 </style>
-<script type="text/javascript">
-let client_id = "QvibsLi5PSZRGzsKS_Zp";
-let redirectURI = encodeURIComponent("http://localhost:8081/");
-let state = crypto.randomUUID();
-			function naverLogin() {
-			
-			$.ajax({
-				url : "https://nid.naver.com/oauth2.0/authorize",
-				type : 'post',
-				data : {
-					response_type : "code",
-					client_id : client_id,
-					state : state,
-					redirect_uri : redirectURI
-				},
-				dataType : 'json',
-				async : false,
-				success : function(data) {
-					// 전송에 성공하면 이 콜백 함수를 실행 (data 에는 응답받은 데이터가 저장된다)
-					parse(data);
-				},
-				error : function() {
-					// 전송에 실패하면 이 콜백 함수를 실행
-				}
-			});
-		}
-	
+<script>
+	window.onload = function () {
+		google.accounts.id.initialize({
+			client_id: '868189545870-s003dih3cpr96cotlbo38r5tti76sj5d.apps.googleusercontent.com',
+			callback: handleCredentialResponse
+		});
+		google.accounts.id.prompt();
+	};
 </script>
 <!-- Callback 처리 -->
 
@@ -188,6 +171,9 @@ let state = crypto.randomUUID();
                                    	 		<img src="/resources/assets/images/Naver-login.png" />
                                     	</div>
                                     </a>
+                                </li>
+                                <li>
+                                	<div class="g-signin2" data-onsuccess="onSignIn"></div>
                                 </li>
                             </ul>
                         </div>

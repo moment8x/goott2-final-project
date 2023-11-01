@@ -13,6 +13,22 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script type="text/javascript">
 	$(function() {
+		$('#payModalBtn').on("click", function() {
+			$.ajax({
+				url : '/list/isLogin',
+				type : 'GET',
+				dataType : 'json',
+				async : false,
+				success : function(data) {
+					payLink(data);
+					
+				},
+				error : function() {
+					// 전송에 실패하면 이 콜백 함수를 실행
+				}
+			});
+		})
+		
 		$('.dropdown-item').on("click", function(evt) {
 			let sortBy = $(this).attr('id');
 			let key = "${key}"
@@ -32,18 +48,35 @@
 		});
 		
 		insertSort();
-	})
+	});
+	
+	function payLink(data) {
+		let pId = $(".product-header").attr("id");
+		if(data.isLogin == "loginOK"){
+			$('#loginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=Y");
+		} else {
+			console.log("안녕은 개뿔");
+			$('#loginPay').attr("href","/login/");
+			$('#noLoginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=N");
+		}
+	}
 
 	function parse(data) {
 		console.log(data);
 		$.each(data.list_product, function(i, product) {
 			console.log(i);
+			if(product.product_image != null){
+			$('#pImage' + (i+1)).attr("src",product.product_image);				
+			} else {
+				$('#pImage' + (i+1)).attr("src","/resources/assets/images/deer.png");
+			}
 			$('#publisher' + (i+1)).html(product.publisher);
 			$('#pName'+ (i+1)).html(product.product_name);
 			$('#pIntro'+ (i+1)).html(product.introduction_detail);
 			$('#page' + (i+1)).html(product.page_count+"p");
 			$('#sPrice'+ (i+1)).html(product.selling_price.toLocaleString()+"원");
 			$('#cPrice'+ (i+1)).html(product.consumer_price.toLocaleString()+"원");
+		console.log($('#pImage' + (i+1)).attr("src"));
 		})
 
 	}
@@ -64,25 +97,6 @@
 			$('#sort').html("낮은 가격순");
 			break;
 		}
-	}
-	
-	function insertShoppingCart(id) {
-		console.log(id);
-			$.ajax({
-				url : '/shoppingCart/insert',
-				type : 'POST',
-				data : {
-					"id" : id
-				},
-				async : false,
-				success : function(data) {
-					// 전송에 성공하면 이 콜백 함수를 실행 (data 에는 응답받은 데이터가 저장된다)
-					console.log(data);
-				},
-				error : function() {
-					// 전송에 실패하면 이 콜백 함수를 실행
-				}
-			});
 	}
 </script>
 </head>
@@ -220,22 +234,30 @@
 								<c:forEach var="product" items="${products }" varStatus="loop">
 									<div>
 										<div class="product-box-3 h-100 wow fadeInUp">
-											<div class="product-header">
+											<div class="product-header" id="${product.product_id }">
 												<div class="product-image">
-													<a href="/detail/${product.product_id}"> <img
-														src="/resources/assets/images/cake/product/2.png"
+												<c:choose>
+												<c:when test="${product.product_image != null}">
+													<a href="/detail/${product.product_id}"> <img id="pImage${loop.index + 1 }"
+														src="${product.product_image}"
 														class="img-fluid blur-up lazyload" alt="">
 													</a>
-
+													</c:when>
+													<c:otherwise>
+													<a href="/detail/${product.product_id}"> <img id="pImage${loop.index + 1 }"
+														src="/resources/assets/images/deer.png"
+														class="img-fluid blur-up lazyload" alt="">
+													</a>
+													</c:otherwise>
+													</c:choose>
 													<ul class="product-option">
-														<li data-bs-toggle="tooltip" data-bs-placement="top"
-															title="View"><a href="javascript:void(0)"
-															data-bs-toggle="modal" data-bs-target="#view"> <i
-																data-feather="eye"></i>
-														</a></li>
+															<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn"
+															title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i>
+															</a></li>
+														
 
 														<li  data-bs-toggle="tooltip" data-bs-placement="top"
-															title="장바구니"  onclick="insertShoppingCart('${product.product_id}');"><i data-feather="shopping-cart"></i>
+															title="장바구니" ><a href="/shoppingCart/insert?product_id='${product.product_id }"><i data-feather="shopping-cart"></i></a>
 														</li>
 
 														<li data-bs-toggle="tooltip" data-bs-placement="top"
@@ -316,6 +338,8 @@
 			</div>
 	</section>
 	<!-- Shop Section End -->
+	
+	
 
 	<!-- Quick View Modal Box Start -->
 	<div class="modal fade theme-modal view-modal" id="view" tabindex="-1"
@@ -331,83 +355,21 @@
 				</div>
 				<div class="modal-body">
 					<div class="row g-sm-4 g-2">
-						<div class="col-lg-6">
+						<div class="col-lg-6" style="display: flex">
 							<div class="slider-image">
-								<img src="/resources/assets/images/product/category/1.jpg"
+								<img src="https://media.istockphoto.com/id/1437657408/ko/%EB%B2%A1%ED%84%B0/%ED%9D%B0%EC%83%89-%EB%B0%B0%EA%B2%BD%EC%97%90-%EA%B2%A9%EB%A6%AC%EB%90%9C-%EC%88%98%EC%B1%84%ED%99%94-%EC%95%84%EA%B8%B0-%EC%82%AC%EC%8A%B4-%EA%B7%80%EC%97%AC%EC%9A%B4-%EC%82%BC%EB%A6%BC-%EB%8F%99%EB%AC%BC-%EC%86%90%EC%9C%BC%EB%A1%9C-%EA%B7%B8%EB%A6%B0-%EA%B7%B8%EB%A6%BC-%ED%82%A4%EC%A6%88-%EB%94%94%EC%9E%90%EC%9D%B8.jpg?s=1024x1024&w=is&k=20&c=U3NghfcvPpFArhj6oAg9-6iVjW4pINKHcjNHFarbEzk="
 									class="img-fluid blur-up lazyload" alt="" />
 							</div>
-						</div>
-
-						<div class="col-lg-6">
-							<div class="right-sidebar-modal">
-								<h4 class="title-name">Peanut Butter Bite Premium Butter
-									Cookies 600 g</h4>
-								<h4 class="price">$36.99</h4>
-								<div class="product-rating">
-									<ul class="rating">
-										<li><i data-feather="star" class="fill"></i></li>
-										<li><i data-feather="star" class="fill"></i></li>
-										<li><i data-feather="star" class="fill"></i></li>
-										<li><i data-feather="star" class="fill"></i></li>
-										<li><i data-feather="star"></i></li>
-									</ul>
-									<span class="ms-2">8 Reviews</span> <span
-										class="ms-2 text-danger">6 sold
-										in last 16 hours</span>
-								</div>
-
-								<div class="product-detail">
-									<h4>Product Details :</h4>
-									<p>Candy canes sugar plum tart cotton candy chupa chups
-										sugar plum chocolate I love. Caramels marshmallow icing
-										dessert candy canes I love soufflé I love toffee. Marshmallow
-										pie sweet sweet roll sesame snaps tiramisu jelly bear claw.
-										Bonbon muffin I love carrot cake sugar plum dessert bonbon.</p>
-								</div>
-
-								<ul class="brand-list">
-									<li>
-										<div class="brand-box">
-											<h5>Brand Name:</h5>
-											<h6>Black Forest</h6>
-										</div>
-									</li>
-
-									<li>
-										<div class="brand-box">
-											<h5>Product Code:</h5>
-											<h6>W0690034</h6>
-										</div>
-									</li>
-
-									<li>
-										<div class="brand-box">
-											<h5>Product Type:</h5>
-											<h6>White Cream Cake</h6>
-										</div>
-									</li>
-								</ul>
-
-								<div class="select-size">
-									<h4>Cake Size :</h4>
-									<select class="form-select select-form-size">
-										<option selected>Select Size</option>
-										<option value="1.2">1/2 KG</option>
-										<option value="0">1 KG</option>
-										<option value="1.5">1/5 KG</option>
-										<option value="red">Red Roses</option>
-										<option value="pink">With Pink Roses</option>
-									</select>
-								</div>
-
-								<div class="modal-button">
-									<button onclick="location.href = 'cart.html';"
-										class="btn btn-md add-cart-button icon">
-										Add To Cart</button>
-									<button onclick="location.href = 'product-left.html';"
-										class="btn theme-bg-color view-button icon text-white fw-bold btn-md">
-										View More Details</button>
-								</div>
+							<div>
+								<c:choose>
+									<c:when test="${sessionScope.loginMember != null }">
+										<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+									</c:when>
+									<c:otherwise>
+										<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+										<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>										
+									</c:otherwise>
+								</c:choose>
 							</div>
 						</div>
 					</div>

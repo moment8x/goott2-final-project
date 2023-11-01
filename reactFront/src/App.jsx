@@ -21,6 +21,7 @@ const LockScreen3 = lazy(() => import('./pages/auth/lock-screen3'));
 
 import Layout from './layout/Layout';
 import AuthLayout from './layout/AuthLayout';
+import MemberInfoModal from './pages/member-info/member-modal';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
           <Route path="admin/home" element={<Ecommerce />} />
           <Route path="admin/members/dashboard" element={<CrmPage />} />
           <Route path="admin/members/member-info" element={<MemberInfo />} />
+          <Route path="admin/members/member-detail" element={<MemberInfoModal />} />
         </Route>
       </Routes>
     </main>

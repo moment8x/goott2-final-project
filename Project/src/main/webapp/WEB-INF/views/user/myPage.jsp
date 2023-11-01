@@ -12,7 +12,7 @@
 <meta name="author" content="Fastkart" />
 <link rel="icon" href="/resources/assets/images/favicon/1.png"
 	type="image/x-icon" />
-<title>마이페이지</title>
+<title>Dear Books</title>
 
 <!-- Google font -->
 <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -23,7 +23,7 @@
 	href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&display=swap"
 	rel="stylesheet" />
 <link
-	href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+	href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100;ㅇ0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
 	rel="stylesheet" />
 
 <!-- bootstrap css -->
@@ -53,6 +53,11 @@
 	href="/resources/assets/css/style.css" />
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+
+<script type="text/javascript"
+	src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+
 <script type="text/javascript">
 	//도로명주소API 
 	function goPopup() {
@@ -76,19 +81,19 @@
 		let newAddrDetail = null
 		
 		if(document.querySelector("#zipNo")){
-			newZipNo = (document.querySelector("#zipNo")
+			newZipNo = document.querySelector("#zipNo")
 			newZipNo.value = zipNo;
 		}
-		if(document.getElementsByClassName("#userAddr")){
-			newAddr = document.getElementsByClassName("#userAddr")
+		if(document.querySelector("#userAddr")){
+			newAddr = document.querySelector("#userAddr")
 			newAddr.value = roadAddrPart1;
 		}
-		if(document.getElementsByClassName("#addrDetail")){
-			newAddrDetail = document.getElementsByClassName("#addrDetail")
+		if(document.querySelector("#addrDetail")){
+			newAddrDetail = document.querySelector("#addrDetail")
 			newAddrDetail.value = addrDetail
 		}
 		
-		// 배송지 추가 주소찾기
+		// 배송주소록 추가 주소찾기
 		let addZipNo = null
 		let addAddr = null
 		let addAddrDetail = null
@@ -97,24 +102,92 @@
 			addZipNo = document.querySelector("#addZipNo")
 			addZipNo.value = zipNo;
 		}
-		if(document.getElementsByClassName("#addAddr")){
-			addAddr = document.getElementsByClassName("#addAddr")
+		if(document.querySelector("#addAddr")){
+			addAddr = document.querySelector("#addAddr")
 			addAddr.value = roadAddrPart1;
 		}
-		if(document.getElementsByClassName("#addAddrDetail")){
-			addAddrDetail = document.getElementsByClassName("#addAddrDetail")
+		if(document.querySelector("#addAddrDetail")){
+			addAddrDetail = document.querySelector("#addAddrDetail")
 			addAddrDetail.value = addrDetail
 		}
+		
+		//배송주소록 수정 주소찾기
+		let shippingZipNoModify = null
+		let shippingAddrModify = null
+		let shippingDetailAddrModify = null
+
+		if(document.querySelector("#shippingZipNoModify")){
+			shippingZipNoModify = document.querySelector("#shippingZipNoModify")
+			shippingZipNoModify.value = zipNo;
+		}
+		if(document.querySelector("#shippingAddrModify")){
+			shippingAddrModify = document.querySelector("#shippingAddrModify")
+			shippingAddrModify.value = roadAddrPart1;
+		}
+		if(document.querySelector("#shippingDetailAddrModify")){
+			shippingDetailAddrModify = document.querySelector("#shippingDetailAddrModify")
+			shippingDetailAddrModify.value = addrDetail
+		}
 	}
+	
+	let IMP = window.IMP;      // 생략 가능
+	IMP.init("imp54017066"); // 예: imp00000000
+	
+	// 본인인증
+	function identify() {
+	      // IMP.certification(param, callback) 호출
+	      IMP
+	            .certification(
+	                  { // param
+	                     pg : 'MIIiasTest',//본인인증 설정이 2개이상 되어 있는 경우 필수 
+	                     merchant_uid : "ORD20180131-0000011", 
+	                     m_redirect_url : "http://localhost:8081/user/myPage", // 모바일환경에서 popup:false(기본값) 인 경우 필수, 예: https://www.myservice.com/payments/complete/mobile
+	                     popup : false
+	                  // PC환경에서는 popup 파라미터가 무시되고 항상 true 로 적용됨
+	                  },
+	                  function(rsp) { // callback
+	                     if (rsp.success) {
+	                        console.log(rsp);
+	                        $.ajax({
+	                			url : '/user/identityVerificationStatus', // 데이터를 수신받을 서버 주소
+	                			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+	                			dataType : 'json',
+	                			async : false,
+	                			success : function(data) {
+	                				console.log(data);
+	                				if(data == true){
+	                					location.href = "/user/myPage"
+	                				}
+	                			},
+	                			error : function() {
+	                			}
+	                		});
+	                     } else {
+	                        console.log("본인인증에 실패하였습니다. 에러 내용: " + rsp.error_msg);
+	                     }
+	                  });
+	   }
 
 	$(function() {
-		//변경 아이콘 클릭시
-		$('.fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber').click(
-				function() {
-					$('.newPhoneNumberEdit').show();
-				})
+		//전화번호변경 아이콘 클릭시
+		$('.fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber').click(function() {
+			$('.newPhoneNumberEdit').show();
+		})
+		//핸드폰번호 변경 아이콘 클릭시
+		$('.fa-regular.fa-pen-to-square.fa-xl.editCellPhoneNumber').click(function() {
+			$('.newCellPhoneNumberEdit').show();
+		})
+		//이메일 변경 아이콘 클릭시
 		$('.fa-regular.fa-pen-to-square.fa-xl.editEmail').click(function() {
 			$('.newEmailEdit').show();
+		})
+		//비밀번호 변경 아이콘 클릭시
+		$('.fa-regular.fa-pen-to-square.fa-xl.editUserPwd').click(function () {
+			$('.editNewUserPwd').show();
+		})
+		//환불변경 아이콘 클릭시
+		$('.fa-regular.fa-pen-to-square.fa-xl.refund').click(function () {
+			$('.editRefund').show()
 		})
 
 		// 새 비밀번호 입력 후
@@ -124,7 +197,17 @@
 		
 		//이메일 변경시 중복검사
 		$('#newEmail').blur(function () {
-			validEamil();
+			duplicateUserEmail();
+		})
+		
+		//전화번호 중복검사
+		$('#newUserPhonNumber').blur(function () {
+			duplicatePhoneNumber();
+		})
+		
+		//휴대폰번호 중복검사
+		$('#newCellPhoneNumber').blur(function() {
+			duplicateCellPhone();
 		})
 	})
 
@@ -142,7 +225,6 @@
 
 	//비밀번호 유효성검사
 	function validUserPwd() {
-		let isValidPwd = false;
 		let reg = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$/;
 		let pwd = $('#newPwd').val();
 		let pwdCheck = $('#newPwdCheck').val();
@@ -161,51 +243,176 @@
 					true)
 		} else if (reg.test(pwd) && reg.test(pwdCheck) && pwd == pwdCheck) {
 			printMsg('', 'newPwdCheck', '', false);
-			$('.fa-regular.fa-circle-check.fa-lg').show();
-			isValidPwd = true;
+			$('#successPwd').show();
 		}
-		return isValidPwd;
 	}
-
+	
 	//이메일 중복검사
-	function validEamil() {
-		let isValidEamil = false;
+	function duplicateUserEmail() {
 		let regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
-		let tmpEmail : $('#newEmail').val()
+		let tmpEmail = $('#newEmail').val()
 		
 		$.ajax({
-			url : '/user/validEamil', // 데이터를 수신받을 서버 주소
+			url : '/user/duplicateUserEmail', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-			data : {
+			data :{
 				tmpEmail
 			},
+			dataType : 'json',
 			async : false,
 			success : function(data) {
 				console.log(data);
-				if(data === false && regExp.test(tmpEmail) {
-					$('.mailCode').show();
-					printMsg("", "newEmail", "사용가능한 이메일 입니다.", false)
-					isValidEamil = true
+				if(data === false && regExp.test(tmpEmail)) {
+					printMsg("", "newEmail", "", false)
+					$('#successEmail').show()
 				}else if (data){
 					$('#newEmail').val('');
 					printMsg("newEmail", "newEmail", "중복된 이메일 입니다.", true)
 					$('.trueMsg').hide();
-					isValidEamil = false
 				}else if(!regExp.test(tmpEmail)){
 					$('#newEmail').val('');
 					printMsg("newEmail", "newEmail", "이메일 형식에 맞지 않습니다.", true)
 					$('.trueMsg').hide();
-					isValidEamil = false
 				}
 			},
 			error : function() {
 			}
 		});
-		return isValidEamil
 	}
+	
+	//전화번호 유효성 검사
+	function duplicatePhoneNumber() {
+		let newPhoneNumber = $('#newUserPhonNumber').val();
+		let regPhone = /^\d{2,3}-\d{3,4}-\d{4}$/;
+		
+		$.ajax({
+			url : '/user/duplicatePhoneNumber', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				newPhoneNumber
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data){ //중복
+					$('#newUserPhonNumber').val('');
+					printMsg("newUserPhonNumber", "newUserPhonNumber", "중복된 전화번호 입니다.", true)
+					$('.trueMsg').hide();
+				}else if(!regPhone.test(newPhoneNumber)){
+					$('#newUserPhonNumber').val('');
+					printMsg("newUserPhonNumber", "newUserPhonNumber", "전화번호 형식에 맞지 않습니다.", true)
+					$('.trueMsg').hide();
+				}else if(data == false && regPhone.test(newPhoneNumber)){
+					printMsg("", "newUserPhonNumber", "", false)
+					$('#successPhoneNumber').show();			
+				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//휴대폰번호 유효성 검사
+	function duplicateCellPhone() {
+		let newCellPhone = $('#newCellPhoneNumber').val();
+		let regCellPhone = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
+		
+		$.ajax({
+			url : '/user/duplicateCellPhone', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				newCellPhone
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data){//휴대폰번호 중복
+					$('#newCellPhoneNumber').val('');		
+					$('.trueMsg').hide();
+					printMsg("newCellPhoneNumber", "newCellPhoneNumber", "중복된 휴대폰번호 입니다.", true)
+				}else if(!regCellPhone.test(newCellPhone)){ //정규식에 맞지않음
+					$('#newCellPhoneNumber').val('');		
+					$('.trueMsg').hide();
+					printMsg("newCellPhoneNumber", "newCellPhoneNumber", "휴대폰번호 형식에 맞지 않습니다.", true)
+				}else if(data == false && regCellPhone.test(newCellPhone)){
+					printMsg("", "newCellPhoneNumber", "", false)
+					$('#successCellPhoneNumber').show();
+				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//배송주소록 추가
+	function addShippingAddress() {
+		let zipCode = $('#addZipNo').val()
+		let address = $('#addAddr').val()
+		let detailAddress = $('#addAddrDetail').val()
+		
+		$.ajax({
+			url : '/user/addShippingAddress', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				zipCode,
+				address,
+				detailAddress
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data == true){
+					$('#addZipNo').val('')
+					$('#addAddr').val('')
+					$('#addAddrDetail').val('')
+					
+					location.reload()
+				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//배송주소록 수정
+	function shippingAddrModify() {
+		let zipCode = $('#shippingZipNoModify').val()
+		let address = $('#shippingAddrModify').val()
+		let detailAddress = $('#shippingDetailAddrModify').val()
+			
+		$.ajax({
+			url : '/user/shippingAddrModify', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				zipCode,
+				address,
+				detailAddress
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				//if(data == true){
+				//	$('#addZipNo').val('')
+				//	$('#addAddr').val('')
+				//	$('#addAddrDetail').val('')
+					
+				//	location.reload()
+				//}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	
 </script>
 <style>
-#deliveryStatus {
+#deliveryStatus, #successPwd, #successPhoneNumber,
+	#successCellPhoneNumber, #successEmail, #successAddr, #successRefund {
 	display: flex;
 }
 
@@ -213,15 +420,16 @@
 	width: 184px;
 }
 
-.fa-regular.fa-circle-check.fa-lg, .newPhoneNumberEdit, .newEmailEdit,
-	.mailCode {
+.newPhoneNumberEdit, .newEmailEdit, .newCellPhoneNumberEdit,
+	.editNewUserPwd, .editRefund, #successPwd, #successPhoneNumber,
+	#successCellPhoneNumber, #successEmail {
 	display: none;
 }
 
-.fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber, .fa-regular.fa-pen-to-square.fa-xl.editEmail
-	{
+.fa-regular.fa-pen-to-square.fa-xl.editPhoneNumber, .fa-regular.fa-pen-to-square.fa-xl.editEmail,
+	.fa-regular.fa-pen-to-square.fa-xl.editCellPhoneNumber, .fa-regular.fa-pen-to-square.fa-xl.refund,
+	.fa-regular.fa-pen-to-square.fa-xl.editUserPwd {
 	cursor: pointer;
-	text-align: center;
 }
 
 .msg {
@@ -238,14 +446,20 @@
 	justify-content: center;
 }
 
-.form-floating.theme-form-floating.editPhoneNumber, .form-floating.theme-form-floating.editEmail
-	{
+.form-floating
+.theme-form-floating
+.editPhoneNumber, .form-floating
+.theme-form-floating
+.editEmail, .form-floating
+.theme-form-floating
+.editCellPhoneNumber, .form-floating
+.theme-form-floating
+.pwd {
 	display: flex;
-	justify-content: flex-end;
 }
 
-.btn.theme-bg-color.btn-md.text-white.delUser {
-	
+#authenticationMsg {
+	font-size: 18px;
 }
 </style>
 </head>
@@ -368,7 +582,7 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-							<button class="nav-link" id="pills-profile-tab"
+								<button class="nav-link" id="pills-profile-tab"
 									data-bs-toggle="pill" data-bs-target="#pills-profile"
 									type="button" role="tab" aria-controls="pills-profile"
 									aria-selected="false">
@@ -437,7 +651,8 @@
 										<h2>마이페이지</h2>
 										<span class="title-leaf"> <svg
 												class="icon-width bg-gray">
-                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+                          <use
+													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 									</div>
@@ -446,9 +661,9 @@
 										<div class="row g-sm-4 g-3">
 											<div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
 												<div class="totle-contain">
-													<img src="resources/assets/images/svg/order.svg"
+													<img src="/resources/assets/images/svg/order.svg"
 														class="img-1 blur-up lazyload" alt="" /> <img
-														src="resources/assets/images/svg/order.svg"
+														src="/resources/assets/images/svg/order.svg"
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>포인트</h5>
@@ -459,9 +674,9 @@
 
 											<div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
 												<div class="totle-contain">
-													<img src="resources/assets/images/svg/pending.svg"
+													<img src="/resources/assets/images/svg/pending.svg"
 														class="img-1 blur-up lazyload" alt="" /> <img
-														src="resources/assets/images/svg/pending.svg"
+														src="/resources/assets/images/svg/pending.svg"
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>적립금</h5>
@@ -472,9 +687,9 @@
 
 											<div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
 												<div class="totle-contain">
-													<img src="resources/assets/images/svg/wishlist.svg"
+													<img src="/resources/assets/images/svg/wishlist.svg"
 														class="img-1 blur-up lazyload" alt="" /> <img
-														src="resources/assets/images/svg/wishlist.svg"
+														src="/resources/assets/images/svg/wishlist.svg"
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>쿠폰</h5>
@@ -502,7 +717,7 @@
 																			<div class="product border-0">
 																				<a href="product-left-thumbnail.html"
 																					class="product-image"> <img
-																					src="resources/assets/images/vegetable/product/1.png"
+																					src="/resources/assets/images/vegetable/product/1.png"
 																					class="img-fluid blur-up lazyload" alt="" />
 																				</a>
 																				<div class="product-detail">
@@ -615,7 +830,8 @@
 										<h2>My Wishlist History</h2>
 										<span class="title-leaf title-leaf-gray"> <svg
 												class="icon-width bg-gray">
-                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+                          <use
+													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 									</div>
@@ -625,7 +841,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/2.png"
+															src="/resources/assets/images/cake/product/2.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -685,7 +901,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/3.png"
+															src="/resources/assets/images/cake/product/3.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -745,7 +961,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/4.png"
+															src="/resources/assets/images/cake/product/4.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -807,7 +1023,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/5.png"
+															src="/resources/assets/images/cake/product/5.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -868,7 +1084,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/6.png"
+															src="/resources/assets/images/cake/product/6.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -930,7 +1146,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/7.png"
+															src="/resources/assets/images/cake/product/7.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -991,7 +1207,7 @@
 												<div class="product-header">
 													<div class="product-image">
 														<a href="product-left-thumbnail.html"> <img
-															src="resources/assets/images/cake/product/2.png"
+															src="/resources/assets/images/cake/product/2.png"
 															class="img-fluid blur-up lazyload" alt="" />
 														</a>
 
@@ -1057,7 +1273,8 @@
 										<h2>주문내역</h2>
 										<span class="title-leaf title-leaf-gray"> <svg
 												class="icon-width bg-gray">
-                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+                          <use
+													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 
@@ -1138,7 +1355,7 @@
 									</div>
 								</div>
 							</div>
-							
+
 							<div class="tab-pane fade show" id="pills-profile"
 								role="tabpanel" aria-labelledby="pills-profile-tab">
 								<div class="dashboard-profile">
@@ -1146,7 +1363,8 @@
 										<h2>회원정보 수정</h2>
 										<span class="title-leaf"> <svg
 												class="icon-width bg-gray">
-                          <use xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+                          <use
+													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
 									</div>
@@ -1159,156 +1377,287 @@
 												</div>
 
 												<div class="input-box">
-													<form class="row g-4" action="#" method="post">
-														<div class="col-12">영어, 숫자, 특수문자 (!@#$%^*+=-) 를 1개이상
-															포함하여 8-15글자로 입력해주세요.</div>
+													<div class="row g-4">
+														<form class="row g-4" action="modifyUser" method="post">
 
-														<div class="col-12">
-															<div class="form-floating theme-form-floating">
-																<input type="password" class="form-control" id="newPwd"
-																	name="newPwd" placeholder="Full Name" /> <label
-																	for="newPwd">새 비밀번호</label>
+															<div class="col-12">
+																<div class="form-floating theme-form-floating pwd">
+																	<input type="password" class="form-control"
+																		id="userPwd" value="●●●●●●●●" readonly /> <label
+																		for="userPwd">비밀번호</label> <i
+																		class="fa-regular fa-pen-to-square fa-xl editUserPwd"></i>
+																</div>
 															</div>
-														</div>
 
-														<div class="col-12 newPwdEdit">
-															<div class="form-floating theme-form-floating">
-																<input type="password" class="form-control"
-																	id="newPwdCheck" name="newPwdCheck"
-																	placeholder="Full Name" /> <label for="newPwdCheck">새
-																	비밀번호 확인</label> <i class="fa-regular fa-circle-check fa-lg"
-																	style="color: #0e997e"></i>
+
+															<div class="col-12 editNewUserPwd">
+																<div class="form-floating theme-form-floating">
+																	<input type="password" class="form-control" id="newPwd"
+																		name="password" placeholder="새 비밀번호" /> <label
+																		for="newPwd">새 비밀번호</label>
+																	<div class="col-12">영어, 숫자, 특수문자 (!@#$%^*+=-) 를
+																		1개이상 포함하여 8-15글자로 입력해주세요.</div>
+																</div>
 															</div>
-														</div>
+
+															<div class="col-12 editNewUserPwd">
+																<div class="form-floating theme-form-floating">
+																	<input type="password" class="form-control"
+																		id="newPwdCheck" placeholder="새 비밀번호 확인 " /> <label
+																		for="newPwdCheck">새 비밀번호 확인</label>
+																	<div id="successPwd">
+																		<i class="fa-regular fa-circle-check fa-lg"
+																			style="color: #0e997e"></i>
+																		<button class="btn theme-bg-color btn-md text-white"
+																			type="submit">변경</button>
+																	</div>
+
+																</div>
+															</div>
+														</form>
+
 
 														<div class="col-12">
 															<div class="form-floating theme-form-floating">
 																<input type="text" class="form-control" id="userName"
-																	name="userName" placeholder="이름"
-																	value="${userInfo.name }" readonly /> <label
-																	for="userName">이름</label>
+																	placeholder="이름" value="${userInfo.name }" readonly />
+																<label for="userName">이름</label>
 															</div>
 														</div>
 
 														<div class="col-12">
 															<div class="form-floating theme-form-floating">
 																<input type="text" class="form-control" id="userBirth"
-																	name="userBirth" value="${userInfo.dateOfBirth }"
-																	placeholder="생년월일" readonly /> <label for="userBirth">생년월일</label>
+																	value="${userInfo.dateOfBirth }" placeholder="생년월일"
+																	readonly /> <label for="userBirth">생년월일</label>
 															</div>
 														</div>
 
 														<div class="col-12">
 															<div class="form-floating theme-form-floating">
-																<input type="text" class="form-control" id="userGender"
-																	name="userGender" value="${userInfo.gender }"
-																	placeholder="성별" readonly /> <label for="userGender">성별</label>
-															</div>
-														</div>
-														
-														<div class="col-12">
-															<div
-																class="form-floating theme-form-floating editPhoneNumber">
-																<input type="text" class="form-control"
-																	id="userPhonNumber" name="userPhonNumber"
-																	value="${userInfo.phoneNumber }" placeholder="휴대폰 번호"
-																	readonly /> <label for="userPhonNumber">휴대폰 번호</label>
-																<i
-																	class="fa-regular fa-pen-to-square fa-xl editPhoneNumber"></i>
-															</div>
-														</div>
-
-														<div class="col-12 newPhoneNumberEdit">
-															<div
-																class="form-floating theme-form-floating editPhoneNumber">
-																<input type="text" class="form-control"
-																	id="newPhoneNumber" name="newPhoneNumber"
-																	placeholder="새 휴대폰 번호" /> <label for="newPhoneNumber">새
-																	휴대폰 번호</label>
-																<button type="button"
-																	class="btn theme-bg-color btn-md text-white" onclick="">
-																	인증?</button>
-															</div>
-														</div>
-
-														<div class="col-12">
-															<div class="form-floating theme-form-floating editEmail">
-																<input type="email" class="form-control" id="userEmail"
-																	name="userEmail" value="${userInfo.email }"
-																	placeholder="이메일" readonly /> <label for="userEmail">이메일</label>
-																<i class="fa-regular fa-pen-to-square fa-xl editEmail"></i>
-															</div>
-														</div>
-
-														<div class="col-12 newEmailEdit">
-															<div class="form-floating theme-form-floating editEmail">
-																<input type="email" class="form-control" id="newEmail"
-																	name="newEmail" placeholder="이메일" /> <label
-																	for="newEmail">새 이메일</label>
-															</div>
-														</div>
-
-														<div class="col-12">
-															<button type="button"
-																class="btn theme-bg-color btn-md text-white"
-																onclick="goPopup();">주소 찾기</button>
-														</div>
-
-														<div class="col-12">
-															<div class="form-floating theme-form-floating">
-																<input type="text" class="form-control" id="zipNo"
-																	name="zipNo" value="${userInfo.zipCode}"
-																	placeholder="우편번호" readonly /> <label for="zipNo">우편번호</label>
-															</div>
-														</div>
-
-														<div class="col-12">
-															<div class="form-floating theme-form-floating">
-																<input type="text" class="form-control" id="userAddr"
-																	name="userAddr" value="${userInfo.address}"
-																	placeholder="주소" readonly /> <label for="userAddr">주소</label>
-															</div>
-														</div>
-
-														<div class="col-12">
-															<div class="form-floating theme-form-floating">
-																<input type="text" class="form-control"
-																	id="addrDetail" name="addrDetail"
-																	value="${userInfo.detailedAddress}" placeholder="상세주소" />
-																<label for="addrDetail">상세주소</label>
-															</div>
-														</div>
-
-													<div class="col-12">
-														<div class="forgot-box">
-															<div class="form-check ps-0 m-0 remember-box">
 																<c:choose>
-																	<c:when
-																		test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
-																		<input class="checkbox_animated check-box"
-																			type="checkbox" id="authentication" checked disabled />
-																		<label class="form-check-label" for="authentication">본인인증</label>
+																	<c:when test="${fn:contains(userInfo.gender,'F')}">
+																		<input type="text" class="form-control"
+																			id="userGender" value="여자" placeholder="성별" readonly />
+																		<label for="userGender">성별</label>
 																	</c:when>
 																	<c:otherwise>
-																		<input class="checkbox_animated check-box"
-																			type="checkbox" id="authentication" disabled />
-																		<label class="form-check-label" for="authentication">본인인증</label>
-																		<button>본인 인증</button>
+																		<input type="text" class="form-control"
+																			id="userGender" value="남자" placeholder="성별" readonly />
+																		<label for="userGender">성별</label>
 																	</c:otherwise>
 																</c:choose>
 															</div>
 														</div>
-													</div>
+														<form class="row g-4" action="modifyUser" method="post">
+															<div class="col-12">
+																<div
+																	class="form-floating theme-form-floating editPhoneNumber">
+																	<input type="text" class="form-control"
+																		id="userPhonNumber" value="${userInfo.phoneNumber }"
+																		placeholder="전화번호" readonly /> <label
+																		for="userPhonNumber">전화번호</label> <i
+																		class="fa-regular fa-pen-to-square fa-xl editPhoneNumber"></i>
+																</div>
+															</div>
 
-													<div class="col-12 modifyBtn">
-														<button class="btn theme-bg-color btn-md text-white"
-															type="submit">수정</button>
-													</div>
-												</form>
-													<div>
-														<button
-															class="btn theme-bg-color btn-md text-white delUser"
-															type="button">탈퇴</button>
+															<div class="col-12 newPhoneNumberEdit">
+																<div class="form-floating theme-form-floating">
+																	<input type="text" class="form-control"
+																		id="newUserPhonNumber" name="phoneNumber"
+																		placeholder="새 전화번호" /> <label
+																		for="newUserPhonNumber">새 전화번호</label>
+																	<h5>-포함해서 입력해주세요.</h5>
+																	<div id="successPhoneNumber">
+																		<i class="fa-regular fa-circle-check fa-lg"
+																			style="color: #0e997e"></i>
+																		<button class="btn theme-bg-color btn-md text-white"
+																			type="submit">변경</button>
+																	</div>
+																</div>
+															</div>
+														</form>
+
+														<form class="row g-4" action="modifyUser" method="post">
+															<div class="col-12">
+																<div
+																	class="form-floating theme-form-floating editCellPhoneNumber">
+																	<input type="text" class="form-control"
+																		id="cellPhoneNumber"
+																		value="${userInfo.cellPhoneNumber }"
+																		placeholder="휴대폰 번호" readonly /> <label
+																		for="cellPhoneNumber">휴대폰 번호</label> <i
+																		class="fa-regular fa-pen-to-square fa-xl editCellPhoneNumber"></i>
+																</div>
+															</div>
+
+															<div class="col-12 newCellPhoneNumberEdit">
+																<div
+																	class="form-floating theme-form-floating editCellPhoneNumber">
+																	<input type="text" class="form-control"
+																		id="newCellPhoneNumber" name="cellPhoneNumber"
+																		placeholder="새 휴대폰 번호" /> <label
+																		for="newCellPhoneNumber">새 휴대폰 번호</label>
+																	<h5>-포함해서 입력해주세요.</h5>
+																	<div id="successCellPhoneNumber">
+																		<i class="fa-regular fa-circle-check fa-lg"
+																			style="color: #0e997e"></i>
+																		<button class="btn theme-bg-color btn-md text-white"
+																			type="submit">변경</button>
+																	</div>
+																</div>
+															</div>
+														</form>
+
+														<form class="row g-4" action="modifyUser" method="post">
+															<div class="col-12">
+																<div class="form-floating theme-form-floating editEmail">
+																	<input type="email" class="form-control" id="userEmail"
+																		value="${userInfo.email }" placeholder="이메일" readonly />
+																	<label for="userEmail">이메일</label> <i
+																		class="fa-regular fa-pen-to-square fa-xl editEmail"></i>
+																</div>
+															</div>
+
+															<div class="col-12 newEmailEdit">
+																<div class="form-floating theme-form-floating editEmail">
+																	<input type="email" class="form-control" id="newEmail"
+																		name="email" placeholder="이메일" /> <label
+																		for="newEmail">새 이메일</label>
+																	<div id="successEmail">
+																		<i class="fa-regular fa-circle-check fa-lg"
+																			style="color: #0e997e"></i>
+																		<button class="btn theme-bg-color btn-md text-white"
+																			type="submit">변경</button>
+																	</div>
+																</div>
+															</div>
+														</form>
+
+														<form class="row g-4" action="modifyUser" method="post">
+															<div class="col-12">
+																<button type="button"
+																	class="btn theme-bg-color btn-md text-white"
+																	onclick="goPopup();">주소 찾기</button>
+
+															</div>
+
+															<div class="col-12">
+																<div class="form-floating theme-form-floating">
+																	<input type="text" class="form-control" id="zipNo"
+																		name="zipCode" value="${userInfo.zipCode}"
+																		placeholder="우편번호" readonly /> <label for="zipNo">우편번호</label>
+																</div>
+															</div>
+
+															<div class="col-12">
+																<div class="form-floating theme-form-floating">
+																	<input type="text" class="form-control" id="userAddr"
+																		name="address" value="${userInfo.address}"
+																		placeholder="주소" readonly /> <label for="userAddr">주소</label>
+																</div>
+															</div>
+
+															<div class="col-12">
+																<div class="form-floating theme-form-floating">
+																	<input type="text" class="form-control" id="addrDetail"
+																		name="detailedAddress"
+																		value="${userInfo.detailedAddress}" placeholder="상세주소" />
+																	<label for="addrDetail">상세주소</label>
+																	<div id="successAddr">
+																		<button class="btn theme-bg-color btn-md text-white"
+																			type="submit">변경</button>
+																	</div>
+																</div>
+															</div>
+														</form>
+
+														<form class="row g-4" action="modifyUser" method="post">
+															<div class="col-12">
+																<div class="form-floating theme-form-floating">
+																	<input type="text" class="form-control" id="refundBank"
+																		value="${userInfo.refundBank}" placeholder="환불은행"
+																		readonly /> <label for="refundBank">환불은행</label>
+																</div>
+															</div>
+
+															<div class="col-12">
+																<div class="form-floating theme-form-floating">
+																	<input type="text" class="form-control"
+																		id="refundAccount" value="${userInfo.refundAccount}"
+																		placeholder="환불계좌" readonly /> <label
+																		for="refundAccount">환불계좌</label> <i
+																		class="fa-regular fa-pen-to-square fa-xl refund"></i>
+																</div>
+															</div>
+
+															<div class="col-12 editRefund">
+																<div class="form-floating theme-form-floating">
+																	<select class="form-select"
+																		id="floatingSelect2 newRefundBank" name="refundBank"
+																		aria-label="Floating label select example">
+																		<option selected>환불받으실 은행을 선택해주세요.</option>
+																		<option value="KB국민은행">KB국민은행</option>
+																		<option value="신한은행">신한은행</option>
+																		<option value="우리은행">우리은행</option>
+																		<option value="하나은행">하나은행</option>
+																		<option value="SC제일은행">SC제일은행</option>
+																		<option value="씨티은행">씨티은행</option>
+																		<option value="NH농협은행">NH농협은행</option>
+																		<option value="수협은행">수협은행</option>
+																		<option value="케이뱅크">케이뱅크</option>
+																		<option value="카카오뱅크">카카오뱅크</option>
+																		<option value="토스뱅크">토스뱅크</option>
+																		<option value="대구은행">대구은행</option>
+																		<option value="BNK부산은행">BNK부산은행</option>
+																		<option value="경남은행">경남은행</option>
+																		<option value="광주은행">광주은행</option>
+																		<option value="전북은행">전북은행</option>
+																		<option value="제주은행">제주은행</option>
+																		<option value="우체국">우체국</option>
+																		<option value="새마을금고">새마을금고</option>
+																	</select> <label for="floatingSelect">환불은행</label>
+																</div>
+															</div>
+
+															<div class="col-12 editRefund">
+																<div class="form-floating theme-form-floating">
+																	<input type="text" class="form-control"
+																		id="newRefundAccount" name="refundAccount"
+																		placeholder="환불계좌" /> <label for="newRefundAccount">환불계좌</label>
+																	<div id="successRefund">
+																		<button class="btn theme-bg-color btn-md text-white"
+																			type="submit">변경</button>
+																	</div>
+																</div>
+															</div>
+														</form>
+
+														<div class="col-12">
+															<div class="forgot-box">
+																<div class="form-check ps-0 m-0 remember-box">
+																	<c:choose>
+																		<c:when
+																			test="${fn:contains(userInfo.identityVerificationStatus,'Y')}">
+																			<input class="checkbox_animated check-box"
+																				type="checkbox" id="authentication" checked disabled />
+																			<label class="form-check-label" for="authentication"><span
+																				id="authenticationMsg">본인인증</span></label>
+																		</c:when>
+																		<c:otherwise>
+																			<button class="btn theme-bg-color btn-md text-white"
+																				type="button" onclick="identify();">본인인증</button>
+																		</c:otherwise>
+																	</c:choose>
+																</div>
+															</div>
+														</div>
+
+														<div class="col-12 modifyBtn">
+															<button
+																class="btn theme-bg-color btn-md text-white delUser"
+																type="button" onclick="location.href='withdrawal';">탈퇴</button>
+														</div>
 													</div>
 												</div>
 
@@ -1317,7 +1666,7 @@
 											<div class="col-xxl-5">
 												<div class="profile-image">
 													<img
-														src="resources/assets/images/inner-page/dashboard-profile.png"
+														src="/resources/assets/images/inner-page/dashboard-profile.png"
 														class="img-fluid blur-up lazyload" alt="" />
 												</div>
 											</div>
@@ -1325,7 +1674,7 @@
 									</div>
 								</div>
 							</div>
-							
+
 							<div class="tab-pane fade show" id="pills-address"
 								role="tabpanel" aria-labelledby="pills-address-tab">
 								<div class="dashboard-address">
@@ -1335,11 +1684,15 @@
 											<span class="title-leaf"> <svg
 													class="icon-width bg-gray">
                             <use
-														xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+														xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                           </svg>
 											</span>
 										</div>
 
+										<button
+											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3">
+											<i data-feather=check class="me-2"></i> 기본배송지로 설정
+										</button>
 										<button
 											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
 											data-bs-toggle="modal" data-bs-target="#add-address">
@@ -1348,58 +1701,63 @@
 									</div>
 
 									<div class="row g-sm-4 g-3">
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
-											<div class="address-box">
-												<div>
-													<div class="form-check">
-														<input class="form-check-input" type="radio" name="jack"
-															id="flexRadioDefault1" />
+										<c:forEach var="addr" items="${userAddrList }">
+											<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
+												<div class="address-box">
+													<div>
+														<div class="form-check">
+															<input class="form-check-input" type="radio" name="jack"
+																id="flexRadioDefault1" />
+														</div>
+
+														<c:if test="${fn:contains(addr.basicAddr,'Y')}">
+															<div class="label">
+																<label>기본배송지</label>
+															</div>
+														</c:if>
+
+
+														<div class="table-responsive address-table">
+															<table class="table">
+																<tbody>
+																	<tr>
+																		<td colspan="2">${userInfo.name}</td>
+																	</tr>
+
+																	<tr>
+																		<td>우편번호 :</td>
+																		<td>
+																			<p>${addr.zipCode }</p>
+																		</td>
+																	</tr>
+
+																	<tr>
+																		<td>주소 :</td>
+																		<td>${addr.address }</td>
+																	</tr>
+
+																	<tr>
+																		<td>상세주소 :</td>
+																		<td>${addr.detailAddress }</td>
+																	</tr>
+																</tbody>
+															</table>
+														</div>
 													</div>
 
-													<div class="label">
-														<label>Home 2</label>
+													<div class="button-group">
+														<button class="btn btn-sm add-button w-100"
+															data-bs-toggle="modal" data-bs-target="#editProfile">
+															<i data-feather="edit"></i> Edit
+														</button>
+														<button class="btn btn-sm add-button w-100"
+															data-bs-toggle="modal" data-bs-target="#removeProfile">
+															<i data-feather="trash-2"></i> Remove
+														</button>
 													</div>
-
-													<div class="table-responsive address-table">
-														<table class="table">
-															<tbody>
-																<tr>
-																	<td colspan="2">Gary M. Bailey</td>
-																</tr>
-
-																<tr>
-																	<td>Address :</td>
-																	<td>
-																		<p>2135 Burning Memory Lane Philadelphia, PA 19135</p>
-																	</td>
-																</tr>
-
-																<tr>
-																	<td>Pin Code :</td>
-																	<td>+26</td>
-																</tr>
-
-																<tr>
-																	<td>Phone :</td>
-																	<td>+ 215-335-9916</td>
-																</tr>
-															</tbody>
-														</table>
-													</div>
-												</div>
-
-												<div class="button-group">
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#editProfile">
-														<i data-feather="edit"></i> Edit
-													</button>
-													<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#removeProfile">
-														<i data-feather="trash-2"></i> Remove
-													</button>
 												</div>
 											</div>
-										</div>
+										</c:forEach>
 									</div>
 								</div>
 							</div>
@@ -1413,7 +1771,7 @@
 											<span class="title-leaf"> <svg
 													class="icon-width bg-gray">
                             <use
-														xlink:href="resources/assets/svg/leaf.svg#leaf"></use>
+														xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                           </svg>
 											</span>
 										</div>
@@ -1450,7 +1808,7 @@
 															<h5>Audrey Carol</h5>
 														</div>
 														<div class="card-img">
-															<img src="resources/assets/images/payment-icon/1.jpg"
+															<img src="/resources/assets/images/payment-icon/1.jpg"
 																class="img-fluid blur-up lazyloaded" alt="" />
 														</div>
 													</div>
@@ -1497,7 +1855,7 @@
 															<h5>Leah Heather</h5>
 														</div>
 														<div class="card-img">
-															<img src="resources/assets/images/payment-icon/2.jpg"
+															<img src="/resources/assets/images/payment-icon/2.jpg"
 																class="img-fluid blur-up lazyloaded" alt="" />
 														</div>
 													</div>
@@ -1544,7 +1902,7 @@
 															<h5>mark jecno</h5>
 														</div>
 														<div class="card-img">
-															<img src="resources/assets/images/payment-icon/3.jpg"
+															<img src="/resources/assets/images/payment-icon/3.jpg"
 																class="img-fluid blur-up lazyloaded" alt="" />
 														</div>
 													</div>
@@ -1570,7 +1928,7 @@
 								</div>
 							</div>
 
-							
+
 
 							<div class="tab-pane fade show" id="pills-security"
 								role="tabpanel" aria-labelledby="pills-security-tab">
@@ -1694,53 +2052,36 @@
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
+
 				<div class="modal-body">
-					<form action="#" id="inputAddrInfo" method="post">
-						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control" id="newaddrName"
-								name="newaddrName" placeholder="배송지 이름을 입력해주세요." /> <label
-								for="newaddrName">배송지명</label>
-						</div>
 
-						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control" id="recipientName"
-								name="recipientName" placeholder="이름을 입력해주세요." /> <label
-								for="recipientName">받는 분</label>
-						</div>
+					<div>
+						<button type="button" class="btn theme-bg-color btn-md text-white"
+							onclick="goPopup();">주소 검색</button>
+					</div>
 
-						<div class="form-floating mb-4 theme-form-floating">
-							<input type="email" class="form-control"
-								id="recipientPhoneNumber" name="recipientPhoneNumber"
-								placeholder="연락처를 입력해주세요." /> <label for="recipientPhoneNumber">연락처</label>
-						</div>
+					<div class="form-floating mb-4 theme-form-floating">
+						<input type="text" class="form-control addZipNo" id="addZipNo"
+							name="zipCode" placeholder="우편번호" readonly />
+					</div>
 
-						<div>
-							<button type="button"
-								class="btn theme-bg-color btn-md text-white"
-								onclick="goPopup();">주소 검색</button>
-						</div>
+					<div class="form-floating mb-4 theme-form-floating">
+						<input type="text" class="form-control addAddr" id="addAddr"
+							name="address" placeholder="주소" readonly />
+					</div>
 
-						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control addZipNo" id="addZipNo"
-								name="addZipNo" placeholder="우편번호" readonly />
-						</div>
+					<div class="form-floating mb-4 theme-form-floating">
+						<input type="text" class="form-control addAddrDetail"
+							id="addAddrDetail" name="detailAddress" placeholder="상세 주소" /><label
+							for="addAddrDetail">상세주소</label>
+					</div>
 
-						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control addAddr" id="addAddr"
-								name="addAddr" placeholder="주소" readonly />
-						</div>
-
-						<div class="form-floating mb-4 theme-form-floating">
-							<input type="text" class="form-control addAddrDetail" id="addAddrDetail"
-								name="newAddrDetail" placeholder="상세 주소" /><label for="addAddrDetail">상세주소</label>
-						</div>
-					</form>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary btn-md"
-						data-bs-dismiss="modal">Close</button>
+						data-bs-dismiss="modal">닫기</button>
 					<button type="button" class="btn theme-bg-color btn-md text-white"
-						data-bs-dismiss="modal">Save changes</button>
+						onclick="addShippingAddress();" data-bs-dismiss="modal">저장</button>
 				</div>
 			</div>
 		</div>
@@ -1824,13 +2165,14 @@
 	<!-- Location Modal End -->
 
 	<!-- Edit Profile Start -->
+	<c:forEach var="addr" items="${userAddrList }">
 	<div class="modal fade theme-modal" id="editProfile" tabindex="-1"
 		aria-labelledby="exampleModalLabel2" aria-hidden="true">
 		<div
 			class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen-sm-down">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel2">Edit Profile</h5>
+					<h5 class="modal-title" id="exampleModalLabel2">배송지 수정</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<i class="fa-solid fa-xmark"></i>
@@ -1841,8 +2183,20 @@
 						<div class="col-xxl-12">
 							<form>
 								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="pname"
-										value="Jack Jennas" /> <label for="pname">Full Name</label>
+									<input type="text" class="form-control" id="recipientName"
+										value="${userInfo.name }" /> <label for="recipientName">이름</label>
+									
+								</div>
+							</form>
+						</div>
+
+						<button type="button" class="btn theme-bg-color btn-md text-white"
+							onclick="goPopup();">주소 찾기</button>
+						<div class="col-xxl-6">
+							<form>
+								<div class="form-floating theme-form-floating">
+									<input type="text" class="form-control" id="shippingZipNoModify" name="zipCode"
+										value="${addr.zipCode }" readonly/> <label for="shippingZipNoModify">우편번호</label>
 								</div>
 							</form>
 						</div>
@@ -1850,21 +2204,11 @@
 						<div class="col-xxl-6">
 							<form>
 								<div class="form-floating theme-form-floating">
-									<input type="email" class="form-control" id="email1"
-										value="vicki.pope@gmail.com" /> <label for="email1">Email
-										address</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-xxl-6">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input class="form-control" type="tel" value="4567891234"
-										name="mobile" id="mobile" maxlength="10"
+									<input class="form-control" type="text" value="${addr.address }"
+										name="address" id="shippingAddrModify" maxlength="10"
 										oninput="javascript: if (this.value.length > this.maxLength) this.value =
-                                            this.value.slice(0, this.maxLength);" />
-									<label for="mobile">Email address</label>
+                                            this.value.slice(0, this.maxLength);" readonly/>
+									<label for="shippingAddrModify">주소</label>
 								</div>
 							</form>
 						</div>
@@ -1872,87 +2216,25 @@
 						<div class="col-12">
 							<form>
 								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="address1"
-										value="8424 James Lane South San Francisco" /> <label
-										for="address1">Add Address</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-12">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="address2"
-										value="CA 94080" /> <label for="address2">Add Address
-										2</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-xxl-4">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<select class="form-select" id="floatingSelect1"
-										aria-label="Floating label select example">
-										<option selected>Choose Your Country</option>
-										<option value="kindom">United Kingdom</option>
-										<option value="states">United States</option>
-										<option value="fra">France</option>
-										<option value="china">China</option>
-										<option value="spain">Spain</option>
-										<option value="italy">Italy</option>
-										<option value="turkey">Turkey</option>
-										<option value="germany">Germany</option>
-										<option value="russian">Russian Federation</option>
-										<option value="malay">Malaysia</option>
-										<option value="mexico">Mexico</option>
-										<option value="austria">Austria</option>
-										<option value="hong">Hong Kong SAR, China</option>
-										<option value="ukraine">Ukraine</option>
-										<option value="thailand">Thailand</option>
-										<option value="saudi">Saudi Arabia</option>
-										<option value="canada">Canada</option>
-										<option value="singa">Singapore</option>
-									</select> <label for="floatingSelect">Country</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-xxl-4">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<select class="form-select" id="floatingSelect">
-										<option selected>Choose Your City</option>
-										<option value="kindom">India</option>
-										<option value="states">Canada</option>
-										<option value="fra">Dubai</option>
-										<option value="china">Los Angeles</option>
-										<option value="spain">Thailand</option>
-									</select> <label for="floatingSelect">City</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-xxl-4">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="address3"
-										value="94080" /> <label for="address3">Pin Code</label>
+									<input type="text" class="form-control" id="shippingDetailAddrModify"
+										value="${addr.detailAddress }" /> <label
+										for="shippingDetailAddrModify">상세주소</label>
 								</div>
 							</form>
 						</div>
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-animation btn-md fw-bold"
-						data-bs-dismiss="modal">Close</button>
 					<button type="button" data-bs-dismiss="modal"
-						class="btn theme-bg-color btn-md fw-bold text-light">
-						Save changes</button>
+						class="btn theme-bg-color btn-md fw-bold text-light" onclick="shippingAddrModify();">
+						변경</button>
+					<button type="button" class="btn btn-animation btn-md fw-bold"
+						data-bs-dismiss="modal">닫기</button>
 				</div>
 			</div>
 		</div>
 	</div>
+	</c:forEach>
 	<!-- Edit Profile End -->
 
 	<!-- Edit Card Start -->

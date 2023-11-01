@@ -8,10 +8,8 @@ import lombok.Data;
 public class SearchMemberRequest {
 	private String ageStart;
 	private String ageEnd;
-	private Date registrationDate;
 	private Date registrationDateStart;
 	private Date registrationDateEnd;
-	private String dateOfBirth;
 	private String dateOfBirthStart;
 	private String dateOfBirthEnd;
 	private String name;
@@ -23,4 +21,24 @@ public class SearchMemberRequest {
 	private Character gender;
 	private String address;
 	private String detailedAddress;
+	private String orderAmountStart;
+	private String orderAmountEnd;
+	private String actualPaymentAmountStart;
+	private String actualPaymentAmountEnd;
+	private String orderCountStart;
+	private String orderCountEnd;
+	private String actualOrderCountStart;
+	private String actualOrderCountEnd;
+	private String orderDateStart;
+	private String orderDateEnd;
+	private String paymentDateStart;
+	private String paymentDateEnd;
+	private String orderItem;
+	private String totalRewardsStart;
+	private String totalRewardsEnd;
+	private String totalPointsStart;
+	private String totalPointsEnd;
+	private Date lastLoginDateStart;
+	private Date lastLoginDateEnd;
+	private Character dormantAccount;
 }

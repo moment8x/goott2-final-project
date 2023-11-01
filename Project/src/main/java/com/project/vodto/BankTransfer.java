@@ -15,11 +15,11 @@ import lombok.ToString;
 @ToString
 public class BankTransfer {
    private String paymentNumber;
-   private int orderNo;
+   private String orderNo;
    private String bankName;
    private String payerName;
    private int depositAmount;
    private Timestamp paymentTime;
    private String depositedAccount;
-   private int pay_to_amount;
+   private int amount_to_pay;
 }
