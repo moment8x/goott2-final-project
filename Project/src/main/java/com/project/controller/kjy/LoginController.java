@@ -52,7 +52,6 @@ public class LoginController {
 	
 	@RequestMapping("/")
 	public String goLogin(HttpServletRequest request, HttpServletResponse response) {
-//	
 		
 		return "/login/login";
 	}

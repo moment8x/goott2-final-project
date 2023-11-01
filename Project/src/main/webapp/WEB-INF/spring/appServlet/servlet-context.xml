@@ -52,6 +52,17 @@
 		</interceptor>
 	</interceptors>
 	
+	<beans:bean id="createOrderIdInterceptor"
+		class="com.project.interceptor.kjy.createOrderId">
+	</beans:bean>
+	
+	<interceptors>
+		<interceptor>
+			<mapping path="/order/requestOrder"/>
+			<beans:ref bean="createOrderIdInterceptor"/>
+		</interceptor>
+	</interceptors>
+	
 	<!-- 아래의 패키지를 스캔하여 객체 확보 -->
 	<context:component-scan base-package="com.project.controller" />
 </beans:beans>
