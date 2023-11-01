@@ -23,7 +23,7 @@ import com.project.service.kym.detailService;
 @RequestMapping("/detail/*")
 @CrossOrigin(origins="*")
 public class detailController {
-    private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
+   
 	
 	
 	@Inject
