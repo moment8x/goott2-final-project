@@ -1,15 +1,20 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo, useEffect, useMemo, useState } from 'react';
 import Card from '@/components/ui/Card';
 import Icon from '@/components/ui/Icon';
+import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
 import Tooltip from '@/components/ui/Tooltip';
 import { useTable, useRowSelect, useSortBy, usePagination } from 'react-table';
+import { Link } from 'react-router-dom';
+import MemberInfoModal from './member-modal';
+import Modal from '@/components/ui/Modal';
 
 const COLUMNS = [
   {
     Header: '가입일',
     accessor: 'registrationDate',
     Cell: (row) => {
-      return <span>{row?.cell?.value}</span>;
+      return <span>{(row?.cell?.value).replace(' 00:00:00.0', '')}</span>;
     },
   },
   {
@@ -75,20 +80,20 @@ const COLUMNS = [
     Cell: (row) => {
       return (
         row?.cell?.value !== '' && (
-          <div className="flex space-x-3 rtl:space-x-reverse">
-            <Tooltip content="주문" placement="top" arrow animation="shift-away">
-              <button className="action-btn" type="button">
-                <Icon icon="heroicons:eye" />
+          <div className='flex space-x-3 rtl:space-x-reverse'>
+            <Tooltip content='주문' placement='top' arrow animation='shift-away'>
+              <button className='action-btn' type='button'>
+                <Icon icon='heroicons:eye' />
               </button>
             </Tooltip>
-            <Tooltip content="적립금" placement="top" arrow animation="shift-away">
-              <button className="action-btn" type="button">
-                <Icon icon="heroicons:pencil-square" />
+            <Tooltip content='적립금' placement='top' arrow animation='shift-away'>
+              <button className='action-btn' type='button'>
+                <Icon icon='heroicons:pencil-square' />
               </button>
             </Tooltip>
-            <Tooltip content="쿠폰" placement="top" arrow animation="shift-away" theme="danger">
-              <button className="action-btn" type="button">
-                <Icon icon="heroicons:trash" />
+            <Tooltip content='쿠폰' placement='top' arrow animation='shift-away' theme='danger'>
+              <button className='action-btn' type='button'>
+                <Icon icon='heroicons:trash' />
               </button>
             </Tooltip>
           </div>
@@ -102,13 +107,13 @@ const IndeterminateCheckbox = React.forwardRef(({ indeterminate, ...rest }, ref)
   const defaultRef = React.useRef();
   const resolvedRef = ref || defaultRef;
 
-  React.useEffect(() => {
+  useEffect(() => {
     resolvedRef.current.indeterminate = indeterminate;
   }, [resolvedRef, indeterminate]);
 
   return (
     <>
-      <input type="checkbox" ref={resolvedRef} {...rest} className="table-checkbox" />
+      <input type='checkbox' ref={resolvedRef} {...rest} className='table-checkbox' />
     </>
   );
 });
@@ -116,6 +121,13 @@ const IndeterminateCheckbox = React.forwardRef(({ indeterminate, ...rest }, ref)
 const SearchedMember = ({ title = '회원 목록', data }) => {
   const columns = useMemo(() => COLUMNS, []);
   // // const data = useMemo(() => searchedInfo, []);
+  const [totalMember, setTotalMember] = useState(0);
+
+  const [showModal, setShowModal] = useState(false);
+
+  const openModal = () => {
+    setShowModal(!showModal);
+  };
 
   const tableInstance = useTable(
     {
@@ -177,27 +189,61 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
     return Array.from({ length: end - start }, (_, i) => start + i);
   }, [pageIndex, totalPages]);
 
+  useEffect(() => {
+    fetch('http://localhost:8081/admin/members/member-info', { method: 'GET' })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log('res:', res);
+        setTotalMember(res.total);
+      });
+  }, []);
+
   return (
     <>
+      {showModal && (
+        <MemberInfoModal
+          title='Extra large modal'
+          label='Extra large modal'
+          labelClass='btn-outline-dark'
+          uncontrol
+          className='max-w-fit'
+          showModal={showModal}
+          setShowModal={setShowModal}
+        >
+          <h4 class='font-medium text-lg mb-3 text-slate-900'>Lorem ipsum dolor sit.</h4>
+          <div class='text-base text-slate-600 dark:text-slate-300'>
+            Oat cake ice cream candy chocolate cake chocolate cake cotton candy dragée apple pie. Brownie carrot cake
+            candy canes bonbon fruitcake topping halvah. Cake sweet roll cake cheesecake cookie chocolate cake
+            liquorice.
+          </div>
+        </MemberInfoModal>
+      )}
       <Card>
-        <div className="md:flex justify-between items-center mb-6">
-          <h4 className="card-title font-black">{title}</h4>
+        <div className='md:flex items-center mb-6'>
+          <h4 className='card-title font-black'>{title}</h4>
+          <Button className='btn-secondary ml-5 p-[7px] pointer-events-none'>
+            <div className='space-x-1 rtl:space-x-reverse'>
+              <span>총 회원 수</span>
+              <Badge label={totalMember} className='bg-white text-slate-900 ' />
+              <span>명</span>
+            </div>
+          </Button>
         </div>
-        <div className="overflow-x-auto -mx-6">
-          <div className="inline-block min-w-full align-middle">
-            <div className="overflow-hidden ">
+        <div className='overflow-x-auto -mx-6'>
+          <div className='inline-block min-w-full align-middle'>
+            <div className='overflow-hidden '>
               <table
-                className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700"
+                className='min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700'
                 {...getTableProps}
               >
-                <thead className="bg-slate-200 dark:bg-slate-700">
+                <thead className='bg-slate-200 dark:bg-slate-700'>
                   {headerGroups.map((headerGroup) => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
                       {headerGroup.headers.map((column) => (
                         <th
                           {...column.getHeaderProps(column.getSortByToggleProps())}
-                          scope="col"
-                          className=" table-th "
+                          scope='col'
+                          className=' table-th '
                         >
                           {column.render('Header')}
                           <span>{column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}</span>
@@ -207,7 +253,7 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
                   ))}
                 </thead>
                 <tbody
-                  className="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700"
+                  className='bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700'
                   {...getTableBodyProps}
                 >
                   {page.map((row) => {
@@ -216,8 +262,10 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
                       <tr {...row.getRowProps()}>
                         {row.cells.map((cell) => {
                           return (
-                            <td {...cell.getCellProps()} className="table-td">
-                              {cell.render('Cell')}
+                            <td {...cell.getCellProps()} className='table-td'>
+                              <Link to='' onClick={openModal}>
+                                {cell.render('Cell')}
+                              </Link>
                             </td>
                           );
                         })}
@@ -229,10 +277,10 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
             </div>
           </div>
         </div>
-        <div className="md:flex md:space-y-0 space-y-5 justify-between mt-6 items-center">
-          <div className=" flex items-center space-x-3 rtl:space-x-reverse">
+        <div className='md:flex md:space-y-0 space-y-5 justify-between mt-6 items-center'>
+          <div className=' flex items-center space-x-3 rtl:space-x-reverse'>
             <select
-              className="form-control py-2 w-max"
+              className='form-control py-2 w-max'
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
             >
@@ -242,24 +290,24 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
                 </option>
               ))}
             </select>
-            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+            <span className='text-sm font-medium text-slate-600 dark:text-slate-300'>
               Page{' '}
               <span>
                 {pageIndex + 1} of {pageOptions.length}
               </span>
             </span>
           </div>
-          <ul className="flex items-center  space-x-3  rtl:space-x-reverse">
-            <li className="text-xl leading-4 text-slate-900 dark:text-white rtl:rotate-180">
+          <ul className='flex items-center  space-x-3  rtl:space-x-reverse'>
+            <li className='text-xl leading-4 text-slate-900 dark:text-white rtl:rotate-180'>
               <button
                 className={` ${!canPreviousPage ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={() => gotoPage(0)}
                 disabled={!canPreviousPage}
               >
-                <Icon icon="heroicons:chevron-double-left-solid" />
+                <Icon icon='heroicons:chevron-double-left-solid' />
               </button>
             </li>
-            <li className="text-sm leading-4 text-slate-900 dark:text-white rtl:rotate-180">
+            <li className='text-sm leading-4 text-slate-900 dark:text-white rtl:rotate-180'>
               <button
                 className={` ${!canPreviousPage ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={() => previousPage()}
@@ -271,8 +319,8 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
             {pages.map((page, pageIdx) => (
               <li key={pageIdx}>
                 <button
-                  href="#"
-                  aria-current="page"
+                  href='#'
+                  aria-current='page'
                   className={` ${
                     page === pageIndex
                       ? 'bg-slate-900 dark:bg-slate-600  dark:text-slate-200 text-white font-medium '
@@ -284,7 +332,7 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
                 </button>
               </li>
             ))}
-            <li className="text-sm leading-4 text-slate-900 dark:text-white rtl:rotate-180">
+            <li className='text-sm leading-4 text-slate-900 dark:text-white rtl:rotate-180'>
               <button
                 className={` ${!canNextPage ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={() => nextPage()}
@@ -293,13 +341,13 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
                 Next
               </button>
             </li>
-            <li className="text-xl leading-4 text-slate-900 dark:text-white rtl:rotate-180">
+            <li className='text-xl leading-4 text-slate-900 dark:text-white rtl:rotate-180'>
               <button
                 onClick={() => gotoPage(pageCount - 1)}
                 disabled={!canNextPage}
                 className={` ${!canNextPage ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <Icon icon="heroicons:chevron-double-right-solid" />
+                <Icon icon='heroicons:chevron-double-right-solid' />
               </button>
             </li>
           </ul>
