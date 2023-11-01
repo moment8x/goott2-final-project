@@ -26,8 +26,11 @@ public class PaymentDTO {
 	private int actual_payment_amount;
 	private Timestamp payment_time;
 	private int amount_to_pay;
-	private List<String> product_id;
-	private List<Integer> product_price;
+//	private List<String> product_id;
+//	private List<Integer> product_price;// quantity
+	private List<DetailOrderItem> products;
 	private String card_name;
 	private String card_number;
+	private String recipient_name;
+	
 }

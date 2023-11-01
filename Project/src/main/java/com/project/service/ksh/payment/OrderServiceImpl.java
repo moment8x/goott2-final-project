@@ -14,7 +14,7 @@ import com.mchange.v2.sql.filter.SynchronizedFilterDataSource;
 import com.project.dao.ksh.order.OrderDAO;
 import com.project.vodto.DetailOrderItem;
 import com.project.vodto.NonOrderHistory;
-
+import com.project.vodto.OrderInfo;
 import com.project.vodto.PaymentDTO;
 import com.project.vodto.Product;
 
@@ -44,7 +44,10 @@ public class OrderServiceImpl implements OrderService {
 				System.out.println("결제 테이블 저장");
 				if(od.saveDetailItems(itemList)>0) { // 주문 상세
 					System.out.println("주문 상세 테이블 저장");
-					result = true;
+					if(od.saveBankTransfer(pd)>0) {
+						System.out.println("무통장 입금 테이블 저장");
+						result = true;
+					}
 				}
 			}
 		} else { // 카드 및 간편결제
@@ -80,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public boolean saveOrderHistory(NonOrderHistory noh) throws Exception {
 		boolean result = false;
-		System.out.println("저장전?");
+	
 		if(od.insertNewOrderHistory(noh)>0) {
 			System.out.println("주문내역 테이블 저장 성공");
 			
@@ -100,9 +103,8 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public List<Product> getProductInfo(String[] product_id) {
-		boolean result = false;
-		List<Product> productInfos = od.getProductInfo(product_id);
+	public List<OrderInfo> getProductInfo(List<String> product_id) throws Exception {
+		List<OrderInfo> productInfos = od.getProductInfo(product_id);
 		return productInfos;
 	}
 

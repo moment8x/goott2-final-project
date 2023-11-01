@@ -14,28 +14,28 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Product {
-	private String product_id;
-	private String product_name;
-	private int consumer_price;
-	private int supply_price;
-	private int selling_price;
+	private String productId;
+	private String productName;
+	private int consumerPrice;
+	private int supplyPrice;
+	private int sellingPrice;
 	private String isbn;
-	private String product_image;
-	private String product_info_image;
-	private String author_translator;
-	private String original_author;
+	private String productImages;
+	private String productInfoImage;
+	private String authorTranslator;
+	private String originalAuthor;
 	private String illustrator;
 	private String publisher;
-	private Timestamp publication_date;
-	private int page_count;
+	private Timestamp publicationDate;
+	private String pageCount;
 	private String size;
-	private int total_volume;
-	private String author_introduction;
-	private String introduction_intro;
-	private String introduction_detail;
-	private String table_of_contents;
-	private int notification_subscription;
-	private int best_seller_status;
-	private String category_key;
-	private String product_images;
+	private int totalVolume;
+	private String authorIntroduction;
+	private String introductionIntro;
+	private String introductionDetail;
+	private String tableOfContents;
+	private int notificationSubscription;
+	private int bestSellerStatus;
+	private String categoryKey;
+	private int currentQuantity;
 }

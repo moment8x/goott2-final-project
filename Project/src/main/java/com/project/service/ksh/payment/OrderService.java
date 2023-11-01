@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.project.vodto.DetailOrderItem;
 import com.project.vodto.NonOrderHistory;
+import com.project.vodto.OrderInfo;
 import com.project.vodto.Payment;
 import com.project.vodto.PaymentDTO;
 import com.project.vodto.Product;
@@ -28,7 +29,7 @@ public interface OrderService {
 	
 	Map<String, Object>getPaymentDetail(String orderNo) throws Exception;
 
-	List<Product> getProductInfo(String[] product_id);
+	List<OrderInfo> getProductInfo(List<String> product_id) throws Exception;
 
 	
 

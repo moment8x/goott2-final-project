@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,6 +12,7 @@
 <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+
 <script>
 	$(function() {
 
@@ -18,19 +21,21 @@
 		$("#zip_code").val("12321");
 		$("#delivery_status").val("출고전");
 	});
+	
+
 	let IMP = window.IMP;
 	IMP.init("${impKey}") // 예: 'imp00000000a'
-	console.log("${requestScope.impKey}");
 	let isPaid = false;
 	let orderId = ('${requestScope.orderId}');
-	console.log(orderId);
+	//console.log(orderId);
 	function getOrderId() {
 
 		console.log(orderId);
 		console.log($("#non_order_no").val());
+		
 	}
-	products = [ 'S000208574421', 'S000202281617' ];
-	price = [ 100, 100 ];
+		
+			
 
 	function identify() {
 		// IMP.certification(param, callback) 호출
@@ -46,6 +51,7 @@
 						function(rsp) { // callback
 							if (rsp.success) {
 								alert("본인인증 성공");
+								console.log(rsp);
 							} else {
 								alert("본인인증에 실패하였습니다. 에러 내용: " + rsp.error_msg);
 							}
@@ -77,7 +83,7 @@
 					async : false,
 				}).done(function(data) {
 					console.log(data);
-
+					
 					// 결제 내역 저장 ajax
 					obj = {
 						"payment_number" : rsp.imp_uid, // 결제번호
@@ -94,9 +100,12 @@
 						"product_price" : price,
 						"card_name" : data.response.cardName,
 						"card_number" : data.response.cardNumber,
+						"recipient_name" : $("#recipient_name").val(),
+						
 
 					// 선택한 상품 보내줘야함
 					};
+					
 
 					$.ajax({
 						url : "/pay/output/",
@@ -184,7 +193,7 @@
 		if ($("input[name='payMethod']").is(':checked')) {
 			// 전체 radio 중에서 하나라도 체크되어 있는지 확인
 			// 아무것도 선택안되어있으면, false
-
+			
 			let payMethod = $("input[name='payMethod']:checked").val();
 			// score의 라디오 중 체크된 것의 값만 가져옴
 			// 아무것도 선택안되어있으면, undefined
@@ -192,6 +201,25 @@
 			if (payMethod == "bkt") {
 				let bktPayNo = "bkt"
 						+ ((String(new Date().getTime())).substring(1));
+				$("#delivery_status").val("입금전");
+				
+				// 상품이 2개면
+				products = [{
+					"non_order_no" : orderId,
+					"product_id" : 1,
+					"product_price" : 2,
+					"product_quantity" : 3,
+					"product_status" : $("#delivery_status").val(),
+					
+			},{
+				"non_order_no" : orderId,
+				"product_id" : 4,
+				"product_price" : 5,
+				"product_quantity" : 6,
+				"product_status" : $("#delivery_status").val(),
+
+				
+			},];
 				obj = {
 					"payment_number" : bktPayNo, // 결제번호 생성 코드 필요
 					"non_order_no" : orderId, // 주문번호
@@ -200,11 +228,13 @@
 					"shipping_fee" : 0, // 배송비
 					"used_points" : 0, // 사용한 포인트
 					"used_reward" : 0, // 사용한 적립금
+					"amount_to_pay" : 200, // (total+배송비-포인트-적립금)
 					"actual_payment_amount" : 0, // 실 결제 금액(무통장입금은 default 0)
-					"product_id" : products,
-					"product_price" : price,
-
+					"recipient_name" : $("#recipient_name").val(),
+					products,
+					
 				};
+				console.log(obj);
 
 				$.ajax({
 					url : "/pay/output",
@@ -213,12 +243,12 @@
 					data : JSON.stringify(obj),
 					async : false,
 					success : function(result) {
+						
 						isPaid = true;
-						console.log("ajax 결과 : ", isPaid);
-						
-						
-						
+						console.log(result);
+
 						if (isPaid) {
+							// 주문 완료 페이지에 필요한 것
 							$("#requestOrder").submit();
 						}
 						// alert("결제 완료");
@@ -241,7 +271,9 @@
 </head>
 <body>
 	<jsp:include page="../header.jsp"></jsp:include>
+
 	<!-- mobile fix menu start -->
+
 	<div class="mobile-menu d-md-none d-block mobile-cart">
 		<ul>
 			<li class="active"><a href="index.html"> <i
@@ -290,8 +322,8 @@
 	<!-- Breadcrumb Section End -->
 	<!-- Checkout section Start -->
 	<section class="checkout-section-2 section-b-space">
+		<div>${requestScope.productInfos }</div>
 		<form action="orderComplete" method="post" id="requestOrder">
-
 			<input type="hidden" name="non_order_no" id="non_order_no" value="">
 			<input type="hidden" name="non_member_id" value="" id="non_member_id"><input
 				type="hidden" name="zip_code" value="" id="zip_code"><input
@@ -354,7 +386,7 @@
 																	<li>
 																		<h6 class="text-content">
 																			<span class="text-title">수령인: </span> <input
-																				name="recipient_name">
+																				id="recipient_name" name="recipient_name">
 																		</h6>
 																	</li>
 
@@ -573,7 +605,7 @@
 																		class="form-floating theme-form-floating date-box">
 																		<input type="date" class="form-control"> <label>Select
 																			Date</label>
-																	</form>
+																	
 																</div>
 															</div>
 														</div>
@@ -868,17 +900,18 @@
 								<div class="summery-header">
 									<h3>Order Summery</h3>
 								</div>
-
 								<ul class="summery-contain">
-									<li><img
-										src="/resources/assets/images/vegetable/product/1.png"
-										class="img-fluid blur-up lazyloaded checkout-image" alt="">
-										<h4>
-											Bell pepper <span>X 1</span>
-										</h4>
-										<h4 class="price">$32.34</h4></li>
+									<c:forEach var="info" items="${requestScope.productInfos }">
+										<li id="${info.product_id }"><img
+											src="${info.product_image }"
+											class="img-fluid blur-up lazyloaded checkout-image" alt="">
+											<h4>
+												${info.product_name } <span>X ${info.product_quantity }</span>
+											</h4>
+											<h4 class="price">${info.calculated_price }원</h4></li>
+									</c:forEach>
 
-									<li><img
+									<!-- <li><img
 										src="/resources/assets/images/vegetable/product/2.png"
 										class="img-fluid blur-up lazyloaded checkout-image" alt="">
 										<h4>
@@ -916,7 +949,7 @@
 										<h4>
 											Broccoli <span>X 2</span>
 										</h4>
-										<h4 class="price">$29.69</h4></li>
+										<h4 class="price">$29.69</h4></li> -->
 								</ul>
 
 								<ul class="summery-total">
@@ -979,6 +1012,9 @@
 							<button type="button"
 								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
 								onclick="identify()">본인 인증</button>
+							<button type="button"
+								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
+								onclick="getOrderId()">테스트</button>
 						</div>
 					</div>
 				</div>

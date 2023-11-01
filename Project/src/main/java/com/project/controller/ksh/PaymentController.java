@@ -9,12 +9,14 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,7 @@ import com.project.service.ksh.payment.OrderService;
 import com.project.vodto.PaymentDTO;
 import com.project.vodto.CancelDatas;
 import com.project.vodto.DetailOrderItem;
+import com.project.vodto.OrderInfo;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
@@ -38,8 +41,7 @@ import com.siot.IamportRestClient.response.IamportResponse;
 public class PaymentController {
 
 	private IamportClient api;
-	public PaymentDTO pdto;
-	public List<DetailOrderItem> itemListdto;
+	
 
 	public PaymentController() {
 		// REST API 키와 REST API secret 를 아래처럼 순서대로 입력한다.
@@ -70,29 +72,28 @@ public class PaymentController {
 	@RequestMapping(value = "output", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> nonPaymentOutput(@RequestBody PaymentDTO pd) {
 		ResponseEntity<Map<String, Object>> result = null;
-//		System.out.println(pd.toString());
-//		pdto = pd;
 		
-
+		System.out.println("pd : " + pd.toString());
+		
 		// 주문 상세 리스트 생성
-		List<DetailOrderItem> itemList = new ArrayList<DetailOrderItem>();
+		List<DetailOrderItem> itemList = pd.getProducts();
+		System.out.println(itemList.toString());
 
 		// ajax로 받은 PaymentDTO에서 주문 상세 상품만 getter로 뽑아 주문 상세 vo 생성 후 리스트 추가
-		for (int i = 0; i < pd.getProduct_id().size(); i++) {
-			itemList.add(
-					new DetailOrderItem(pd.getNon_order_no(), pd.getProduct_id().get(i), pd.getProduct_price().get(i)));
-		}
-//		itemListdto = itemList;
+//		for (int i = 0; i < pd.getProduct_id().size(); i++) {
+//			itemList.add(
+//					new DetailOrderItem(pd.getNon_order_no(), pd.getProduct_id().get(i), pd.getProduct_price().get(i)));
+//		}
+
 		
 		Map<String, Object> paymentDetail = new HashMap<String, Object>();
 		try {
 
-			// 결제 테이블, 주문 상세 테이블 저장
+			// 결제 테이블, 주문 상세 테이블, 무통장입금일 시 무통장입금 또한 저장
 			if (os.savePayment(pd, itemList)) {
-				result = new ResponseEntity<Map<String, Object>>(paymentDetail, HttpStatus.OK);
+				result = new ResponseEntity<Map<String, Object>>(paymentDetail, HttpStatus.OK); // 아작스로 돌아가서 쓸모없음
 				paymentDetail.put("itemList", itemList);
 				paymentDetail.put("pd", pd);
-				System.out.println("무통장 입금 결제 정보 저장");
 			} else {
 				result = new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
@@ -117,4 +118,6 @@ public class PaymentController {
 		return api.cancelPaymentByImpUid(cancelData);
 
 	}
+	
+	
 }

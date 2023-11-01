@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.project.vodto.DetailOrderItem;
 import com.project.vodto.NonOrderHistory;
+import com.project.vodto.OrderInfo;
 import com.project.vodto.Payment;
 import com.project.vodto.PaymentDTO;
 import com.project.vodto.Product;
@@ -17,9 +18,11 @@ public interface OrderDAO {
 
 	int insertNewOrderHistory(NonOrderHistory noh) throws Exception;
 
-	Payment getPaymentHistory(String orderNo);
+	Payment getPaymentHistory(String orderNo) throws Exception;
 
-	List<Product> getProductInfo(String[] product_id);
+	List<OrderInfo> getProductInfo(List<String> product_id) throws Exception;
+
+	int saveBankTransfer(PaymentDTO pd) throws Exception;
 	
 	
 }
