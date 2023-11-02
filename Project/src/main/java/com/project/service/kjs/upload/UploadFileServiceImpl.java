@@ -1,8 +1,13 @@
 package com.project.service.kjs.upload;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.Calendar;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 
 import com.project.vodto.UploadFile;
 
@@ -10,13 +15,70 @@ import com.project.vodto.UploadFile;
 public class UploadFileServiceImpl implements UploadFileService {
 
 	@Override
-	public UploadFile uploadFile(UploadFile uf) throws IOException {
+	public UploadFile uploadFile(String originalFileName, long size, String contentType, byte[] data,
+			String realPath) throws IOException {
 		System.out.println("======= 업로드 서비스단 - 업로드 파일 =======");
 		UploadFile result = null;
 		
+		String completePath = makeCalculatePath(realPath);	// 물리적 경로 + /년/월/일
 		
+		UploadFile uf = new UploadFile();
+		
+		if (size > 0) {
+			uf.setOriginalFileName(uf.getOriginalFileName());
+			uf.setFileSize(size);
+			
+			uf.setNewFileName(getNewFileName(originalFileName, realPath, completePath));
+			
+			// 실제 파일을 저장시키는 문장
+			FileCopyUtils.copy(data, new File(realPath + uf.getNewFileName()));
+			System.out.println("이미지 파일 저장");
+//			if (ImgMimeType.contentTypeIsImage(contentType)) {
+//				// 이미지 파일일 경우
+//				// 스케일 다운 -> thumbnail 이름으로 파일 저장
+//				makeThumbNailImage(uf, realPath, completePath);
+//			}
+		}
 		
 		System.out.println("======= 업로드 서비스단 종료 =======");
 		return result;
 	}
+	
+	public static String makeCalculatePath(String realPath) {
+		Calendar cal = Calendar.getInstance();
+		String year = File.separator + cal.get(Calendar.YEAR);	// "\2023"
+		String monthStr = "0" + (cal.get(Calendar.MONTH) + 1);
+		String month = year + File.separator + monthStr.substring(monthStr.length() - 2);
+		String date = month + File.separator + new DecimalFormat("00").format(cal.get(Calendar.DATE));
+		
+		System.out.println(realPath + date);
+		
+		makeDirectroy(realPath, year, month, date);
+		
+		return realPath + date;
+	}
+	
+	private static void makeDirectroy(String realPath, String...strings) {
+		// realPath 경로 + /년/월/일 폴더가 모두 존재하지 않는다면
+		if (!new File(realPath + strings[strings.length - 1]).exists()) {
+			for (String path : strings) {
+				File tmp = new File(realPath + path);
+				if (!tmp.exists()) {
+					tmp.mkdir();
+				}
+			}
+		}
+	}
+	
+	private static String getNewFileName(String originalFilename, String realPath, String completePath) {
+		String uuid = UUID.randomUUID().toString();
+		
+		// 파일 이름이 중복되지 않게 처리하기
+		// ex) "userId_UUID.확장자";
+		String newFileName = uuid + "_" + originalFilename;
+		
+		return completePath.substring(realPath.length()) + File.separator + newFileName;
+	}
+	
+	
 }

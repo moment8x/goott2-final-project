@@ -5,5 +5,6 @@ import java.io.IOException;
 import com.project.vodto.UploadFile;
 
 public interface UploadFileService {
-	UploadFile uploadFile(UploadFile uf) throws IOException;
+	UploadFile uploadFile(String originalFileName, long size, String contentType, byte[] data,
+			String realPath) throws IOException;
 }

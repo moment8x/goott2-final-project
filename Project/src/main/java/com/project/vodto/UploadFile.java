@@ -17,5 +17,5 @@ public class UploadFile {
 	private String extension;
 	private String originalFileName;
 	private String newFileName;
-	private int fileSize;
+	private long fileSize;
 }

@@ -202,10 +202,11 @@
     					contentType : false,	// application/x-www-form-urlencoded 처리 안함.(인코딩 하지 않음)  default = true
     					success : function(data) {
     						console.log(data);
-    						
     						if (data != null) {
     							showUploadedFile(data);
     						}
+    					}, error : function(data) {
+    						console.log(data);
     					}
     				});
     			}
@@ -526,9 +527,7 @@
                                         <div class="upFileArea">
 							    			업로드할 파일을 드래그 앤 드랍 하세요.
 							    		</div>
-							    		<div class="uploadFiles">
-							    			
-							    		</div>
+							    		<div class="uploadFiles"></div>
                                     </div>
                                     <div class="validation"></div>
                                 </div>

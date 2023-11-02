@@ -1,5 +1,6 @@
 package com.project.controller.kjs;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +9,6 @@ import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,12 +16,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.project.service.kjs.upload.UploadFileService;
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
 import com.project.vodto.UploadFile;
+
 
 @Controller
 @RequestMapping("/register/*")
@@ -31,6 +34,9 @@ public class RegisterController {
 	private MemberService mService;
 	@Inject
 	private UploadFileService ufService;
+	
+//	private UploadFile file = new UploadFile();
+	private UploadFile file = null;
 	
 	@RequestMapping("register")
 	public ModelAndView moveRegister() {
@@ -73,7 +79,7 @@ public class RegisterController {
 		System.out.println("======= 회원가입 컨트롤러 - 회원가입 =======");
 		
 		try {
-			mService.insertMember(member);
+			mService.insertMember(member, file);
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
 		}
@@ -82,18 +88,22 @@ public class RegisterController {
 	}
 	
 	@RequestMapping(value="uploadFile", method=RequestMethod.POST)
-	public void uploadFile(HttpServletRequest request) {
+	public @ResponseBody UploadFile uploadFile(HttpServletRequest request, MultipartFile uploadFile) {
 		System.out.println("======= 회원가입 컨트롤러 - 프로필 사진 등록 =======");
 		
 		// 1. 파일이 저장될 경로 확인
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
 		
-		UploadFile uf = null;
-		// 2. 파일 업로드
-//		ufService
-		
-		// 3. DB에 저장
+		try {
+			// 2. 파일 업로드
+			file = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(), 
+					uploadFile.getContentType(), uploadFile.getBytes(), realPath);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		System.out.println("======= 회원가입 컨트롤러 끝 =======");
+		return file;
 	}
 }
