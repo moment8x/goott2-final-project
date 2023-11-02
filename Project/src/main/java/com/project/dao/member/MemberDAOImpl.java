@@ -161,7 +161,7 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public int shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
+	public int shippingAddrModify(String memberId, ShippingAddress tmpAddr, int addrSeq) throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("memberId", memberId);
 		params.put("recipient", tmpAddr.getRecipient());
@@ -169,7 +169,7 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("zipCode", tmpAddr.getZipCode());
 		params.put("address", tmpAddr.getAddress());
 		params.put("detailAddress", tmpAddr.getDetailAddress());
-		params.put("addrSeq", tmpAddr.getAddrSeq());
+		params.put("addrSeq", addrSeq);
 		
 		return ses.update(ns + ".updateShippingAddress", params);
 	}
@@ -183,6 +183,32 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectOne(ns + ".getShippingAddr", params);
 	}
+	
+	@Override
+	public int deleteShippingAddr(String memberId, int addrSeq) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("addrSeq", addrSeq);
+		
+		return ses.delete(ns + ".delShippingAddr", params);
+	}
+	
+	@Override
+	public int allBasicAddrN(String memberId) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".allBasicAddrN", memberId);
+	}
+
+	@Override
+	public int updateBasicAddr(String memberId, int addrSeq) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("addrSeq", addrSeq);
+		
+		return ses.update(ns + ".updateBasicAddr", params);
+	}
+
+	
 	
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
@@ -214,6 +240,12 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectOne(ns + ".login", param);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+	
+
+
+
+	
 
 	
 

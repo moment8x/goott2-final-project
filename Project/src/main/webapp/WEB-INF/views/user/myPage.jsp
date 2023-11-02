@@ -389,10 +389,8 @@
 		let zipCode = $('#shippingZipNoModify').val()
 		let address = $('#shippingAddrModify').val()
 		let detailAddress = $('#shippingDetailAddrModify').val()
-		let recipient = $('#recipient').val()
-		let recipientContact = $('#recipientContact').val()
-			
-		alert(addrSeq + "번 배송지를 수정하자");
+		let recipient = $('#recipientName').val()
+		let recipientContact = $('#editRecipientContact').val()
 		
 		$.ajax({
 			url : '/user/shippingAddrModify', // 데이터를 수신받을 서버 주소
@@ -402,27 +400,22 @@
 				address,
 				detailAddress,
 				recipient,
-				recipientContact
+				recipientContact,
+				addrSeq
 			},
 			dataType : 'json',
 			async : false,
 			success : function(data) {
 				console.log(data);
-				//if(data == true){
-				//	$('#addZipNo').val('')
-				//	$('#addAddr').val('')
-				//	$('#addAddrDetail').val('')
-					
-				//	location.reload()
-				//}
+					location.reload()
 			},
 			error : function() {
 			}
 		});
 	}
 	
+	//수정할 주소록 가져오기
 	function editShippingAddr(addrSeq) {
-		alert(addrSeq + "번 배송지를 수정하자")
 		$.ajax({
 			url : '/user/myPage/modifyShippingAddr', // 데이터를 수신받을 서버 주소
 			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
@@ -441,7 +434,98 @@
 	}
 	
 	function outputShippingAddr(addr) {
+		let output = `<button type="button" class="btn theme-bg-color btn-md text-white"
+			onclick="goPopup();">주소 찾기</button>`
+		output += `<div class="col-xxl-6">`
+		output += `<div class="form-floating theme-form-floating">`
+		output += `<input type="text" class="form-control" id="shippingZipNoModify"
+			name="zipCode" value="\${addr.zipCode}" readonly />`
+		output += `<label for="shippingZipNoModify">우편번호</label>`	
+		output += `</div>`
+		output += `</div>`
+
+		output += `<div class="col-xxl-6">`
+		output += `<div class="form-floating theme-form-floating">`
+		output += `<input class="form-control" type="text"
+			value="\${addr.address}" name="address"
+			id="shippingAddrModify" readonly />`
+		output += `<label for="shippingAddrModify">주소</label>`
+		output += `</div>`
+		output += `</div>`
+
+		output += `<div class="col-xxl-12">`
+		output += `<div class="form-floating theme-form-floating">`
+		output += `<input type="text" class="form-control"
+			id="shippingDetailAddrModify"
+			value="\${addr.detailAddress}" />`
+		output += `<label for="shippingDetailAddrModify">상세주소</label>`
+		output += `</div>`
+		output += `</div>`
+			
+		output += `<div class="col-xxl-6">`
+		output += `<div class="form-floating theme-form-floating">`
+		output += `<input type="text" class="form-control" id="recipientName"
+			name="recipient" placeholder="받는사람"
+			value="\${addr.recipient} " />`
+		output += `<label for="recipientName">받는사람</label>`
+		output += `</div>`
+		output += `</div>`
+
+		output += `<div class="col-xxl-6">`
+		output += `<div class="form-floating theme-form-floating">`
+		output += `<input type="text" class="form-control"
+				id="editRecipientContact" placeholder="받는사람 연락처"
+				value="\${addr.recipientContact}" />`
+		output += `<label for="editRecipientContact">받는사람 연락처</label>`
+		output += `<p>- 포함해서 입력해주세요.</p>`
+		output += `</div>`
+		output += `</div>`
 		
+		let outputFooter = `<button type="button" data-bs-dismiss="modal"
+			class="btn theme-bg-color btn-md fw-bold text-light"
+			onclick="shippingAddrModify(\${addr.addrSeq});">
+			변경</button>`
+		outputFooter += `<button type="button" class="btn btn-animation btn-md fw-bold"
+			data-bs-dismiss="modal">닫기</button>`	
+
+		$('.row.g-4.editAddr').html(output);
+		$('.modal-footer.editAddrFooter').html(outputFooter);
+	}
+	
+	function delShippingAddr(addrSeq){
+		$.ajax({
+			url : '/user/deleteShippingAddr', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				addrSeq
+			},
+			async : false,
+			success : function(data) {
+				console.log(data);
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	function setBasicAddr(addrSeq) {
+		$.ajax({
+			url : '/user/setBasicAddr', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				addrSeq
+			},
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data == "success"){
+					alert("기본배송지로 설정되었습니다.")
+					location.reload()
+				}
+			},
+			error : function() {
+			}
+		});
 	}
 </script>
 <style>
@@ -494,6 +578,9 @@
 
 #authenticationMsg {
 	font-size: 18px;
+}
+.container-fluid-lg.recentOrderHistoy{
+	padding-left: 0px;
 }
 </style>
 </head>
@@ -701,7 +788,7 @@
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>포인트</h5>
-														<h3>3658</h3>
+														<h3>${userInfo.totalPoints }점</h3>
 													</div>
 												</div>
 											</div>
@@ -714,7 +801,7 @@
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>적립금</h5>
-														<h3>254</h3>
+														<h3>${userInfo.totalRewards }원</h3>
 													</div>
 												</div>
 											</div>
@@ -727,7 +814,7 @@
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>쿠폰</h5>
-														<h3>32158</h3>
+														<h3>${userInfo.couponCount }개</h3>
 													</div>
 												</div>
 											</div>
@@ -739,7 +826,7 @@
 									</div>
 
 									<section class="cart-section section-b-space">
-										<div class="container-fluid-lg">
+										<div class="container-fluid-lg recentOrderHistoy">
 											<div class="row g-sm-5 g-3">
 												<div class="col-xxl-9">
 													<div class="cart-table">
@@ -1715,7 +1802,7 @@
 									<div class="title title-flex">
 										<div>
 											<h2>배송주소록</h2>
-											
+
 											<span class="title-leaf"> <svg
 													class="icon-width bg-gray">
                             <use
@@ -1725,10 +1812,6 @@
 										</div>
 
 										<button
-											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3">
-											<i data-feather=check class="me-2"></i> 기본배송지로 설정
-										</button>
-										<button
 											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
 											data-bs-toggle="modal" data-bs-target="#add-address">
 											<i data-feather="plus" class="me-2"></i> 배송지 추가
@@ -1737,14 +1820,11 @@
 
 									<div class="row g-sm-4 g-3">
 										<c:forEach var="addr" items="${userAddrList }">
+										
 											<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
-											
+
 												<div class="address-box">
 													<div>
-														<div class="form-check">
-															<input class="form-check-input" type="radio" name="jack"
-																id="flexRadioDefault1" />
-														</div>
 
 														<c:if test="${fn:contains(addr.basicAddr,'Y')}">
 															<div class="label">
@@ -1752,14 +1832,14 @@
 															</div>
 														</c:if>
 
-				
+
 														<div class="table-responsive address-table">
 															<table class="table">
 																<tbody>
 																	<tr>
 																		<td colspan="2">${addr.recipient}</td>
 																	</tr>
-																	
+
 																	<tr>
 																		<td colspan="2">${addr.recipientContact}</td>
 																	</tr>
@@ -1784,7 +1864,14 @@
 															</table>
 														</div>
 													</div>
-
+														
+													<c:if test="${fn:contains(addr.basicAddr,'N')}">
+														<button
+															class="btn btn-sm add-button w-100"
+															onclick="setBasicAddr(${addr.addrSeq});">
+															<i data-feather=check class="me-2"></i> 기본배송지로 설정
+														</button>
+													</c:if>
 													<div class="button-group">
 														<button class="btn btn-sm add-button w-100"
 															data-bs-toggle="modal" data-bs-target='#editProfile'
@@ -1792,7 +1879,8 @@
 															<i data-feather="edit"></i> Edit
 														</button>
 														<button class="btn btn-sm add-button w-100"
-															data-bs-toggle="modal" data-bs-target="#removeProfile">
+														data-bs-toggle="modal" data-bs-target="#removeProfile"
+															onclick="delShippingAddr(${addr.addrSeq});">
 															<i data-feather="trash-2"></i> Remove
 														</button>
 													</div>
@@ -2097,17 +2185,16 @@
 				<div class="modal-body">
 					<div class="form-floating mb-4 theme-form-floating">
 						<input type="text" class="form-control" id="recipient"
-							name="recipient" placeholder="받는사람"  /><label
-							for="recipient">받는사람</label>
+							name="recipient" placeholder="받는사람" /><label for="recipient">받는사람</label>
 					</div>
-					
+
 					<div class="form-floating mb-4 theme-form-floating">
 						<input type="text" class="form-control" id="recipientContact"
-							name="recipientContact" placeholder="받는사람 연락처"  /><label
+							name="recipientContact" placeholder="받는사람 연락처" /><label
 							for="recipientContact">받는사람 연락처</label>
-							<p>- 포함해서 입력해주세요.</p>
+						<p>- 포함해서 입력해주세요.</p>
 					</div>
-					
+
 					<div>
 						<button type="button" class="btn theme-bg-color btn-md text-white"
 							onclick="goPopup();">주소 검색</button>
@@ -2220,7 +2307,7 @@
 	<!-- Location Modal End -->
 
 	<!-- Edit Profile Start -->
-	
+
 	<div class="modal fade theme-modal" id='editProfile' tabindex="-1"
 		aria-labelledby="exampleModalLabel2" aria-hidden="true">
 		<div
@@ -2228,68 +2315,18 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title" id="exampleModalLabel2">배송지 수정</h5>
-					<div> ${memberShippingAddr}</div>
+					<div>${memberShippingAddr}</div>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
 				<div class="modal-body">
-					<div class="row g-4">
-						<div class="col-xxl-12">
-					
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="recipientName" name="recipient" placeholder="받는사람"
-										value="${memberShippingAddr.recipient} " /> <label for="recipientName">받는사람</label>
-								</div>
-								
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="editRecipientContact" placeholder="받는사람 연락처"
-										value="${memberShippingAddr.recipientContact}" /> <label for="editRecipientContact">받는사람 연락처</label>
-										<p>- 포함해서 입력해주세요.</p>
-								</div>
-							</form>
-						</div>
-
-						<button type="button" class="btn theme-bg-color btn-md text-white"
-							onclick="goPopup();">주소 찾기</button>
-						<div class="col-xxl-6">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="shippingZipNoModify" name="zipCode"
-										value="${memberShippingAddr.zipCode}" readonly/> <label for="shippingZipNoModify">우편번호</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-xxl-6">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input class="form-control" type="text" value="${memberShippingAddr.address}"
-										name="address" id="shippingAddrModify" readonly/>
-									<label for="shippingAddrModify">주소</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-12">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="shippingDetailAddrModify"
-										value="${memberShippingAddr.detailAddress}" /> <label
-										for="shippingDetailAddrModify">상세주소</label>
-								</div>
-							</form>
-						</div>
+					<div class="row g-4 editAddr">
 					</div>
 				</div>
-				<div class="modal-footer">
-					<button type="button" data-bs-dismiss="modal"
-						class="btn theme-bg-color btn-md fw-bold text-light" onclick="shippingAddrModify(${memberShippingAddr.addrSeq});">
-						변경</button>
-					<button type="button" class="btn btn-animation btn-md fw-bold"
-						data-bs-dismiss="modal">닫기</button>
+				<div class="modal-footer editAddrFooter">
+					
 				</div>
 			</div>
 		</div>
@@ -2364,25 +2401,19 @@
 			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
 			<div class="modal-content">
 				<div class="modal-header d-block text-center">
-					<h5 class="modal-title w-100" id="exampleModalLabel22">Are You
-						Sure ?</h5>
+					<h5 class="modal-title w-100" id="exampleModalLabel22">삭제하시겠습니까?</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<i class="fa-solid fa-xmark"></i>
 					</button>
-				</div>
-				<div class="modal-body">
-					<div class="remove-box">
-						<p>The permission for the use/group, preview is inherited from
-							the object, object will create a new permission for this object</p>
-					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-animation btn-md fw-bold"
 						data-bs-dismiss="modal">No</button>
 					<button type="button"
 						class="btn theme-bg-color btn-md fw-bold text-light"
-						data-bs-target="#removeAddress" data-bs-toggle="modal">
+						data-bs-target="#removeAddress" data-bs-toggle="modal"
+						>
 						Yes</button>
 				</div>
 			</div>
@@ -2395,20 +2426,16 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title text-center" id="exampleModalLabel12">
-						Done!</h5>
+					삭제되었습니다.</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
-				<div class="modal-body">
-					<div class="remove-box text-center">
-						<h4 class="text-content">It's Removed.</h4>
-					</div>
-				</div>
 				<div class="modal-footer pt-0">
 					<button type="button"
 						class="btn theme-bg-color btn-md fw-bold text-light"
+						onclick="location.reload();"
 						data-bs-dismiss="modal">Close</button>
 				</div>
 			</div>

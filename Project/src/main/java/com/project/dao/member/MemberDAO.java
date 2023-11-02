@@ -65,10 +65,20 @@ public interface MemberDAO {
 	int addShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
 	
 	//배송주소록 수정
-	int shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
+	int shippingAddrModify(String memberId, ShippingAddress tmpAddr, int addrSeq) throws SQLException, NamingException;
 	
 	//특정회원의 수정할 배송지가져오기
-	ShippingAddress selectShippingAddr(int addrSeq, String memberId);
+	ShippingAddress selectShippingAddr(int addrSeq, String memberId) throws SQLException, NamingException;
+	
+	//특정 회원의 배송지 삭제
+	int deleteShippingAddr(String memberId, int addrSeq) throws SQLException, NamingException;
+	
+	// 특정회원의 기본배송지 설정 N으로 업데이트
+	int allBasicAddrN(String memberId) throws SQLException, NamingException;
+	
+	// 특정 배송지 기본배송지로 설정
+	int updateBasicAddr(String memberId, int addrSeq) throws SQLException, NamingException;
+
 	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
@@ -79,5 +89,8 @@ public interface MemberDAO {
 	// 로그인(비밀번호 체크)
 	Member selectMember(String memberId, String password) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+	
+	
+	
 	
 }

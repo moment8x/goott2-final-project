@@ -87,6 +87,19 @@
 	<select id="getShippingAddr" resultType="com.project.vodto.ShippingAddress">
 		select * from shipping_address where member_id = #{memberId} and addr_seq = #{addrSeq}
 	</select>
+	
+	<delete id="delShippingAddr">
+		delete from shipping_address where member_id = #{memberId} and addr_seq = #{addrSeq};
+	</delete>
+	
+	<update id="allBasicAddrN">
+		update shipping_address set basic_addr = 'N' where member_id = #{memberId}
+	</update>
+	
+	<update id="updateBasicAddr">
+		update shipping_address set basic_addr = 'Y' where member_id = #{memberId} and addr_seq = #{addrSeq}
+	</update>
+
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">
 		SELECT member_id FROM member WHERE member_id = #{memberId}  

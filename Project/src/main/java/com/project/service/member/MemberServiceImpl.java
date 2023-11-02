@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.naming.NamingException;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.dao.member.MemberDAO;
 import com.project.service.member.MemberService;
@@ -154,10 +155,10 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public boolean shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
+	public boolean shippingAddrModify(String memberId, ShippingAddress tmpAddr, int addrSeq) throws SQLException, NamingException {
 		boolean result = false;
 			
-			if(mDao.shippingAddrModify(memberId, tmpAddr) == 1) {
+			if(mDao.shippingAddrModify(memberId, tmpAddr, addrSeq) == 1) {
 				result = true;
 			}
 			
@@ -166,11 +167,32 @@ public class MemberServiceImpl implements MemberService {
 	}
 	
 	@Override
-	public ShippingAddress getShippingAddr(int addrSeq, String memberId) {
+	public ShippingAddress getShippingAddr(int addrSeq, String memberId) throws SQLException, NamingException {
 		
 		return mDao.selectShippingAddr(addrSeq, memberId);
 	}
 	
+	@Override
+	public int deleteShippingAddr(String memberId, int addrSeq) throws SQLException, NamingException {
+		
+		return mDao.deleteShippingAddr(memberId, addrSeq);
+	}
+	
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean setBasicAddr(String memberId, int addrSeq) throws SQLException, NamingException {
+		boolean result = false;
+		//1) 기본배송지 설정 버튼을 누르면 모든 basicAddr컬럼을 N으로 바꾼다
+			if(mDao.allBasicAddrN(memberId) != 0) {
+				//2) 해당 번호의 basic_addr을 Y로 바꿔준다.
+				if(mDao.updateBasicAddr(memberId, addrSeq) != 0) {
+					result = true;
+				}
+			}
+		return result;	
+	}
+	
+
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
 	@Override
@@ -215,6 +237,9 @@ public class MemberServiceImpl implements MemberService {
 		return result;
 	}
 	// --------------------------------------- 김진솔 끝 ----------------------------------------	
+
+	
+
 
 
 

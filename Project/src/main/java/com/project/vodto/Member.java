@@ -30,7 +30,7 @@ public class Member {
 	private char reciveAdvertising;
 	private String membershipGrade;
 	private int totalPoints;
-	private int totalReward;
+	private int totalRewards;
 	private int couponCount;
 	private int profileImage;
 	private int remember;

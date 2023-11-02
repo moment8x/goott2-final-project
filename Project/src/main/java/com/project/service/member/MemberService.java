@@ -64,11 +64,17 @@ public interface MemberService {
 	boolean insertShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
 	
 	//배송주소록 수정
-	boolean shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
+	boolean shippingAddrModify(String memberId, ShippingAddress tmpAddr, int addrSeq) throws SQLException, NamingException;
 
 	//특정 회원의 배송주소록 데이터 가져오기
-	ShippingAddress getShippingAddr(int addrSeq, String memberId);
+	ShippingAddress getShippingAddr(int addrSeq, String memberId) throws SQLException, NamingException;
 	
+	//특정회원의 배송지 삭제
+	int deleteShippingAddr(String memberId, int addrSeq) throws SQLException, NamingException;
+	
+	//기본배송지 설정
+	boolean setBasicAddr(String memberId, int addrSeq) throws SQLException, NamingException;
+
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -78,5 +84,8 @@ public interface MemberService {
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
+	
+	
+	
 	
 }

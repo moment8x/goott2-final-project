@@ -2,7 +2,10 @@
 package com.project.controller.jmj;
 
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -45,6 +48,8 @@ public class myPageController {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMember_id();
+		
+		DecimalFormat formatter = new DecimalFormat("###,###");
 //		System.out.println(orderListNo);
 
 //		List<MyPageOrderList> lst = null;
@@ -54,14 +59,14 @@ public class myPageController {
 			Member userInfo = mService.getMyInfo(memberId);
 			model.addAttribute("userInfo", userInfo);
 			System.out.println("회원정보 : " + userInfo);
-
+			
 //			System.out.println("list : " + lst);
 //			model.addAttribute("orderList", lst);
 
 			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
 			model.addAttribute("userAddrList", userAddrList);
-
 			System.out.println("배송주소록" + userAddrList);
+			
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -98,8 +103,8 @@ public class myPageController {
 				System.out.println(addrSeq + "번 배송지를 수정하자!@ " + sa.toString());
 				result = new ResponseEntity<ShippingAddress>(sa, header, HttpStatus.OK);
 
-			} catch (NumberFormatException e) {
-				System.out.println("예외남 : " + addrSeqObj);
+			} catch (Exception e) {
+				System.out.println("예외났음 : " + addrSeqObj);
 				
 				result = new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
@@ -110,27 +115,52 @@ public class myPageController {
 		
 		return result;
 	}
+	
+	@RequestMapping(value = "shippingAddrModify", method = RequestMethod.POST)
+	public void shippingAddrModify(@ModelAttribute ShippingAddress tmpAddr, HttpServletRequest request, @RequestParam Map<String, Object> map) {
+		System.out.println("배송주소록 수정" + tmpAddr.toString());
+		
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMember_id();
+		
+		Object addrSeqObj = map.get("addrSeq");
 
-	@RequestMapping("address")
-	public void deliveryList() {
+		if (addrSeqObj != null) {
+			try {
+				// String을 int로 변환
+				int addrSeq = Integer.parseInt((String) addrSeqObj);
 
+				ShippingAddress sa = mService.getShippingAddr(addrSeq, memberId);
+				System.out.println(addrSeq + "번 배송지를 수정하자!@ " + sa.toString());
+				
+				if (mService.shippingAddrModify(memberId, tmpAddr, addrSeq)) {
+					System.out.println("배송주소록 수정 완");
+				}
+			} catch (Exception e) {
+				System.out.println("예외났음 : " + addrSeqObj);
+			}
+		}else {
+		    // addrSeqObj가 null인 경우
+		    System.out.println("addrSeq null");
+		}
 	}
-
+	
 	@RequestMapping("jusoPopup")
 	public void findAddr() {
 		System.out.println("주소 검색");
 	}
-
+	
 	@RequestMapping("orderList")
 	public void getOrderList(Model model, HttpServletRequest req) {
-
+		
 	}
-
+	
 	@RequestMapping("detailOrderList")
 	public void getDetailOrderList() {
 		System.out.println("주문 상세 내역");
 	}
-
+	
 	@RequestMapping("userInfo")
 	public void checkPwd() {
 		System.out.println("비밀번호 확인");
@@ -289,36 +319,65 @@ public class myPageController {
 		return result;
 	}
 
-	@RequestMapping("editShippingAddr")
-	public void editShippingAddr(@RequestParam("addrSeq") int addrSeq, HttpServletRequest request, Model model) {
-		System.out.println(addrSeq + "번 배송지를 수정하자");
-
-		HttpSession session = request.getSession();
-		Member member = (Member) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
-
-		ShippingAddress sa = mService.getShippingAddr(addrSeq, memberId);
-		model.addAttribute("memberShippingAddr", sa);
-
-	}
-
-	@RequestMapping(value = "shippingAddrModify", method = RequestMethod.POST)
-	public void shippingAddrModify(@ModelAttribute ShippingAddress tmpAddr, HttpServletRequest request) {
-		System.out.println("배송주소록 수정" + tmpAddr.toString());
+	@RequestMapping(value = "deleteShippingAddr", method = RequestMethod.POST)
+	public void deleteShippingAddr(@RequestParam Map<String, Object> map, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMember_id();
 
-		try {
+		Object addrSeqObj = map.get("addrSeq");
 
-			if (mService.shippingAddrModify(memberId, tmpAddr)) {
-				System.out.println("배송주소록 수정 완");
+		if (addrSeqObj != null) {
+			try {
+				// String을 int로 변환
+				int addrSeq = Integer.parseInt((String) addrSeqObj);
+
+				int delAddr = mService.deleteShippingAddr(memberId, addrSeq);
+				System.out.println(addrSeq + "번 배송지를 삭제하자! ");
+				
+				if (mService.deleteShippingAddr(memberId, addrSeq) == 0) {
+					System.out.println("배송주소록 삭제 완");;
+				}
+			} catch (Exception e) {
+				System.out.println("예외났음 : " + addrSeqObj);
 			}
-		} catch (SQLException | NamingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		}else {
+		    // addrSeqObj가 null인 경우
+		    System.out.println("addrSeq null");
 		}
-
 	}
+	
+	@RequestMapping(value = "setBasicAddr", method = RequestMethod.POST)
+	public ResponseEntity<String> setBasicAddr(@RequestParam Map<String, Object> map, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMember_id();
+
+		ResponseEntity<String> result = null;
+		
+		Object addrSeqObj = map.get("addrSeq");
+
+		if (addrSeqObj != null) {
+			try {
+				// String을 int로 변환
+				int addrSeq = Integer.parseInt((String) addrSeqObj);
+				
+				if(mService.setBasicAddr(memberId, addrSeq)) {
+					System.out.println(addrSeq + "번 배송지가 기본배송지로 바뀌었습니다.");
+					result = new ResponseEntity<String>("success", HttpStatus.OK);
+				}
+				
+			} catch (Exception e) {
+				System.out.println("예외났음 : " + addrSeqObj);
+				result = new ResponseEntity<>(HttpStatus.CONFLICT);
+			}
+		}else {
+		    // addrSeqObj가 null인 경우
+		    System.out.println("addrSeq null");
+		    result = new ResponseEntity<>(HttpStatus.CONFLICT);
+		}
+		return result;
+	}
+	
 
 }
