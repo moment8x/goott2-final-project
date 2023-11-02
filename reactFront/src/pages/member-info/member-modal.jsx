@@ -1,7 +1,6 @@
 import { Dialog, Transition } from '@headlessui/react';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import Icon from '@/components/ui/Icon';
-import { preventScroll, allowScroll } from './utils/modal';
 
 const MemberInfoModal = ({
   activeModal,
@@ -21,8 +20,9 @@ const MemberInfoModal = ({
   ref,
   showModal,
   setShowModal,
+  isGoBackClicked,
 }) => {
-  // const [showModal, setShowModal] = useState(false);
+  // history.scrollRestoration = 'auto';
 
   const closeModal = () => {
     setShowModal(false);
@@ -35,65 +35,78 @@ const MemberInfoModal = ({
     return null;
   };
 
-  // useEffect(() => {
-  //   document.body.style.cssText = `
-  //     position: fixed;
-  //     top: -${window.scrollY}px;
-  //     overflow-y: scroll;
-  //     width: 100%;`;
-  //   return () => {
-  //     const scrollY = document.body.style.top;
-  //     document.body.style.cssText = '';
-  //     window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   const prevScrollY = preventScroll();
-  //   return () => {
-  //     allowScroll(prevScrollY);
-  //   };
-  // }, []);
-
-  const scrollY = document.body.style.top;
-
+  // 모달 닫은 뒤에도 위치 고정
+  // 모달 창에서 백스페이스 누를 시 모달창만 꺼지도록
   if (showModal) {
-    document.body.style.cssText = `
+    // const [isGoBackClicked, setIsGoBackClicked] = useState(false);
+    const scrollY = window.scrollY;
+
+    // const goBack = () => {
+    //   console.log('goBack');
+    //   isGoBackClicked = true;
+    //   closeModal();
+    // };
+
+    useEffect(() => {
+      // const scrollPosition = window.scrollY;
+      console.log('savePos:', scrollY);
+      localStorage.setItem('scrollY', scrollY);
+
+      document.body.style.cssText = `
       position: fixed;
-      top: -${window.scrollY}px;
+      top: -${scrollY}px;
       overflow-y: scroll;
       width: 100%;`;
-  } else if (!showModal) {
-    document.body.style.cssText = `
-      position: static;
-      top: -${window.scrollY}px;
-      overflow-y: scroll;
-      width: 100%;`;
-    window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
+
+      // history.pushState({ page: 'modal' }, document.title, location.pathname + '#modal');
+      // window.addEventListener('popstate', goBack);
+      // console.log('popstate');
+
+      return () => {
+        const savedScrollY = localStorage.getItem('scrollY');
+        // window.removeEventListener('popstate', goBack);
+        // console.log('isGoBackClicked:', isGoBackClicked);
+        // if (!isGoBackClicked) {
+        //   history.back();
+        // }
+
+        if (savedScrollY) {
+          console.log('savedScrollY:', savedScrollY);
+          window.scrollTo(0, savedScrollY);
+          localStorage.removeItem('scrollY');
+        }
+        document.body.style.cssText = '';
+      };
+    }, []);
   }
 
   // useEffect(() => {
-  //   document.body.style.cssText = `
-  //       position: fixed;
-  //       top: -${window.scrollY}px;
-  //       overflow-y: scroll;
-  //       width: 100%;`;
+  //   history.pushState({ page: 'modal' }, document.title);
+  //   // document.addEventListener('popstate', goBack);
+
+  //   document.addEventListener('keydown', function (e) {
+  //     console.log(e);
+
+  //     if (e.code == 'Backspace') {
+  //       console.log('back');
+  //       goBack();
+  //     }
+  //   });
+
   //   return () => {
-  //     const scrollY = document.body.style.top;
-  //     document.body.style.cssText = '';
-  //     window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
+  //     document.addEventListener('keydown', function (e) {
+  //       console.log(e);
+
+  //       if (e.keycode == 8) {
+  //         console.log('back');
+  //         goBack();
+  //       }
+  //     });
+  //     if (!isGoBackClicked) {
+  //       history.back();
+  //     }
   //   };
   // }, []);
-
-  // if (showModal) {
-  //   document.body.style.overflow = 'hidden';
-  // } else {
-  //   document.body.style.overflow = 'auto';
-  // }
-
-  // document.body.style.cssText = `
-  //     position: static
-  //   `;
 
   return (
     <>

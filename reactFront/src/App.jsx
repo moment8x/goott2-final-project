@@ -1,12 +1,14 @@
 import React, { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 // home pages  & dashboard
 //import Dashboard from "./pages/dashboard";
-const Test = lazy(() => import('./pages/test'));
 const Ecommerce = lazy(() => import('./pages/dashboard/ecommerce'));
 const CrmPage = lazy(() => import('./pages/dashboard/crm'));
 const MemberInfo = lazy(() => import('./pages/member-info/index'));
+const MemberInfoModal = lazy(() => import('./pages/member-info/member-modal'));
+const SearchedMember = lazy(() => import('./pages/member-info/member-result'));
+const Modal2 = lazy(() => import('./pages/member-info/modal2'));
 
 const Login = lazy(() => import('./pages/auth/login'));
 const Register = lazy(() => import('./pages/auth/register'));
@@ -21,15 +23,18 @@ const LockScreen3 = lazy(() => import('./pages/auth/lock-screen3'));
 
 import Layout from './layout/Layout';
 import AuthLayout from './layout/AuthLayout';
-import MemberInfoModal from './pages/member-info/member-modal';
+// import MemberInfoModal from './pages/member-info/member-modal';
 
 function App() {
+  const location = useLocation();
+  const background = location.state && location.state.background;
+
   return (
-    <main className="App  relative">
+    <main className='App  relative'>
       <Routes>
-        <Route path="/admin" element={<AuthLayout />}>
-          <Route path="/admin" element={<Login />} />
-          {/* <Route path="/register" element={<Register />} />
+        {/* <Route path='/admin' element={<AuthLayout />}>
+          <Route path='/admin' element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/register2" element={<Register2 />} />
           <Route path="/register3" element={<Register3 />} />
           <Route path="/forgot-password" element={<ForgotPass />} />
@@ -37,14 +42,17 @@ function App() {
           <Route path="/forgot-password3" element={<ForgotPass3 />} />
           <Route path="/lock-screen" element={<LockScreen />} />
           <Route path="/lock-screen2" element={<LockScreen2 />} />
-          <Route path="/lock-screen3" element={<LockScreen3 />} /> */}
-        </Route>
-        <Route path="/*" element={<Layout />}>
-          <Route index element={<Navigate to="admin/home" />} />
-          <Route path="admin/home" element={<Ecommerce />} />
-          <Route path="admin/members/dashboard" element={<CrmPage />} />
-          <Route path="admin/members/member-info" element={<MemberInfo />} />
-          <Route path="admin/members/member-detail" element={<MemberInfoModal />} />
+          <Route path="/lock-screen3" element={<LockScreen3 />} />
+        </Route> */}
+        <Route path='/*' element={<Layout />}>
+          <Route index element={<Navigate to='admin/home' />} />
+          <Route path='admin/home' element={<Ecommerce />} />
+          <Route path='admin/members/dashboard' element={<CrmPage />} />
+          <Route path='admin/members/member-info/*' element={<MemberInfo />}>
+            {/* <Route path='modal' element={<Modal2 />} /> */}
+          </Route>
+          {/* <Route path='admin/members/member-info/modal' element={<Modal2 />} /> */}
+          {/* <Route path='admin/members/member-detail' element={<MemberInfoModal />} /> */}
         </Route>
       </Routes>
     </main>

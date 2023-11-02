@@ -5,15 +5,15 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Tooltip from '@/components/ui/Tooltip';
 import { useTable, useRowSelect, useSortBy, usePagination } from 'react-table';
-import { Link } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import MemberInfoModal from './member-modal';
-import Modal from '@/components/ui/Modal';
 
 const COLUMNS = [
   {
     Header: '가입일',
     accessor: 'registrationDate',
     Cell: (row) => {
+      // 시간 제거
       return <span>{(row?.cell?.value).replace(' 00:00:00.0', '')}</span>;
     },
   },
@@ -122,8 +122,10 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
   const columns = useMemo(() => COLUMNS, []);
   // // const data = useMemo(() => searchedInfo, []);
   const [totalMember, setTotalMember] = useState(0);
-
   const [showModal, setShowModal] = useState(false);
+  const location = useLocation();
+
+  // let isGoBackClicked = false;
 
   const openModal = () => {
     setShowModal(!showModal);
@@ -183,12 +185,14 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
     return Math.ceil(length / pageSize);
   }, [length, pageSize]);
 
+  // 페이징 블록 추가
   const pages = useMemo(() => {
     const start = Math.floor(pageIndex / 10) * 10;
     const end = start + 10 > totalPages ? totalPages : start + 10;
     return Array.from({ length: end - start }, (_, i) => start + i);
   }, [pageIndex, totalPages]);
 
+  // 총 회원 수 조회
   useEffect(() => {
     fetch('http://localhost:8081/admin/members/member-info', { method: 'GET' })
       .then((res) => res.json())
@@ -200,6 +204,7 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
 
   return (
     <>
+      {/* state 값 true일 시 모달 오픈 */}
       {showModal && (
         <MemberInfoModal
           title='Extra large modal'
@@ -209,9 +214,10 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
           className='max-w-fit'
           showModal={showModal}
           setShowModal={setShowModal}
+          isGoBackClicked={isGoBackClicked}
         >
-          <h4 class='font-medium text-lg mb-3 text-slate-900'>Lorem ipsum dolor sit.</h4>
-          <div class='text-base text-slate-600 dark:text-slate-300'>
+          <h4 className='font-medium text-lg mb-3 text-slate-900'>Lorem ipsum dolor sit.</h4>
+          <div className='text-base text-slate-600 dark:text-slate-300'>
             Oat cake ice cream candy chocolate cake chocolate cake cotton candy dragée apple pie. Brownie carrot cake
             candy canes bonbon fruitcake topping halvah. Cake sweet roll cake cheesecake cookie chocolate cake
             liquorice.
@@ -223,6 +229,7 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
           <h4 className='card-title font-black'>{title}</h4>
           <Button className='btn-secondary ml-5 p-[7px] pointer-events-none'>
             <div className='space-x-1 rtl:space-x-reverse'>
+              {/* 총 회원 수 조회 */}
               <span>총 회원 수</span>
               <Badge label={totalMember} className='bg-white text-slate-900 ' />
               <span>명</span>
@@ -263,8 +270,10 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
                         {row.cells.map((cell) => {
                           return (
                             <td {...cell.getCellProps()} className='table-td'>
-                              <Link to='' onClick={openModal}>
+                              {/* row 클릭 시 모달 오픈 */}
+                              <Link to='modal' state={{ background: location }}>
                                 {cell.render('Cell')}
+                                <Outlet />
                               </Link>
                             </td>
                           );

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, lazy } from 'react';
 import Card from '@/components/ui/Card';
 import Textinput from '@/components/ui/Textinput';
 import Select from 'react-select';
@@ -6,6 +6,7 @@ import Radio from '@/components/ui/Radio';
 import Flatpickr from 'react-flatpickr';
 import Button from '@/components/ui/Button';
 import Checkbox from '@/components/ui/Checkbox';
+// import SearchedMembers from './member-result';
 
 // select
 const privacy = [
@@ -67,7 +68,7 @@ const styles = {
   }),
 };
 
-const genders = [
+const gender = [
   {
     value: '',
     label: '전체',
@@ -96,6 +97,10 @@ const MemberSearch = ({ setSearchedInfo }) => {
   const [inputSelectOption, setInputSelectOption] = useState('');
   const [selectLabel, setSelectLabel] = useState({
     membershipGrade: '전체',
+    gender: '전체',
+    anniversary: '선택',
+    amount: '전체',
+    point: '선택',
   });
   const [searchMember, setSearchMember] = useState({
     ageStart: '',
@@ -134,6 +139,17 @@ const MemberSearch = ({ setSearchedInfo }) => {
     lastLoginDateEnd: '',
     dormantAccount: 'N',
   });
+
+  useEffect(() => {
+    const savedScrollY = localStorage.getItem('scrollY');
+
+    document.body.style.cssText = '';
+    if (savedScrollY) {
+      console.log('savedScrollY:', savedScrollY);
+      window.scrollTo(0, savedScrollY);
+      localStorage.removeItem('scrollY');
+    }
+  }, []);
 
   // 성별
   const handleRadio = (e) => {
@@ -222,6 +238,7 @@ const MemberSearch = ({ setSearchedInfo }) => {
   // 검색 버튼
   const handleSubmit = (e) => {
     console.log('searchMember:', searchMember);
+    console.log('selectLabel:', selectLabel);
     e.preventDefault();
     fetch(' http://localhost:8081/admin/members/search', {
       // http://localhost:8081/
@@ -243,12 +260,15 @@ const MemberSearch = ({ setSearchedInfo }) => {
 
   // 초기화 버튼
   const handleReset = () => {
+    // window.location.reload();
     setSearchMember({
       ...searchMember,
       ageStart: '',
       ageEnd: '',
       registrationDateStart: '',
       registrationDateEnd: '',
+      dateOfBirthStart: '',
+      dateOfBirthEnd: '',
       name: '',
       email: '',
       memberId: '',
@@ -256,72 +276,96 @@ const MemberSearch = ({ setSearchedInfo }) => {
       phoneNumber: '',
       cellPhoneNumber: '',
       gender: '',
-      dateOfBirthStart: '',
-      dateOfBirthEnd: '',
       address: '',
+      detailedAddress: '',
+      orderAmountStart: '',
+      orderAmountEnd: '',
+      actualPaymentAmountStart: '',
+      actualPaymentAmountEnd: '',
+      orderCountStart: '',
+      orderCountEnd: '',
+      actualOrderCountStart: '',
+      actualOrderCountEnd: '',
+      orderDateStart: '',
+      orderDateEnd: '',
+      paymentDateStart: '',
+      paymentDateEnd: '',
+      orderItem: '',
+      totalRewardsStart: '',
+      totalRewardsEnd: '',
+      totalPointsStart: '',
+      totalPointsEnd: '',
+      lastLoginDateStart: '',
+      lastLoginDateEnd: '',
+      dormantAccount: 'N',
+    });
+    setSelectLabel({
+      ...selectLabel,
+      membershipGrade: '전체',
     });
   };
 
   return (
     <div>
-      <div className="grid xl:grid-cols-1 grid-cols-1 gap-5">
-        <Card title="회원 정보 조회" noborder titleClass="font-black">
-          <div className="overflow-x-auto -mx-6">
-            <div className="inline-block min-w-full align-middle">
-              <div className="overflow-hidden ">
+      <div className='grid xl:grid-cols-1 grid-cols-1 gap-5'>
+        <Card title='회원 정보 조회' noborder titleClass='font-black'>
+          <div className='overflow-x-auto -mx-6'>
+            <div className='inline-block min-w-full align-middle'>
+              <div className='overflow-hidden '>
                 <form>
-                  <table className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
-                    <tbody className="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                  <table className='min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700'>
+                    <tbody className='bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700'>
                       <tr>
-                        <td className="table-td w-[200px]">개인정보</td>
+                        <td className='table-td w-[200px]'>개인정보</td>
                         <td>
                           <Select
-                            className="w-[120px] mr-1 react-select float-left"
-                            classNamePrefix="select"
+                            className='w-[120px] mr-1 react-select float-left'
+                            classNamePrefix='select'
                             defaultValue={privacy[0]}
                             options={privacy}
                             styles={styles}
                             onChange={handlePrivacyOption}
                           />
                           <Textinput
-                            label=""
-                            type="text"
-                            placeholder=""
-                            className="w-[200px] h-[32px] text-sm float-left"
+                            label=''
+                            type='text'
+                            placeholder=''
+                            className='w-[200px] h-[32px] text-sm float-left'
                             onChange={handlePrivacyValueChange}
                             value={searchMember[`${privacyOption}`]}
                           />
                         </td>
                       </tr>
                       <tr>
-                        <td className="table-td">회원등급</td>
+                        <td className='table-td'>회원등급</td>
                         <td>
                           <Select
-                            className="w-[120px] mr-1 react-select"
-                            classNamePrefix="select"
+                            className='w-[120px] mr-1 react-select'
+                            classNamePrefix='select'
                             defaultValue={grade[0]}
                             options={grade}
                             styles={styles}
                             onChange={(e) => handleSelectOption(e, 'membershipGrade')}
-                            // value={[{ value: searchMember.membershipGrade, label: selectLabel.membershipGrade }]}
+                            value={[{ value: searchMember.membershipGrade, label: selectLabel.membershipGrade }]}
                           />
                         </td>
                       </tr>
                       <tr>
-                        <td className="table-td">가입일/기념일</td>
+                        <td className='table-td'>가입일/기념일</td>
                         <td>
                           <Select
-                            className="w-[120px] mr-1 react-select align-middle inline-block"
-                            classNamePrefix="select"
+                            className='w-[120px] mr-1 react-select align-middle inline-block'
+                            classNamePrefix='select'
                             defaultValue={anniversary[0]}
                             options={anniversary}
                             styles={styles}
                             onChange={checkSelectValue}
+                            // value={[{ value: searchMember.anniversary, label: selectLabel.anniversary }]}
                           />
                           {inputSelectOption !== '' && (
                             <span>
                               <Flatpickr
-                                className="form-control py-2 w-[120px] align-middle inline-block"
+                                className='form-control py-2 w-[120px] align-middle inline-block'
                                 onChange={(date, value, name) => handlePicker(date, value, name)}
                                 value={
                                   inputSelectOption === 'registrationDate'
@@ -334,9 +378,9 @@ const MemberSearch = ({ setSearchedInfo }) => {
                                     : 'dateOfBirthStart'
                                 }
                               />
-                              <p className="ml-[10px] mr-[10px] align-middle inline-block"> ~ </p>
+                              <p className='ml-[10px] mr-[10px] align-middle inline-block'> ~ </p>
                               <Flatpickr
-                                className="form-control py-2 w-[120px] align-middle inline-block"
+                                className='form-control py-2 w-[120px] align-middle inline-block'
                                 onChange={(date, value, name) => handlePicker(date, value, name)}
                                 // onChange={(date) => handlePicker(date, 'registrationDateEnd')}
                                 value={
@@ -352,35 +396,35 @@ const MemberSearch = ({ setSearchedInfo }) => {
                           )}
                         </td>
                       </tr>
-                      <tr className="flex-row">
-                        <td className="table-td">나이</td>
+                      <tr className='flex-row'>
+                        <td className='table-td'>나이</td>
                         <td>
                           <Textinput
-                            label=""
-                            type="text"
-                            placeholder=""
-                            className="w-[50px] h-[32px] text-sm float-left"
+                            label=''
+                            type='text'
+                            placeholder=''
+                            className='w-[50px] h-[32px] text-sm float-left'
                             onChange={(e) => handleInputValueChange(e, 'ageStart')}
                             value={searchMember.ageStart}
                           />
-                          <p className="ml-[10px] mr-[10px] float-left"> ~ </p>
+                          <p className='ml-[10px] mr-[10px] float-left'> ~ </p>
                           <Textinput
-                            label=""
-                            type="text"
-                            placeholder=""
-                            className="w-[50px] h-[32px] text-s float-left"
+                            label=''
+                            type='text'
+                            placeholder=''
+                            className='w-[50px] h-[32px] text-s float-left'
                             onChange={(e) => handleInputValueChange(e, 'ageEnd')}
                             value={searchMember.ageEnd}
                           />
                         </td>
                       </tr>
                       <tr>
-                        <td className="table-td w-[150px]">성별</td>
-                        <td className="flex gap-5 mt-[16px]">
-                          {genders.map((gender, i) => (
+                        <td className='table-td w-[150px]'>성별</td>
+                        <td className='flex gap-5 mt-[16px]'>
+                          {gender.map((gender, i) => (
                             <Radio
                               key={i}
-                              name="gender"
+                              name='gender'
                               label={gender.label}
                               value={gender.value}
                               checked={selectGender === gender.value}
@@ -391,113 +435,114 @@ const MemberSearch = ({ setSearchedInfo }) => {
                         </td>
                       </tr>
                       <tr>
-                        <td className="table-td">구매금액/건수</td>
+                        <td className='table-td'>구매금액/건수</td>
                         <td>
                           <Select
-                            className="w-[120px] mr-1 react-select float-left"
-                            classNamePrefix="select"
+                            className='w-[120px] mr-1 react-select float-left'
+                            classNamePrefix='select'
                             defaultValue={amount[0]}
                             options={amount}
                             styles={styles}
+                            value={[{ value: searchMember.amount, label: selectLabel.amount }]}
                           />
                           <Textinput
-                            label=""
-                            type="text"
-                            placeholder=""
-                            className="w-[50px] h-[32px] text-sm float-left"
+                            label=''
+                            type='text'
+                            placeholder=''
+                            className='w-[50px] h-[32px] text-sm float-left'
                           />
-                          <p className="ml-[10px] mr-[10px] float-left"> ~ </p>
+                          <p className='ml-[10px] mr-[10px] float-left'> ~ </p>
                           <Textinput
-                            label=""
-                            type="text"
-                            placeholder=""
-                            className="w-[50px] h-[32px] text-sm float-left"
+                            label=''
+                            type='text'
+                            placeholder=''
+                            className='w-[50px] h-[32px] text-sm float-left'
                           />
                         </td>
                       </tr>
                       <tr>
-                        <td className="table-td">주문일/결제완료일</td>
+                        <td className='table-td'>주문일/결제완료일</td>
                         <td>
                           <Select
-                            className="w-[120px] mr-1 react-select align-middle inline-block"
-                            classNamePrefix="select"
+                            className='w-[120px] mr-1 react-select align-middle inline-block'
+                            classNamePrefix='select'
                             defaultValue={orderDate[0]}
                             options={orderDate}
                             styles={styles}
                           />
                           <Flatpickr
-                            className="form-control py-2 w-[120px] align-middle inline-block"
+                            className='form-control py-2 w-[120px] align-middle inline-block'
                             value={picker}
                             onChange={(date) => handlePicker(date)}
                           />
-                          <p className="ml-[10px] mr-[10px] align-middle inline-block"> ~ </p>
+                          <p className='ml-[10px] mr-[10px] align-middle inline-block'> ~ </p>
                           <Flatpickr
-                            className="form-control py-2 w-[120px] align-middle inline-block"
+                            className='form-control py-2 w-[120px] align-middle inline-block'
                             value={picker2}
                             onChange={(date) => setPicker2(date)}
-                            id="default-picker2"
+                            id='default-picker2'
                           />
                         </td>
                       </tr>
                       <tr>
-                        <td className="table-td">주문상품</td>
+                        <td className='table-td'>주문상품</td>
                         <td>
                           <Textinput
-                            label=""
-                            type="text"
-                            placeholder=""
-                            className="w-[200px] h-[32px] text-sm float-left"
+                            label=''
+                            type='text'
+                            placeholder=''
+                            className='w-[200px] h-[32px] text-sm float-left'
                           />
-                          <Button text="상품 검색" className="btn-outline-dark p-[5px] ml-[10px] float-left" />
+                          <Button text='상품 검색' className='btn-outline-dark p-[5px] ml-[10px] float-left' />
                         </td>
                       </tr>
                       <tr>
-                        <td className="table-td">가용 적립금</td>
+                        <td className='table-td'>가용 적립금</td>
                         <td>
                           <Select
-                            className="w-[120px] mr-1 react-select float-left"
-                            classNamePrefix="select"
+                            className='w-[120px] mr-1 react-select float-left'
+                            classNamePrefix='select'
                             defaultValue={point[0]}
                             options={point}
                             styles={styles}
                           />
                           <Textinput
-                            label=""
-                            type="text"
-                            placeholder=""
-                            className="w-[50px] h-[32px] text-sm float-left"
+                            label=''
+                            type='text'
+                            placeholder=''
+                            className='w-[50px] h-[32px] text-sm float-left'
                           />
-                          <p className="ml-[10px] mr-[10px] float-left"> ~ </p>
+                          <p className='ml-[10px] mr-[10px] float-left'> ~ </p>
                           <Textinput
-                            label=""
-                            type="text"
-                            placeholder=""
-                            className="w-[50px] h-[32px] text-sm float-left"
+                            label=''
+                            type='text'
+                            placeholder=''
+                            className='w-[50px] h-[32px] text-sm float-left'
                           />
                         </td>
                       </tr>
                       <tr>
-                        <td className="table-td">접속일</td>
+                        <td className='table-td'>접속일</td>
                         <td>
                           <Flatpickr
-                            className="form-control py-2 w-[120px] align-middle inline-block "
+                            className='form-control py-2 w-[120px] align-middle inline-block '
                             value={picker3}
                             onChange={(date) => setPicker3(date)}
-                            id="default-picker3"
+                            id='default-picker3'
                           />
-                          <p className="ml-[10px] mr-[10px] align-middle inline-block"> ~ </p>
+                          <p className='ml-[10px] mr-[10px] align-middle inline-block'> ~ </p>
                           <Flatpickr
-                            className="form-control py-2 w-[120px] align-middle inline-block "
+                            className='form-control py-2 w-[120px] align-middle inline-block '
                             value={picker4}
                             onChange={(date) => setPicker4(date)}
-                            id="default-picker4"
+                            id='default-picker4'
                           />
                         </td>
                       </tr>
                       <tr>
-                        <td className="table-td">휴면 회원</td>
+                        <td className='table-td'>휴면 회원</td>
                         <td>
-                          <Checkbox value={checked} name="dormantAccount" onChange={handleCheckbox} />
+                          <Checkbox value={checked} name='dormantAccount' onChange={handleCheckbox} />
                         </td>
                       </tr>
                     </tbody>
@@ -507,11 +552,11 @@ const MemberSearch = ({ setSearchedInfo }) => {
             </div>
           </div>
         </Card>
-        <div className="box box-warning flex justify-center gap-3">
-          <button className="btn btn-dark" onClick={handleSubmit}>
+        <div className='box box-warning flex justify-center gap-3'>
+          <button className='btn btn-dark' onClick={handleSubmit}>
             검&nbsp;&nbsp;&nbsp;&nbsp;색
           </button>
-          <button type="submit" className="btn btn-secondary" onClick={handleReset}>
+          <button type='submit' className='btn btn-secondary' onClick={handleReset}>
             초기화
           </button>
         </div>
