@@ -298,7 +298,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                     <i></i>
 													<c:choose>
 														<c:when test="${sessionScope.loginMember == null }">
-		                                                    <a href="/logintest/main">Log In</a>
+		                                                    <a href="/login/">Log In</a>
 														</c:when>
 														<c:otherwise>
 		                                                    <a href="/logintest/logout">Log out</a>

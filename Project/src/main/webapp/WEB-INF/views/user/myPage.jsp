@@ -385,7 +385,7 @@
 	}
 	
 	//배송주소록 수정
-	function shippingAddrModify() {
+	function shippingAddrModify(addrSeq) {
 		let zipCode = $('#shippingZipNoModify').val()
 		let address = $('#shippingAddrModify').val()
 		let detailAddress = $('#shippingDetailAddrModify').val()
@@ -424,20 +424,25 @@
 	function editShippingAddr(addrSeq) {
 		alert(addrSeq + "번 배송지를 수정하자")
 		$.ajax({
-			url : '/user/myPage', // 데이터를 수신받을 서버 주소
-			type : 'GET', // 통신방식(GET, POST, PUT, DELETE)
+			url : '/user/myPage/modifyShippingAddr', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
-					addrSeq
+				"addrSeq" : addrSeq
 			},
+			dataType : 'json',
 			async : false,
 			success : function(data) {
 				console.log(data);
+				outputShippingAddr(data);
 			},
 			error : function() {
 			}
 		});
 	}
 	
+	function outputShippingAddr(addr) {
+		
+	}
 </script>
 <style>
 #deliveryStatus, #successPwd, #successPhoneNumber,
@@ -1710,6 +1715,7 @@
 									<div class="title title-flex">
 										<div>
 											<h2>배송주소록</h2>
+											
 											<span class="title-leaf"> <svg
 													class="icon-width bg-gray">
                             <use
@@ -1732,6 +1738,7 @@
 									<div class="row g-sm-4 g-3">
 										<c:forEach var="addr" items="${userAddrList }">
 											<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
+											
 												<div class="address-box">
 													<div>
 														<div class="form-check">
@@ -1745,7 +1752,7 @@
 															</div>
 														</c:if>
 
-
+				
 														<div class="table-responsive address-table">
 															<table class="table">
 																<tbody>
@@ -1780,7 +1787,7 @@
 
 													<div class="button-group">
 														<button class="btn btn-sm add-button w-100"
-															data-bs-toggle="modal" th:attr="data-bs-target=${'#editProfile'+ userAddrList }" 
+															data-bs-toggle="modal" data-bs-target='#editProfile'
 															onclick="editShippingAddr(${addr.addrSeq});">
 															<i data-feather="edit"></i> Edit
 														</button>
@@ -2214,13 +2221,14 @@
 
 	<!-- Edit Profile Start -->
 	
-	<div class="modal fade theme-modal" th:attr="id='editProfile' + ${userAddrList }" tabindex="-1"
+	<div class="modal fade theme-modal" id='editProfile' tabindex="-1"
 		aria-labelledby="exampleModalLabel2" aria-hidden="true">
 		<div
 			class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen-sm-down">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title" id="exampleModalLabel2">배송지 수정</h5>
+					<div> ${memberShippingAddr}</div>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<i class="fa-solid fa-xmark"></i>
@@ -2229,15 +2237,16 @@
 				<div class="modal-body">
 					<div class="row g-4">
 						<div class="col-xxl-12">
+					
 							<form>
 								<div class="form-floating theme-form-floating">
 									<input type="text" class="form-control" id="recipientName" name="recipient" placeholder="받는사람"
-										value="${userAddrList.recipient }" /> <label for="recipientName">받는사람</label>
+										value="${memberShippingAddr.recipient} " /> <label for="recipientName">받는사람</label>
 								</div>
 								
 								<div class="form-floating theme-form-floating">
 									<input type="text" class="form-control" id="editRecipientContact" placeholder="받는사람 연락처"
-										value="${userAddrList.recipientContact }" /> <label for="editRecipientContact">받는사람 연락처</label>
+										value="${memberShippingAddr.recipientContact}" /> <label for="editRecipientContact">받는사람 연락처</label>
 										<p>- 포함해서 입력해주세요.</p>
 								</div>
 							</form>
@@ -2249,7 +2258,7 @@
 							<form>
 								<div class="form-floating theme-form-floating">
 									<input type="text" class="form-control" id="shippingZipNoModify" name="zipCode"
-										value="${userAddrList.zipCode }" readonly/> <label for="shippingZipNoModify">우편번호</label>
+										value="${memberShippingAddr.zipCode}" readonly/> <label for="shippingZipNoModify">우편번호</label>
 								</div>
 							</form>
 						</div>
@@ -2257,10 +2266,8 @@
 						<div class="col-xxl-6">
 							<form>
 								<div class="form-floating theme-form-floating">
-									<input class="form-control" type="text" value="${userAddrList.address }"
-										name="address" id="shippingAddrModify" maxlength="10"
-										oninput="javascript: if (this.value.length > this.maxLength) this.value =
-                                            this.value.slice(0, this.maxLength);" readonly/>
+									<input class="form-control" type="text" value="${memberShippingAddr.address}"
+										name="address" id="shippingAddrModify" readonly/>
 									<label for="shippingAddrModify">주소</label>
 								</div>
 							</form>
@@ -2270,7 +2277,7 @@
 							<form>
 								<div class="form-floating theme-form-floating">
 									<input type="text" class="form-control" id="shippingDetailAddrModify"
-										value="${userAddrList.detailAddress }" /> <label
+										value="${memberShippingAddr.detailAddress}" /> <label
 										for="shippingDetailAddrModify">상세주소</label>
 								</div>
 							</form>
@@ -2279,7 +2286,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" data-bs-dismiss="modal"
-						class="btn theme-bg-color btn-md fw-bold text-light" onclick="shippingAddrModify();">
+						class="btn theme-bg-color btn-md fw-bold text-light" onclick="shippingAddrModify(${memberShippingAddr.addrSeq});">
 						변경</button>
 					<button type="button" class="btn btn-animation btn-md fw-bold"
 						data-bs-dismiss="modal">닫기</button>
