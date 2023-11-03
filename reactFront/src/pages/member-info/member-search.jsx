@@ -145,7 +145,6 @@ const MemberSearch = ({ setSearchedInfo }) => {
 
     document.body.style.cssText = '';
     if (savedScrollY) {
-      console.log('savedScrollY:', savedScrollY);
       window.scrollTo(0, savedScrollY);
       localStorage.removeItem('scrollY');
     }
@@ -185,7 +184,7 @@ const MemberSearch = ({ setSearchedInfo }) => {
   };
 
   // 가입일/기념일
-  const checkSelectValue = (e) => {
+  const checkSelectValue = (e, name) => {
     const oldSelect = { ...searchMember };
     const initSelect = Object.entries(oldSelect).map((obj) => {
       if (inputSelectOption !== '' && obj[0].includes(inputSelectOption)) {
@@ -195,6 +194,10 @@ const MemberSearch = ({ setSearchedInfo }) => {
     });
     setSearchMember({
       ...Object.fromEntries(initSelect),
+    });
+    setSelectLabel({
+      ...selectLabel,
+      [name]: e.label,
     });
     // console.log('searchMember: ', searchMember);
     setInputSelectOption(e.value);
@@ -359,8 +362,10 @@ const MemberSearch = ({ setSearchedInfo }) => {
                             defaultValue={anniversary[0]}
                             options={anniversary}
                             styles={styles}
-                            onChange={checkSelectValue}
-                            // value={[{ value: searchMember.anniversary, label: selectLabel.anniversary }]}
+                            name='anniversary'
+                            onChange={(e, name) => checkSelectValue(e, name)}
+                            // 수정 필요
+                            value={[{ value: selectLabel.anniversary, label: selectLabel.anniversary }]}
                           />
                           {inputSelectOption !== '' && (
                             <span>

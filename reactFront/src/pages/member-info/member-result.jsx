@@ -5,8 +5,9 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Tooltip from '@/components/ui/Tooltip';
 import { useTable, useRowSelect, useSortBy, usePagination } from 'react-table';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import MemberInfoModal from './member-modal';
+import CrmPage from './member-modal-detail';
 
 const COLUMNS = [
   {
@@ -123,12 +124,12 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
   // // const data = useMemo(() => searchedInfo, []);
   const [totalMember, setTotalMember] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  const location = useLocation();
+  const [selectedMemberId, setSelectedMemberId] = useState('');
 
-  // let isGoBackClicked = false;
-
-  const openModal = () => {
+  const openModal = (row) => {
     setShowModal(!showModal);
+    setSelectedMemberId(row.cells[3].value);
+    console.log('id: ', row.cells[3].value);
   };
 
   const tableInstance = useTable(
@@ -204,6 +205,9 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
 
   return (
     <>
+      {/* <Routes location={location}>
+        <Route path=':modal' element={<Modal2 />} />
+      </Routes> */}
       {/* state 값 true일 시 모달 오픈 */}
       {showModal && (
         <MemberInfoModal
@@ -211,16 +215,16 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
           label='Extra large modal'
           labelClass='btn-outline-dark'
           uncontrol
+          noFade
           className='max-w-fit'
           showModal={showModal}
           setShowModal={setShowModal}
-          isGoBackClicked={isGoBackClicked}
+          selectedMemberId={selectedMemberId}
         >
-          <h4 className='font-medium text-lg mb-3 text-slate-900'>Lorem ipsum dolor sit.</h4>
+          {/* <h4 className='font-medium text-lg mb-3 text-slate-900'>Lorem ipsum dolor sit.</h4> */}
+
           <div className='text-base text-slate-600 dark:text-slate-300'>
-            Oat cake ice cream candy chocolate cake chocolate cake cotton candy dragée apple pie. Brownie carrot cake
-            candy canes bonbon fruitcake topping halvah. Cake sweet roll cake cheesecake cookie chocolate cake
-            liquorice.
+            <CrmPage />
           </div>
         </MemberInfoModal>
       )}
@@ -267,14 +271,24 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
                     prepareRow(row);
                     return (
                       <tr {...row.getRowProps()}>
-                        {row.cells.map((cell) => {
+                        {row.cells.map((cell, index) => {
                           return (
-                            <td {...cell.getCellProps()} className='table-td'>
+                            <td
+                              {...cell.getCellProps()}
+                              className='table-td cursor-pointer'
+                              onClick={index !== 0 ? () => openModal(row) : null}
+                            >
                               {/* row 클릭 시 모달 오픈 */}
-                              <Link to='modal' state={{ background: location }}>
+
+                              {cell.render('Cell')}
+
+                              {/* <Link to='' onClick={openModal}>
+                                {cell.render('Cell')}
+                              </Link> */}
+                              {/* <Link to='modal' state={{ background: location }}>
                                 {cell.render('Cell')}
                                 <Outlet />
-                              </Link>
+                              </Link> */}
                             </td>
                           );
                         })}

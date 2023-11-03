@@ -49,7 +49,7 @@ public class MemberAdminController {
 	public Map<String, Object> searchMemberInfo(@RequestBody SearchMemberRequest member) throws Exception {
 		System.out.println("member:" + member.toString());		
 		
-			return adminMemberService.getMemberInfo(member);
+		return adminMemberService.getMemberInfo(member);
 	}
 	
 	

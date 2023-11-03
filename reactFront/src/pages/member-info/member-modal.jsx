@@ -1,6 +1,7 @@
 import { Dialog, Transition } from '@headlessui/react';
 import React, { Fragment, useEffect } from 'react';
 import Icon from '@/components/ui/Icon';
+import { useNavigate } from 'react-router-dom';
 
 const MemberInfoModal = ({
   activeModal,
@@ -20,10 +21,8 @@ const MemberInfoModal = ({
   ref,
   showModal,
   setShowModal,
-  isGoBackClicked,
+  selectedMemberId,
 }) => {
-  // history.scrollRestoration = 'auto';
-
   const closeModal = () => {
     setShowModal(false);
   };
@@ -31,90 +30,45 @@ const MemberInfoModal = ({
   const openModal = () => {
     setShowModal(!showModal);
   };
+
   const returnNull = () => {
     return null;
   };
 
   // 모달 닫은 뒤에도 위치 고정
-  // 모달 창에서 백스페이스 누를 시 모달창만 꺼지도록
   if (showModal) {
-    // const [isGoBackClicked, setIsGoBackClicked] = useState(false);
     const scrollY = window.scrollY;
 
-    // const goBack = () => {
-    //   console.log('goBack');
-    //   isGoBackClicked = true;
-    //   closeModal();
-    // };
-
     useEffect(() => {
-      // const scrollPosition = window.scrollY;
-      console.log('savePos:', scrollY);
+      // url 변경
+      window.history.replaceState(null, '', `/admin/members/member-info/${selectedMemberId}`);
+
       localStorage.setItem('scrollY', scrollY);
-
       document.body.style.cssText = `
-      position: fixed;
-      top: -${scrollY}px;
-      overflow-y: scroll;
-      width: 100%;`;
-
-      // history.pushState({ page: 'modal' }, document.title, location.pathname + '#modal');
-      // window.addEventListener('popstate', goBack);
-      // console.log('popstate');
+        position: fixed;
+        top: -${scrollY}px;
+        overflow-y: scroll;
+        width: 100%;`;
 
       return () => {
-        const savedScrollY = localStorage.getItem('scrollY');
-        // window.removeEventListener('popstate', goBack);
-        // console.log('isGoBackClicked:', isGoBackClicked);
-        // if (!isGoBackClicked) {
-        //   history.back();
-        // }
+        // 이전 url로 복구
+        window.history.replaceState(null, '', `/admin/members/member-info`);
 
+        const savedScrollY = localStorage.getItem('scrollY');
+        document.body.style.cssText = '';
         if (savedScrollY) {
           console.log('savedScrollY:', savedScrollY);
           window.scrollTo(0, savedScrollY);
           localStorage.removeItem('scrollY');
         }
-        document.body.style.cssText = '';
       };
     }, []);
   }
-
-  // useEffect(() => {
-  //   history.pushState({ page: 'modal' }, document.title);
-  //   // document.addEventListener('popstate', goBack);
-
-  //   document.addEventListener('keydown', function (e) {
-  //     console.log(e);
-
-  //     if (e.code == 'Backspace') {
-  //       console.log('back');
-  //       goBack();
-  //     }
-  //   });
-
-  //   return () => {
-  //     document.addEventListener('keydown', function (e) {
-  //       console.log(e);
-
-  //       if (e.keycode == 8) {
-  //         console.log('back');
-  //         goBack();
-  //       }
-  //     });
-  //     if (!isGoBackClicked) {
-  //       history.back();
-  //     }
-  //   };
-  // }, []);
 
   return (
     <>
       {uncontrol ? (
         <>
-          {/* <button type="button" onClick={openModal} className={`btn ${labelClass}`}>
-            {label}
-          </button> */}
           <Transition appear show={showModal} as={Fragment}>
             <Dialog as='div' className='relative z-[99999]' onClose={!disableBackdrop ? closeModal : returnNull}>
               {!disableBackdrop && (
