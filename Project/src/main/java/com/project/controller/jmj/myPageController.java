@@ -29,8 +29,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
-import com.project.vodto.MyPageOrderList;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.DetailOrder;
+import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.kjy.Memberkjy;
 
 @Controller
@@ -48,24 +49,20 @@ public class myPageController {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMember_id();
-		
-		DecimalFormat formatter = new DecimalFormat("###,###");
-//		System.out.println(orderListNo);
-
-//		List<MyPageOrderList> lst = null;
 
 		try {
-//			lst = mService.getOrderHistory(memberId);
-			Member userInfo = mService.getMyInfo(memberId);
-			model.addAttribute("userInfo", userInfo);
-			System.out.println("회원정보 : " + userInfo);
+			//주문내역
+			List<MyPageOrderList> lst = mService.getOrderHistory(memberId);
+			model.addAttribute("orderList", lst);			
+			System.out.println("list : " + lst);
 			
-//			System.out.println("list : " + lst);
-//			model.addAttribute("orderList", lst);
+			//회원정보
+			Member userInfo = mService.getMyInfo(memberId);
+			model.addAttribute("userInfo", userInfo);			
 
+			//배송주소록
 			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
 			model.addAttribute("userAddrList", userAddrList);
-			System.out.println("배송주소록" + userAddrList);
 			
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
@@ -379,5 +376,23 @@ public class myPageController {
 		return result;
 	}
 	
+	@RequestMapping("orderDetail")
+	public void orderDetail(@RequestParam("no") String orderNo, HttpServletRequest request, Model model) {
+		System.out.println("주문상세페이지입니당.");
+		
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMember_id();
+		
+		try {
+			List<DetailOrder> detailOrderInfo = mService.getDetailOrderInfo(memberId, orderNo);
+			model.addAttribute("detailOrderInfo", detailOrderInfo);
+			System.out.println("주문상세정보!!!!!" + detailOrderInfo.toString());
+			
+		} catch (SQLException | NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }

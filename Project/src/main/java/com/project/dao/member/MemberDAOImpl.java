@@ -12,8 +12,9 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.Member;
-import com.project.vodto.MyPageOrderList;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.DetailOrder;
+import com.project.vodto.jmj.MyPageOrderList;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO {
@@ -207,7 +208,15 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.update(ns + ".updateBasicAddr", params);
 	}
-
+	
+	@Override
+	public List<DetailOrder> selectDetailOrder(String memberId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.selectList(ns + ".getDetailOrder", params);
+	}
 	
 	
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
@@ -240,6 +249,8 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectOne(ns + ".login", param);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+	
 
 	
 

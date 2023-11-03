@@ -15,10 +15,11 @@ import com.project.vodto.Board;
 import com.project.vodto.CouponLog;
 import com.project.vodto.CustomerInquiry;
 import com.project.vodto.Member;
-import com.project.vodto.MyPageOrderList;
 import com.project.vodto.OrderHistory;
 import com.project.vodto.PointLog;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.DetailOrder;
+import com.project.vodto.jmj.MyPageOrderList;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -192,6 +193,11 @@ public class MemberServiceImpl implements MemberService {
 		return result;	
 	}
 	
+	@Override
+	public List<DetailOrder> getDetailOrderInfo(String memberId, String orderNo) throws SQLException, NamingException {
+		
+		return mDao.selectDetailOrder(memberId, orderNo);
+	}
 
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
@@ -237,6 +243,8 @@ public class MemberServiceImpl implements MemberService {
 		return result;
 	}
 	// --------------------------------------- 김진솔 끝 ----------------------------------------	
+
+	
 
 	
 

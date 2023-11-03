@@ -572,7 +572,7 @@
 .theme-form-floating
 .editCellPhoneNumber, .form-floating
 .theme-form-floating
-.pwd {
+.pwd, #orderStatus {
 	display: flex;
 }
 
@@ -581,6 +581,26 @@
 }
 .container-fluid-lg.recentOrderHistoy{
 	padding-left: 0px;
+}
+.btn.btn-sm.add-button.w-100.basicAddrBtn{
+	background-color: #E0EFEC;
+}
+.col-xxl-9.recentOrder{
+	margin-top: 0px;
+}
+#deliveryStatus{
+	gap:15px;
+}
+#orderStatus{
+	gap : 7px;
+	
+}
+#orderStatus Button{
+	width: 80px;
+	height: 30px;
+}
+.orderDetailClick{
+	font-size: 24px;
 }
 </style>
 </head>
@@ -739,9 +759,9 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="pills-profile-tab"
-									data-bs-toggle="pill" data-bs-target="#pills-profile"
-									type="button" role="tab" aria-controls="pills-profile"
+								<button class="nav-link" id="pills-review-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-review"
+									type="button" role="tab" aria-controls="pills-review"
 									aria-selected="false">
 									<i data-feather="clipboard"></i>작성한 리뷰
 								</button>
@@ -828,7 +848,7 @@
 									<section class="cart-section section-b-space">
 										<div class="container-fluid-lg recentOrderHistoy">
 											<div class="row g-sm-5 g-3">
-												<div class="col-xxl-9">
+												<div class="col-xxl-9 recentOrder">
 													<div class="cart-table">
 														<div class="table-responsive-xl">
 															<table class="table">
@@ -1430,17 +1450,25 @@
 									<div class="order-contain">
 										<div class="order-box dashboard-bg-box">
 
-											${orderList }
-
 											<div class="product-order-detail">
 												<c:forEach var="order" items="${orderList }">
-													<a href="#" class="order-image"> <img
-														src="${order.productImage }" class="blur-up lazyload"
-														alt="${order.productName }" id="productImg" />
-													</a>
+												<c:choose>
+													<c:when test="${order.productInfoImage == null }">
+														<a href="#" class="order-image"> <img
+															src="${order.productInfoImage }" class="blur-up lazyload"
+															alt="${order.productName }" id="productImg" />
+														</a>
+													</c:when>
+													<c:otherwise>
+														<a href="#" class="order-image"> <img
+															src="/resources/assets/images/noimage.png" class="blur-up lazyload"
+															alt="noImg" id="productImg" />
+														</a>
+													</c:otherwise>
+												</c:choose>
 
 													<div class="order-wrap">
-														<h3>${order.orderNo }</h3>
+														<a class="orderDetailClick" href="orderDetail?no=${order.orderNo }">주문번호 : ${order.orderNo }</a>
 														<p class="text-content">${order.orderTime }</p>
 														<a href="#">
 															<h3>${order.productName }</h3>
@@ -1453,8 +1481,6 @@
 																</div>
 															</li>
 
-
-
 															<li>
 																<div class="size-box">
 																	<h6 class="text-content">총 결제금액 :</h6>
@@ -1464,8 +1490,66 @@
 
 															<li>
 																<div class="size-box">
-																	<h6 class="text-content">Quantity :</h6>
-																	<h5>250 G</h5>
+																	<h6 class="text-content">배송상태 :</h6>
+																	<h5>${order.deliveryStatus }</h5>
+																</div>
+															</li>
+															
+															<li>
+																<div class="size-box">
+																	<div id="orderStatus">
+																		<c:choose>
+																			<c:when test="${order.deliveryStatus eq '출고전' }">
+																				<button
+																					class="btn theme-bg-color text-white m-0"
+																					type="button" id="button-addon1">
+																					<span>취소</span>
+																				</button>	
+																			</c:when>
+																			
+																			<c:when test="${order.deliveryStatus eq '입금전' }">
+																				<button
+																					class="btn theme-bg-color text-white m-0"
+																					type="button" id="button-addon1">
+																					<span>취소</span>
+																				</button>	
+																			</c:when>
+																			
+																			<c:when test="${order.deliveryStatus eq '출고완료' }">
+																				<button
+																					class="btn theme-bg-color text-white m-0"
+																					type="button" id="button-addon1">
+																					<span>배송조회</span>
+																				</button>	
+																			</c:when>
+																			
+																			<c:when test="${order.deliveryStatus eq '배송중' }">
+																				<button
+																					class="btn theme-bg-color text-white m-0"
+																					type="button" id="button-addon1">
+																					<span>배송조회</span>
+																				</button>	
+																			</c:when>
+																			
+																			<c:otherwise>
+																				<button
+																					class="btn theme-bg-color text-white m-0"
+																					type="button" id="button-addon1">
+																					<span>교환</span>
+																				</button>	
+																				<button
+																					class="btn theme-bg-color text-white m-0"
+																					type="button" id="button-addon1">
+																					<span>반품</span>
+																				</button>
+																				<button
+																					class="btn theme-bg-color text-white m-0"
+																					type="button" id="button-addon1">
+																					<span>리뷰작성</span>
+																				</button>
+																			</c:otherwise>
+																	</c:choose>
+																	</div>
 																</div>
 															</li>
 														</ul>
@@ -1867,7 +1951,7 @@
 														
 													<c:if test="${fn:contains(addr.basicAddr,'N')}">
 														<button
-															class="btn btn-sm add-button w-100"
+															class="btn btn-sm add-button w-100 basicAddrBtn"
 															onclick="setBasicAddr(${addr.addrSeq});">
 															<i data-feather=check class="me-2"></i> 기본배송지로 설정
 														</button>

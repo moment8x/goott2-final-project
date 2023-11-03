@@ -5,17 +5,14 @@
 
 <mapper namespace="com.project.mappers.memberMapper">
 	<select id="getOrderList"
-		resultType="com.project.vodto.MyPageOrderList">
-	SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, o.member_id,
-		max(pay.actual_payment_amount) as actualPaymentAmount, max(prod.product_image) as product_image,  max(prod.product_name) as product_name, count(d.order_no) as totalOrderCnt
-		FROM products prod
-		inner JOIN  detailed_order_items d
-        on prod.product_id = d.product_id
-		inner JOIN payments pay
-        on pay.order_no = d.order_no
-        inner join order_history o
-        on d.order_no = o.order_no
-		where member_id = #{memberId}  group by order_no
+		resultType="com.project.vodto.jmj.MyPageOrderList">
+	SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, d.product_id,
+		pay.actual_payment_amount, prod.product_info_image,  prod.product_name, sum(d.product_quantity) as totalOrderCnt
+		FROM products prod, detailed_order_items d, order_history o, payments pay
+        where member_id = #{memberId}
+        and prod.product_id = d.product_id
+        and d.order_no = o.order_no
+        and o.order_no = pay.order_no group by o.order_no order by order_time desc
 	</select>
 
 	<select id="getProductCount" resultType="int">
@@ -99,6 +96,18 @@
 	<update id="updateBasicAddr">
 		update shipping_address set basic_addr = 'Y' where member_id = #{memberId} and addr_seq = #{addrSeq}
 	</update>
+	
+	<select id="getDetailOrder" resultType="com.project.vodto.jmj.DetailOrder"> 
+		select o.order_no, o.invoice_number, o.recipient_name, o.recipient_phone_number, o.order_time,
+		o.zip_code, o.shipping_address, o.detailed_shipping_address, o.delivery_status, o.delivery_message, d.product_price, d.product_quantity, d.product_status,
+	    pay.payment_method, pay.total_amount, pay.shipping_fee, pay.used_reward, pay.used_points, pay.actual_payment_amount, pay.card_name, pay.card_number,
+	    prod.product_info_image, prod.product_name
+	    from order_history o, detailed_order_items d, payments pay, products prod
+	    where member_id = #{memberId} and d.order_no = #{orderNo}
+	    and prod.product_id = d.product_id
+		and d.order_no = o.order_no
+		and o.order_no = pay.order_no;	
+	</select>
 
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">

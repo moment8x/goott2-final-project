@@ -11,10 +11,11 @@ import com.project.vodto.Board;
 import com.project.vodto.CouponLog;
 import com.project.vodto.CustomerInquiry;
 import com.project.vodto.Member;
-import com.project.vodto.MyPageOrderList;
 import com.project.vodto.OrderHistory;
 import com.project.vodto.PointLog;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.DetailOrder;
+import com.project.vodto.jmj.MyPageOrderList;
 
 public interface MemberService {
 	// ----------------------------------- 장민정 시작 -----------------------------------
@@ -74,6 +75,9 @@ public interface MemberService {
 	
 	//기본배송지 설정
 	boolean setBasicAddr(String memberId, int addrSeq) throws SQLException, NamingException;
+	
+	//주문상세페이지 정보 가져오기
+	List<DetailOrder> getDetailOrderInfo(String memberId, String orderNo) throws SQLException, NamingException;
 
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
@@ -84,6 +88,7 @@ public interface MemberService {
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
+	
 	
 	
 	
