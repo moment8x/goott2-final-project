@@ -5,9 +5,9 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Tooltip from '@/components/ui/Tooltip';
 import { useTable, useRowSelect, useSortBy, usePagination } from 'react-table';
-import { useLocation, useNavigate } from 'react-router-dom';
 import MemberInfoModal from './member-modal';
-import CrmPage from './member-modal-detail';
+import Layout from './member-modal-detail/Layout';
+import Sidebar from '@/components/partials/sidebar';
 
 const COLUMNS = [
   {
@@ -195,7 +195,7 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
 
   // 총 회원 수 조회
   useEffect(() => {
-    fetch('http://localhost:8081/admin/members/member-info', { method: 'GET' })
+    fetch('http://localhost:8081/admin/members/count', { method: 'GET' })
       .then((res) => res.json())
       .then((res) => {
         console.log('res:', res);
@@ -215,8 +215,9 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
           label='Extra large modal'
           labelClass='btn-outline-dark'
           uncontrol
+          // scrollContent
           noFade
-          className='max-w-fit'
+          className='max-w max-h'
           showModal={showModal}
           setShowModal={setShowModal}
           selectedMemberId={selectedMemberId}
@@ -224,7 +225,8 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
           {/* <h4 className='font-medium text-lg mb-3 text-slate-900'>Lorem ipsum dolor sit.</h4> */}
 
           <div className='text-base text-slate-600 dark:text-slate-300'>
-            <CrmPage />
+            <Layout />
+            {/* <Sidebar /> */}
           </div>
         </MemberInfoModal>
       )}

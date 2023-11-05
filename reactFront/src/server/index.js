@@ -55,17 +55,6 @@ createServer({
     // this.namespace = 'api';
     this.urlPrefix = 'http://localhost:8081';
 
-    // this.post('/*', (schema, request) => {
-    //   let attrs = JSON.parse(request.requestBody).user;
-    //   // console.log('attrs :', attrs);
-    //   // debugger;
-    //   if (attrs.name) {
-    //     return schema.user.create(attrs);
-    //   } else {
-    //     return new Response(400, { some: 'header' }, { errors: ['name cannot be blank'] });
-    //   }
-    // });
-
     authServerConfig(this);
     ShopServerConfig(this);
     calendarServerConfig(this);

@@ -1,7 +1,8 @@
 import { Dialog, Transition } from '@headlessui/react';
 import React, { Fragment, useEffect } from 'react';
 import Icon from '@/components/ui/Icon';
-import { useNavigate } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import MemberSearch from './member-search';
 
 const MemberInfoModal = ({
   activeModal,
@@ -23,6 +24,8 @@ const MemberInfoModal = ({
   setShowModal,
   selectedMemberId,
 }) => {
+  const location = useLocation();
+
   const closeModal = () => {
     setShowModal(false);
   };
@@ -41,7 +44,7 @@ const MemberInfoModal = ({
 
     useEffect(() => {
       // url 변경
-      window.history.replaceState(null, '', `/admin/members/member-info/${selectedMemberId}`);
+      window.history.replaceState(null, '', `/admin/members/search/${selectedMemberId}`);
 
       localStorage.setItem('scrollY', scrollY);
       document.body.style.cssText = `
@@ -52,7 +55,7 @@ const MemberInfoModal = ({
 
       return () => {
         // 이전 url로 복구
-        window.history.replaceState(null, '', `/admin/members/member-info`);
+        window.history.replaceState(null, '', `/admin/members/search`);
 
         const savedScrollY = localStorage.getItem('scrollY');
         document.body.style.cssText = '';
@@ -67,6 +70,9 @@ const MemberInfoModal = ({
 
   return (
     <>
+      {/* <Routes location={location}>
+        <Route path=':home' element={<MemberSearch />} />
+      </Routes> */}
       {uncontrol ? (
         <>
           <Transition appear show={showModal} as={Fragment}>

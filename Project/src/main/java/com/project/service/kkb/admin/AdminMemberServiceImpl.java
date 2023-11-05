@@ -8,8 +8,12 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.project.dao.kkb.admin.AdminMemberDAO;
-import com.project.vodto.kkb.SearchMemberRequest;
-import com.project.vodto.kkb.SearchMemberResponse;
+import com.project.vodto.kkb.MemberBasicInfo;
+import com.project.vodto.kkb.MemberCondition;
+import com.project.vodto.kkb.MemberRecentInquiry;
+import com.project.vodto.kkb.MemberRecentOrder;
+import com.project.vodto.kkb.MemberRecentPost;
+import com.project.vodto.kkb.MemberResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +33,25 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		
 		return result;
 	}
+	
+	@Override
+	public Map<String, Object> getHomeDetailInfo(String memberId) throws Exception {
+		
+		MemberBasicInfo basicInfo = adminMemberRepository.findBasicInfoById(memberId);
+		List<MemberRecentOrder> recentOrder = adminMemberRepository.findRecentOrderById(memberId);
+		List<MemberRecentPost> recentPost = adminMemberRepository.findRecentPostById(memberId);
+		List<MemberRecentInquiry> recentInquiry = adminMemberRepository.findRecentInquiryById(memberId);
+		
+		Map<String, Object> result = new HashMap<>();
+		result.put("basicInfo", basicInfo);
+		result.put("recentOrder", recentOrder);
+		result.put("recentPost", recentPost);
+		result.put("recentInquiry", recentInquiry);
+		
+		return result;
+	}
+	
+	
 //	@Override
 //	public Map<String, Object> getTotalMemberCount() throws Exception {
 //		// DB가 아니라 MemberCountListener에 미리 저장해둔 값 가져옴
@@ -55,15 +78,15 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 //	
 	
 	@Override
-	public Map<String, Object> getMemberInfo(SearchMemberRequest member ) throws Exception {
+	public Map<String, Object> getMemberInfo(MemberCondition member ) throws Exception {
 		
 		//전화번호 "-" 제거
 		member.setCellPhoneNumber(member.getCellPhoneNumber().replace("-", "")); 
 		member.setPhoneNumber(member.getPhoneNumber().replace("-", ""));
 		
-		List<SearchMemberResponse> responseList = adminMemberRepository.findByInfo(member);
+		List<MemberResponse> responseList = adminMemberRepository.findByInfo(member);
 		
-		for ( SearchMemberResponse responseParam : responseList ) {
+		for ( MemberResponse responseParam : responseList ) {
 			
 			//=== 값 세팅 ===//
 			
@@ -88,7 +111,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		return result;
 	}
 	
-	private String detectRegion(SearchMemberResponse param) {
+	private String detectRegion(MemberResponse param) {
 		List<String> regions = 
 				List.of("서울","경기","인천","강원","충남", "충청북도","충북","충청북도",
 						"대전","경북","경상북도","경남","경상남도","대구","부산","울산",
@@ -106,7 +129,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		return region;
 	}
 
-	private String calculateAge(SearchMemberResponse param) {
+	private String calculateAge(MemberResponse param) {
 		
 		String birth = param.getDateOfBirth().replace("-", "");
 		Calendar current = Calendar.getInstance();
@@ -127,6 +150,5 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	}
 
 
-	
 
 }

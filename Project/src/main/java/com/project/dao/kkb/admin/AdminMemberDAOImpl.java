@@ -5,8 +5,12 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
-import com.project.vodto.kkb.SearchMemberRequest;
-import com.project.vodto.kkb.SearchMemberResponse;
+import com.project.vodto.kkb.MemberBasicInfo;
+import com.project.vodto.kkb.MemberCondition;
+import com.project.vodto.kkb.MemberRecentInquiry;
+import com.project.vodto.kkb.MemberRecentOrder;
+import com.project.vodto.kkb.MemberRecentPost;
+import com.project.vodto.kkb.MemberResponse;
 
 @Repository
 public class AdminMemberDAOImpl implements AdminMemberDAO {
@@ -25,9 +29,33 @@ public class AdminMemberDAOImpl implements AdminMemberDAO {
 	}
 	
 	@Override
-	public List<SearchMemberResponse> findByInfo(SearchMemberRequest member) throws Exception {
+	public List<MemberResponse> findByInfo(MemberCondition member) throws Exception {
 		
 		return ses.selectList(ns + ".findByInfo", member);
+	}
+
+	@Override
+	public MemberBasicInfo findBasicInfoById(String memberId) throws Exception {
+		
+		return ses.selectOne(ns + ".findBasicInfoById", memberId);
+	}
+
+	@Override
+	public List<MemberRecentOrder> findRecentOrderById(String memberId) throws Exception {
+		
+		return ses.selectList(ns + ".findRecentOrderById", memberId);
+	}
+
+	@Override
+	public List<MemberRecentPost> findRecentPostById(String memberId) throws Exception {
+		
+		return ses.selectList(ns + ".findRecentPostById", memberId);
+	}
+
+	@Override
+	public List<MemberRecentInquiry> findRecentInquiryById(String memberId) throws Exception {
+		
+		return ses.selectList(ns + ".findRecentInquiryById", memberId);
 	}
 
 	

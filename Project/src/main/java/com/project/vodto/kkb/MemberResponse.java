@@ -3,7 +3,7 @@ package com.project.vodto.kkb;
 import lombok.Data;
 
 @Data
-public class SearchMemberResponse {
+public class MemberResponse {
 	private String registrationDate;
 	private String name;
 	private String memberId;

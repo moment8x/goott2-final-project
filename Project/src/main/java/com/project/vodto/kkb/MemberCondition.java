@@ -5,7 +5,7 @@ import java.sql.Date;
 import lombok.Data;
 
 @Data
-public class SearchMemberRequest {
+public class MemberCondition {
 	private String ageStart;
 	private String ageEnd;
 	private Date registrationDateStart;
