@@ -111,6 +111,9 @@
 			</div>
 		</div>
 	</section>
+	<div>
+							<sec:authentication property="principal"/>
+						</div>
 	<!-- Product Section End -->
 
 	<jsp:include page="../footer.jsp"></jsp:include>

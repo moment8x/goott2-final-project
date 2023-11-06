@@ -4,11 +4,12 @@
 
 <!DOCTYPE html>
 <html>
+
 <head>
 <meta charset="UTF-8">
 <meta name="google-signin-client_id" content="868189545870-s003dih3cpr96cotlbo38r5tti76sj5d.apps.googleusercontent.com">
 <script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" charset="utf-8"></script>
-<script src="https://apis.google.com/js/platform.js" async defer></script>
+<script src="https://apis.google.com/js/platform.js?onload=loadAuthClient" async defer></script>
     <script
       src="https://code.jquery.com/jquery-3.4.1.js"
       integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
@@ -27,13 +28,16 @@
 	}
 </style>
 <script>
-	window.onload = function () {
-		google.accounts.id.initialize({
-			client_id: '868189545870-s003dih3cpr96cotlbo38r5tti76sj5d.apps.googleusercontent.com',
-			callback: handleCredentialResponse
-		});
-		google.accounts.id.prompt();
-	};
+	function initGoogleAuth (clientId = 'YOUR_CLIENT_ID') {
+		  gapi.auth2.init({
+		    client_id: clientId,
+		    scope: 'https://www.googleapis.com/auth/userinfo.email'
+		  }).then(() => {
+		    document.getElementById('sign-in-btn').disabled = false;
+		  }).catch(err => {
+		    console.log(err);
+		  });
+		}
 </script>
 <!-- Callback 처리 -->
 
@@ -122,7 +126,6 @@
                             <img src="/resources/assets/images/deer.png" style="width: 50%" />
                             <img src="/resources/assets/images/Deer_logo.png" />
                             </div>
-                            
                         </div>
 
                         <div class="input-box">
@@ -146,8 +149,8 @@
                                     <div class="forgot-box">
                                         <div class="form-check ps-0 m-0 remember-box">
                                             <input class="checkbox_animated check-box" type="checkbox"
-                                                id="flexCheckDefault">
-                                            <label class="form-check-label" for="flexCheckDefault" name="remember">자동 로그인</label>
+                                                id="flexCheckDefault" name="rememberMe">
+                                            <label class="form-check-label" for="flexCheckDefault" >자동 로그인</label>
                                         </div>
                                         <a href="forgot.html" class="forgot-password">아이디/비밀번호 찾기</a>
                                     </div>

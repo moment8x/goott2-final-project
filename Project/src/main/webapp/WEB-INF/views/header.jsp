@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html >
   <head>
@@ -147,7 +148,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                     <i class="fa-solid fa-bars"></i>
                                 </span>
                             </button>
-                            <a href="index.html" class="web-logo nav-logo">
+                            <a href="/" class="web-logo nav-logo">
 
                                 <img src="/resources/assets/images/deer.png" class="img-fluid blur-up lazyload" alt="">
                             </a>
@@ -208,11 +209,6 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                             </div>
                                         </a>
                                     </li>
-                                    <li class="right-side">
-                                        <a href="wishlist.html" class="btn p-0 position-relative header-wishlist">
-                                            <i data-feather="heart"></i>
-                                        </a>
-
                                     <li class="right-side" data-bs-toggle="modal" data-bs-target="#deal-box">
                                             <i data-feather="heart"></i>
 
@@ -296,15 +292,21 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                             <ul class="user-box-name">
                                                 <li class="product-box-contain">
                                                     <i></i>
-													<c:choose>
-														<c:when test="${sessionScope.loginMember == null }">
-		                                                    <a href="/logintest/main">Log In</a>
-														</c:when>
-														<c:otherwise>
-		                                                    <a href="/logintest/logout">Log out</a>
-														</c:otherwise>
-													</c:choose>
-
+                                                    <!-- 시큐리티 적용시
+                                                    <sec:authorize access="isAnonymous()" >
+                                                    	<a href="/login/">Log In</a>
+                                                    </sec:authorize>
+                                                    <sec:authorize access="isAuthenticated()">
+                                                    	  <form method="post" action="/logout">
+													        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+													        <input type="submit" value="로그아웃" />    
+													        </form>                                                
+                                                    </sec:authorize>
+                                                    -->
+                                                    
+                                                    <c:choose>
+                                                    	<c:when test=""></c:when>
+                                                    </c:choose>
                                                 </li>
 
                                                 <li class="product-box-contain">

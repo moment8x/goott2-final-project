@@ -1,6 +1,5 @@
 package com.project.controller.kjy;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,32 +7,24 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.security.SecureRandom;
-import java.util.UUID;
+
 
 import javax.inject.Inject;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import com.project.service.kjy.LoginService;
 import com.project.vodto.kjy.LoginDTO;
@@ -47,11 +38,15 @@ public class LoginController {
 	@Inject
 	private LoginService loginService;
 	
-//	@Inject
-//	private BCryptPasswordEncoder passwordEncoder;
+//	private BCryptPasswordEncoder passenc;
+	
+	private String BeforeUri = null;
 	
 	@RequestMapping("/")
-	public String goLogin(HttpServletRequest request, HttpServletResponse response) {
+	public String goLogin(HttpServletRequest request) {
+		this.BeforeUri = request.getHeader("referer");
+		System.out.println(BeforeUri + "이전 uri");
+		
 		
 		return "/login/login";
 	}
@@ -69,18 +64,21 @@ public class LoginController {
 						cookie.setPath("/");
 						response.addCookie(cookie);
 					}
-				model.addObject("loginMember", loginMember);
 				model.addObject("status", "로그인 성공");
-				model.setViewName("/index");
+				if(BeforeUri != null) {
+					model.setViewName("redirect:"+BeforeUri);
+				} else {
+					model.setViewName("/login/login");
+				}
 			} else {
 				model.addObject("status", "로그인 실패");
-				model.setViewName("/login/login");
+				model.setViewName("/login/");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			model.addObject("status", "로그인 도중 에러");
-			model.setViewName("/login/login");
+			model.setViewName("/login/");
 		}
 		
 		return model;
@@ -96,10 +94,17 @@ public class LoginController {
 		
 	}
 	
-	@RequestMapping("/logout")
-	public void goLogOut() {
-		
-	}
+//	@RequestMapping("/logout")
+//	public String goLogOut(HttpServletRequest request) {
+//		HttpSession ses = request.getSession();
+//		ses.invalidate();
+//		System.out.println("로그아웃 됨!");
+//		if(BeforeUri != null) {
+//		return "redirect:"+this.BeforeUri;
+//		} else {
+//			return "/index";
+//		}
+//	}
 	@RequestMapping("/naverLogin")
 	public String naverLogin(HttpServletRequest request) throws UnsupportedEncodingException {
 		

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,7 +62,7 @@ public class ListController {
 	}
 	
 	@RequestMapping("/categoryList/{lang}/{key}")
-	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page, @PathVariable(name="lang") String lang, HttpServletRequest request) {
+	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page,@RequestParam(value="active", defaultValue = "grid-btn d-xxl-inline-block d-none") String active, @PathVariable(name="lang") String lang, HttpServletRequest request) {
 		this.page = page;
 		String categoryKey = lang + "/" + key; 
 		
@@ -74,6 +75,7 @@ public class ListController {
 			model.addAttribute("nowCategory", nowCategory);
 			model.addAttribute("key", categoryKey);
 			model.addAttribute("page", page);
+			model.addAttribute("active", active);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -124,7 +126,6 @@ public class ListController {
 	}
 	@RequestMapping("/isLogin")
 	public ResponseEntity<Map<String, String>> checkLogin(HttpServletRequest request){
-		System.out.println("!!!!!!!!!!!!");
 		ResponseEntity<Map<String, String>> data = null;
 		Map<String, String> loginMap = new HashMap<String, String>();
 		if(request.getSession().getAttribute("loginMe") != null) {
