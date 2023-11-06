@@ -12,10 +12,10 @@ import com.project.vodto.Product;
 
 @Repository
 public class ReviewDAOImpl implements ReviewDAO {
-	
+
 	@Inject
 	private SqlSession ses;
-	
+
 	private static String ns = "com.kym.mappers.reviewMapper";
 
 	@Override
@@ -30,6 +30,16 @@ public class ReviewDAOImpl implements ReviewDAO {
 		return ses.insert(ns + ".insertReview", board);
 	}
 
+	@Override
+	public int updateReview(Board board) throws Exception {
+		// TODO Auto-generated method stub
+		return ses.update(ns + ".updateReview", board);
+	}
 
+	@Override
+	public int deleteReview(Board board) throws Exception {
+		// TODO Auto-generated method stub
+		return ses.delete(ns + ".updateReview", board);
+	}
 
 }

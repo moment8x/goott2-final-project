@@ -14,9 +14,9 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Wishlist {
-	private int wishlist_no;
-	private String member_id;
-	private String product_id;
-	private Timestamp registration_date;
-	private String category_key;
+	private int wishlistNo;
+	private String memberId;
+	private String productId;
+	private Timestamp registrationDate;
+	private String categoryKey;
 }

@@ -13,6 +13,7 @@
 		<typeAlias type="com.project.vodto.kkb.SearchMemberResponse" alias="SearchMemberResponse" />
 		<typeAlias type="com.project.vodto.Product" alias="product" />
 		<typeAlias type="com.project.vodto.Board" alias="Board" />
+		<typeAlias type="com.project.vodto.BoardCategory" alias="BoardCategory" />
 	</typeAliases>
 
 </configuration>

@@ -11,4 +11,10 @@ public interface ReviewDAO {
 	
 	// 신규 리뷰 저장
 	int insertReview(Board board) throws Exception;
+
+	int updateReview(Board board) throws Exception;
+
+	int deleteReview(Board board) throws Exception;
+
+
 	}
