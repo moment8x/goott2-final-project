@@ -235,7 +235,8 @@
 										<button onclick="location.href = 'cart.html';"
 											class="btn btn-md bg-dark cart-button text-white w-80">장바구니</button>
 
-										<button onclick="location.href = 'cart.html';"
+										<button
+											onclick="location.href = '/order/${Product.productId}';"
 											class="btn btn-md bg-dark cart-button text-white w-80">바로구매</button>
 									</div>
 
@@ -1484,29 +1485,22 @@
 	<jsp:include page="./footer.jsp"></jsp:include>
 
 	<script>
-		function getAllReview() {
-			const subcategory = $(this).data("productId");
-
-			// ajax 호출
-			$.ajax({
-				url : "/all/" + subcategory,
-				type : "GET",
-				dataType : "json",
-				success : function(data) {
-					// 응답 성공 시
-					console.log(data);
-					// data를 화면에 출력
-					$("#reviewList").html(data);
-				},
-				error : function(error) {
-					// 응답 실패 시
-					console.log(error);
-				}
-			});
-		}
-
-		$(".getAllReview").on("click", getAllReview);
-	</script>
+        $(document).ready(function() {
+            // 리뷰 목록을 가져옵니다.
+            $.ajax({
+                url: "/review/all/<%=request.getParameter("subcategory")%>",
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    // 리뷰 목록을 DOM에 추가합니다.
+                    for (let review of data) {
+                        let li = $("<li>").append($("<strong>").text(review.title)).append($("<p>").text(review.content)).append($("<p>").text(review.author)).append($("<p>").text(review.createdDate));
+                        $("#review-list").append(li);
+                    }
+                }
+            });
+        });
+    </script>
 
 
 	<!-- latest jquery
