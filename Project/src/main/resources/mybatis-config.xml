@@ -15,6 +15,7 @@
 		<typeAlias type="com.project.vodto.kkb.MemberRecentOrder" alias="MemberRecentOrder" />
 		<typeAlias type="com.project.vodto.kkb.MemberRecentPost" alias="MemberRecentPost" />
 		<typeAlias type="com.project.vodto.kkb.MemberRecentInquiry" alias="MemberRecentInquiry" />
+		<typeAlias type="com.project.vodto.kkb.MemberParam" alias="MemberParam" />
 		<typeAlias type="com.project.vodto.Product" alias="product" />
 		<typeAlias type="com.project.vodto.Board" alias="Board" />
 	</typeAliases>

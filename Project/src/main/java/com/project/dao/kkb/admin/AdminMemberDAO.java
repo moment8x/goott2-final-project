@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.project.vodto.kkb.MemberBasicInfo;
 import com.project.vodto.kkb.MemberCondition;
+import com.project.vodto.kkb.MemberParam;
 import com.project.vodto.kkb.MemberRecentInquiry;
 import com.project.vodto.kkb.MemberRecentOrder;
 import com.project.vodto.kkb.MemberRecentPost;
@@ -28,4 +29,10 @@ public interface AdminMemberDAO {
 	
 	// CRM 홈(최근 1:1 문의)
 	List<MemberRecentInquiry> findRecentInquiryById(String memberId) throws Exception;
+	
+	// CRM 회원 상세정보
+	MemberParam findDetailInfoById(String memberId) throws Exception;
+	
+	// CRM 회원 상세정보 수정
+	int changeMemberDetailInfo(MemberParam member) throws Exception;
 }

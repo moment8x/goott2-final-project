@@ -2,9 +2,11 @@ package com.project.vodto.kkb;
 
 import java.sql.Date;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class MemberRecentInquiry {
 //	private String inquiryType;
 	private String title;

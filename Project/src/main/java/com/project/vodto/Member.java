@@ -19,7 +19,7 @@ public class Member {
 	private String name;
 	private String phoneNumber; //전화번호
 	private String cellPhoneNumber; // 핸드폰번호
-	private Timestamp registertaionDate;
+	private Timestamp registration_date;
 	private char gender;
 	private String dateOfBirth;
 	private String zipCode;
@@ -41,4 +41,5 @@ public class Member {
 	private String memberToken;
 	private String permission; //권한 등급
 	private String withdraw; //탈퇴여부
+	private String accountHolder;
 }

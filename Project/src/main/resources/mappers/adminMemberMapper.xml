@@ -5,11 +5,35 @@
 
 <mapper namespace="com.project.mappers.adminMemberMapper">
 	
-	<select id="countAll" resultType="Integer">
+	<select id="selectAllMemberCount" resultType="Integer">
 		SELECT count(*) FROM member
 	</select>
 	
-	<select id="findRecentPostById" resultType="MemberRecentPost">
+	<update id="updateMemberDetailInfo">
+		UPDATE member 
+		SET   password = #{password},
+			  name = #{name},
+			  phone_number = #{phoneNumber },
+			  cell_phone_number = #{cellPhoneNumber },
+			  gender = #{gender},
+			  date_of_birth = #{dateOfBirth},
+			  zip_code = #{zipCode},
+			  address = #{address},
+			  detailed_address = #{detailedAddress},
+			  email = #{email},
+			  membership_grade = #{membershipGrade},
+			  profile_image = #{profileImage},
+			  refund_bank = #{refundBank},
+			  refund_account = #{refundAccount},
+			  account_holder = #{accountHolder}
+		WHERE member_id  = #{memberId};
+	</update>
+	
+	<select id="selectMemberDetailInfo" resultType="MemberParam">
+		SELECT * FROM member WHERE member_id = #{memberId}
+	</select>
+	
+	<select id="selectRecentPost" resultType="MemberRecentPost">
 		SELECT c.category_name, c.subcategory, b.title, b.author, b.created_date 
 		FROM board b
 		INNER JOIN board_categories c
@@ -18,14 +42,14 @@
 		ORDER BY b.post_no DESC limit 5
 	</select>
 	
-	<select id="findRecentInquiryById" resultType="MemberRecentInquiry">
+	<select id="selectRecentInquiry" resultType="MemberRecentInquiry">
 		SELECT title, author, created_date, answer_status
 		FROM customer_inquiries_board 
 		WHERE author = #{memberId}
 		ORDER BY post_no DESC limit 5 
 	</select>
 	
-	<select id="findRecentOrderById" resultType="MemberRecentOrder">
+	<select id="selectRecentOrder" resultType="MemberRecentOrder">
 		SELECT h.order_time,
 			   h.order_no,
 		       p.actual_payment_amount,
@@ -78,7 +102,7 @@
 		ORDER BY h.order_time DESC limit 5	
 	</select>
 	
-	<select id="findBasicInfoById" resultType="MemberBasicInfo">
+	<select id="selectBasicInfo" resultType="MemberBasicInfo">
 		SELECT member_id, name, phone_number, cell_phone_number, 
 			   gender, zip_code, address, detailed_address, email, identity_verification_status, 
 			   membership_grade, total_points, total_rewards, dormant_account, permission, withdraw
@@ -86,7 +110,7 @@
 	    WHERE member_id = #{memberId}
 	</select>
 	
-	<select id="findByInfo" resultType="MemberResponse">
+	<select id="selectMemberInfo" resultType="MemberResponse">
 		SELECT registration_date, name, member_id, membership_grade, phone_number, cell_phone_number, gender, date_of_birth, address
 		FROM member 
 		<where>

@@ -1,4 +1,4 @@
-package com.project.controller.kkb.admin.member;
+package com.project.controller.kkb.admin;
 
 import java.util.Map;
 
@@ -6,12 +6,14 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.service.kkb.admin.AdminMemberService;
 import com.project.vodto.kkb.MemberCondition;
+import com.project.vodto.kkb.MemberParam;
 
 import lombok.RequiredArgsConstructor;
 
@@ -51,10 +53,22 @@ public class AdminMemberController {
 		return adminMemberService.getMemberInfo(member);
 	}
 	
-	// 회원 상세 정보 조회
-	@GetMapping("/detail/{memberId}")
+	// CRM 홈
+	@GetMapping("/{memberId}")
 	public Map<String, Object> searchMemberDetailHome(@PathVariable("memberId") String memberId) throws Exception {
 		return adminMemberService.getHomeDetailInfo(memberId);
+	}
+	
+	// CRM 회원 상세정보
+	@GetMapping("/detail/{memberId}")
+	public Map<String, Object> searchMemberDetail(@PathVariable("memberId") String memberId) throws Exception {
+		return adminMemberService.getMemberDetailInfo(memberId);
+	}
+	
+	// CRM 회원 상세정보 수정
+	@PutMapping("/detail/update")
+	public Map<String, Object> modifyMemberDetail(@RequestBody MemberParam member) throws Exception {
+		return adminMemberService.editMemberDetailInfo(member);
 	}
 	
 	

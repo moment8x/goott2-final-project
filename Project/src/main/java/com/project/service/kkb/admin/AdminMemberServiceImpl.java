@@ -1,5 +1,6 @@
 package com.project.service.kkb.admin;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.project.dao.kkb.admin.AdminMemberDAO;
 import com.project.vodto.kkb.MemberBasicInfo;
 import com.project.vodto.kkb.MemberCondition;
+import com.project.vodto.kkb.MemberParam;
 import com.project.vodto.kkb.MemberRecentInquiry;
 import com.project.vodto.kkb.MemberRecentOrder;
 import com.project.vodto.kkb.MemberRecentPost;
@@ -30,6 +32,29 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		int totalCount = adminMemberRepository.countAll();	
 		Map<String, Object> result = new HashMap<>();
 		result.put("total", totalCount);
+		
+		return result;
+	}
+	
+	@Override
+	public Map<String, Object> editMemberDetailInfo(MemberParam member) throws Exception {
+		
+		int result = adminMemberRepository.changeMemberDetailInfo(member);
+		Map<String, Object> status = new HashMap<>();
+		if(result == 1) {
+			status.put("status", "success");
+		} else {
+			status.put("status", "fail");
+		}
+		return status;
+	}
+	
+	@Override
+	public Map<String, Object> getMemberDetailInfo(String memberId) throws Exception {
+		
+		MemberParam detailInfo = adminMemberRepository.findDetailInfoById(memberId);
+		Map<String, Object> result = new HashMap<>();
+		result.put("detailInfo", detailInfo);
 		
 		return result;
 	}
@@ -113,9 +138,10 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	
 	private String detectRegion(MemberResponse param) {
 		List<String> regions = 
-				List.of("서울","경기","인천","강원","충남", "충청북도","충북","충청북도",
+				Arrays.asList("서울","경기","인천","강원","충남", "충청북도","충북","충청북도",
 						"대전","경북","경상북도","경남","경상남도","대구","부산","울산",
-						"전북","전라북도","전남","전라남도","광주","세종","제주"); 
+						"전북","전라북도","전남","전라남도","광주","세종","제주");
+		
 		
 		String region = "해외";
 		for( String value : regions ) {
@@ -149,6 +175,9 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		return age+"세";
 	}
 
+	
+
+	
 
 
 }
