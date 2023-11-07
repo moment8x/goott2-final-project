@@ -2,10 +2,12 @@ package com.project.vodto.kkb;
 
 import java.sql.Date;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class SearchMemberRequest {
+@Getter
+@Setter
+public class MemberCondition {
 	private String ageStart;
 	private String ageEnd;
 	private Date registrationDateStart;

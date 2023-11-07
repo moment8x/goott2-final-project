@@ -1,9 +1,11 @@
 package com.project.vodto.kkb;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class SearchMemberResponse {
+@Getter
+@Setter
+public class MemberResponse {
 	private String registrationDate;
 	private String name;
 	private String memberId;

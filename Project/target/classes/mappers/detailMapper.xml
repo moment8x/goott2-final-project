@@ -15,7 +15,6 @@
       products.supply_price,
       products.selling_price,
       products.isbn,
-      products.author_introduction,
       product_images.product_image,
       products.author_translator,
       products.original_author,
