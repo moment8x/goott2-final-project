@@ -225,7 +225,7 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
           {/* <h4 className='font-medium text-lg mb-3 text-slate-900'>Lorem ipsum dolor sit.</h4> */}
 
           <div className='text-base text-slate-600 dark:text-slate-300'>
-            <Layout />
+            {/* <Layout /> */}
             {/* <Sidebar /> */}
           </div>
         </MemberInfoModal>

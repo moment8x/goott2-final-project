@@ -12,6 +12,9 @@ import com.project.vodto.kkb.MemberRecentPost;
 
 public interface AdminMemberService {
 	
+	// 회원 수 갱신 이벤트 발행
+	void updateMemberCount() throws Exception;
+	
 	// 전체 회원 수 조회
 	Map<String, Object> getTotalMemberCount() throws Exception;
 	
@@ -29,4 +32,6 @@ public interface AdminMemberService {
 
 	// CRM 회원 상세정보 수정
 	Map<String, Object> editMemberDetailInfo(MemberParam member) throws Exception;
+
+	
 }

@@ -24,20 +24,12 @@ import lombok.RequiredArgsConstructor;
 public class AdminMemberController {
 	
 	private final AdminMemberService adminMemberService;
-//	private final AdminMemberDAO adminMemberRepository;
-//	private final ApplicationEventPublisher publisher;
 	
-//	@GetMapping("/count")
-//	public Map<String, Object> countTotalMember() throws Exception {
-//		return adminMemberService.getTotalMemberCount();
-//	}
-	
-//	@GetMapping("/test")
-//	public void eventTest() throws Exception {
-//		int updateCount = adminMemberRepository.countAll();	
-//		System.out.println("context refresh");
-//		publisher.publishEvent(new TotalMemberCountEvent(updateCount));
-//	}
+	// 회원 수 변경 시 이벤트 발행(test)
+	@GetMapping("/test")
+	public void eventTest() throws Exception {
+		adminMemberService.updateMemberCount();
+	}
 	
 	// 총 회원 수
 	@GetMapping("/count")

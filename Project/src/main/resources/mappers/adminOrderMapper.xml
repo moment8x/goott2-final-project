@@ -4,6 +4,90 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.project.mappers.adminOrderMapper">
+	<select id="selectOrderProductInfo" resultType="OrderProductResponse">
+		SELECT 	 h.order_time,
+				 p.payment_time,
+			     h.order_no,
+		         d.detailed_order_id,
+		         m.name,
+		         h.member_id,
+		         pr.product_name,
+		         pr.product_id,
+		         d.product_quantity,
+		         d.product_price,
+		         p.actual_payment_amount,
+		         p.payment_method,
+		         p.payment_status,
+		         d.product_status,
+		         h.invoice_number,
+		         h.delivery_message
+		FROM payments p
+		INNER JOIN order_history h 
+		ON p.order_no = h.order_no
+		INNER JOIN member m 
+		ON h.member_id = m.member_id 
+		INNER JOIN detailed_order_items d
+		ON p.order_no = d.order_no
+		INNER JOIN products pr
+		ON d.product_id = pr.product_id;
+		<where>
+			WHERE h.member_id = #{memberId} 
+		</where>
+		ORDER BY h.order_time DESC;
+	</select>
 	
-	
+	<select id="selectOrderNoInfo" resultType="OrderNoResponse">
+		SELECT 	 h.order_time,
+				 p.payment_time,
+			     h.order_no,
+		         m.name,
+		         h.member_id,
+		CASE   WHEN product_count.count = 1 THEN product_count.product_name
+			   ELSE CONCAT(product_count.product_name, ' 외 ', product_count.count - 1, '건')
+		       END product_name,  
+			     p.total_amount,
+		         p.actual_payment_amount,
+			     p.payment_method,
+			     p.payment_status,
+		         status.undelivered,
+		         status.inTransit,
+		         status.delivered,
+		         status.cancels,
+		         status.exchanges,
+		         status.returns,
+		         h.delivery_message
+		FROM payments p
+		INNER JOIN order_history h ON p.order_no = h.order_no
+		INNER JOIN member m ON h.member_id = m.member_id 
+		LEFT JOIN (
+			SELECT d.order_no,
+		    (SELECT count(*) FROM detailed_order_items WHERE product_status in ('입금완료', '출고전', '출고완료', '취소') and order_no = d.order_no) 'Undelivered',
+		    (SELECT count(*) FROM detailed_order_items WHERE product_status = '배송중' and order_no = d.order_no) 'intransit',
+		    (SELECT count(*) FROM detailed_order_items WHERE product_status in ('배송완료','반품','교환') and order_no = d.order_no) 'Delivered',
+		    (SELECT count(*) FROM detailed_order_items WHERE product_status = '취소' and order_no = d.order_no) 'cancels',
+		    (SELECT count(*) FROM detailed_order_items WHERE product_status = '교환' and order_no = d.order_no) 'exchanges',
+		    (SELECT count(*) FROM detailed_order_items WHERE product_status = '반품' and order_no = d.order_no) 'returns'
+		    FROM detailed_order_items d
+			GROUP BY d.order_no 
+		) status
+		ON h.order_no = status.order_no
+		LEFT JOIN (
+			SELECT  d.order_no, p.product_name, count(distinct d.product_id) count
+			FROM detailed_order_items d
+			INNER JOIN products p
+			ON d.product_id = p.product_id
+			GROUP BY d.order_no) product_count
+		ON h.order_no = product_count.order_no
+		<where> 
+			<choose>
+				<when test='memberId != null and !memberId.equals("")' >
+					h.member_id = #{memberId}
+				</when>
+				<when test='name != null and !name.equals("")' >
+					m.name = #{name}
+				</when>
+			</choose>
+		</where>
+		ORDER BY h.order_time DESC;
+	</select> 
 </mapper>
