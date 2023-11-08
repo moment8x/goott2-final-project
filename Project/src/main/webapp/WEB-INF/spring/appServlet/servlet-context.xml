@@ -67,17 +67,17 @@
 			<beans:ref bean="createOrderIdInterceptor"/>
 		</interceptor>
 	</interceptors>
-	<!-- -->
-	<beans:bean id="beforeUriInterceptor"
-		class="com.project.interceptor.kjs.LoginInterceptor">
+	
+	<beans:bean id="RememberInterceptor"
+		class="com.project.interceptor.kjy.RememberInterceptor">
 	</beans:bean>
-	<!--  
+	
 	<interceptors>
 		<interceptor>
 			<mapping path="/login/"/>
-			<beans:ref bean="beforeUriInterceptor"/>
+			<beans:ref bean="RememberInterceptor"/>
 		</interceptor>
-	</interceptors>  -->
+	</interceptors>
 	
 	<!-- 아래의 패키지를 스캔하여 객체 확보 -->
 	<context:component-scan base-package="com.project.controller" />

@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.project.service.kjy.ListService;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.Product;
@@ -48,7 +48,8 @@ public class ListController {
 	public String goCategory(Model model, @PathVariable String lang) {
 		// 리스트 카테고리 가져오기 + 현재 페이지 정보
 		try {
-			List<ProductCategories> lst = lService.getProductCategory(lang);
+			List<ProductCategories> lst = lService.getProductCategory(lang+"/");
+			System.out.println("리스트 : " + lst);
 			ProductCategories pd = lService.getCategoryInfo(lang);
 			model.addAttribute("categories", lst);
 			model.addAttribute("nowCategory", pd);

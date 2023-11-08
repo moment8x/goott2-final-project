@@ -7,15 +7,47 @@
 
 <head>
 <meta charset="UTF-8">
-<meta name="google-signin-client_id" content="868189545870-s003dih3cpr96cotlbo38r5tti76sj5d.apps.googleusercontent.com">
 <script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" charset="utf-8"></script>
-<script src="https://apis.google.com/js/platform.js?onload=loadAuthClient" async defer></script>
-    <script
-      src="https://code.jquery.com/jquery-3.4.1.js"
-      integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.4.0/kakao.min.js"
+  integrity="sha384-mXVrIX2T/Kszp6Z0aEWaA8Nm7J6/ZeWXbL8UpGRjKwWe56Srd/iyNmWMBhcItAjH" crossorigin="anonymous"></script>
+<script>
+  Kakao.init('b116d826d54948d007fe4dd027ba8553'); // 사용하려는 앱의 JavaScript 키 입력
+</script>
 <title>Insert title here</title>
+<script>
+  function loginWithKakao() {
+    Kakao.Auth.authorize({
+      redirectUri: 'http://localhost:8081/login/kakaoLogin',
+    });
+  }
+
+
+  // 아래는 데모를 위한 UI 코드입니다.
+  displayToken()
+  function displayToken() {
+    var token = getCookie('authorize-access-token');
+
+    if(token) {
+      Kakao.Auth.setAccessToken(token);
+      Kakao.Auth.getStatusInfo()
+        .then(function(res) {
+          if (res.status === 'connected') {
+            document.getElementById('token-result').innerText
+              = 'login success, token: ' + Kakao.Auth.getAccessToken();
+          }
+        })
+        .catch(function(err) {
+          Kakao.Auth.setAccessToken(null);
+        });
+    }
+  }
+
+  function getCookie(name) {
+    var parts = document.cookie.split(name + '=');
+    if (parts.length === 2) { return parts[1].split(';')[0]; }
+  }
+</script>
 <style type="text/css">
 	.login-button {
 		margin-top: 15px;
@@ -27,18 +59,6 @@
 		width: 50%
 	}
 </style>
-<script>
-	function initGoogleAuth (clientId = 'YOUR_CLIENT_ID') {
-		  gapi.auth2.init({
-		    client_id: clientId,
-		    scope: 'https://www.googleapis.com/auth/userinfo.email'
-		  }).then(() => {
-		    document.getElementById('sign-in-btn').disabled = false;
-		  }).catch(err => {
-		    console.log(err);
-		  });
-		}
-</script>
 <!-- Callback 처리 -->
 
 </head>
@@ -149,7 +169,7 @@
                                     <div class="forgot-box">
                                         <div class="form-check ps-0 m-0 remember-box">
                                             <input class="checkbox_animated check-box" type="checkbox"
-                                                id="flexCheckDefault" name="rememberMe">
+                                                id="flexCheckDefault" name="remember">
                                             <label class="form-check-label" for="flexCheckDefault" >자동 로그인</label>
                                         </div>
                                         <a href="forgot.html" class="forgot-password">아이디/비밀번호 찾기</a>
@@ -176,15 +196,16 @@
                                     </a>
                                 </li>
                                 <li>
-                                	<div class="g-signin2" data-onsuccess="onSignIn"></div>
+                                	<a id="kakao-login-btn" href="javascript:loginWithKakao()">
+									  <img src="https://k.kakaocdn.net/14/dn/btroDszwNrM/I6efHub1SN5KCJqLm1Ovx1/o.jpg" width="222"
+									    alt="카카오 로그인 버튼" />
+									</a>
                                 </li>
                             </ul>
                         </div>
 
                         <div class="other-log-in">
-                            <h6></h6>
                         </div>
-
                         <div class="sign-up-box">
                             <a href="sign-up.html">회원 가입</a>
                         </div>

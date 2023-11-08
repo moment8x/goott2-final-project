@@ -410,7 +410,7 @@
 							</sec:authorize>	
 							 -->
 							 <c:choose>
-							 	<c:when test="${isLogin == 'loginOK'}">
+							 	<c:when test="${sessionScope.loginMember != null }">
 							 		<a href="/order/requestOrder?product_id="+pId+"&isLogin=Y" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
 							 	</c:when>
 							 	<c:otherwise>

@@ -303,10 +303,14 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 													        </form>                                                
                                                     </sec:authorize>
                                                     -->
-                                                    
                                                     <c:choose>
-                                                    	<c:when test=""></c:when>
-                                                    </c:choose>
+														<c:when test="${sessionScope.loginMember == null }">
+		                                                    <a href="/login/">Log In</a>
+														</c:when>
+														<c:otherwise>
+		                                                    <a href="/login/logout">Log out</a>
+														</c:otherwise>
+													</c:choose>
                                                 </li>
 
                                                 <li class="product-box-contain">
