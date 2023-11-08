@@ -591,9 +591,13 @@
 #deliveryStatus{
 	gap:15px;
 }
+
+#deliveryStatus Button{
+	width: 90px;
+	height: 30px;
+}
 #orderStatus{
 	gap : 7px;
-	
 }
 #orderStatus Button{
 	width: 80px;
@@ -1453,7 +1457,7 @@
 											<div class="product-order-detail">
 												<c:forEach var="order" items="${orderList }">
 												<c:choose>
-													<c:when test="${order.productInfoImage == null }">
+													<c:when test="${order.productInfoImage != '' }">
 														<a href="#" class="order-image"> <img
 															src="${order.productInfoImage }" class="blur-up lazyload"
 															alt="${order.productName }" id="productImg" />
@@ -1461,7 +1465,7 @@
 													</c:when>
 													<c:otherwise>
 														<a href="#" class="order-image"> <img
-															src="/resources/assets/images/noimage.png" class="blur-up lazyload"
+															src="/resources/assets/images/noimage.jpg" class="blur-up lazyload"
 															alt="noImg" id="productImg" />
 														</a>
 													</c:otherwise>
@@ -1483,7 +1487,7 @@
 
 															<li>
 																<div class="size-box">
-																	<h6 class="text-content">총 결제금액 :</h6>
+																	<h6 class="text-content">결제금액 :</h6>
 																	<h5>${order.actualPaymentAmount }</h5>
 																</div>
 															</li>
@@ -1541,11 +1545,6 @@
 																					class="btn theme-bg-color text-white m-0"
 																					type="button" id="button-addon1">
 																					<span>반품</span>
-																				</button>
-																				<button
-																					class="btn theme-bg-color text-white m-0"
-																					type="button" id="button-addon1">
-																					<span>리뷰작성</span>
 																				</button>
 																			</c:otherwise>
 																	</c:choose>
@@ -2287,13 +2286,13 @@
 					<div class="form-floating mb-4 theme-form-floating">
 						<input type="text" class="form-control addZipNo" id="addZipNo"
 							name="zipCode" placeholder="우편번호" readonly /><label
-							for="addAddrDetail">우편번호</label>
+							for="addZipNo">우편번호</label>
 					</div>
 
 					<div class="form-floating mb-4 theme-form-floating">
 						<input type="text" class="form-control addAddr" id="addAddr"
 							name="address" placeholder="주소" readonly /><label
-							for="addAddrDetail">주소</label>
+							for="addAddr">주소</label>
 					</div>
 
 					<div class="form-floating mb-4 theme-form-floating">

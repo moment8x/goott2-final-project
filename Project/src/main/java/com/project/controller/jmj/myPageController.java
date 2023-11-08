@@ -31,6 +31,7 @@ import com.project.service.member.MemberService;
 import com.project.vodto.Member;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.jmj.DetailOrder;
+import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.kjy.Memberkjy;
 
@@ -385,14 +386,46 @@ public class myPageController {
 		String memberId = member.getMember_id();
 		
 		try {
-			List<DetailOrder> detailOrderInfo = mService.getDetailOrderInfo(memberId, orderNo);
-			model.addAttribute("detailOrderInfo", detailOrderInfo);
-			System.out.println("주문상세정보!!!!!" + detailOrderInfo.toString());
+			//주문상품 상세정보
+			List<DetailOrder> detailOrder = mService.getDetailOrderInfo(memberId, orderNo);
+			model.addAttribute("detailOrderInfo", detailOrder);
+			System.out.println("주문상품상세정보!!!!!" + detailOrder.toString());
+			
+			//주문상세정보
+			DetailOrderInfo detailOrderInfo = mService.getOrderInfo(memberId, orderNo);
+			model.addAttribute("detailOrder", detailOrderInfo);
+			System.out.println("주문상세정보@@" + detailOrderInfo.toString());
+			
+			//배송주소록
+			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
+			 model.addAttribute("userAddrList", userAddrList);
+			 System.out.println("배송지선택!!"  + userAddrList.toString());
+			
 			
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+	
+	@RequestMapping(value = "editDeliveryAddress", method = RequestMethod.POST)
+	public void editDeliveryAddress(@ModelAttribute DetailOrderInfo updateDetailOrderAddr, HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMember_id();
+	
+		
+//		mService.updateDetailOrderAddr(updateDetailOrderAddr, memberId);
+	}
 
+	@RequestMapping(value = "getBasicAddrList", method = RequestMethod.POST)
+	public void getBasicAddrList(@ModelAttribute DetailOrderInfo updateDetailOrderAddr, HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMember_id();
+		
+
+		
+
+	}
 }

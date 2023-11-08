@@ -8,8 +8,10 @@ import javax.naming.NamingException;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.Member;
+import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.jmj.DetailOrder;
+import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.MyPageOrderList;
 
 @Repository
@@ -80,8 +82,11 @@ public interface MemberDAO {
 	// 특정 배송지 기본배송지로 설정
 	int updateBasicAddr(String memberId, int addrSeq) throws SQLException, NamingException;
 
-	// 주문상세정보 가져오기
+	// 주문 상품 상세정보 가져오기
 	List<DetailOrder> selectDetailOrder(String memberId, String orderNo) throws SQLException, NamingException;
+
+	// 주문상세정보 가져오기
+	DetailOrderInfo selectDetailOrderInfo(String memberId, String orderNo) throws SQLException, NamingException;
 	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
@@ -92,6 +97,8 @@ public interface MemberDAO {
 	// 로그인(비밀번호 체크)
 	Member selectMember(String memberId, String password) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+	
+	
 	
 	
 	

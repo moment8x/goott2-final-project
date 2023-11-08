@@ -12,8 +12,10 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.Member;
+import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.jmj.DetailOrder;
+import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.MyPageOrderList;
 
 @Repository
@@ -217,7 +219,14 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectList(ns + ".getDetailOrder", params);
 	}
-	
+
+	@Override
+	public DetailOrderInfo selectDetailOrderInfo(String memberId, String orderNo) throws SQLException, NamingException {
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("memberId", memberId);
+			params.put("orderNo", orderNo);
+		return ses.selectOne(ns + ".getDetailOrderInfo", params);
+	}
 	
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
@@ -249,6 +258,10 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectOne(ns + ".login", param);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+
+
+
 
 	
 
