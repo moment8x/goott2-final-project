@@ -11,7 +11,7 @@ public class OrderProductResponse {
 	private Timestamp orderTime;
 	private Timestamp paymentTime;
 	private String orderNo;
-	private int detailedOrderId;
+	private String productOrderNo;
 	private String name;
 	private String memberId;
 	private String productName;

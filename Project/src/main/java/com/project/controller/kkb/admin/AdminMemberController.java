@@ -39,10 +39,10 @@ public class AdminMemberController {
 	
 	// 회원 정보 조회
 	@PostMapping("/search")
-	public Map<String, Object> searchMemberInfo(@RequestBody MemberCondition member) throws Exception {
-		System.out.println("member:" + member.toString());		
+	public Map<String, Object> searchMemberInfo(@RequestBody MemberCondition memberCond) throws Exception {
+//		System.out.println("member:" + memberCond.toString());		
 		
-		return adminMemberService.getMemberInfo(member);
+		return adminMemberService.getMemberInfo(memberCond);
 	}
 	
 	// CRM 홈

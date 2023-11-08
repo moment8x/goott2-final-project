@@ -32,10 +32,9 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	public Map<String, Object> getTotalMemberCount() throws Exception {
 		int totalCount = 0;
 		if(memberCount.getCurrentCount() > 0) {
-			// DB가 아니라 TotalMemberCountEvent에 저장해둔 값 가져옴
+			// TotalMemberCountEvent에 저장해둔 값 가져옴
 			System.out.println("이벤트 객체에서 전체 회원 수 조회");
 			totalCount = memberCount.getCurrentCount(); 
-			
 		} else {
 			System.out.println("DB에서 전체 회원 수 조회");
 			totalCount = adminMemberRepository.countAll();	
@@ -97,13 +96,13 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	
 	
 	@Override
-	public Map<String, Object> getMemberInfo(MemberCondition member ) throws Exception {
+	public Map<String, Object> getMemberInfo(MemberCondition memberCond ) throws Exception {
 		
 		//전화번호 "-" 제거
-		member.setCellPhoneNumber(member.getCellPhoneNumber().replace("-", "")); 
-		member.setPhoneNumber(member.getPhoneNumber().replace("-", ""));
+		memberCond.setCellPhoneNumber(memberCond.getCellPhoneNumber().replace("-", "")); 
+		memberCond.setPhoneNumber(memberCond.getPhoneNumber().replace("-", ""));
 		
-		List<MemberResponse> responseList = adminMemberRepository.findByInfo(member);
+		List<MemberResponse> responseList = adminMemberRepository.findByInfo(memberCond);
 		
 		for ( MemberResponse responseParam : responseList ) {
 			
@@ -135,7 +134,6 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 				Arrays.asList("서울","경기","인천","강원","충남", "충청북도","충북","충청북도",
 						"대전","경북","경상북도","경남","경상남도","대구","부산","울산",
 						"전북","전라북도","전남","전라남도","광주","세종","제주");
-		
 		
 		String region = "해외";
 		for( String value : regions ) {

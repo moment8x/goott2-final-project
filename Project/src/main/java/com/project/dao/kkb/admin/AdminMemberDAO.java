@@ -16,7 +16,7 @@ public interface AdminMemberDAO {
 	int countAll() throws Exception;
 	
 	// 회원 정보 조회
-	List<MemberResponse> findByInfo(MemberCondition member) throws Exception;
+	List<MemberResponse> findByInfo(MemberCondition memberCond) throws Exception;
 
 	// CRM 홈(기본 정보)
 	MemberBasicInfo findBasicInfoById(String memberId) throws Exception;
