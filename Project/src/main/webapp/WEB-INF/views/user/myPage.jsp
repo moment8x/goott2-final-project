@@ -1525,6 +1525,7 @@
 																					type="button" id="button-addon1">
 																					<span>배송조회</span>
 																				</button>	
+																				<div>${order.invoiceNumber }</div>
 																			</c:when>
 																			
 																			<c:when test="${order.deliveryStatus eq '배송중' }">
@@ -1533,6 +1534,12 @@
 																					type="button" id="button-addon1">
 																					<span>배송조회</span>
 																				</button>	
+																				<div>${order.invoiceNumber }</div>
+																			</c:when>
+																			
+																			<c:when test="${order.deliveryStatus eq '취소' }">
+																				<div>취소</div>	
+																				<div>${order.invoiceNumber }</div>
 																			</c:when>
 																			
 																			<c:otherwise>

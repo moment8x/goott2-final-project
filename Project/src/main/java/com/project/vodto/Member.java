@@ -33,14 +33,14 @@ public class Member {
 	private int totalRewards;
 	private int couponCount;
 	private int profileImage;
-	private int remember;
+	private String remember;
 	private Timestamp lastLoginDate;
 	private String refundBank;
+	private String accountHolder; //예금주
 	private String refundAccount;
 	private String dormantAccout; //휴면계정
 	private String memberToken;
 	private String permission; //권한 등급
 	private String withdraw; //탈퇴여부
-	
 	
 }

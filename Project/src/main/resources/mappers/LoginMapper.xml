@@ -9,6 +9,7 @@
     <mapper namespace="com.project.mappers.loginMapper">
     <resultMap type="com.project.vodto.kjy.Memberkjy" id="memberLoginResultMap">
   		<result property="member_id" column="member_id"/>
+  		<result property="remember" column="remember"/>
   	</resultMap>
     	<!-- 로그인 하는 유저의 정보가 DB에 있는지 조회 -->
     	<select id="selectLoginUser" resultMap="memberLoginResultMap">
