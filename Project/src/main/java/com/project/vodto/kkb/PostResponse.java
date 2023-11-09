@@ -11,8 +11,8 @@ public class PostResponse {
 	private String categoryName;
 	private String subcategory;
 	private String title;
-	private boolean reply;
-	private String author;
 	private String name;
+	private String author;
+	private String status;
 	private Timestamp createdDate;
 }

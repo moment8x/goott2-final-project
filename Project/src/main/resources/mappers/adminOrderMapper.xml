@@ -22,13 +22,13 @@
 		         h.delivery_message
 		FROM payments p
 		INNER JOIN order_history h 
-		ON p.order_no = h.order_no
+			ON p.order_no = h.order_no
 		INNER JOIN member m 
-		ON h.member_id = m.member_id 
+			ON h.member_id = m.member_id 
 		INNER JOIN detailed_order_items d
-		ON p.order_no = d.order_no
+			ON p.order_no = d.order_no
 		INNER JOIN products pr
-		ON d.product_id = pr.product_id
+			ON d.product_id = pr.product_id
 		<where> 
 			<if test='orderNo != null and !orderNo.equals("")' >
 				AND h.order_no = #{orderNo}
@@ -93,9 +93,9 @@
 			     h.order_no,
 		         m.name,
 		         h.member_id,
-		CASE   WHEN product_count.count = 1 THEN product_count.product_name
-			   ELSE CONCAT(product_count.product_name, ' 외 ', product_count.count - 1, '건')
-		       END product_name,  
+		  CASE   WHEN product_count.count = 1 THEN product_count.product_name
+			     ELSE CONCAT(product_count.product_name, ' 외 ', product_count.count - 1, '건')
+		         END product_name,  
 			     p.total_amount,
 		         p.actual_payment_amount,
 			     p.payment_method,
@@ -107,10 +107,13 @@
 		         status.exchanges,
 		         status.returns,
 		         h.delivery_message
-		FROM payments p
-		INNER JOIN order_history h ON p.order_no = h.order_no
-		INNER JOIN member m ON h.member_id = m.member_id 
-		LEFT JOIN bank_transfers b ON p.payment_number = b.payment_number
+  		  FROM 	 payments p
+		INNER JOIN order_history h 
+			ON p.order_no = h.order_no
+		INNER JOIN member m 
+			ON h.member_id = m.member_id 
+		LEFT JOIN bank_transfers b 
+			ON p.payment_number = b.payment_number
 		LEFT JOIN (
 			SELECT d.order_no,
 		    (SELECT count(*) FROM detailed_order_items WHERE product_status in ('입금완료', '출고전', '출고완료', '취소') and order_no = d.order_no) 'Undelivered',
@@ -122,14 +125,14 @@
 		    FROM detailed_order_items d
 			GROUP BY d.order_no 
 		) status
-		ON h.order_no = status.order_no
+			ON h.order_no = status.order_no
 		LEFT JOIN (
 			SELECT  d.order_no, p.product_name, p.category_key, count(distinct d.product_id) count
 			FROM detailed_order_items d
 			INNER JOIN products p
-			ON d.product_id = p.product_id
+				ON d.product_id = p.product_id
 			GROUP BY d.order_no) product_count
-		ON h.order_no = product_count.order_no
+				ON h.order_no = product_count.order_no
 		<where> 
 			<if test='orderNo != null and !orderNo.equals("")' >
 				AND h.order_no = #{orderNo}

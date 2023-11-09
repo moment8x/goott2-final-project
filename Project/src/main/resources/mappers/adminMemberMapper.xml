@@ -10,8 +10,8 @@
 	</select>
 	
 	<update id="updateMemberDetailInfo">
-		UPDATE member 
-		SET   password = #{password},
+	   UPDATE member 
+		  SET password = #{password},
 			  name = #{name},
 			  phone_number = #{phoneNumber },
 			  cell_phone_number = #{cellPhoneNumber },
@@ -35,17 +35,17 @@
 	
 	<select id="selectRecentPost" resultType="MemberRecentPost">
 		SELECT c.category_name, c.subcategory, b.title, b.author, b.created_date 
-		FROM board b
+		FROM   board b
 		INNER JOIN board_categories c
-		ON b.category_id = c.category_id
+			ON b.category_id = c.category_id
 		WHERE b.author = #{memberId}
 		ORDER BY b.post_no DESC limit 5
 	</select>
 	
 	<select id="selectRecentInquiry" resultType="MemberRecentInquiry">
 		SELECT title, author, created_date, answer_status
-		FROM customer_inquiries_board 
-		WHERE author = #{memberId}
+		FROM   customer_inquiries_board 
+		WHERE  author = #{memberId}
 		ORDER BY post_no DESC limit 5 
 	</select>
 	
@@ -73,31 +73,31 @@
 			   ELSE '반품 안 함'
 		       END returns
 		FROM payments p
-		INNER JOIN order_history h ON p.order_no = h.order_no
+		INNER JOIN order_history h 
+			ON p.order_no = h.order_no
 		LEFT JOIN (
-		    SELECT order_no, count(*) count
-		    FROM detailed_order_items 
-		    WHERE product_status = '취소'
-		    GROUP BY order_no) cancels
-		ON h.order_no = cancels.order_no
+			    SELECT order_no, count(*) count
+			    FROM detailed_order_items 
+			    WHERE product_status = '취소'
+			    GROUP BY order_no) cancels
+			ON h.order_no = cancels.order_no
 		LEFT JOIN (
-		    SELECT order_no, count(*) count
-		    FROM detailed_order_items 
-		    WHERE product_status = '교환'
-		    GROUP BY order_no) exchanges
-		ON h.order_no = exchanges.order_no
+			    SELECT order_no, count(*) count
+			    FROM detailed_order_items 
+			    WHERE product_status = '교환'
+			    GROUP BY order_no) exchanges
+			ON h.order_no = exchanges.order_no
 		LEFT JOIN (
-		    SELECT order_no, count(*) count
-		    FROM detailed_order_items 
-		    WHERE product_status = '반품'
-		    GROUP BY order_no) returns
-		ON h.order_no = returns.order_no
+			    SELECT order_no, count(*) count
+			    FROM detailed_order_items 
+			    WHERE product_status = '반품'
+			    GROUP BY order_no) returns
+			ON h.order_no = returns.order_no
 		LEFT JOIN (
-		    SELECT order_no, count(*) count
-		    FROM detailed_order_items 
-		    GROUP BY order_no
-		) total 
-		ON h.order_no = total.order_no
+			    SELECT order_no, count(*) count
+			    FROM detailed_order_items 
+			    GROUP BY order_no) total 
+			ON h.order_no = total.order_no
 		WHERE h.member_id = #{memberId}
 		ORDER BY h.order_time DESC limit 5	
 	</select>
@@ -106,13 +106,13 @@
 		SELECT member_id, name, phone_number, cell_phone_number, 
 			   gender, zip_code, address, detailed_address, email, identity_verification_status, 
 			   membership_grade, total_points, total_rewards, dormant_account, permission, withdraw
-	    FROM member 
-	    WHERE member_id = #{memberId}
+	    FROM   member 
+	    WHERE  member_id = #{memberId}
 	</select>
 	
 	<select id="selectMemberInfo" resultType="MemberResponse">
 		SELECT registration_date, name, member_id, membership_grade, phone_number, cell_phone_number, gender, date_of_birth, address
-		FROM member 
+		FROM   member 
 		<where>
 			 <if test='memberId != null and !memberId.equals("")'>
 	            AND member_id = #{memberId} 
