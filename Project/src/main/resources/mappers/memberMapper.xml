@@ -110,6 +110,15 @@
 		and o.order_no = pay.order_no;
 	</select>
 
+	<select id="pwdCheck" resultType="com.project.vodto.Member">
+		select member_id from member where password = sha1(md5(#{password})) and member_id = #{memberId}
+	</select>
+	
+	<update id="selectBasicShippingAddr">
+    update order_history set recipient_name = #{recipient}, recipient_phone_number = #{recipientContact}, zip_code = #{zipCode}, 
+		shipping_address = #{address}, detailed_shipping_address=#{detailAddress}, delivery_message=#{deliveryMessage}
+        where member_id = #{memberId} and order_no = #{orderNo}
+	</update>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">
 		SELECT member_id FROM member WHERE member_id = #{memberId}  

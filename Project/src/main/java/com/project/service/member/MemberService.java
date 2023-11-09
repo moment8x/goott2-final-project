@@ -30,7 +30,7 @@ public interface MemberService {
 	// 특정 회원 정보 수정(update)
 	boolean setMyInfo(String memberId, Member modifyMemberInfo) throws SQLException, NamingException;
 	// 특정 회원 탈퇴
-	Boolean withdraw(String memberId) throws SQLException, NamingException;
+	Boolean withdraw(String memberId, String password) throws SQLException, NamingException;
 	// 배송지 목록 조회
 	List<ShippingAddress> getShippingAddress(String memberId) throws SQLException, NamingException;
 	// 리뷰 조회
@@ -86,6 +86,9 @@ public interface MemberService {
 	
 	//출고전, 입금전 배송지 변경하기
 //	int updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId) throws SQLException, NamingException;
+	
+	//출고전, 입금전 배송주소록에서 배송지선택해서 변경하기
+	boolean selectBasicAddr(String memberId, int addrSeq, String orderNo, String deliveryMessage) throws SQLException, NamingException;
 
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
@@ -96,6 +99,7 @@ public interface MemberService {
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
+	
 	
 
 	

@@ -30,6 +30,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.MyPageOrderList;
@@ -159,8 +160,8 @@ public class myPageController {
 		System.out.println("주문 상세 내역");
 	}
 	
-	@RequestMapping("userInfo")
-	public void checkPwd() {
+	@RequestMapping("pwdCheck")
+	public void pwdCheck() {
 		System.out.println("비밀번호 확인");
 	}
 
@@ -271,28 +272,30 @@ public class myPageController {
 	}
 
 	@RequestMapping(value = "withdrawal", method = RequestMethod.POST)
-	public String withdrawMember(HttpServletRequest request) {
+	public ResponseEntity<String> withdrawMember(HttpServletRequest request, @RequestParam("password") String password) {
 
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMember_id();
 
 		System.out.println(memberId + " 탈퇴시도");
+		
+		ResponseEntity<String> result = null;
 
 		try {
-			boolean delUser = mService.withdraw(memberId);
+			boolean delUser = mService.withdraw(memberId, password);
 			if (delUser) {
 				System.out.println(memberId + "탈퇴 완");
 				session.removeAttribute("loginMember");
 				session.invalidate();
 				System.out.println("로그아웃 완");
+				result = new ResponseEntity<String>("success", HttpStatus.OK);
 			}
 		} catch (SQLException | NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			result = new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
-		return "redirect:/";
-
+		return result;
 	}
 
 	@RequestMapping(value = "addShippingAddress", method = RequestMethod.POST)
@@ -418,14 +421,26 @@ public class myPageController {
 //		mService.updateDetailOrderAddr(updateDetailOrderAddr, memberId);
 	}
 
-	@RequestMapping(value = "getBasicAddrList", method = RequestMethod.POST)
-	public void getBasicAddrList(@ModelAttribute DetailOrderInfo updateDetailOrderAddr, HttpServletRequest request, Model model) {
+	@RequestMapping(value = "selectBasicAddr", method = RequestMethod.POST)
+	public void getBasicAddrList(HttpServletRequest request, @ModelAttribute ChangeShippingAddr tmpAddr, 
+		 @RequestParam("no") String orderNo) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMember_id();
 		
-
+//		ResponseEntity<String> result = null;
 		
-
+		System.out.println(tmpAddr.toString());
+//		System.out.println(addrSeq + "번 배송지로 변경하자 배송 메세지는 " + deliveryMessage);
+//		try {
+//			if(mService.selectBasicAddr(memberId, tmpAddr, orderNo, deliveryMessage)) {
+//				System.out.println("배송지 수정완");
+//				result = new ResponseEntity<String>("success",HttpStatus.OK);
+//			}
+//		} catch (SQLException | NamingException e) {
+//			e.printStackTrace();
+//			result = new ResponseEntity<>(HttpStatus.CONFLICT);
+//		}
+//		return result;
 	}
 }

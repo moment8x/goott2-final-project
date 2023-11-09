@@ -88,6 +88,12 @@ public interface MemberDAO {
 	// 주문상세정보 가져오기
 	DetailOrderInfo selectDetailOrderInfo(String memberId, String orderNo) throws SQLException, NamingException;
 	
+	// 비밀번호 일치하는지 체크
+	Member duplicatePwd(String memberId, String password) throws SQLException, NamingException;
+
+	// 출고전, 입금전 배송주소록에서 선택해서 배송지 변경
+	int updateShippingAddr(String memberId, int addrSeq, String orderNo, String deliveryMessage) throws SQLException, NamingException;
+	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -97,6 +103,8 @@ public interface MemberDAO {
 	// 로그인(비밀번호 체크)
 	Member selectMember(String memberId, String password) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+
+	
 	
 	
 	

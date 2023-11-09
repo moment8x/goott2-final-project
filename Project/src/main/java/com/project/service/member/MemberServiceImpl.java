@@ -71,11 +71,16 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public Boolean withdraw(String memberId) throws SQLException, NamingException {
+	@Transactional(rollbackFor = Exception.class)
+	public Boolean withdraw(String memberId, String password) throws SQLException, NamingException {
 		boolean result = false;
 		
-		if(mDao.updateWithdraw(memberId) == 1) {
-			result = true;
+		//비밀번호가 일치한다면
+		if(mDao.duplicatePwd(memberId, password) != null) { // 비밀번호가 일치
+			//탈퇴시킨다
+			if(mDao.updateWithdraw(memberId) == 1) {
+				result = true;
+			}			
 		}
 		return result; 
 	}
@@ -206,6 +211,18 @@ public class MemberServiceImpl implements MemberService {
 
 		return mDao.selectDetailOrderInfo(memberId, orderNo);
 	}
+	
+	@Override
+	public boolean selectBasicAddr(String memberId, int addrSeq, String orderNo, String deliveryMessage) throws SQLException, NamingException {
+		
+		boolean result = false;
+		if(mDao.updateShippingAddr(memberId, addrSeq, orderNo, deliveryMessage) != 0) {
+			result = true;
+			System.out.println("1");
+		}
+		System.out.println("2");
+		return result;
+	}
 
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
@@ -251,6 +268,8 @@ public class MemberServiceImpl implements MemberService {
 		return result;
 	}
 	// --------------------------------------- 김진솔 끝 ----------------------------------------	
+
+	
 
 	
 

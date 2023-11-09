@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -51,7 +52,8 @@
 <!-- Template css -->
 <link id="color-link" rel="stylesheet" type="text/css"
 	href="/resources/assets/css/style.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script type="text/javascript">
 //도로명주소API 
 function goPopup() {
@@ -77,6 +79,9 @@ function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
 	let newAddrDetail = document.querySelector("#editAddrDetail")
 		newAddrDetail.value = addrDetail
 }
+$(function () {
+	
+})
 
 
 //배송주소록 수정
@@ -112,18 +117,45 @@ function shippingAddrModify(orderNo) {
 }
 
 function editBasicShippingAddress() {
-	 let selectAddr = $("input[type=radio][id=checkAddr]:checked").val();
-	let addrList = '${userAddrList}'
 
-	alert(addrSeq);
-     if (selectAddr) {
-         alert(selectAddr);
-		let tmp = $('#doAddress').text();
-		alert(tmp)
-     }else {
-         alert('선택된 배송지가 없습니다.');
-     }	
+     // 선택된 주소의 정보 가져오기
+     let selectedAddressInfo = $('input[name="checkAddr"]:checked').closest('.addrInfo').find('.contact-detail-contain');
 
+     // 선택된 주소의 recipient 값 가져오기
+     let recipientValue = $('input[name="checkAddr"]:checked').closest('.addrInfo').find('#doRecipient').text().trim();
+
+     let recipient = recipientValue
+     let recipientContact = selectedAddressInfo.find('#doRecipientContact').text()
+     let zipCode = selectedAddressInfo.find('#doZipCode').text()
+     let address = selectedAddressInfo.find('#doAddress').text()
+     let detailAddress = selectedAddressInfo.find('#doDetailAddress').text()
+            
+     let deliveryMessage = $('#changeDeliveryMessage').val()
+     
+     $.ajax({
+			url : '/user/selectBasicAddr', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				recipient,
+				recipientContact,
+				zipCode,
+				address,
+				detailAddress,
+				deliveryMessage
+			},
+			dataType : 'text',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data == 'success'){
+					location.reload()
+				}
+			},
+			error : function() {
+			}
+		}); 
+     
+        
 }
 </script>
 <style type="text/css">
@@ -155,18 +187,30 @@ function editBasicShippingAddress() {
 .infoContent {
 	font-size: 8px;
 }
-.col-xxl-6.col-lg-12.col-sm-6.addrInfo{
+
+.col-xxl-6.col-lg-12.col-sm-6.addrInfo {
 	margin-bottom: 10px;
 }
-.detailOrderBtn{
+
+.detailOrderBtn {
 	display: flex;
 	justify-content: center;
-	gap : 10px;
-	vertical-align:middle;
+	gap: 10px;
+	vertical-align: middle;
 }
-.table.mb-0.productInfo{
+
+.table.mb-0.productInfo {
 	border-bottom: 0.5px solid #E7E7E7;
 	padding-bottom: 50px;
+	padding-top: 10px;
+}
+
+.deliverMsg {
+	font-weight: bold;
+}
+
+.form-floating.mb-4.theme-form-floating.changeDeliveryMessage {
+	border-top: 0.5px solid #E7E7E7;
 	padding-top: 10px;
 }
 </style>
@@ -212,7 +256,10 @@ function editBasicShippingAddress() {
 					<div class="cart-table order-table order-table-2">
 						<div class="table-responsive">
 							<h3>주문번호 ${detailOrder.orderNo }</h3>
-							<h4>${detailOrder.orderTime }</h4>
+
+							<h4>
+								<fmt:formatDate value="${detailOrder.orderTime }" type="date" />
+							</h4>
 							<c:forEach var="order" items="${detailOrderInfo }">
 								<table class="table mb-0 productInfo">
 									<tbody>
@@ -246,7 +293,11 @@ function editBasicShippingAddress() {
 
 											<td class="price">
 												<h4 class="table-title text-content">상품금액</h4>
-												<h6 class="theme-color productPrice">${order.productPrice }원</h6>
+												<h6 class="theme-color productPrice">
+													<fmt:formatNumber value="${order.productPrice }"
+														type="NUMBER" />
+													원
+												</h6>
 											</td>
 
 											<td class="quantity">
@@ -305,10 +356,10 @@ function editBasicShippingAddress() {
 															type="button" id="button-addon1">
 															<span>배송조회</span>
 														</button>
-															<div>${order.productInvoiceNumber }</div>
+														<div>${order.productInvoiceNumber }</div>
 													</td>
 												</c:when>
-													<c:when test="${order.productStatus eq '취소' }">
+												<c:when test="${order.productStatus eq '취소' }">
 													<td class="subtotal">
 														<h4 class="table-title text-content">상품상태</h4>
 														<h5>${order.productStatus }</h5>
@@ -317,7 +368,7 @@ function editBasicShippingAddress() {
 														<div>취소</div>
 													</td>
 												</c:when>
-												
+
 												<c:otherwise>
 													<td class="subtotal">
 														<h4 class="table-title text-content">상품상태</h4>
@@ -381,6 +432,8 @@ function editBasicShippingAddress() {
 													<h4 class="infoContent">${detailOrder.deliveryMessage }</h4>
 												</li>
 												<c:if test="${detailOrder.deliveryStatus eq '출고전' }">
+													<li class="deliverMsg">* 출고전 / 입금전 상품에 대해서 배송지 변경이
+														가능합니다.</li>
 													<li>
 														<button
 															class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
@@ -388,9 +441,10 @@ function editBasicShippingAddress() {
 															<i data-feather="plus" class="me-2"></i> 배송지 변경
 														</button>
 													</li>
-													<li>* 출고전 / 입금전 상품에 대해서 배송지 변경이 가능합니다.</li>
 												</c:if>
 												<c:if test="${detailOrder.deliveryStatus eq '입금전' }">
+													<li class="deliverMsg">* 출고전 / 입금전 상품에 대해서만 배송지 변경이
+														가능합니다.</li>
 													<li>
 														<button
 															class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
@@ -398,7 +452,6 @@ function editBasicShippingAddress() {
 															<i data-feather="edit" class="me-2"></i> 배송지 변경
 														</button>
 													</li>
-													<li>* 출고전 / 입금전 상품에 대해서만 배송지 변경이 가능합니다.</li>
 												</c:if>
 											</ul>
 										</div>
@@ -418,7 +471,11 @@ function editBasicShippingAddress() {
 
 												<li class="pb-0">
 													<h4 class="infoTitle">총 금액(할인전 금액) :</h4>
-													<h4 class="infoContent">${detailOrder.totalAmount }원</h4>
+													<h4 class="infoContent">
+														<fmt:formatNumber value="${detailOrder.totalAmount }"
+															type="NUMBER" />
+														원
+													</h4>
 												</li>
 
 												<li class="pb-0">
@@ -439,7 +496,11 @@ function editBasicShippingAddress() {
 											<ul class="summery-total">
 												<li class="list-total border-top-0 pt-2">
 													<h4 class="fw-bold">결제금액</h4>
-													<h4 class="fw-bold">${detailOrder.actualPaymentAmount }원</h4>
+													<h4 class="fw-bold">
+														<fmt:formatNumber
+															value="${detailOrder.actualPaymentAmount }" type="NUMBER" />
+														원
+													</h4>
 												</li>
 
 											</ul>
@@ -452,7 +513,7 @@ function editBasicShippingAddress() {
 
 												<li class="pb-0">
 													<h4 class="infoTitle">결제 카드 번호 :</h4>
-													<h4 class="infoContent">${detailOrder.cardNumber }원</h4>
+													<h4 class="infoContent">${detailOrder.cardNumber }</h4>
 												</li>
 											</ul>
 										</div>
@@ -589,7 +650,7 @@ function editBasicShippingAddress() {
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
- 
+
 				<div class="modal-body">
 					<c:forEach var="addr" items="${userAddrList }">
 						<div class="col-xxl-6 col-lg-12 col-sm-6 addrInfo">
@@ -598,8 +659,8 @@ function editBasicShippingAddress() {
 								<div class="contact-detail-title">
 									<h4 id="doRecipient">
 										<i class="fa-solid fa-location-dot"></i> ${addr.recipient } <input
-											class="form-check-input" type="radio" value="${addr.addrSeq }"
-											id="checkAddr" name="checkAddr"/>
+											class="form-check-input" type="radio"
+											value="${addr.addrSeq }" id="checkAddr" name="checkAddr" />
 									</h4>
 								</div>
 
@@ -611,20 +672,19 @@ function editBasicShippingAddress() {
 								</div>
 							</div>
 						</div>
-					<div class="form-floating mb-4 theme-form-floating">
-						<input type="text" class="form-control editDeliveryMsg"
-							id="editDeliveryMessage"
-							name="deliveryMessage" placeholder="배송메세지" /><label
-							for="editDeliveryMsg">배송메세지</label>
-					</div>
 					</c:forEach>
+					<div
+						class="form-floating mb-4 theme-form-floating changeDeliveryMessage">
+						<input type="text" class="form-control changeDeliveryMessage"
+							id="changeDeliveryMessage" name="deliveryMessage"
+							placeholder="배송메세지" /><label for="changeDeliveryMessage">배송메세지</label>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary btn-md"
 						data-bs-dismiss="modal">닫기</button>
 					<button type="button" class="btn theme-bg-color btn-md text-white"
-						onclick="editBasicShippingAddress();"
-						data-bs-dismiss="modal">변경</button>
+						onclick="editBasicShippingAddress();" data-bs-dismiss="modal">변경</button>
 				</div>
 			</div>
 		</div>

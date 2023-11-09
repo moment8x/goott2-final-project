@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -1473,7 +1474,8 @@
 
 													<div class="order-wrap">
 														<a class="orderDetailClick" href="orderDetail?no=${order.orderNo }">주문번호 : ${order.orderNo }</a>
-														<p class="text-content">${order.orderTime }</p>
+														<p class="text-content"><fmt:formatDate value="${order.orderTime }" type="date" /></p>
+														
 														<a href="#">
 															<h3>${order.productName }</h3>
 														</a>
@@ -1481,14 +1483,15 @@
 															<li>
 																<div class="size-box">
 																	<h6 class="text-content">총 수량 :</h6>
-																	<h5>${order.totalOrderCnt }</h5>
+																	<h5>${order.totalOrderCnt }권</h5>
 																</div>
 															</li>
 
 															<li>
 																<div class="size-box">
 																	<h6 class="text-content">결제금액 :</h6>
-																	<h5>${order.actualPaymentAmount }</h5>
+																	<h5><fmt:formatNumber value="${order.actualPaymentAmount}" type="NUMBER" />원</h5>
+																	
 																</div>
 															</li>
 
