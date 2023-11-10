@@ -1,7 +1,6 @@
 package com.project.controller.ksh;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,8 +8,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,15 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.project.service.ksh.payment.OrderService;
 import com.project.vodto.CouponInfos;
-import com.project.vodto.DetailOrderItem;
-import com.project.vodto.Member;
 import com.project.vodto.NonOrderHistory;
 import com.project.vodto.OrderHistory;
 import com.project.vodto.OrderInfo;
 import com.project.vodto.OrderInfo2;
 import com.project.vodto.PaymentDTO;
-import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.kjy.Memberkjy;
 
 @Controller
 @RequestMapping(value = "/order/*")
@@ -97,7 +92,7 @@ public class OrderController {
 		if(orderId.contains("O")) {
 			// 쿠폰, 포인트, 적립금, 배송 주소록 
 			HttpSession session = request.getSession();
-			Member member = (Member) session.getAttribute("loginMember");
+			Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 			try {
 				List<ShippingAddress> shippingAddr = os.getShippingAddress(member.getMemberId());
 //				List<ShippingAddress> otherAddr = new ArrayList<ShippingAddress>();

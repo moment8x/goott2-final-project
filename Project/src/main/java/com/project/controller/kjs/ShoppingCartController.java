@@ -26,8 +26,8 @@ import org.springframework.web.util.WebUtils;
 
 import com.project.controller.HomeController;
 import com.project.service.kjs.shoppingcart.ShoppingCartService;
-import com.project.vodto.Member;
 import com.project.vodto.kjs.DisPlayedProductDTO;
+import com.project.vodto.kjy.Memberkjy;
 
 /**
  * @author goott1
@@ -64,7 +64,7 @@ public class ShoppingCartController {
 		try {
 			if (session.getAttribute("loginMember") != null) {
 				// 로그인을 했으면
-				Member member = (Member) session.getAttribute("loginMember");
+				Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 				list = scService.getShoppingCart(member.getMemberId(), true);
 				List<DisPlayedProductDTO> items = (List<DisPlayedProductDTO>)list.get("items");
 				result = output(list, items);
@@ -111,7 +111,7 @@ public class ShoppingCartController {
 		try {				
 			if (session.getAttribute("loginMember") != null) {
 				// 로그인을 했으면
-				if (scService.deleteItem(((Member)session.getAttribute("loginMember")).getMemberId(), true, productId)) {
+				if (scService.deleteItem(((Memberkjy)session.getAttribute("loginMember")).getMemberId(), true, productId)) {
 					map.put("status", "success");
 					result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.OK);
 				}
@@ -185,7 +185,7 @@ public class ShoppingCartController {
 		try {
 			if (session.getAttribute("loginMember") != null) {
 				// 로그인 했을 시
-				if (scService.insertItem(((Member)session.getAttribute("loginMember")).getMemberId(), true, productId)) {
+				if (scService.insertItem(((Memberkjy)session.getAttribute("loginMember")).getMemberId(), true, productId)) {
 					map.put("status", "success");
 				} else {
 					// 이미 담긴 상품일 시

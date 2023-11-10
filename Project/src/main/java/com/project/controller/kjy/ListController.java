@@ -98,7 +98,7 @@ public class ListController {
 		// 상품 가져오기
 		try {
 			Map<String, Object> map = lService.getProductForList(categoryKey, page, sortBy);
-			List<Product> lst = (List<Product>)map.get("list_product");
+			List<Products> lst = (List<Products>)map.get("list_product");
 			PagingInfo paging = (PagingInfo)map.get("paging_info");
 			model.addAttribute("products", lst);
 			model.addAttribute("paging_info", paging);
