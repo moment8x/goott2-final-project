@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.mappers.shoppingCartMapper">
+	<insert id="insertShoppingCartNon">
+		INSERT INTO shopping_cart(non_member_id, product_id, member_check) VALUES(#{nonMemberId}, #{productId}, 0)
+	</insert>
+	<select id="selectNonMemberShoppingCart" resultType="com.project.vodto.ShoppingCart">
+		SELECT * FROM shopping_cart WHERE non_member_id = #{nonMemberId}
+	</select>
+	<select id="selectMemberShoppingCart" resultType="com.project.vodto.ShoppingCart">
+		SELECT * FROM shopping_cart WHERE member_id = #{memberId}
+	</select>
+	<select id="deleteNonMemberCartItem" resultType="com.project.vodto.ShoppingCart">
+		DELETE FROM shopping_cart WHERE non_member_id = #{nonMemberId} AND product_id = #{productId}
+	</select>
+</mapper>

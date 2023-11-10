@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  	<mapper namespace="com.project.mappers.listMapper">
+  	<resultMap type="com.project.vodto.kjy.ProductCategories" id="productCategoriesResultMap">
+  		<result property="category_key" column="category_key"/>
+  		<result property="category_name" column="category_name"/>
+  	</resultMap>
+  	
+  	<resultMap type="com.project.vodto.kjy.Products" id="productsResultMap">
+  		<result property="product_id" column="product_id"/>
+  		<result property="product_name" column="product_name"/>
+  		<result property="consumer_price" column="consumer_price"/>
+  		<result property="supply_price" column="supply_price"/>
+  		<result property="selling_price" column="selling_price"/>
+  		<result property="isbn" column="isbn"/>
+  		<result property="product_image" column="product_image"/>
+  		<result property="product_info_image" column="product_info_image"/>
+  		<result property="author_translator" column="author_translator"/>
+  		<result property="original_author" column="original_author"/>
+  		<result property="illustrator" column="illustrator"/>
+  		<result property="publisher" column="publisher"/>
+  		<result property="publication_date" column="publication_date"/>
+  		<result property="page_count" column="page_count"/>
+  		<result property="size" column="size"/>
+  		<result property="total_volume" column="total_volume"/>
+  		<result property="author_introduction" column="author_introduction"/>
+  		<result property="introduction_intro" column="introduction_intro"/>
+  		<result property="introduction_detail" column="introduction_detail"/>
+  		<result property="notification_subscription" column="notification_subscription"/>
+  		<result property="best_seller_status" column="best_seller_status"/>
+  		<result property="category_key" column="category_key"/>
+  		<result property="current_quantity" column="current_quantity"/>
+  	</resultMap>
+  
+  
+  	<!-- 리스트 목록 가져오기 -->
+  	<select id="selectProductCategories" resultMap="productCategoriesResultMap">
+  		select * from product_categories where category_key like CONCAT(#{key}, "__") 
+  	</select>
+  	
+  	<!-- 리스트 상품정보 가져오기 -->
+  	<select id="selectProductForList" resultMap="productsResultMap">
+  		SELECT p.*, (SELECT i.product_image FROM product_images i WHERE i.product_id = p.product_id LIMIT 1) AS product_image FROM products p where p.category_key like CONCAT(#{key}, "%") order by p.${sortBy} limit #{startRowIndex}, #{viewProductPerPage};
+  	</select>
+  	
+  	<!-- 키로 해당 카테고리 정보 가져오기 -->
+ 	<select id="selectProductCategoriesOne" resultMap="productCategoriesResultMap">
+  		SELECT * FROM product_categories WHERE category_key = #{key}
+  	</select>
+  	
+  	<!-- 전체 상품 갯수 조회 -->
+  	<select id="selectProductCount" resultType="int">
+  		select count(*) from products where category_key like CONCAT(#{key}, "%")
+  	</select>
+  	
+  
+  </mapper>
