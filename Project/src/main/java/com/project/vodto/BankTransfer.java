@@ -21,5 +21,5 @@ public class BankTransfer {
    private int depositAmount;
    private Timestamp paymentTime;
    private String depositedAccount;
-   private int amount_to_pay;
+   private int amountToPay;
 }

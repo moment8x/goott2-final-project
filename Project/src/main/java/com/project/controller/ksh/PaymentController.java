@@ -77,6 +77,7 @@ public class PaymentController {
 		
 		// 주문 상세 리스트 생성
 		List<DetailOrderItem> itemList = pd.getProducts();
+		
 		System.out.println(itemList.toString());
 
 		// ajax로 받은 PaymentDTO에서 주문 상세 상품만 getter로 뽑아 주문 상세 vo 생성 후 리스트 추가

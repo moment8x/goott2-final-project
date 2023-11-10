@@ -4,17 +4,50 @@
 
 <!DOCTYPE html>
 <html>
+
 <head>
 <meta charset="UTF-8">
-<meta name="google-signin-client_id" content="868189545870-s003dih3cpr96cotlbo38r5tti76sj5d.apps.googleusercontent.com">
 <script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" charset="utf-8"></script>
-<script src="https://apis.google.com/js/platform.js" async defer></script>
-    <script
-      src="https://code.jquery.com/jquery-3.4.1.js"
-      integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.4.0/kakao.min.js"
+  integrity="sha384-mXVrIX2T/Kszp6Z0aEWaA8Nm7J6/ZeWXbL8UpGRjKwWe56Srd/iyNmWMBhcItAjH" crossorigin="anonymous"></script>
+<script>
+  Kakao.init('b116d826d54948d007fe4dd027ba8553'); // 사용하려는 앱의 JavaScript 키 입력
+</script>
 <title>Insert title here</title>
+<script>
+  function loginWithKakao() {
+    Kakao.Auth.authorize({
+      redirectUri: 'http://localhost:8081/login/kakaoLogin',
+    });
+  }
+
+
+  // 아래는 데모를 위한 UI 코드입니다.
+  displayToken()
+  function displayToken() {
+    var token = getCookie('authorize-access-token');
+
+    if(token) {
+      Kakao.Auth.setAccessToken(token);
+      Kakao.Auth.getStatusInfo()
+        .then(function(res) {
+          if (res.status === 'connected') {
+            document.getElementById('token-result').innerText
+              = 'login success, token: ' + Kakao.Auth.getAccessToken();
+          }
+        })
+        .catch(function(err) {
+          Kakao.Auth.setAccessToken(null);
+        });
+    }
+  }
+
+  function getCookie(name) {
+    var parts = document.cookie.split(name + '=');
+    if (parts.length === 2) { return parts[1].split(';')[0]; }
+  }
+</script>
 <style type="text/css">
 	.login-button {
 		margin-top: 15px;
@@ -26,15 +59,6 @@
 		width: 50%
 	}
 </style>
-<script>
-	window.onload = function () {
-		google.accounts.id.initialize({
-			client_id: '868189545870-s003dih3cpr96cotlbo38r5tti76sj5d.apps.googleusercontent.com',
-			callback: handleCredentialResponse
-		});
-		google.accounts.id.prompt();
-	};
-</script>
 <!-- Callback 처리 -->
 
 </head>
@@ -122,7 +146,6 @@
                             <img src="/resources/assets/images/deer.png" style="width: 50%" />
                             <img src="/resources/assets/images/Deer_logo.png" />
                             </div>
-                            
                         </div>
 
                         <div class="input-box">
@@ -146,10 +169,10 @@
                                     <div class="forgot-box">
                                         <div class="form-check ps-0 m-0 remember-box">
                                             <input class="checkbox_animated check-box" type="checkbox"
-                                                id="flexCheckDefault">
-                                            <label class="form-check-label" for="flexCheckDefault" name="remember">자동 로그인</label>
+                                                id="flexCheckDefault" name="remember">
+                                            <label class="form-check-label" for="flexCheckDefault" >자동 로그인</label>
                                         </div>
-                                        <a href="forgot.html" class="forgot-password">아이디/비밀번호 찾기</a>
+                                        <a href="" class="forgot-password" data-bs-toggle="modal" data-bs-target="#myModal">아이디/비밀번호 찾기</a>
                                     </div>
                                 </div>
 
@@ -173,15 +196,16 @@
                                     </a>
                                 </li>
                                 <li>
-                                	<div class="g-signin2" data-onsuccess="onSignIn"></div>
+                                	<a id="kakao-login-btn" href="javascript:loginWithKakao()">
+									  <img src="https://k.kakaocdn.net/14/dn/btroDszwNrM/I6efHub1SN5KCJqLm1Ovx1/o.jpg" width="222"
+									    alt="카카오 로그인 버튼" />
+									</a>
                                 </li>
                             </ul>
                         </div>
 
                         <div class="other-log-in">
-                            <h6></h6>
                         </div>
-
                         <div class="sign-up-box">
                             <a href="sign-up.html">회원 가입</a>
                         </div>
@@ -192,5 +216,30 @@
     </section>
     <!-- log in section end -->
     <jsp:include page="../footer.jsp"></jsp:include>
+    
+    <!-- The Modal -->
+<div class="modal" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body" style="align-items: center; text-align: center;">
+      <a href="/login/forgot?status=id"><button type="button" class="btn btn-outline-primary">아이디 찾기</button></a>
+       <a href="/login/forgot?status=password"><button type="button" class="btn btn-outline-success">비밀번호 찾기</button></a>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
    </body>
 </html>

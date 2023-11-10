@@ -13,8 +13,9 @@ import org.springframework.stereotype.Service;
 
 import com.project.dao.kjs.product.ProductDAO;
 import com.project.dao.kjs.shoppingCart.ShoppingCartDAO;
-import com.project.vodto.Product;
 import com.project.vodto.ShoppingCart;
+import com.project.vodto.kjs.DisPlayedProductDTO;
+import com.project.vodto.kjs.ShowCartDTO;
 
 /**
  * @author goott1
@@ -58,7 +59,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 			list = scDao.selectShoppingCartNon(memberId);
 		}
 		// 물품 내역의 상품id로 상품 정보 조회
-		List<Product> items = new ArrayList<Product>();
+		List<DisPlayedProductDTO> items = new ArrayList<DisPlayedProductDTO>();
 		// 저장
 		for (int i = 0; i < list.size(); i++) {
 			System.out.println(list.get(i).getProductId());
@@ -94,6 +95,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 		
 		if (loginCheck) {
 			// 회원일 시
+			if (scDao.deleteItem(memberId, productId) == 1) {
+				result = true;
+			}
 		} else {
 			// 비회원일 시
 			int check = scDao.deleteItemNon(memberId, productId);
@@ -138,17 +142,72 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 			throws SQLException, NamingException {
 		System.out.println("======= 장바구니 서비스단 - 장바구니에 아이템 추가 =======");
 		boolean result = false;
+		boolean isFirst = true;
 		
+		// 기존에 장바구니에 담긴 상품인지 확인
+		List<ShoppingCart> list = null;
 		if (loginCheck) {
 			// 회원일 시
+			list = scDao.selectShoppingCart(memberId);
 		} else {
 			// 비회원일 시
-			if (scDao.insertShoppingCartNon(memberId, productId) == 1) {
-				System.out.println("아이템 추가 성공");
-				result = true;
+			list = scDao.selectShoppingCartNon(memberId);
+		}
+		
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).getProductId().equals(productId)) {
+				isFirst = false;
+				break;
 			}
 		}
 		
+		// 담긴 상품이 아닐 시
+		if (isFirst) {
+			if (loginCheck) {
+				// 회원일 시
+				if (scDao.insertShoppingCart(memberId, productId) == 1) {
+					System.out.println("회원 장바구니 추가 성공");
+					result = true;
+				}
+			} else {
+				// 비회원일 시
+				if (scDao.insertShoppingCartNon(memberId, productId) == 1) {
+					System.out.println("비회원 장바구니 추가 성공");
+					result = true;
+				}
+			}
+		}
+		
+		System.out.println("======= 장바구니 서비스단 끝 =======");
+		return result;
+	}
+
+	@Override
+	public List<ShowCartDTO> getCartList(String memberId, boolean loginCheck) throws SQLException, NamingException {
+		System.out.println("======= 장바구니 서비스단 - 헤더 장바구니 정보 조회 =======");
+		List<ShowCartDTO> result = null;
+		
+		if (loginCheck) {
+			result = scDao.getMemberShoppingCart(memberId);
+		} else {
+			result = scDao.getNonMemberShoppingCart(memberId);
+		}
+		
+		System.out.println("======= 장바구니 서비스단 끝 =======");
+		return result;
+	}
+
+	@Override
+	public int countList(String memberId, boolean loginCheck) throws SQLException, NamingException {
+		System.out.println("======= 장바구니 서비스단 - 헤더 장바구니 정보 조회 =======");
+		int result = -1;
+		
+		if (loginCheck) {
+			result = scDao.countList(memberId);
+		} else {
+			result = scDao.countListNon(memberId);
+		}
+		System.out.println("Service result : " + result);
 		System.out.println("======= 장바구니 서비스단 끝 =======");
 		return result;
 	}

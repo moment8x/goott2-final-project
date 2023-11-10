@@ -26,4 +26,12 @@ public interface ListDao {
 	// 페이징을 위한 전체 상품 개수 구하기
 	public int selectProductCount(String key) throws Exception;
 	
+	// 카테고리에 맞는 베스트셀러 목록 가져오기
+	public List<Products> selectBsetSeller(String key) throws Exception;
+	
+	// id값으로 상품 하나의 정보 가져오기
+	public Products selectProductById(String id) throws Exception;
+	
+	public List<Products> selectProductsSearching(String val) throws Exception;
+	
 }

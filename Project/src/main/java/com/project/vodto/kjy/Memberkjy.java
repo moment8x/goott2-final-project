@@ -33,7 +33,7 @@ public class Memberkjy {
 	private int total_reward;
 	private int coupon_count;
 	private int profile_image;
-	private int remember;
+	private String remember;
 	private Timestamp last_login_date;
 	private String refund_bank;
 	private String refund_account;

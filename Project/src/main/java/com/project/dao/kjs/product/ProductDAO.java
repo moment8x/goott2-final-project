@@ -4,8 +4,8 @@ import java.sql.SQLException;
 
 import javax.naming.NamingException;
 
-import com.project.vodto.Product;
+import com.project.vodto.kjs.DisPlayedProductDTO;
 
 public interface ProductDAO {
-	Product selectProduct(String productId) throws SQLException, NamingException;
+	DisPlayedProductDTO selectProduct(String productId) throws SQLException, NamingException;
 }

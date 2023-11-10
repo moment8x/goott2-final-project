@@ -140,7 +140,7 @@ export const menuItems = [
         multi_menu: [
           {
             multiTitle: '회원 정보 조회',
-            multiLink: 'admin/members/member-info',
+            multiLink: 'admin/members/search',
           },
           {
             multiTitle: '주문 회원 조회',

@@ -12,25 +12,26 @@ import lombok.ToString;
 @Setter
 @ToString
 public class DetailOrderItem {
-	private int no;
-	private String order_no;
-	private String non_order_no;
-	private String product_id;
-	private int product_price;
-	private int product_quantity;
-	private String product_status;
+	private int detailedOrderId;
+	private String orderNo;
+	private String nonOrderNo;
+	private String productId;
+	private int productPrice;
+	private int productQuantity;
+	private String productStatus;
+	private String productOrderNo;
 
-	public DetailOrderItem(String order_no, String product_id, int product_quantity) {
+	public DetailOrderItem(String orderNo, String productId, int productQuantity) {
 		// 회원 비회원 구분 필요 (나중에 추가 지금 테스트중)
-//		if(order_no.substring(0, 1).equals("N")) {
-//			
-//			this.non_order_no = order_no;
-//		} else {
-//			this.order_no = order_no;
-//		}
-		this.non_order_no = order_no;
-		this.product_id = product_id;
-		this.product_quantity = product_quantity;
+		if(orderNo.substring(0, 1).equals("N")) {
+			
+			this.nonOrderNo = orderNo;
+		} else {
+			this.orderNo = orderNo;
+		}
+		//this.nonOrderNo = orderNo;
+		this.productId = productId;
+		this.productQuantity = productQuantity;
 		
 	}
 	
