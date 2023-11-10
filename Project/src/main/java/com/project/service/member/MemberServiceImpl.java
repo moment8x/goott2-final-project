@@ -11,17 +11,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.project.dao.kjs.upload.UploadDAO;
 import com.project.dao.member.MemberDAO;
+import com.project.service.member.MemberService;
 import com.project.vodto.Board;
 import com.project.vodto.CouponLog;
 import com.project.vodto.CustomerInquiry;
 import com.project.vodto.Member;
+import com.project.vodto.OrderHistory;
 import com.project.vodto.PointLog;
+import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
-import com.project.vodto.UploadFiles;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.UploadFiles;
 
 @Service
 public class MemberServiceImpl implements MemberService {

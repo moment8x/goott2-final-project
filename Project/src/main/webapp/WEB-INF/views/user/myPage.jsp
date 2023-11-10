@@ -2559,6 +2559,7 @@
 			</div>
 		</div>
 	</div>
+	</c:forEach>
 	<!-- Edit Profile End -->
 
 	<!-- Edit Card Start -->

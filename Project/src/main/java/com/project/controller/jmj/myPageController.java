@@ -51,7 +51,7 @@ public class myPageController {
 
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
+		String memberId = member.getMember_id();
 
 		try {
 			//주문내역
@@ -85,7 +85,7 @@ public class myPageController {
 		
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
+		String memberId = member.getMember_id();
 
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
@@ -122,7 +122,7 @@ public class myPageController {
 		
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
+		String memberId = member.getMember_id();
 		
 		Object addrSeqObj = map.get("addrSeq");
 
@@ -171,7 +171,7 @@ public class myPageController {
 		System.out.println("본인인증 업데이트");
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
+		String memberId = member.getMember_id();
 
 		boolean result = false;
 		try {
@@ -252,7 +252,7 @@ public class myPageController {
 		System.out.println("회원정보 수정");
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
+		String memberId = member.getMember_id();
 
 		try {
 			boolean userInfo = mService.setMyInfo(memberId, modifyMemberInfo);
@@ -277,7 +277,7 @@ public class myPageController {
 
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
+		String memberId = member.getMember_id();
 
 		System.out.println(memberId + " 탈퇴시도");
 		
@@ -305,7 +305,7 @@ public class myPageController {
 		System.out.println("배송주소록 추가" + tmpAddr.toString());
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
+		String memberId = member.getMember_id();
 
 		boolean result = false;
 		try {
@@ -325,7 +325,7 @@ public class myPageController {
 	public void deleteShippingAddr(@RequestParam Map<String, Object> map, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
+		String memberId = member.getMember_id();
 
 		Object addrSeqObj = map.get("addrSeq");
 
@@ -353,7 +353,7 @@ public class myPageController {
 	public ResponseEntity<String> setBasicAddr(@RequestParam Map<String, Object> map, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
+		String memberId = member.getMember_id();
 
 		ResponseEntity<String> result = null;
 		
@@ -387,7 +387,7 @@ public class myPageController {
 		
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
+		String memberId = member.getMember_id();
 		
 		try {
 			//주문상품 상세정보
@@ -416,7 +416,7 @@ public class myPageController {
 	public void editDeliveryAddress(@ModelAttribute DetailOrderInfo updateDetailOrderAddr, HttpServletRequest request, Model model) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
+		String memberId = member.getMember_id();
 	
 		
 //		mService.updateDetailOrderAddr(updateDetailOrderAddr, memberId);
@@ -427,7 +427,7 @@ public class myPageController {
 		 @RequestParam("orderNo") String orderNo) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
+		String memberId = member.getMember_id();
 	
 		ResponseEntity<String> result = null;
 		

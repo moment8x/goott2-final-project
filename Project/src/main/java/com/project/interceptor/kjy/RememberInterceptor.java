@@ -26,7 +26,7 @@ public class RememberInterceptor extends HandlerInterceptorAdapter {
 			String remember = request.getParameter("remember");
 			if (request.getSession().getAttribute("loginMember") != null) {
 				Memberkjy member = (Memberkjy) request.getSession().getAttribute("loginMember");
-				String member_id = member.getMemberId();
+				String member_id = member.getMember_id();
 				if (remember != null && remember.equals("on")) {
 					String key = getUUID();
 					int temp1 = lDao.updateRemember(member_id, key);
