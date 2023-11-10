@@ -25,9 +25,6 @@
     <link rel="stylesheet" type="text/css" href="/resources/assets/css/vendors/font-awesome.css">
     <!-- feather icon css -->
     <link rel="stylesheet" type="text/css" href="/resources/assets/css/vendors/feather-icon.css">
-    <!-- slick css -->
-    <link rel="stylesheet" type="text/css" href="/resources/assets/css/vendors/slick/slick.css">
-    <link rel="stylesheet" type="text/css" href="/resources/assets/css/vendors/slick/slick-theme.css">
     <!-- Iconly css -->
     <link rel="stylesheet" type="text/css" href="/resources/assets/css/bulk-style.css">
     <!-- Template css -->
@@ -358,6 +355,7 @@
     <!-- feather icon js-->
     <script src="/resources/assets/js/feather/feather.min.js"></script>
     <script src="/resources/assets/js/feather/feather-icon.js"></script>
+    
 
 
     </body>

@@ -37,19 +37,24 @@
 	<beans:bean id="headerCartInterceptor"
 		class="com.project.interceptor.kjs.HeaderCartInterceptor">
 	</beans:bean>
+	<!-- -->
 	<beans:bean id="loginInterceptor"
 		class="com.project.interceptor.kjs.LoginInterceptor">
 	</beans:bean>
+	 
+	
 	
 	<interceptors>
 		<interceptor>
 			<mapping path="/"/>
 			<beans:ref bean="headerCartInterceptor"/>
 		</interceptor>
+		<!-- -->
 		<interceptor>
 			<mapping path="/user/myPage"/>
 			<beans:ref bean="loginInterceptor"/>
 		</interceptor>
+
 	</interceptors>
 	
 	<beans:bean id="createOrderIdInterceptor"
@@ -60,6 +65,17 @@
 		<interceptor>
 			<mapping path="/order/requestOrder"/>
 			<beans:ref bean="createOrderIdInterceptor"/>
+		</interceptor>
+	</interceptors>
+	
+	<beans:bean id="RememberInterceptor"
+		class="com.project.interceptor.kjy.RememberInterceptor">
+	</beans:bean>
+	
+	<interceptors>
+		<interceptor>
+			<mapping path="/login/"/>
+			<beans:ref bean="RememberInterceptor"/>
 		</interceptor>
 	</interceptors>
 	

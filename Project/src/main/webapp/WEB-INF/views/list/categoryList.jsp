@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,21 +14,38 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script type="text/javascript">
 	$(function() {
+		$(document).ready(function() {
+		    $(".grid-option ul li").on("click", function() {
+		        let clickedClass = $(this).attr("class").split("active")[0];
+
+		        console.log("클릭한 리스트 항목의 클래스: " + clickedClass);
+		        useState(clickedClass);
+		      
+		    });
+		});
+		
+		// 시큐리티 적용시 결제모달 링크 적용
+		//$('#payModalBtn').on("click", function() {
+		//	let pId = $(this).attr("value");
+		//	getHrefModal(pId);
+		//})
+
 		$('#payModalBtn').on("click", function() {
+			let pId = $(this).attr("value");
 			$.ajax({
 				url : '/list/isLogin',
 				type : 'GET',
 				dataType : 'json',
 				async : false,
 				success : function(data) {
-					payLink(data);
-					
+					payLink(data, pId);
+				
 				},
 				error : function() {
 					// 전송에 실패하면 이 콜백 함수를 실행
 				}
 			});
-		})
+		});
 		
 		$('.dropdown-item').on("click", function(evt) {
 			let sortBy = $(this).attr('id');
@@ -48,14 +66,13 @@
 		});
 		
 		insertSort();
+		changeGrid();
 	});
-	
-	function payLink(data) {
-		let pId = $(".product-header").attr("id");
+	 
+	function payLink(data, pId) {
 		if(data.isLogin == "loginOK"){
-			$('#loginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=Y");
+			$('#MemberLoginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=Y");
 		} else {
-			console.log("안녕은 개뿔");
 			$('#loginPay').attr("href","/login/");
 			$('#noLoginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=N");
 		}
@@ -98,6 +115,28 @@
 			break;
 		}
 	}
+	
+	// 시큐리티 적용시 결제 모달창 링크 적용
+	//function getHrefModal(pId) {
+	//	$('#MemberLoginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=Y");
+	//	$('#loginPay').attr("href","/login/");
+	//	$('#noLoginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=N");
+	//}
+	
+	function changeGrid() {
+		console.log("${active}");
+		let active = "${active}";
+		$("."+active).attr("class",(active+" active"));
+	}
+	
+	function useState(active) {
+		let activeClass = active;
+		
+		for(let i = 1; i < 11; i++){
+			$('.link'+i).attr("href",($(".link"+i).attr("href")+"&active="+activeClass));
+		}
+	}
+	
 </script>
 </head>
 <body>
@@ -210,7 +249,7 @@
 											src="/resources/assets/svg/grid-3.svg"
 											class="blur-up lazyload" alt="">
 									</a></li>
-									<li class="grid-btn d-xxl-inline-block d-none active"><a
+									<li class="grid-btn d-xxl-inline-block d-none"><a
 										href="javascript:void(0)"> <img
 											src="/resources/assets/svg/grid-4.svg"
 											class="blur-up lazyload d-lg-inline-block d-none" alt="">
@@ -234,7 +273,7 @@
 								<c:forEach var="product" items="${products }" varStatus="loop">
 									<div>
 										<div class="product-box-3 h-100 wow fadeInUp">
-											<div class="product-header" id="${product.product_id }">
+											<div class="product-header">
 												<div class="product-image">
 												<c:choose>
 												<c:when test="${product.product_image != null}">
@@ -251,7 +290,7 @@
 													</c:otherwise>
 													</c:choose>
 													<ul class="product-option">
-															<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn"
+															<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="${product.product_id }"
 															title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i>
 															</a></li>
 														
@@ -315,7 +354,7 @@
 									<c:forEach var="i"
 										begin="${paging_info.startNumOfCurrentPagingBlock}"
 										end="${paging_info.endNumOfCurrentPagingBlock }" step="1">
-										<li class="page-item active"><a class="page-link"
+										<li class="page-item active"><a class="page-link link${i}"
 											href="/list/categoryList/${key }?page=${i}">${i}</a></li>
 									</c:forEach>
 								</c:when>
@@ -361,15 +400,24 @@
 									class="img-fluid blur-up lazyload" alt="" />
 							</div>
 							<div>
-								<c:choose>
-									<c:when test="${sessionScope.loginMember != null }">
-										<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-									</c:when>
-									<c:otherwise>
-										<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-										<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>										
-									</c:otherwise>
-								</c:choose>
+							<!-- 
+							<sec:authorize  access="isAuthenticated()">
+								<a href="/order/requestOrder?product_id="+pId+"&isLogin=Y" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+							</sec:authorize>
+							<sec:authorize access="isAnonymous()">
+								<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+								<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>
+							</sec:authorize>	
+							 -->
+							 <c:choose>
+							 	<c:when test="${sessionScope.loginMember != null }">
+							 		<a href="/order/requestOrder?product_id="+pId+"&isLogin=Y" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+							 	</c:when>
+							 	<c:otherwise>
+							 		<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+									<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>
+							 	</c:otherwise>
+							 </c:choose>												
 							</div>
 						</div>
 					</div>
