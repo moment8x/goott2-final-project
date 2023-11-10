@@ -14,30 +14,32 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Memberkjy {
-	private String member_id;
+	private String memberId;
 	private String password;
 	private String name;
-	private String phone_number;
-	private Timestamp registertaion_date;
+	private String phoneNumber; //전화번호
+	private String cellPhoneNumber; // 핸드폰번호
+	private Timestamp registrationDate;
 	private char gender;
-	private String date_of_birth;
-	private String zip_code;
+	private String dateOfBirth;
+	private String zipCode;
 	private String address;
-	private String detailed_address;
+	private String detailedAddress;
 	private String email;
-	private char identity_verification_status;
-	private char adult_verification_status;
-	private char recive_advertising;
-	private String membership_grade;
-	private int total_points;
-	private int total_reward;
-	private int coupon_count;
-	private int profile_image;
+	private char identityVerificationStatus;
+	private char reciveAdvertising;
+	private String membershipGrade;
+	private int totalPoints;
+	private int totalRewards;
+	private int couponCount;
+	private int profileImage;
 	private String remember;
-	private Timestamp last_login_date;
-	private String refund_bank;
-	private String refund_account;
-	private String dormant_accout;
-	private String member_token;
-	private String Privilege;
+	private Timestamp lastLoginDate;
+	private String refundBank;
+	private String accountHolder; //예금주
+	private String refundAccount;
+	private String dormantAccout; //휴면계정
+	private String memberToken;
+	private String permission; //권한 등급
+	private String withdraw; //탈퇴여부
 }

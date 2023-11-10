@@ -8,7 +8,7 @@
   
     <mapper namespace="com.project.mappers.loginMapper">
     <resultMap type="com.project.vodto.kjy.Memberkjy" id="memberLoginResultMap">
-  		<result property="member_id" column="member_id"/>
+  		<result property="memberId" column="member_id"/>
   		<result property="remember" column="remember"/>
   	</resultMap>
     	<!-- 로그인 하는 유저의 정보가 DB에 있는지 조회 -->
@@ -17,15 +17,15 @@
     	</select>
     	<!-- 로그인에 성공한 유저의 최종 접속일을 갱신 -->
     	<update id="updateLatsAccess" >
-    		update member set last_login_date = now() where member_id = #{member_id}
+    		update member set last_login_date = now() where member_id = #{memberId}
     	</update>
     	<!-- 자동로그인이 체크되어있을 경우 db에 키값을 저장 -->
     	<update id="updateRememberKey">
-    		update member set remember = #{key} where member_id = #{member_id}
+    		update member set remember = #{key} where member_id = #{memberId}
     	</update>
     	<!-- 자동로그인 확인 -->
     	<select id="rememberCheck" resultMap="memberLoginResultMap">
-    		select * from member where member_id = #{member_id} and remember = #{key}
+    		select * from member where member_id = #{memberId} and remember = #{key}
     	</select>
     	<!-- id로 계정 조회 -->
     	<select id="selectMemberById" resultMap="memberLoginResultMap">
