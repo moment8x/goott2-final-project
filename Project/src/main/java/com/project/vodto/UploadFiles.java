@@ -11,11 +11,11 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class UploadFile {
-	private int ufSeq;
+public class UploadFiles {
+	private int uploadFilesSeq;
 	private String thumbnailFileName;
 	private String extension;
 	private String originalFileName;
 	private String newFileName;
-	private int fileSize;
+	private long fileSize;
 }

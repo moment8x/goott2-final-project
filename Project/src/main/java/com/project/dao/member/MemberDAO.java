@@ -104,6 +104,8 @@ public interface MemberDAO {
 	int insertMember(Member member) throws SQLException, NamingException;
 	// 로그인(비밀번호 체크)
 	Member selectMember(String memberId, String password) throws SQLException, NamingException;
+	// 프로필사진 업데이트
+	int updateProfile(String memberId, String newFileName) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
 	
 

@@ -296,7 +296,7 @@
 														
 
 														<li  data-bs-toggle="tooltip" data-bs-placement="top"
-															title="장바구니" ><a href="/shoppingCart/insert?product_id='${product.product_id }"><i data-feather="shopping-cart"></i></a>
+															title="장바구니" ><a href="/shoppingCart/insert?product_id=${product.product_id }"><i data-feather="shopping-cart"></i></a>
 														</li>
 
 														<li data-bs-toggle="tooltip" data-bs-placement="top"

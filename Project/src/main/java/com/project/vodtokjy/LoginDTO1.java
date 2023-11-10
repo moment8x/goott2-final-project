@@ -11,7 +11,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class LoginDTO {
+public class LoginDTO1 {
 	private String username;
 	private String password;
 	private Boolean remember;

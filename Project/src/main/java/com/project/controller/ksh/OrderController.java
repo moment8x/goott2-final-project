@@ -232,14 +232,53 @@ public class OrderController {
 //				List<DetailOrderItem>
 				System.out.println("paymentDetail 조회 - " + paymentDetail.toString());
 			}
-
+			pd.setTotalAmount(totalAmount);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-
 		}
+		
+		model.addAttribute("paymentInfo", pd);
+		model.addAttribute("orderId", orderId);
+		model.addAttribute("productInfos", productInfos);
+		model.addAttribute("impKey", impKey);
+		
 
+		return path;
 	}
+
+//	@RequestMapping(value = "orderComplete", method = RequestMethod.POST)
+//	public void orderComplete(NonOrderHistory noh, Model model) {
+//
+//		// 비회원 주문 결제 완료하고 주문 내역 창 띄우기
+//
+//		System.out.println("결제 완료하고 주문 내역 저장하기");
+//		System.out.println(noh.toString());
+//
+////		System.out.println(pd.toString());
+////		System.out.println(itemList.toString());
+////		if (pd.getPayment_method() != null) {
+////			if (pd.getPayment_method().equals("bkt")) {
+////				noh.setDelivery_status("입금확인중");
+////				pd.setPayment_method("무통장입금");
+////			}
+////		}
+//
+//		try {
+//			// 주문내역 테이블 저장
+//			if (os.saveOrderHistory(noh)) {
+////				 결제랑 주문상세 조회
+//				Map<String, Object> paymentDetail = os.getPaymentDetail(noh.getNonOrderNo());
+//				System.out.println("paymentDetail 조회 - " + paymentDetail.toString());
+//			}
+//
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//
+//		}
+//
+//	}
 
 //	@RequestMapping(value = "orderComplete", method = RequestMethod.POST)
 //	public ResponseEntity<Map<String, Object>> orderComplete(NonOrderHistory noh, Model model) {

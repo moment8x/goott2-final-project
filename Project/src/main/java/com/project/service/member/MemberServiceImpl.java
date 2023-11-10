@@ -9,6 +9,7 @@ import javax.naming.NamingException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.project.dao.kjs.upload.UploadDAO;
 import com.project.dao.member.MemberDAO;
 import com.project.service.member.MemberService;
 import com.project.vodto.Board;
@@ -23,12 +24,15 @@ import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.UploadFiles;
 
 @Service
 public class MemberServiceImpl implements MemberService {
 	
 	@Inject
 	private MemberDAO mDao;
+	@Inject
+	private UploadDAO uDao;
 	// --------------------------------------- 장민정 시작 ---------------------------------------
 	@Override
 	public Boolean signUp(Member member) throws SQLException, NamingException {
@@ -241,15 +245,26 @@ public class MemberServiceImpl implements MemberService {
 		System.out.println("======= 멤버(회원가입, 로그인) 서비스단 끝 =======");
 		return result;
 	}
-
-	public boolean insertMember(Member member) throws SQLException, NamingException {
+	
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean insertMember(Member member, UploadFiles file) throws SQLException, NamingException {
 		System.out.println("======= 멤버(회원가입) 서비스단 - 회원가입 =======");
 		boolean result = false;
-		
-		// 회원 가입
-		if (mDao.insertMember(member) == 1) {
-			result = true;
+		String newFileName = "";
+		// 회원 가입 - 프로필 사진 저장
+		if (file != null) {
+			uDao.insertUploadFile(file);
+			newFileName = file.getNewFileName();
 		};
+		// 회원 가입 - 회원 가입
+		if (mDao.insertMember(member) == 1) {
+			if (!newFileName.equals("")) {
+				// 프로필사진이 있을 시.(update)
+				mDao.updateProfile(member.getMemberId(), newFileName);
+			}
+			result = true;
+		}
 		System.out.println("member : " + member.toString());
 		System.out.println("======= 멤버(회원가입) 서비스단 끝 =======");
 		return result;
@@ -270,19 +285,5 @@ public class MemberServiceImpl implements MemberService {
 		System.out.println("======= 멤버(로그인) 서비스단 끝 =======");
 		return result;
 	}
-	// --------------------------------------- 김진솔 끝 ----------------------------------------	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-
+	// --------------------------------------- 김진솔 끝 ----------------------------------------
 }

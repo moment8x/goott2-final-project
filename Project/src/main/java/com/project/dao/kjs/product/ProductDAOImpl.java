@@ -8,7 +8,7 @@ import javax.naming.NamingException;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
-import com.project.vodto.Product;
+import com.project.vodto.kjs.DisPlayedProductDTO;
 
 @Repository
 public class ProductDAOImpl implements ProductDAO {
@@ -19,7 +19,7 @@ public class ProductDAOImpl implements ProductDAO {
 	
 	
 	@Override
-	public Product selectProduct(String productId) throws SQLException, NamingException {
+	public DisPlayedProductDTO selectProduct(String productId) throws SQLException, NamingException {
 		return session.selectOne(ns + ".selectProduct", productId);
 	}
 }

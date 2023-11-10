@@ -1,4 +1,4 @@
-package com.project.vodto;
+package com.project.vodto.kjs;
 
 import java.sql.Timestamp;
 
@@ -13,13 +13,14 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Product {
+public class DisPlayedProductDTO {
 	private String productId;
 	private String productName;
 	private int consumerPrice;
 	private int supplyPrice;
 	private int sellingPrice;
 	private String isbn;
+	private String productImage;
 	private String productInfoImage;
 	private String authorTranslator;
 	private String originalAuthor;

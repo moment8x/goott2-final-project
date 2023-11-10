@@ -95,7 +95,7 @@ public interface MemberService {
 	// 회원 아이디 중복 조회
 	boolean checkedDuplication(String memberId) throws SQLException, NamingException;
 	// 회원 가입
-	boolean insertMember(Member member) throws SQLException, NamingException;
+	boolean insertMember(Member member, UploadFiles file) throws SQLException, NamingException;
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------

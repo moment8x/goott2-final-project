@@ -1,3 +1,4 @@
+<%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
@@ -46,6 +47,27 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 	}
     </script>
 
+	
+	<script>
+		function delCart(productId) {
+			$.ajax({
+				url: "/shoppingCart/" + productId,
+				type: "DELETE",
+				data: {
+					"productId" : productId
+				},
+				dataType: "json",
+				async: false,
+				success: function (data) {
+					console.log(data);
+					//showCart();
+				}, error: function (data) {
+					console.log(data);
+				}
+			});
+		}
+	</script>
+	
   </head>
 
   <!-- Header Start -->
@@ -225,56 +247,49 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                         <div class="onhover-dropdown header-badge">
                                             <button type="button" class="btn p-0 position-relative header-wishlist">
                                                 <i data-feather="shopping-cart"></i>
-                                                <span class="position-absolute top-0 start-100 translate-middle badge">2
+                                                <span class="position-absolute top-0 start-100 translate-middle badge">${cartItems.size()}
                                                     <span class="visually-hidden">unread messages</span>
                                                 </span>
                                             </button>
 
                                             <div class="onhover-div">
                                                 <ul class="cart-list">
-                                                    <li class="product-box-contain">
-                                                        <div class="drop-cart">
-                                                            <a href="product-left-thumbnail.html" class="drop-image">
-                                                                <img src="/resources/assets/images/vegetable/product/1.png"
-                                                                    class="blur-up lazyload" alt="">
-                                                            </a>
-
-                                                            <div class="drop-contain">
-                                                                <a href="product-left-thumbnail.html">
-                                                                    <h5>Fantasy Crunchy Choco Chip Cookies</h5>
-                                                                </a>
-                                                                <h6><span>1 x</span> $80.58</h6>
-                                                                <button class="close-button close_button">
-                                                                    <i class="fa-solid fa-xmark"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-
-                                                    <li class="product-box-contain">
-                                                        <div class="drop-cart">
-                                                            <a href="product-left-thumbnail.html" class="drop-image">
-                                                                <img src="/resources/assets/images/vegetable/product/2.png"
-                                                                    class="blur-up lazyload" alt="">
-                                                            </a>
-
-                                                            <div class="drop-contain">
-                                                                <a href="product-left-thumbnail.html">
-                                                                    <h5>Peanut Butter Bite Premium Butter Cookies 600 g
-                                                                    </h5>
-                                                                </a>
-                                                                <h6><span>1 x</span> $25.68</h6>
-                                                                <button class="close-button close_button">
-                                                                    <i class="fa-solid fa-xmark"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </li>
+                                                	<c:choose>
+                                                		<c:when test="${cartItems.size() > 0}">
+                                                			<c:forEach var="item" items="${cartItems}">
+                                                				<li class="product-box-contain">
+                                                				<div class="drop-cart">
+                                                				<a href="#" class="drop-image">
+                                                				<img src="${item.productImage}" class="blur-up lazyload" alt=""></a>
+                                                				<div class="drop-contain">
+                                                				<a href="#">
+                                                				<h5>${item.productName}</h5></a>
+                                                				<h6><span>1 x</span> ${item.sellingPrice}원</h6>
+                                                				<button class="close-button close_button" onclick="delCart('${item.productId}');">
+                                                				<i class="fa-solid fa-xmark"></i></button></div></div></li>
+                                                			</c:forEach>
+                                                		</c:when>
+                                                		<c:otherwise>
+                                                			등록된 상품이 없습니다.
+                                                		</c:otherwise>
+                                                	</c:choose>
                                                 </ul>
 
                                                 <div class="price-box">
                                                     <h5>Total :</h5>
-                                                    <h4 class="theme-color fw-bold">$106.58</h4>
+                                                    <c:choose>
+                                                    	<c:when test="${cartItems.size() > 0}">
+                                                    		<c:set var="total" value="0" />
+                                                    		<c:forEach var="item" items="${cartItems}" varStatus="status">
+                                                    			<c:set var="total" value="${total + item.sellingPrice}" />
+                                                    			 <!-- <div id="sellingPrice${status.index }" style="display: none">${item.sellingPrice }</div>  -->
+                                                    		</c:forEach>
+                                                    		<c:out value="${total }"/>원
+                                                    	</c:when>
+                                                    	<c:otherwise>
+                                                    		--
+                                                    	</c:otherwise>
+                                                    </c:choose>
                                                 </div>
 
                                                 <div class="button-group">
@@ -475,7 +490,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 		                        </div>
 		                      </div>
 		                    </li>
-		
+		                    
 		                    <li class="onhover-category-list">
 		                      <a href="javascript:void(0)" class="category-name">
 		                        <img src="/resources/assets/images/open-book.png" alt="" />
@@ -719,9 +734,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     
     <!-- Header End -->
     
-    <!-- latest jquery -->
+	<!-- latest jquery -->
     <script src="/resources/assets/js/jquery-3.6.0.min.js"></script>
-
+    
     <!-- jquery ui-->
     <script src="/resources/assets/js/jquery-ui.min.js"></script>
     <!-- Bootstrap js-->
@@ -742,8 +757,4 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     <script src="/resources/assets/js/quantity.js"></script>
     <!-- script js -->
     <script src="/resources/assets/js/script.js"></script>
-
-
 </html>
-
-

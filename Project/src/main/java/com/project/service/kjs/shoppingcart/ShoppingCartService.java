@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.naming.NamingException;
 
 import com.project.vodto.ShoppingCart;
+import com.project.vodto.kjs.ShowCartDTO;
 
 public interface ShoppingCartService {
 	// 장바구니 조회
@@ -17,4 +18,8 @@ public interface ShoppingCartService {
 	boolean dellteItems(String memberId, boolean loginCheck, List<String> items) throws SQLException, NamingException;
 	// 장바구니 추가
 	boolean insertItem(String memberId, boolean loginCheck, String productId) throws SQLException, NamingException;
+	// 헤더 장바구니 정보 조회
+	List<ShowCartDTO> getCartList(String memberId, boolean loginCheck) throws SQLException, NamingException;
+	// 장바구니 수량 조회
+	int countList(String memberId, boolean loginCheck) throws SQLException, NamingException;
 }

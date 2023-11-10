@@ -9,7 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 
-public class Products {
+public class Products1 {
 	private String product_id;
 	private String product_name;
 	private int consumer_price;
@@ -36,7 +36,7 @@ public class Products {
 
 	
 	
-	public Products(String product_id, String product_name, int consumer_price, int supply_price, int selling_price,
+	public Products1(String product_id, String product_name, int consumer_price, int supply_price, int selling_price,
 			String isbn, String product_image, String product_info_image, String author_translator,
 			String original_author, String illustrator, String publisher, Timestamp publication_date, int page_count,
 			String size, int total_volume, String author_introduction, String introduction_intro,
