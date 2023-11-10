@@ -1,27 +1,31 @@
-import React, { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import React, { lazy, Suspense } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // home pages  & dashboard
 //import Dashboard from "./pages/dashboard";
-const Test = lazy(() => import('./pages/test'));
-const Ecommerce = lazy(() => import('./pages/dashboard/ecommerce'));
-const CrmPage = lazy(() => import('./pages/dashboard/crm'));
-const MemberInfo = lazy(() => import('./pages/member-info/index'));
+const Test = lazy(() => import("./pages/test"));
+const Ecommerce = lazy(() => import("./pages/dashboard/ecommerce"));
+const CrmPage = lazy(() => import("./pages/dashboard/crm"));
+const MemberInfo = lazy(() => import("./pages/member-info/index"));
 
-const Login = lazy(() => import('./pages/auth/login'));
-const Register = lazy(() => import('./pages/auth/register'));
-const Register2 = lazy(() => import('./pages/auth/register2'));
-const Register3 = lazy(() => import('./pages/auth/register3'));
-const ForgotPass = lazy(() => import('./pages/auth/forgot-password'));
-const ForgotPass2 = lazy(() => import('./pages/auth/forgot-password2'));
-const ForgotPass3 = lazy(() => import('./pages/auth/forgot-password3'));
-const LockScreen = lazy(() => import('./pages/auth/lock-screen'));
-const LockScreen2 = lazy(() => import('./pages/auth/lock-screen2'));
-const LockScreen3 = lazy(() => import('./pages/auth/lock-screen3'));
+const ProductPage = lazy(() => import("./pages/dashboard/Product"));
+const ProductInfo = lazy(() => import("./pages/product-info/index"));
+const ProductRegister = lazy(() => import("./pages/product-register/index"));
 
-import Layout from './layout/Layout';
-import AuthLayout from './layout/AuthLayout';
-import MemberInfoModal from './pages/member-info/member-modal';
+const Login = lazy(() => import("./pages/auth/login"));
+const Register = lazy(() => import("./pages/auth/register"));
+const Register2 = lazy(() => import("./pages/auth/register2"));
+const Register3 = lazy(() => import("./pages/auth/register3"));
+const ForgotPass = lazy(() => import("./pages/auth/forgot-password"));
+const ForgotPass2 = lazy(() => import("./pages/auth/forgot-password2"));
+const ForgotPass3 = lazy(() => import("./pages/auth/forgot-password3"));
+const LockScreen = lazy(() => import("./pages/auth/lock-screen"));
+const LockScreen2 = lazy(() => import("./pages/auth/lock-screen2"));
+const LockScreen3 = lazy(() => import("./pages/auth/lock-screen3"));
+
+import Layout from "./layout/Layout";
+import AuthLayout from "./layout/AuthLayout";
+import MemberInfoModal from "./pages/member-info/member-modal";
 
 function App() {
   return (
@@ -44,7 +48,17 @@ function App() {
           <Route path="admin/home" element={<Ecommerce />} />
           <Route path="admin/members/dashboard" element={<CrmPage />} />
           <Route path="admin/members/member-info" element={<MemberInfo />} />
-          <Route path="admin/members/member-detail" element={<MemberInfoModal />} />
+          <Route
+            path="admin/members/member-detail"
+            element={<MemberInfoModal />}
+          />
+
+          <Route path="admin/products/dashboard" element={<ProductPage />} />
+          <Route path="admin/products/product-info" element={<ProductInfo />} />
+          <Route
+            path="admin/products/product-register"
+            element={<ProductRegister />}
+          />
         </Route>
       </Routes>
     </main>
