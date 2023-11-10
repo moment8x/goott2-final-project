@@ -22,7 +22,7 @@ public class MyPageOrderList {
 	private String actualPaymentAmount; //최종금액
 
 //	products
-	private String productInfoImage; //상품 이미지
+	private String productImage; //상품 이미지
 	private String productName; //상품 이름
 	
 //	detailed_order_items

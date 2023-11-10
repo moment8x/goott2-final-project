@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -117,44 +118,28 @@ function shippingAddrModify(orderNo) {
 }
 
 function editBasicShippingAddress() {
-
-     // 선택된 주소의 정보 가져오기
-     let selectedAddressInfo = $('input[name="checkAddr"]:checked').closest('.addrInfo').find('.contact-detail-contain');
-
-     // 선택된 주소의 recipient 값 가져오기
-     let recipientValue = $('input[name="checkAddr"]:checked').closest('.addrInfo').find('#doRecipient').text().trim();
-
-     let recipient = recipientValue
-     let recipientContact = selectedAddressInfo.find('#doRecipientContact').text()
-     let zipCode = selectedAddressInfo.find('#doZipCode').text()
-     let address = selectedAddressInfo.find('#doAddress').text()
-     let detailAddress = selectedAddressInfo.find('#doDetailAddress').text()
-            
-     let deliveryMessage = $('#changeDeliveryMessage').val()
-     
-     $.ajax({
-			url : '/user/selectBasicAddr', // 데이터를 수신받을 서버 주소
-			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-			data : {
-				recipient,
-				recipientContact,
-				zipCode,
-				address,
-				detailAddress,
-				deliveryMessage
-			},
-			dataType : 'text',
-			async : false,
-			success : function(data) {
-				console.log(data);
-				if(data == 'success'){
-					location.reload()
+		let addrSeq = $('input[name="checkAddr"]:checked').val()
+		let deliveryMessage = $('#changeDeliveryMessage').val()
+		let orderNo = "${detailOrder.orderNo}"
+		
+		 $.ajax({
+				url : '/user/selectBasicAddr', // 데이터를 수신받을 서버 주소
+				type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+				data : {
+					addrSeq,
+					deliveryMessage,
+					orderNo
+				},
+				async : false,
+				success : function(data) {
+					console.log(data);
+					if(data == 'success'){
+						location.reload()
+					}
+				},
+				error : function() {
 				}
-			},
-			error : function() {
-			}
-		}); 
-     
+			});
         
 }
 </script>
@@ -212,6 +197,12 @@ function editBasicShippingAddress() {
 .form-floating.mb-4.theme-form-floating.changeDeliveryMessage {
 	border-top: 0.5px solid #E7E7E7;
 	padding-top: 10px;
+}
+.basicAddr{
+	font-size: 12px;
+	border: 2px solid #0DA487;
+	border-radius: 10px;
+	padding: 3px;
 }
 </style>
 </head>
@@ -658,7 +649,11 @@ function editBasicShippingAddress() {
 								<div class="contact-icon"></div>
 								<div class="contact-detail-title">
 									<h4 id="doRecipient">
-										<i class="fa-solid fa-location-dot"></i> ${addr.recipient } <input
+										<i class="fa-solid fa-location-dot"></i> ${addr.recipient }
+										<c:if test="${fn:contains(addr.basicAddr,'Y')}">
+											<span class="basicAddr">기본배송지</span>
+										</c:if>
+										 <input
 											class="form-check-input" type="radio"
 											value="${addr.addrSeq }" id="checkAddr" name="checkAddr" />
 									</h4>

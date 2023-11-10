@@ -21,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -422,25 +423,24 @@ public class myPageController {
 	}
 
 	@RequestMapping(value = "selectBasicAddr", method = RequestMethod.POST)
-	public void getBasicAddrList(HttpServletRequest request, @ModelAttribute ChangeShippingAddr tmpAddr, 
-		 @RequestParam("no") String orderNo) {
+	public ResponseEntity<String> getBasicAddrList(HttpServletRequest request, @RequestParam("addrSeq") int addrSeq, @RequestParam("deliveryMessage") String deliveryMessage, 
+		 @RequestParam("orderNo") String orderNo) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMember_id();
+	
+		ResponseEntity<String> result = null;
 		
-//		ResponseEntity<String> result = null;
-		
-		System.out.println(tmpAddr.toString());
-//		System.out.println(addrSeq + "번 배송지로 변경하자 배송 메세지는 " + deliveryMessage);
-//		try {
-//			if(mService.selectBasicAddr(memberId, tmpAddr, orderNo, deliveryMessage)) {
-//				System.out.println("배송지 수정완");
-//				result = new ResponseEntity<String>("success",HttpStatus.OK);
-//			}
-//		} catch (SQLException | NamingException e) {
-//			e.printStackTrace();
-//			result = new ResponseEntity<>(HttpStatus.CONFLICT);
-//		}
-//		return result;
+		System.out.println(addrSeq + "번 배송지로 변경하자 배송 메세지는 " + deliveryMessage);
+		try {
+			if(mService.selectBasicAddr(memberId, addrSeq, orderNo, deliveryMessage)) {
+				System.out.println("배송지 수정완");
+				result = new ResponseEntity<String>("success",HttpStatus.OK);
+			}
+		} catch (SQLException | NamingException e) {
+			e.printStackTrace();
+			result = new ResponseEntity<>(HttpStatus.CONFLICT);
+		}
+		return result;
 	}
 }

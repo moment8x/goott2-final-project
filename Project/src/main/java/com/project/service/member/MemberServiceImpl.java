@@ -19,6 +19,7 @@ import com.project.vodto.OrderHistory;
 import com.project.vodto.PointLog;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.MyPageOrderList;
@@ -214,13 +215,15 @@ public class MemberServiceImpl implements MemberService {
 	
 	@Override
 	public boolean selectBasicAddr(String memberId, int addrSeq, String orderNo, String deliveryMessage) throws SQLException, NamingException {
-		
 		boolean result = false;
-		if(mDao.updateShippingAddr(memberId, addrSeq, orderNo, deliveryMessage) != 0) {
+		
+		ShippingAddress sa = mDao.selectShippingAddr(addrSeq, memberId);
+		ChangeShippingAddr cs = new ChangeShippingAddr(sa.getRecipient(), sa.getRecipientContact(), sa.getZipCode(), sa.getAddress(), sa.getDetailAddress(), deliveryMessage);
+
+		if(mDao.updateShippingAddr(memberId, orderNo, cs) !=0) {
 			result = true;
-			System.out.println("1");
 		}
-		System.out.println("2");
+		
 		return result;
 	}
 

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import com.project.vodto.Member;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.MyPageOrderList;
@@ -237,12 +238,16 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	
 	@Override
-	public int updateShippingAddr(String memberId, int addrSeq, String orderNo, String deliveryMessage) throws SQLException, NamingException {
+	public int updateShippingAddr(String memberId, String orderNo, ChangeShippingAddr cs) throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("memberId", memberId);
-		params.put("addrSeq", addrSeq);
 		params.put("orderNo", orderNo);
-		params.put("deliveryMessage", deliveryMessage);
+		params.put("recipient", cs.getRecipient());
+		params.put("recipientContact", cs.getRecipientContact());
+		params.put("zipCode", cs.getZipCode());
+		params.put("address", cs.getAddress());
+		params.put("detailAddress", cs.getDetailAddress());
+		params.put("deliveryMessage", cs.getDeliveryMessage());
 		
 		return ses.update(ns + ".selectBasicShippingAddr", params);
 	}
@@ -277,6 +282,8 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectOne(ns + ".login", param);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+
 
 	
 

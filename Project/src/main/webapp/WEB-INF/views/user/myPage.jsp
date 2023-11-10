@@ -607,6 +607,7 @@
 .orderDetailClick{
 	font-size: 24px;
 }
+
 </style>
 </head>
 
@@ -1452,15 +1453,15 @@
 											</button>
 										</div>
 									</div>
-									<div class="order-contain">
+									<div class="order-contain orderHistory">
 										<div class="order-box dashboard-bg-box">
 
+										<c:forEach var="order" items="${orderList }">
 											<div class="product-order-detail">
-												<c:forEach var="order" items="${orderList }">
 												<c:choose>
-													<c:when test="${order.productInfoImage != '' }">
+													<c:when test="${order.productImage != '' }">
 														<a href="#" class="order-image"> <img
-															src="${order.productInfoImage }" class="blur-up lazyload"
+															src="${order.productImage }" class="blur-up lazyload"
 															alt="${order.productName }" id="productImg" />
 														</a>
 													</c:when>
@@ -1563,8 +1564,8 @@
 															</li>
 														</ul>
 													</div>
-												</c:forEach>
 											</div>
+												</c:forEach>
 										</div>
 									</div>
 								</div>

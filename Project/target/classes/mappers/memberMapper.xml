@@ -7,12 +7,14 @@
 	<select id="getOrderList"
 		resultType="com.project.vodto.jmj.MyPageOrderList">
 	SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, d.product_id,
-		pay.actual_payment_amount, prod.product_info_image,  prod.product_name, sum(d.product_quantity) as totalOrderCnt
-		FROM products prod, detailed_order_items d, order_history o, payments pay
+		pay.actual_payment_amount, p.product_image,  prod.product_name, sum(d.product_quantity) as totalOrderCnt
+		FROM products prod, detailed_order_items d, order_history o, payments pay, product_images p
         where member_id = #{memberId}
         and prod.product_id = d.product_id
+        and d.product_id = p.product_id
         and d.order_no = o.order_no
-        and o.order_no = pay.order_no group by o.order_no order by order_time desc
+        and o.order_no = pay.order_no 
+        group by o.order_no order by order_time desc
 	</select>
 
 	<select id="getProductCount" resultType="int">

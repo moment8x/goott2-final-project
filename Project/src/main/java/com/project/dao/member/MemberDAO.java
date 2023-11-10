@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.project.vodto.Member;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.MyPageOrderList;
@@ -92,7 +93,8 @@ public interface MemberDAO {
 	Member duplicatePwd(String memberId, String password) throws SQLException, NamingException;
 
 	// 출고전, 입금전 배송주소록에서 선택해서 배송지 변경
-	int updateShippingAddr(String memberId, int addrSeq, String orderNo, String deliveryMessage) throws SQLException, NamingException;
+	int updateShippingAddr(String memberId, String orderNo, ChangeShippingAddr cs) throws SQLException, NamingException;
+	
 	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
@@ -103,6 +105,7 @@ public interface MemberDAO {
 	// 로그인(비밀번호 체크)
 	Member selectMember(String memberId, String password) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+	
 
 	
 	
