@@ -157,7 +157,18 @@ public class ListController {
 	}
 	
 	@RequestMapping("/searchPage")
-	public void goSearching(@RequestParam(value="val", defaultValue = "notSearch") String val) {
-		
+	public Model goSearching(@RequestParam(value="val", defaultValue = "notSearch") String val, Model model) {
+		if("notSearch".equals(val)) {
+			model.addAttribute("products", val);
+		} else {
+			try {
+				List<Products> lst = lService.searchProducts(val);
+				model.addAttribute("products", lst);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return model;
 	}
 }

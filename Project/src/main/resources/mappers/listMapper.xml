@@ -67,7 +67,7 @@
   	</select>
   	
   	<select id="selectProductsSearching" resultMap="productsResultMap">
-  		select p.*, (SELECT i.product_image FROM product_images i WHERE i.product_id = p.product_id LIMIT 1) AS product_image from products p where p.best_seller_status = 1 and p.category_key like CONCAT(#{key}, "%")
+  		select p.*, (SELECT i.product_image FROM product_images i WHERE i.product_id = p.product_id LIMIT 1) AS product_image from products p where p.product_name like #{value}
   	</select>
   
   </mapper>

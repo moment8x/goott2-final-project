@@ -96,8 +96,11 @@ public class ListDaoImpl implements ListDao {
 
 	@Override
 	public List<Products> selectProductsSearching(String val) throws Exception {
+		String value = "%" + val + "%";
 		
-		return null;
+		List<Products> searchedProducts = ses.selectList(ns+".selectProductsSearching", value);
+		System.out.println("검색된 상품 : " +searchedProducts);
+		return searchedProducts;
 	}
 
 }
