@@ -49,10 +49,12 @@ public class ListController {
 		// 리스트 카테고리 가져오기 + 현재 페이지 정보
 		try {
 			List<ProductCategories> lst = lService.getProductCategory(lang+"/");
-			System.out.println("리스트 : " + lst);
 			ProductCategories pd = lService.getCategoryInfo(lang);
+			System.out.println("pd"+pd +"lst"+lst);
+			List<Products> bestSellers = lService.getProductsBsetSeller(lang);
 			model.addAttribute("categories", lst);
 			model.addAttribute("nowCategory", pd);
+			model.addAttribute("bestSellers", bestSellers);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -137,5 +139,25 @@ public class ListController {
 			data = new ResponseEntity<Map<String,String>>(loginMap, HttpStatus.OK);
 		}
 		return data;
+	}
+	
+	@RequestMapping(value = "/float", method = RequestMethod.POST)
+	public ResponseEntity<Products> getProduct(@RequestParam("id") String id){
+		ResponseEntity<Products> res = null;
+		try {
+			Products products = lService.getProductById(id);
+			res = new ResponseEntity<Products>(products, HttpStatus.OK);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			res = new ResponseEntity<Products>(HttpStatus.CONFLICT);
+			e.printStackTrace();
+		}
+		return res;
+		
+	}
+	
+	@RequestMapping("/searchPage")
+	public void goSearching(@RequestParam(value="val", defaultValue = "notSearch") String val) {
+		
 	}
 }

@@ -80,4 +80,24 @@ public class ListDaoImpl implements ListDao {
 		return ses.selectOne(ns+".selectProductCategoriesOne", key);
 	}
 
+	@Override
+	public List<Products> selectBsetSeller(String key) throws Exception {
+		// TODO Auto-generated method stub
+		List<Products> lst = ses.selectList(ns+".selectBsetSeller", key);
+		System.out.println("lst : " + lst);
+		return lst;
+	}
+
+	@Override
+	public Products selectProductById(String id) throws Exception {
+		
+		return ses.selectOne(ns+".selectProductById", id);
+	}
+
+	@Override
+	public List<Products> selectProductsSearching(String val) throws Exception {
+		
+		return null;
+	}
+
 }

@@ -69,4 +69,22 @@ public class ListServiceImpl implements ListService {
 		return pagingInfo;
 	}
 
+	@Override
+	public List<Products> getProductsBsetSeller(String key) throws Exception {
+		
+		return lDao.selectBsetSeller(key);
+	}
+
+	@Override
+	public Products getProductById(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return lDao.selectProductById(id);
+	}
+
+	@Override
+	public List<Products> searchProducts(String val) throws Exception {
+		
+		return lDao.selectProductsSearching(val);
+	}
+
 }

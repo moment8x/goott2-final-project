@@ -172,7 +172,7 @@
                                                 id="flexCheckDefault" name="remember">
                                             <label class="form-check-label" for="flexCheckDefault" >자동 로그인</label>
                                         </div>
-                                        <a href="forgot.html" class="forgot-password">아이디/비밀번호 찾기</a>
+                                        <a href="" class="forgot-password" data-bs-toggle="modal" data-bs-target="#myModal">아이디/비밀번호 찾기</a>
                                     </div>
                                 </div>
 
@@ -216,5 +216,30 @@
     </section>
     <!-- log in section end -->
     <jsp:include page="../footer.jsp"></jsp:include>
+    
+    <!-- The Modal -->
+<div class="modal" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body" style="align-items: center; text-align: center;">
+      <a href="/login/forgot?status=id"><button type="button" class="btn btn-outline-primary">아이디 찾기</button></a>
+       <a href="/login/forgot?status=password"><button type="button" class="btn btn-outline-success">비밀번호 찾기</button></a>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
    </body>
 </html>

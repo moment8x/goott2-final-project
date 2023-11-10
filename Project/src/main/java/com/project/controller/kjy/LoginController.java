@@ -23,8 +23,10 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -566,5 +568,12 @@ public class LoginController {
 		}
 		
 		return result;
+	}
+	
+	@RequestMapping("/login/forgot")
+	public Model forgot(@RequestParam("status") String status, Model model) {
+		model.addAttribute("status", status);
+		
+		return model;
 	}
 }

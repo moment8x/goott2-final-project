@@ -30,6 +30,7 @@
   		<result property="author_introduction" column="author_introduction"/>
   		<result property="introduction_intro" column="introduction_intro"/>
   		<result property="introduction_detail" column="introduction_detail"/>
+  		<result property="table_of_contents" column="table_of_contents"/>
   		<result property="notification_subscription" column="notification_subscription"/>
   		<result property="best_seller_status" column="best_seller_status"/>
   		<result property="category_key" column="category_key"/>
@@ -57,5 +58,16 @@
   		select count(*) from products where category_key like CONCAT(#{key}, "%")
   	</select>
   	
+  	<select id="selectBsetSeller" resultMap="productsResultMap">
+  		select p.*, (SELECT i.product_image FROM product_images i WHERE i.product_id = p.product_id LIMIT 1) AS product_image from products p where p.best_seller_status = 1 and p.category_key like CONCAT(#{key}, "%")
+  	</select>
+  	
+  	<select id="selectProductById" resultMap="productsResultMap">
+  		select p.*, (SELECT i.product_image FROM product_images i WHERE i.product_id = p.product_id LIMIT 1) AS product_image from products p where p.product_id = #{id}
+  	</select>
+  	
+  	<select id="selectProductsSearching" resultMap="productsResultMap">
+  		select p.*, (SELECT i.product_image FROM product_images i WHERE i.product_id = p.product_id LIMIT 1) AS product_image from products p where p.best_seller_status = 1 and p.category_key like CONCAT(#{key}, "%")
+  	</select>
   
   </mapper>
