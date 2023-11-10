@@ -12,8 +12,12 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.Member;
-import com.project.vodto.MyPageOrderList;
+import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.ChangeShippingAddr;
+import com.project.vodto.jmj.DetailOrder;
+import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.MyPageOrderList;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO {
@@ -59,25 +63,6 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectOne(ns + ".getEmail", email);
 	}
 	
-	@Override
-	public List<Integer> selectOrderNo(String memberId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	// ---------------------------------------- 장민정 끝 -----------------------------------------
-	// ---------------------------------------- 김진솔 시작 ----------------------------------------
-	@Override
-	public boolean selectId(String memberId) throws SQLException, NamingException {
-		System.out.println("======= 회원가입 DAO - 아이디 중복 조회 =======");
-		boolean result = false;	// 중복x
-		
-		if (ses.selectOne(ns + ".getId", memberId) != null) {
-			result = true;	// 중복. 존재함
-		}
-		
-		return result;
-	}
-
 	@Override
 	public Member duplicatePhoneNumber(String phoneNumber) throws SQLException, NamingException {
 
@@ -169,6 +154,8 @@ public class MemberDAOImpl implements MemberDAO {
 	public int addShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("memberId", memberId);
+		params.put("recipient", tmpAddr.getRecipient());
+		params.put("recipientContact", tmpAddr.getRecipientContact());
 		params.put("zipCode", tmpAddr.getZipCode());
 		params.put("address", tmpAddr.getAddress());
 		params.put("detailAddress", tmpAddr.getDetailAddress());
@@ -178,16 +165,107 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public int shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
+	public int shippingAddrModify(String memberId, ShippingAddress tmpAddr, int addrSeq) throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("memberId", memberId);
+		params.put("recipient", tmpAddr.getRecipient());
+		params.put("recipientContact", tmpAddr.getRecipientContact());
 		params.put("zipCode", tmpAddr.getZipCode());
 		params.put("address", tmpAddr.getAddress());
 		params.put("detailAddress", tmpAddr.getDetailAddress());
-		params.put("addrSeq", tmpAddr.getAddrSeq());
+		params.put("addrSeq", addrSeq);
 		
 		return ses.update(ns + ".updateShippingAddress", params);
 	}
+	
+	@Override
+	public ShippingAddress selectShippingAddr(int addrSeq, String memberId) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("addrSeq", addrSeq);
+		
+		
+		return ses.selectOne(ns + ".getShippingAddr", params);
+	}
+	
+	@Override
+	public int deleteShippingAddr(String memberId, int addrSeq) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("addrSeq", addrSeq);
+		
+		return ses.delete(ns + ".delShippingAddr", params);
+	}
+	
+	@Override
+	public int allBasicAddrN(String memberId) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".allBasicAddrN", memberId);
+	}
+
+	@Override
+	public int updateBasicAddr(String memberId, int addrSeq) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("addrSeq", addrSeq);
+		
+		return ses.update(ns + ".updateBasicAddr", params);
+	}
+	
+	@Override
+	public List<DetailOrder> selectDetailOrder(String memberId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.selectList(ns + ".getDetailOrder", params);
+	}
+
+	@Override
+	public DetailOrderInfo selectDetailOrderInfo(String memberId, String orderNo) throws SQLException, NamingException {
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("memberId", memberId);
+			params.put("orderNo", orderNo);
+		return ses.selectOne(ns + ".getDetailOrderInfo", params);
+	}
+	
+	@Override
+	public Member duplicatePwd(String memberId, String password) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("password", password);
+		return ses.selectOne(ns + ".pwdCheck", params);
+	}
+	
+	@Override
+	public int updateShippingAddr(String memberId, String orderNo, ChangeShippingAddr cs) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		params.put("recipient", cs.getRecipient());
+		params.put("recipientContact", cs.getRecipientContact());
+		params.put("zipCode", cs.getZipCode());
+		params.put("address", cs.getAddress());
+		params.put("detailAddress", cs.getDetailAddress());
+		params.put("deliveryMessage", cs.getDeliveryMessage());
+		
+		return ses.update(ns + ".selectBasicShippingAddr", params);
+	}
+	
+	// ---------------------------------------- 장민정 끝 -----------------------------------------
+	// ---------------------------------------- 김진솔 시작 ----------------------------------------
+	@Override
+	public boolean selectId(String memberId) throws SQLException, NamingException {
+		System.out.println("======= 회원가입 DAO - 아이디 중복 조회 =======");
+		boolean result = false;	// 중복x
+		
+		if (ses.selectOne(ns + ".getId", memberId) != null) {
+			result = true;	// 중복. 존재함
+		}
+		
+		return result;
+	}
+
 	public int insertMember(Member member) throws SQLException, NamingException {
 		System.out.println("======= 회원가입 DAO - 회원 가입 =======");
 		
@@ -205,9 +283,10 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
 
-	@Override
-	public List<Integer> selectOrderNo(String memberId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
+
+	
+
+
+
 }

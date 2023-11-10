@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.naming.NamingException;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.dao.member.MemberDAO;
 import com.project.service.member.MemberService;
@@ -14,10 +15,14 @@ import com.project.vodto.Board;
 import com.project.vodto.CouponLog;
 import com.project.vodto.CustomerInquiry;
 import com.project.vodto.Member;
-import com.project.vodto.MyPageOrderList;
 import com.project.vodto.OrderHistory;
 import com.project.vodto.PointLog;
+import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.ChangeShippingAddr;
+import com.project.vodto.jmj.DetailOrder;
+import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.MyPageOrderList;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -67,11 +72,16 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public Boolean withdraw(String memberId) throws SQLException, NamingException {
+	@Transactional(rollbackFor = Exception.class)
+	public Boolean withdraw(String memberId, String password) throws SQLException, NamingException {
 		boolean result = false;
 		
-		if(mDao.updateWithdraw(memberId) == 1) {
-			result = true;
+		//비밀번호가 일치한다면
+		if(mDao.duplicatePwd(memberId, password) != null) { // 비밀번호가 일치
+			//탈퇴시킨다
+			if(mDao.updateWithdraw(memberId) == 1) {
+				result = true;
+			}			
 		}
 		return result; 
 	}
@@ -154,10 +164,10 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public boolean shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
+	public boolean shippingAddrModify(String memberId, ShippingAddress tmpAddr, int addrSeq) throws SQLException, NamingException {
 		boolean result = false;
 			
-			if(mDao.shippingAddrModify(memberId, tmpAddr) == 1) {
+			if(mDao.shippingAddrModify(memberId, tmpAddr, addrSeq) == 1) {
 				result = true;
 			}
 			
@@ -165,6 +175,58 @@ public class MemberServiceImpl implements MemberService {
 
 	}
 	
+	@Override
+	public ShippingAddress getShippingAddr(int addrSeq, String memberId) throws SQLException, NamingException {
+		
+		return mDao.selectShippingAddr(addrSeq, memberId);
+	}
+	
+	@Override
+	public int deleteShippingAddr(String memberId, int addrSeq) throws SQLException, NamingException {
+		
+		return mDao.deleteShippingAddr(memberId, addrSeq);
+	}
+	
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean setBasicAddr(String memberId, int addrSeq) throws SQLException, NamingException {
+		boolean result = false;
+		//1) 기본배송지 설정 버튼을 누르면 모든 basicAddr컬럼을 N으로 바꾼다
+			if(mDao.allBasicAddrN(memberId) != 0) {
+				//2) 해당 번호의 basic_addr을 Y로 바꿔준다.
+				if(mDao.updateBasicAddr(memberId, addrSeq) != 0) {
+					result = true;
+				}
+			}
+		return result;	
+	}
+	
+	@Override
+	public List<DetailOrder> getDetailOrderInfo(String memberId, String orderNo) throws SQLException, NamingException {
+		
+		return mDao.selectDetailOrder(memberId, orderNo);
+	}
+
+	@Override
+	public DetailOrderInfo getOrderInfo(String memberId, String orderNo) throws SQLException, NamingException {
+
+		return mDao.selectDetailOrderInfo(memberId, orderNo);
+	}
+	
+	@Override
+	public boolean selectBasicAddr(String memberId, int addrSeq, String orderNo, String deliveryMessage) throws SQLException, NamingException {
+		boolean result = false;
+		
+		ShippingAddress sa = mDao.selectShippingAddr(addrSeq, memberId);
+		ChangeShippingAddr cs = new ChangeShippingAddr(sa.getRecipient(), sa.getRecipientContact(), sa.getZipCode(), sa.getAddress(), sa.getDetailAddress(), deliveryMessage);
+
+		if(mDao.updateShippingAddr(memberId, orderNo, cs) !=0) {
+			result = true;
+		}
+		
+		return result;
+	}
+
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
 	@Override
@@ -209,4 +271,18 @@ public class MemberServiceImpl implements MemberService {
 		return result;
 	}
 	// --------------------------------------- 김진솔 끝 ----------------------------------------	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+
 }

@@ -11,10 +11,13 @@ import com.project.vodto.Board;
 import com.project.vodto.CouponLog;
 import com.project.vodto.CustomerInquiry;
 import com.project.vodto.Member;
-import com.project.vodto.MyPageOrderList;
 import com.project.vodto.OrderHistory;
 import com.project.vodto.PointLog;
+import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.DetailOrder;
+import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.MyPageOrderList;
 
 public interface MemberService {
 	// ----------------------------------- 장민정 시작 -----------------------------------
@@ -27,7 +30,7 @@ public interface MemberService {
 	// 특정 회원 정보 수정(update)
 	boolean setMyInfo(String memberId, Member modifyMemberInfo) throws SQLException, NamingException;
 	// 특정 회원 탈퇴
-	Boolean withdraw(String memberId) throws SQLException, NamingException;
+	Boolean withdraw(String memberId, String password) throws SQLException, NamingException;
 	// 배송지 목록 조회
 	List<ShippingAddress> getShippingAddress(String memberId) throws SQLException, NamingException;
 	// 리뷰 조회
@@ -64,11 +67,29 @@ public interface MemberService {
 	boolean insertShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
 	
 	//배송주소록 수정
-	boolean shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
-	
+	boolean shippingAddrModify(String memberId, ShippingAddress tmpAddr, int addrSeq) throws SQLException, NamingException;
 
-	// 주문번호 가져오기
-	List<Integer> getOrderNo(String memberId) throws SQLException, NamingException;
+	//특정 회원의 배송주소록 데이터 가져오기
+	ShippingAddress getShippingAddr(int addrSeq, String memberId) throws SQLException, NamingException;
+	
+	//특정회원의 배송지 삭제
+	int deleteShippingAddr(String memberId, int addrSeq) throws SQLException, NamingException;
+	
+	//기본배송지 설정
+	boolean setBasicAddr(String memberId, int addrSeq) throws SQLException, NamingException;
+	
+	//주문상세페이지 상품 정보 가져오기
+	List<DetailOrder> getDetailOrderInfo(String memberId, String orderNo) throws SQLException, NamingException;
+	
+	//주문상세페이지 정보가져오기
+	DetailOrderInfo getOrderInfo(String memberId, String orderNo) throws SQLException, NamingException;
+	
+	//출고전, 입금전 배송지 변경하기
+//	int updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId) throws SQLException, NamingException;
+	
+	//출고전, 입금전 배송주소록에서 배송지선택해서 변경하기
+	boolean selectBasicAddr(String memberId, int addrSeq, String orderNo, String deliveryMessage) throws SQLException, NamingException;
+
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -78,4 +99,13 @@ public interface MemberService {
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
+	
+	
+
+	
+	
+	
+	
+	
+	
 }

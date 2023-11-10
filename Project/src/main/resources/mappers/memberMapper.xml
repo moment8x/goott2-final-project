@@ -5,17 +5,16 @@
 
 <mapper namespace="com.project.mappers.memberMapper">
 	<select id="getOrderList"
-		resultType="com.project.vodto.MyPageOrderList">
-	SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, o.member_id,
-		max(pay.actual_payment_amount) as actualPaymentAmount, max(prod.product_image) as product_image,  max(prod.product_name) as product_name, count(d.order_no) as totalOrderCnt
-		FROM products prod
-		inner JOIN  detailed_order_items d
-        on prod.product_id = d.product_id
-		inner JOIN payments pay
-        on pay.order_no = d.order_no
-        inner join order_history o
-        on d.order_no = o.order_no
-		where member_id = #{memberId}  group by order_no
+		resultType="com.project.vodto.jmj.MyPageOrderList">
+	SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, d.product_id,
+		pay.actual_payment_amount, p.product_image,  prod.product_name, sum(d.product_quantity) as totalOrderCnt
+		FROM products prod, detailed_order_items d, order_history o, payments pay, product_images p
+        where member_id = #{memberId}
+        and prod.product_id = d.product_id
+        and d.product_id = p.product_id
+        and d.order_no = o.order_no
+        and o.order_no = pay.order_no 
+        group by o.order_no order by order_time desc
 	</select>
 
 	<select id="getProductCount" resultType="int">
@@ -67,11 +66,8 @@
 	</update>
 	
 	<insert id="addShippingAddress">
-		<selectKey resultType="int" keyProperty="addrSeq" order="BEFORE">
-	        select max(addr_seq) + 1 from shipping_address       
-	    </selectKey> 
-		insert into shipping_address(addr_seq, member_id, zip_code, address, detail_address)
- 		values(#{addrSeq}, #{memberId}, #{zipCode}, #{address}, #{detailAddress})
+		insert into shipping_address(member_id, recipient, recipient_contact, zip_code, address, detail_address)
+ 		values(#{memberId}, #{recipient}, #{recipientContact}, #{zipCode}, #{address}, #{detailAddress})
 	</insert>
 	
 	<select id="getShippingAddress" resultType="com.project.vodto.ShippingAddress">
@@ -79,8 +75,51 @@
 	</select>
 	
 	<update id="updateShippingAddress">
-		update shipping_address set zip_code = #{zipCode}, address = #{address}, detail_address = #{detailAddress} 
+		update shipping_address set recipient = #{recipient}, recipient_contact = #{recipientContact}, 
+		zip_code = #{zipCode}, address = #{address}, detail_address = #{detailAddress} 
 		where member_id = #{memberId} and addr_seq=#{addrSeq}
+	</update>
+	
+	<select id="getShippingAddr" resultType="com.project.vodto.ShippingAddress">
+		select * from shipping_address where member_id = #{memberId} and addr_seq = #{addrSeq}
+	</select>
+	
+	<delete id="delShippingAddr">
+		delete from shipping_address where member_id = #{memberId} and addr_seq = #{addrSeq};
+	</delete>
+	
+	<update id="allBasicAddrN">
+		update shipping_address set basic_addr = 'N' where member_id = #{memberId}
+	</update>
+	
+	<update id="updateBasicAddr">
+		update shipping_address set basic_addr = 'Y' where member_id = #{memberId} and addr_seq = #{addrSeq}
+	</update>
+	
+	<select id="getDetailOrder" resultType="com.project.vodto.jmj.DetailOrder"> 
+		select d.product_price, d.product_quantity, d.product_status, prod.product_info_image, prod.product_name, d.product_invoice_number
+	    from detailed_order_items d, products prod, order_history o
+	    where member_id = #{memberId} and d.order_no = #{orderNo}
+        and prod.product_id = d.product_id
+        and d.order_no = o.order_no;
+	</select>
+	
+	<select id="getDetailOrderInfo" resultType="com.project.vodto.jmj.DetailOrderInfo">
+		select o.*, pay.payment_method, pay.total_amount, pay.shipping_fee, pay.used_reward, 
+		pay.used_points, pay.actual_payment_amount, pay.card_name, pay.card_number
+		from order_history o, payments pay
+		where member_id = #{memberId} and o.order_no = #{orderNo}
+		and o.order_no = pay.order_no;
+	</select>
+
+	<select id="pwdCheck" resultType="com.project.vodto.Member">
+		select member_id from member where password = sha1(md5(#{password})) and member_id = #{memberId}
+	</select>
+	
+	<update id="selectBasicShippingAddr">
+    update order_history set recipient_name = #{recipient}, recipient_phone_number = #{recipientContact}, zip_code = #{zipCode}, 
+		shipping_address = #{address}, detailed_shipping_address=#{detailAddress}, delivery_message=#{deliveryMessage}
+        where member_id = #{memberId} and order_no = #{orderNo}
 	</update>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">

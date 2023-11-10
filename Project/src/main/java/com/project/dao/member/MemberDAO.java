@@ -8,8 +8,12 @@ import javax.naming.NamingException;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.Member;
-import com.project.vodto.MyPageOrderList;
+import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.ChangeShippingAddr;
+import com.project.vodto.jmj.DetailOrder;
+import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.MyPageOrderList;
 
 @Repository
 public interface MemberDAO {
@@ -65,10 +69,33 @@ public interface MemberDAO {
 	int addShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
 	
 	//배송주소록 수정
-	int shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
+	int shippingAddrModify(String memberId, ShippingAddress tmpAddr, int addrSeq) throws SQLException, NamingException;
 	
-	//
-	List<Integer> selectOrderNo(String memberId);
+	//특정회원의 수정할 배송지가져오기
+	ShippingAddress selectShippingAddr(int addrSeq, String memberId) throws SQLException, NamingException;
+	
+	//특정 회원의 배송지 삭제
+	int deleteShippingAddr(String memberId, int addrSeq) throws SQLException, NamingException;
+	
+	// 특정회원의 기본배송지 설정 N으로 업데이트
+	int allBasicAddrN(String memberId) throws SQLException, NamingException;
+	
+	// 특정 배송지 기본배송지로 설정
+	int updateBasicAddr(String memberId, int addrSeq) throws SQLException, NamingException;
+
+	// 주문 상품 상세정보 가져오기
+	List<DetailOrder> selectDetailOrder(String memberId, String orderNo) throws SQLException, NamingException;
+
+	// 주문상세정보 가져오기
+	DetailOrderInfo selectDetailOrderInfo(String memberId, String orderNo) throws SQLException, NamingException;
+	
+	// 비밀번호 일치하는지 체크
+	Member duplicatePwd(String memberId, String password) throws SQLException, NamingException;
+
+	// 출고전, 입금전 배송주소록에서 선택해서 배송지 변경
+	int updateShippingAddr(String memberId, String orderNo, ChangeShippingAddr cs) throws SQLException, NamingException;
+	
+	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -78,4 +105,14 @@ public interface MemberDAO {
 	// 로그인(비밀번호 체크)
 	Member selectMember(String memberId, String password) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
 }

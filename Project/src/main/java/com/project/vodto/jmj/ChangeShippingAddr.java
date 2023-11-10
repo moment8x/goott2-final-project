@@ -1,4 +1,4 @@
-package com.project.vodto;
+package com.project.vodto.jmj;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,13 +11,11 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ShippingAddress {
-	private int addrSeq;
-	private String memberId;
-	private String recipient; //받는사람
-	private String recipientContact; //받는사람 연락처
+public class ChangeShippingAddr {
+	private String recipient;
+	private String recipientContact;
 	private String zipCode;
 	private String address;
 	private String detailAddress;
-	private char basicAddr; // 기본배송지 체크여부
+	private String deliveryMessage;
 }
