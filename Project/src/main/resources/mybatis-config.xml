@@ -18,6 +18,8 @@
 		<typeAlias type="com.project.vodto.kkb.MemberParam" alias="MemberParam" />
 		<typeAlias type="com.project.vodto.kkb.OrderNoResponse" alias="OrderNoResponse" />
 		<typeAlias type="com.project.vodto.kkb.OrderProductResponse" alias="OrderProductResponse" />
+		<typeAlias type="com.project.vodto.kkb.PostResponse" alias="PostResponse" />
+		<typeAlias type="com.project.vodto.kkb.PostCondition" alias="PostCondition" />
 		<typeAlias type="com.project.vodto.Product" alias="product" />
 		<typeAlias type="com.project.vodto.Board" alias="Board" />
 	</typeAliases>

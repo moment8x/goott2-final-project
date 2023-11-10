@@ -37,22 +37,11 @@
 	<beans:bean id="headerCartInterceptor"
 		class="com.project.interceptor.kjs.HeaderCartInterceptor">
 	</beans:bean>
-	<!-- -->
-	<beans:bean id="loginInterceptor"
-		class="com.project.interceptor.kjs.LoginInterceptor">
-	</beans:bean>
-	 
-	
-	
+		
 	<interceptors>
 		<interceptor>
 			<mapping path="/**/*"/>
 			<beans:ref bean="headerCartInterceptor"/>
-		</interceptor>
-		<!-- -->
-		<interceptor>
-			<mapping path="/user/myPage"/>
-			<beans:ref bean="loginInterceptor"/>
 		</interceptor>
 
 	</interceptors>

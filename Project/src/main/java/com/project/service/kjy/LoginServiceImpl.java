@@ -1,11 +1,7 @@
 package com.project.service.kjy;
 
-import java.util.UUID;
-
 import javax.inject.Inject;
-import javax.servlet.http.Cookie;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +20,7 @@ public class LoginServiceImpl implements LoginService {
 		Memberkjy loginMember = loginDao.selectLogin(loginDTO);
 		if(loginMember != null) {
 			System.out.println("로그인 성공");
-			loginDao.updateLastAccess(loginMember.getMember_id());
+			loginDao.updateLastAccess(loginMember.getMemberId());
 //			System.out.println(loginMember.toString());
 		} else {
 			System.out.println("로그인 실패");

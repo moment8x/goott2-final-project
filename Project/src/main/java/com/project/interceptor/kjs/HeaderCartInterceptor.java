@@ -19,6 +19,7 @@ import com.project.service.kjs.shoppingcart.ShoppingCartService;
 import com.project.vodto.Member;
 import com.project.vodto.ShoppingCart;
 import com.project.vodto.kjs.ShowCartDTO;
+import com.project.vodto.kjy.Memberkjy;
 
 public class HeaderCartInterceptor extends HandlerInterceptorAdapter {
 	@Inject
@@ -73,8 +74,8 @@ public class HeaderCartInterceptor extends HandlerInterceptorAdapter {
 		HttpSession session = request.getSession();
 		if (session.getAttribute("loginMember") != null) {
 			// 로그인 했을 시
-			if (scService.countList(((Member)session.getAttribute("loginMember")).getMemberId(), true) > 0) {
-				items = scService.getCartList(((Member)session.getAttribute("loginMember")).getMemberId(), true);
+			if (scService.countList(((Memberkjy)session.getAttribute("loginMember")).getMemberId(), true) > 0) {
+				items = scService.getCartList(((Memberkjy)session.getAttribute("loginMember")).getMemberId(), true);
 			}
 		} else {
 			// 비회원일 시

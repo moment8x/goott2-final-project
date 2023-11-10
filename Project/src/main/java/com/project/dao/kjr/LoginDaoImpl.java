@@ -26,24 +26,24 @@ public class LoginDaoImpl implements LoginDao {
 
 	// 로그인 성공시 최종 접속일 업데이트
 	@Override
-	public int updateLastAccess(String member_id) throws Exception {
+	public int updateLastAccess(String memberId) throws Exception {
 		
-		return ses.update(ns+".updateLatsAccess", member_id);
+		return ses.update(ns+".updateLatsAccess", memberId);
 	}
 
 	@Override
-	public int updateRemember(String member_id, String key) throws Exception {
+	public int updateRemember(String memberId, String key) throws Exception {
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("member_id", member_id);
+		params.put("memberId", memberId);
 		params.put("key", key);
 		
 		return ses.update(ns+".updateRememberKey", params);
 	}
 
 	@Override
-	public Memberkjy selectRememberCheck(String member_id, String key) throws Exception {
+	public Memberkjy selectRememberCheck(String memberId, String key) throws Exception {
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("member_id", member_id);
+		params.put("memberId", memberId);
 		params.put("key", key);
 		
 		return ses.selectOne(ns+".rememberCheck", params);
