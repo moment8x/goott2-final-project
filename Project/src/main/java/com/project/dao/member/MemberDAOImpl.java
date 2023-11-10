@@ -252,6 +252,12 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.update(ns + ".selectBasicShippingAddr", params);
 	}
 	
+	@Override
+	public List<MyPageOrderList> selectCurOrderHistory(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".getCurOrderHistory", memberId);
+	}
+	
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
 	@Override
@@ -281,6 +287,7 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectOne(ns + ".login", param);
 	}
+
 	
 	@Override
 	public int updateProfile(String memberId, String newFileName) throws SQLException, NamingException {

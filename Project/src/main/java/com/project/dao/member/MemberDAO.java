@@ -95,6 +95,8 @@ public interface MemberDAO {
 	// 출고전, 입금전 배송주소록에서 선택해서 배송지 변경
 	int updateShippingAddr(String memberId, String orderNo, ChangeShippingAddr cs) throws SQLException, NamingException;
 	
+	//최근 주문 3개 가져오기
+	List<MyPageOrderList> selectCurOrderHistory(String memberId) throws SQLException, NamingException;
 	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
@@ -107,6 +109,7 @@ public interface MemberDAO {
 	// 프로필사진 업데이트
 	int updateProfile(String memberId, String newFileName) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+	
 	
 
 	

@@ -86,6 +86,9 @@ public interface MemberService {
 	
 	//출고전, 입금전 배송주소록에서 배송지선택해서 변경하기
 	boolean selectBasicAddr(String memberId, int addrSeq, String orderNo, String deliveryMessage) throws SQLException, NamingException;
+	
+	//최근주문내역 3개 가져오기
+	List<MyPageOrderList> getCurOrderHistory(String memberId) throws SQLException, NamingException;
 
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
@@ -96,6 +99,7 @@ public interface MemberService {
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
+	
 	
 	
 

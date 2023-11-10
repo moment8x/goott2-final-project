@@ -57,7 +57,12 @@ public class myPageController {
 			//주문내역
 			List<MyPageOrderList> lst = mService.getOrderHistory(memberId);
 			model.addAttribute("orderList", lst);			
-			System.out.println("list : " + lst);
+			System.out.println("주문내역 페이지 : " + lst);
+			
+			//최근 주문내역
+			List<MyPageOrderList> list = mService.getCurOrderHistory(memberId);
+			model.addAttribute("curOrderHistory", list);			
+			System.out.println("최근주문내역 : " + list);
 			
 			//회원정보
 			Member userInfo = mService.getMyInfo(memberId);

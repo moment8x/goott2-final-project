@@ -944,7 +944,7 @@
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>포인트</h5>
-														<h3>${userInfo.totalPoints }점</h3>
+														<h3><fmt:formatNumber value="${userInfo.totalPoints }" type="NUMBER" />점</h3>
 													</div>
 												</div>
 											</div>
@@ -957,7 +957,7 @@
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>적립금</h5>
-														<h3>${userInfo.totalRewards }원</h3>
+														<h3><fmt:formatNumber value="${userInfo.totalRewards }" type="NUMBER" />원</h3>
 													</div>
 												</div>
 											</div>
@@ -970,7 +970,7 @@
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>쿠폰</h5>
-														<h3>${userInfo.couponCount }개</h3>
+														<h3><fmt:formatNumber value="${userInfo.couponCount }" type="NUMBER" />개</h3>
 													</div>
 												</div>
 											</div>
@@ -980,7 +980,8 @@
 									<div class="dashboard-title">
 										<h3>최근 주문내역</h3>
 									</div>
-
+									
+									<c:forEach var="curOrder" items="${curOrderHistory }">
 									<section class="cart-section section-b-space">
 										<div class="container-fluid-lg recentOrderHistoy">
 											<div class="row g-sm-5 g-3">
@@ -993,9 +994,19 @@
 																		<td class="product-detail">
 																			<div class="product border-0">
 																				<a href="product-left-thumbnail.html"
-																					class="product-image"> <img
-																					src="/resources/assets/images/vegetable/product/1.png"
-																					class="img-fluid blur-up lazyload" alt="" />
+																					class="product-image">
+																					<c:choose>
+																					<c:when test="${curOrder.productImage != '' }">
+																					 <img
+																					src="${curOrder.productImage }"
+																					class="img-fluid blur-up lazyload" alt="${curOrder.productName }" />
+																					</c:when>
+																					<c:otherwise>
+																					<img
+																					src="/resources/assets/images/noimage.jpg"
+																					class="img-fluid blur-up lazyload" alt="${curOrder.productName }" />
+																					</c:otherwise>
+																					</c:choose>
 																				</a>
 																				<div class="product-detail">
 																					<ul>
@@ -1097,6 +1108,7 @@
 											</div>
 										</div>
 									</section>
+									</c:forEach>
 								</div>
 							</div>
 

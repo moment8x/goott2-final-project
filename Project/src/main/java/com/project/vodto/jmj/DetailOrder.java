@@ -18,6 +18,6 @@ public class DetailOrder {
 	private int productQuantity;
 	private String productStatus;
 	private String productName;
-	private String productInfoImage;
+	private String productImage;
 	private String productInvoiceNumber;
 }

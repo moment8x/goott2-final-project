@@ -258,9 +258,9 @@ function editBasicShippingAddress() {
 											<td class="product-detail">
 												<div class="product border-0">
 													<c:choose>
-														<c:when test="${order.productInfoImage != '' }">
+														<c:when test="${order.productImage != '' }">
 															<a href="product.left-sidebar.html" class="product-image">
-																<img src="${order.productInfoImage }"
+																<img src="${order.productImage }"
 																class="img-fluid blur-up lazyload"
 																alt="${order.productName }">
 															</a>
@@ -291,17 +291,17 @@ function editBasicShippingAddress() {
 												</h6>
 											</td>
 
-											<td class="quantity">
+											<td class="name">
 												<h4 class="table-title text-content">수량</h4>
 												<h4 class="text-title">${order.productQuantity }</h4>
 											</td>
 											<c:choose>
 												<c:when test="${order.productStatus eq '출고전' }">
-													<td class="subtotal">
+													<td class="name">
 														<h4 class="table-title text-content">상품상태</h4>
 														<h5>${order.productStatus }</h5>
 													</td>
-													<td>
+													<td class="name">
 														<button
 															class="btn theme-bg-color text-white m-0 productStatusBtn"
 															type="button" id="button-addon1">
@@ -310,11 +310,11 @@ function editBasicShippingAddress() {
 													</td>
 												</c:when>
 												<c:when test="${order.productStatus eq '입금전' }">
-													<td class="subtotal">
+													<td class="name">
 														<h4 class="table-title text-content">상품상태</h4>
 														<h5>${order.productStatus }</h5>
 													</td>
-													<td>
+													<td class="name">
 														<button
 															class="btn theme-bg-color text-white m-0 productStatusBtn"
 															type="button" id="button-addon1">
@@ -323,11 +323,11 @@ function editBasicShippingAddress() {
 													</td>
 												</c:when>
 												<c:when test="${order.productStatus eq '출고완료' }">
-													<td class="subtotal">
+													<td class="name">
 														<h4 class="table-title text-content">상품상태</h4>
 														<h5>${order.productStatus }</h5>
 													</td>
-													<td>
+													<td class="name">
 														<button
 															class="btn theme-bg-color text-white m-0 productStatusBtn"
 															type="button" id="button-addon1">
@@ -337,7 +337,7 @@ function editBasicShippingAddress() {
 													</td>
 												</c:when>
 												<c:when test="${order.productStatus eq '배송중' }">
-													<td class="subtotal">
+													<td class="name">
 														<h4 class="table-title text-content">상품상태</h4>
 														<h5>${order.productStatus }</h5>
 													</td>
@@ -351,7 +351,7 @@ function editBasicShippingAddress() {
 													</td>
 												</c:when>
 												<c:when test="${order.productStatus eq '취소' }">
-													<td class="subtotal">
+													<td class="name">
 														<h4 class="table-title text-content">상품상태</h4>
 														<h5>${order.productStatus }</h5>
 													</td>
@@ -361,7 +361,7 @@ function editBasicShippingAddress() {
 												</c:when>
 
 												<c:otherwise>
-													<td class="subtotal">
+													<td class="name">
 														<h4 class="table-title text-content">상품상태</h4>
 														<h5>${order.productStatus }</h5>
 													</td>

@@ -230,6 +230,12 @@ public class MemberServiceImpl implements MemberService {
 		
 		return result;
 	}
+	
+	@Override
+	public List<MyPageOrderList> getCurOrderHistory(String memberId) throws SQLException, NamingException {
+		
+		return mDao.selectCurOrderHistory(memberId);
+	}
 
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
@@ -285,5 +291,7 @@ public class MemberServiceImpl implements MemberService {
 		System.out.println("======= 멤버(로그인) 서비스단 끝 =======");
 		return result;
 	}
+
 	// --------------------------------------- 김진솔 끝 ----------------------------------------
+
 }
