@@ -1,5 +1,6 @@
 package com.project.dao.kjr;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,8 @@ import org.springframework.stereotype.Repository;
 
 import com.project.vodto.PagingInfo;
 import com.project.vodto.ProductCategory;
-import com.project.vodtokjy.Products;
+import com.project.vodto.kjy.ProductCategories;
+import com.project.vodto.kjy.Products;
 
 @Repository
 public class ListDaoImpl implements ListDao {
@@ -21,7 +23,7 @@ public class ListDaoImpl implements ListDao {
 	private String ns = "com.project.mappers.listMapper";
 	
 	@Override
-	public List<ProductCategory> selectProductCategories(String key) throws Exception {
+	public List<ProductCategories> selectProductCategories(String key) throws Exception {
 		
 		return ses.selectList(ns+".selectProductCategories", key);
 	}
@@ -33,6 +35,7 @@ public class ListDaoImpl implements ListDao {
 		param.put("startRowIndex", pi.getStartRowIndex());
 		param.put("viewProductPerPage", pi.getViewProductPerPage());
 		param.put("sortBy", "publication_date desc");
+
 
 
 		return ses.selectList(ns+".selectProductForList", param);
@@ -63,16 +66,18 @@ public class ListDaoImpl implements ListDao {
 		return ses.selectList(ns+".selectProductForList", param);
 	}
 
-	@Override
-	public ProductCategory selectProductCategory(String key) throws Exception {
-		// TODO Auto-generated method stub
-		return ses.selectOne(ns+".selectProductCategory", key);
-	}
+
 
 	@Override
 	public int selectProductCount(String key) throws Exception {
 		
 		return ses.selectOne(ns+".selectProductCount", key);
+	}
+
+	@Override
+	public ProductCategories selectProductCategory(String key) throws Exception {
+		
+		return ses.selectOne(ns+".selectProductCategoriesOne", key);
 	}
 
 }

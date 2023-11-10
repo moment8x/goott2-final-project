@@ -1,7 +1,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java,windows,eclipse
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,windows,eclipse
 
-
+/classes/
+/test-classes/
+.classpath
+MANIFEST.MF
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
@@ -186,9 +189,10 @@ Servers/
 config.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/java,windows,eclipse
-Project/target/m2e-wtp/web-resources/META-INF/maven/com.project/controller/pom.properties
 Project/src/main/webapp/WEB-INF/spring/root-context.xml
 Project/.settings
 Project/.classpath
 Project/src/main/webapp/config/config.properties
 Project/target/m2e-wtp/web-resources/META-INF/MANIFEST.MF
+Project/.settings
+Project/target/m2e-wtp/web-resources/META-INF/maven/com.project/controller/pom.properties

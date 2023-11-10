@@ -123,7 +123,7 @@
     		
     		// 전화번호 유효성 검사
     		$('#phoneNumber').on('blur', function () {
-    			let regNumber = /^[0-9+]{9,15}$/;
+    			let regNumber = /^([0-9]{2,4})-?([0-9]{3,4})->([0-9]{4})$/;
     			if (regNumber.test($('#phoneNumber').val())) {
     				isValidPhone = true;
     				$('#phoneNumber').parent().next().html('');
@@ -136,7 +136,7 @@
     		
     		// 휴대폰 번호 유효성 검사
     		$('#cellPhoneNumber').on('blur', function () {
-    			let regNumber = /^[0-9+]{9,15}$/;
+    			let regNumber = /^01([0|1|6|7|8|9])-?([0-9]{3,4})->([0-9]{4})$/;
     			if (regNumber.test($('#cellPhoneNumber').val())) {
     				isValidCellPhone = true;
     				$('#cellPhoneNumber').parent().next().html('');
@@ -177,7 +177,60 @@
     				isvalidAddress = false;
     			}
     		})
+    		
+    		// 첨부파일
+    		$(".upFileArea").on("dragenter dragover", function(evt) {
+    			evt.preventDefault();
+    		});
+    		$(".upFileArea").on("drop", function(evt) {
+    			evt.preventDefault();
+    			
+    			console.log(evt.originalEvent.dataTransfer.files);
+    			
+    			let files = evt.originalEvent.dataTransfer.files;
+    			for (let i = 0; i < files.length; i++) {
+    				let form = new FormData();
+    				form.append("profileImage", files[i]);	// 파일의 이름을 컨트롤러단의 MultipartFile 객체명과 맞춘다.
+    				
+    				$.ajax({
+    					url : "/register/uploadFile",
+    					type : "post",
+    					data : form,
+    					dataType : "json",
+    					async : false,
+    					processData : false,	// text데이터에 대해 쿼리스트링 처리를 하지 않겠다.  default = true
+    					contentType : false,	// application/x-www-form-urlencoded 처리 안함.(인코딩 하지 않음)  default = true
+    					success : function(data) {
+    						console.log(data);
+    						
+    						if (data != null) {
+    							showUploadedFile(data);
+    						}
+    					}
+    				});
+    			}
+    		});
     	});
+    	
+		// 업로드 된 파일 표시    	
+    	function showUploadedFile(json) {
+    		let output = "";
+
+    		$.each(json, function(i, elt) {
+    			let name = elt.new_file_name.replaceAll("\\", "/");
+    			if (elt.thumb_file_name != null) {	// 이미지
+    				let name = elt.thumb_file_name.replaceAll("\\", "/");
+    				output += `<img src='../resources/uploads\${name}' class='upImg' id="\${elt.originalFileName}"/>`;
+    			} else {
+    				output += `<a href="../resources/uploads\${name}" id="\${elt.originalFileName}">\${elt.originalFileName}</a>`;
+    			}
+    			output += `<img src='../resources/images/remove.png' class='remIcon' onclick="remFile(this);"/>`;
+    			
+    			console.log(output);
+    		});
+    		
+    		$('.uploadFiles').html(output);
+    	}
     	
     	// 우편번호 검색
     	function searchZipCode() {
@@ -263,18 +316,6 @@
 </head>
 
 <body>
-
-    <!-- Loader Start -->
-    <div class="fullpage-loader">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-    <!-- Loader End -->
-
 	<!-- Include Header -->
     <jsp:include page="../header.jsp"></jsp:include>
 
@@ -420,7 +461,7 @@
                                 <!-- 핸드폰 번호 -->
 								<div class="col-12">
                                     <div class="form-floating theme-form-floating">
-                                        <input type="text" class="form-control" id="cellPhoneNumber" name="cellPhoneNumber" placeholder="전화번호 '-' 없이 입력">
+                                        <input type="text" class="form-control" id="cellPhoneNumber" name="cellPhoneNumber" placeholder="전화번호 '-'도 입력">
                                         <label for="cellPhoneNumber">핸드폰 번호</label>
                                     </div>
                                     <div class="validation"></div>
@@ -477,7 +518,20 @@
                                         <label for="profileImage">프로필 이미지</label>
                                     </div>
                                     <div class="validation"></div>
-                                </div> -->
+                                </div>-->
+                                <!-- 프로필사진2 -->
+                                <div class="col-12">
+                                    <div class="form-floating theme-form-floating">
+                                        <label for="profileImage">프로필 이미지</label>
+                                        <div class="upFileArea">
+							    			업로드할 파일을 드래그 앤 드랍 하세요.
+							    		</div>
+							    		<div class="uploadFiles">
+							    			
+							    		</div>
+                                    </div>
+                                    <div class="validation"></div>
+                                </div>
                                 
                                 <!-- 본인 인증 
                                 <div class="col-12">

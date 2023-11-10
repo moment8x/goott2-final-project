@@ -44,21 +44,42 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public Member setMyInfo(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean setMyInfo(String memberId, Member modifyMemberInfo) throws SQLException, NamingException {
+		boolean result = true;
+		
+		if(modifyMemberInfo.getPassword() != null) {
+			mDao.updatePwd(memberId, modifyMemberInfo);			
+		}else if(modifyMemberInfo.getPhoneNumber() != null) {
+			mDao.updatePhoneNumber(memberId, modifyMemberInfo);
+		}else if(modifyMemberInfo.getCellPhoneNumber() != null) {
+			mDao.updateCellPhoneNumber(memberId, modifyMemberInfo);
+		}else if(modifyMemberInfo.getEmail() != null) {
+			mDao.updateEmail(memberId, modifyMemberInfo);
+		}else if(modifyMemberInfo.getAddress() != null) {
+			mDao.updateAddr(memberId, modifyMemberInfo);
+		}else if(modifyMemberInfo.getRefundBank() != null) {
+			mDao.updateRefund(memberId, modifyMemberInfo);
+		}else {
+			result =false;
+		}
+		 
+		return result;
 	}
 
 	@Override
 	public Boolean withdraw(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
+		boolean result = false;
+		
+		if(mDao.updateWithdraw(memberId) == 1) {
+			result = true;
+		}
+		return result; 
 	}
 
 	@Override
 	public List<ShippingAddress> getShippingAddress(String memberId) throws SQLException, NamingException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return mDao.getShippingAddress(memberId);
 	}
 
 	@Override
@@ -102,24 +123,65 @@ public class MemberServiceImpl implements MemberService {
 
 		return mDao.duplicateUserEmail(email);
 	}
+	
+	@Override
+	public Member duplicatePhoneNumber(String phoneNumber) throws SQLException, NamingException {
+		return mDao.duplicatePhoneNumber(phoneNumber);
+		
+	}
+
+	@Override
+	public Member duplicateCellPhone(String cellPhoneNumber) throws SQLException, NamingException {
+		
+		return mDao.duplicateCellPhone(cellPhoneNumber);
+	}
+
+	@Override
+	public int updateAuthentication(String memberId) throws SQLException, NamingException {
+		
+		return mDao.updateAuthentication(memberId);
+	}
+
+	@Override
+	public boolean insertShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
+		boolean result = false;
+		
+		if(mDao.addShippingAddress(memberId, tmpAddr) == 1) {
+			result = true;
+		}
+		
+		return result;
+	}
+
+	@Override
+	public boolean shippingAddrModify(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
+		boolean result = false;
+			
+			if(mDao.shippingAddrModify(memberId, tmpAddr) == 1) {
+				result = true;
+			}
+			
+		return result;
+
+	}
+	
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
 	@Override
 	public boolean checkedDuplication(String memberId) throws SQLException, NamingException {
-		System.out.println("======= 회원가입 서비스단 - 회원 정보 조회 =======");
+		System.out.println("======= 멤버(회원가입, 로그인) 서비스단 - 회원 정보 조회 =======");
 		boolean result = false;
 		// 회원 정보 조회
-		if (mDao.selectId(memberId) == 0) {
-			result = true;
+		if (!mDao.selectId(memberId)) {
+			result = true;	// 중복된 아이디가 없을 때
 		}
 		
-		System.out.println("======= 회원가입 서비스단 끝 =======");
-		return true;
+		System.out.println("======= 멤버(회원가입, 로그인) 서비스단 끝 =======");
+		return result;
 	}
 
-	@Override
 	public boolean insertMember(Member member) throws SQLException, NamingException {
-		System.out.println("======= 회원가입 서비스단 - 회원가입 =======");
+		System.out.println("======= 멤버(회원가입) 서비스단 - 회원가입 =======");
 		boolean result = false;
 		
 		// 회원 가입
@@ -127,8 +189,24 @@ public class MemberServiceImpl implements MemberService {
 			result = true;
 		};
 		System.out.println("member : " + member.toString());
-		System.out.println("======= 회원가입 서비스단 끝 =======");
+		System.out.println("======= 멤버(회원가입) 서비스단 끝 =======");
 		return result;
 	}
-	// --------------------------------------- 김진솔 끝 ----------------------------------------
+	
+	@Override
+	public Member login(String memberId, String password) throws SQLException, NamingException {
+		System.out.println("======= 멤버(로그인) 서비스단 - 로그인 =======");
+		Member result = null;
+		
+		// Pwd 확인
+		result = mDao.selectMember(memberId, password);
+		
+		if (result != null) {
+			System.out.println(result.toString());
+		}
+		
+		System.out.println("======= 멤버(로그인) 서비스단 끝 =======");
+		return result;
+	}
+	// --------------------------------------- 김진솔 끝 ----------------------------------------	
 }

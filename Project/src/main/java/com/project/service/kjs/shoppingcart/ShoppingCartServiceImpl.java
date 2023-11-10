@@ -94,6 +94,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 		
 		if (loginCheck) {
 			// 회원일 시
+			if (scDao.deleteItem(memberId, productId) == 1) {
+				result = true;
+			}
 		} else {
 			// 비회원일 시
 			int check = scDao.deleteItemNon(memberId, productId);
@@ -141,10 +144,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 		
 		if (loginCheck) {
 			// 회원일 시
+			if (scDao.insertShoppingCart(memberId, productId) == 1) {
+				System.out.println("회원 장바구니 추가 성공");
+				result = true;
+			}
 		} else {
 			// 비회원일 시
 			if (scDao.insertShoppingCartNon(memberId, productId) == 1) {
-				System.out.println("아이템 추가 성공");
+				System.out.println("비회원 장바구니 추가 성공");
 				result = true;
 			}
 		}

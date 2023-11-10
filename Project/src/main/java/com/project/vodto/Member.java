@@ -17,8 +17,8 @@ public class Member {
 	private String memberId;
 	private String password;
 	private String name;
-	private String phoneNumber;
-	private String cellPhoneNumber;
+	private String phoneNumber; //전화번호
+	private String cellPhoneNumber; // 핸드폰번호
 	private Timestamp registertaionDate;
 	private char gender;
 	private String dateOfBirth;
@@ -27,16 +27,19 @@ public class Member {
 	private String detailedAddress;
 	private String email;
 	private char identityVerificationStatus;
+	private char reciveAdvertising;
 	private String membershipGrade;
 	private int totalPoints;
-	private int totalReward;
+	private int totalRewards;
 	private int couponCount;
 	private int profileImage;
-	private int remember;
+	private String remember;
 	private Timestamp lastLoginDate;
 	private String refundBank;
 	private String refundAccount;
-	private String dormantAccout;
+	private String dormantAccout; //휴면계정
 	private String memberToken;
-	private String permission;
+	private String permission; //권한 등급
+	private String withdraw; //탈퇴여부
+	private String accountHolder;
 }

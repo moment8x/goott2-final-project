@@ -6,7 +6,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
+import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.project.service.kjs.upload.UploadFileService;
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
+import com.project.vodto.UploadFile;
 
 @Controller
 @RequestMapping("/register/*")
@@ -25,6 +29,8 @@ public class RegisterController {
 	
 	@Inject
 	private MemberService mService;
+	@Inject
+	private UploadFileService ufService;
 	
 	@RequestMapping("register")
 	public ModelAndView moveRegister() {
@@ -71,6 +77,22 @@ public class RegisterController {
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
 		}
+		
+		System.out.println("======= 회원가입 컨트롤러 끝 =======");
+	}
+	
+	@RequestMapping(value="uploadFile", method=RequestMethod.POST)
+	public void uploadFile(HttpServletRequest request) {
+		System.out.println("======= 회원가입 컨트롤러 - 프로필 사진 등록 =======");
+		
+		// 1. 파일이 저장될 경로 확인
+		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
+		
+		UploadFile uf = null;
+		// 2. 파일 업로드
+//		ufService
+		
+		// 3. DB에 저장
 		
 		System.out.println("======= 회원가입 컨트롤러 끝 =======");
 	}
