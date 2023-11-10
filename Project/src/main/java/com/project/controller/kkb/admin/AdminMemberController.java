@@ -24,20 +24,12 @@ import lombok.RequiredArgsConstructor;
 public class AdminMemberController {
 	
 	private final AdminMemberService adminMemberService;
-//	private final AdminMemberDAO adminMemberRepository;
-//	private final ApplicationEventPublisher publisher;
 	
-//	@GetMapping("/count")
-//	public Map<String, Object> countTotalMember() throws Exception {
-//		return adminMemberService.getTotalMemberCount();
-//	}
-	
-//	@GetMapping("/test")
-//	public void eventTest() throws Exception {
-//		int updateCount = adminMemberRepository.countAll();	
-//		System.out.println("context refresh");
-//		publisher.publishEvent(new TotalMemberCountEvent(updateCount));
-//	}
+	// 회원 수 변경 시 이벤트 발행(test)
+	@GetMapping("/test")
+	public void eventTest() throws Exception {
+		adminMemberService.updateMemberCount();
+	}
 	
 	// 총 회원 수
 	@GetMapping("/count")
@@ -47,10 +39,10 @@ public class AdminMemberController {
 	
 	// 회원 정보 조회
 	@PostMapping("/search")
-	public Map<String, Object> searchMemberInfo(@RequestBody MemberCondition member) throws Exception {
-		System.out.println("member:" + member.toString());		
+	public Map<String, Object> searchMemberInfo(@RequestBody MemberCondition memberCond) throws Exception {
+//		System.out.println("member:" + memberCond.toString());		
 		
-		return adminMemberService.getMemberInfo(member);
+		return adminMemberService.getMemberInfo(memberCond);
 	}
 	
 	// CRM 홈

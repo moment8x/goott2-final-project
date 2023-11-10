@@ -7,290 +7,52 @@ export const menuItems = [
   {
     title: '홈',
     icon: 'heroicons-outline:home',
+    link: 'home',
+  },
+  {
+    title: '회원 상세 정보',
+    icon: 'heroicons-outline:home',
     link: 'admin/home',
   },
   {
-    title: '주문',
-    icon: 'heroicons-outline:shopping-cart',
-    link: '#',
-    child: [
-      {
-        childtitle: '주문 대시보드',
-        childlink: 'test',
-      },
-      {
-        childtitle: '전체 주문 조회',
-        childlink: 'icons2',
-      },
-      {
-        childtitle: '입금전 관리',
-        childlink: 'icons3',
-      },
-      {
-        childtitle: '배송 준비중 관리',
-        childlink: 'icons4',
-      },
-      {
-        childtitle: '배송 대기 관리',
-        childlink: 'icons5',
-      },
-      {
-        childtitle: '배송 중 관리',
-        childlink: 'icons6',
-      },
-      {
-        childtitle: '배송 완료 조회',
-        childlink: 'icons7',
-      },
-      {
-        childtitle: '취소/교환/반품/환불',
-        childlink: 'Level-1',
-        multi_menu: [
-          {
-            multiTitle: '입금전 취소 관리',
-            multiLink: 'Level-2',
-          },
-          {
-            multiTitle: '취소 관리',
-            multiLink: 'Level-3',
-          },
-          {
-            multiTitle: '교환 관리',
-            multiLink: 'Level-4',
-          },
-          {
-            multiTitle: '반품 관리',
-            multiLink: 'Level-5',
-          },
-          {
-            multiTitle: '환불 관리',
-            multiLink: 'Level-6',
-          },
-          {
-            multiTitle: '카드 취소 조회',
-            multiLink: 'Level-7',
-          },
-          {
-            multiTitle: '관리자 환불 관리',
-            multiLink: 'Level-8',
-          },
-        ],
-      },
-    ],
+    title: '주문내역',
+    icon: 'heroicons-outline:home',
+    link: 'admin/home',
   },
   {
-    title: '상품',
-    icon: 'heroicons-outline:book-open',
-    link: '#',
-    child: [
-      {
-        childtitle: '상품 대시보드',
-        childlink: 'product',
-      },
-      {
-        childtitle: '상품 목록',
-        childlink: 'product1',
-      },
-      {
-        childtitle: '상품 등록',
-        childlink: 'product2',
-        multi_menu: [
-          {
-            multiTitle: '일반 등록',
-            multiLink: 'product4',
-          },
-          {
-            multiTitle: '엑셀 등록',
-            multiLink: 'product5',
-          },
-        ],
-      },
-      {
-        childtitle: '상품 관리',
-        childlink: 'Level-1',
-        multi_menu: [
-          {
-            multiTitle: '상품 정보 일괄변경',
-            multiLink: 'product6',
-          },
-          {
-            multiTitle: '상품 엑셀 관리',
-            multiLink: 'product7',
-          },
-          {
-            multiTitle: '삭제 상품 목록',
-            multiLink: 'product8',
-          },
-        ],
-      },
-    ],
+    title: '게시글 정보',
+    icon: 'heroicons-outline:home',
+    link: 'admin/home',
   },
   {
-    title: '고객',
-    icon: 'heroicons-outline:user',
-    link: '/admin/members/dashboard',
-    child: [
-      {
-        childtitle: '고객 대시보드',
-        childlink: 'admin/members/dashboard',
-      },
-      {
-        childtitle: '회원 조회',
-        childlink: 'user2',
-        multi_menu: [
-          {
-            multiTitle: '회원 정보 조회',
-            multiLink: 'admin/members/search',
-          },
-          {
-            multiTitle: '주문 회원 조회',
-            multiLink: 'user4',
-          },
-          {
-            multiTitle: '구매액 상위회원 조회',
-            multiLink: 'user5',
-          },
-        ],
-      },
-      {
-        childtitle: '회원 관리',
-        childlink: 'user6',
-        multi_menu: [
-          {
-            multiTitle: '회원 등급별 관리',
-            multiLink: 'user7',
-          },
-          {
-            multiTitle: '회원 엑셀 등록',
-            multiLink: 'user8',
-          },
-          {
-            multiTitle: '회원 탈퇴 관리',
-            multiLink: 'user9',
-          },
-          {
-            multiTitle: '휴면 회원 관리',
-            multiLink: 'user10',
-          },
-        ],
-      },
-    ],
+    title: '1:1문의 정보',
+    icon: 'heroicons-outline:home',
+    link: 'admin/home',
   },
   {
-    title: '게시판',
-    icon: 'heroicons-outline:view-boards',
-    link: '#',
-    child: [
-      {
-        childtitle: '게시판 대시보드',
-        childlink: 'board',
-      },
-      {
-        childtitle: '게시판 관리',
-        childlink: 'board2',
-      },
-      {
-        childtitle: '게시물 관리',
-        childlink: 'board3',
-      },
-      {
-        childtitle: '1:1 문의',
-        childlink: 'board4',
-      },
-      {
-        childtitle: '운영 일지',
-        childlink: 'board5',
-      },
-      {
-        childtitle: '캘린더',
-        childlink: 'board6',
-      },
-    ],
+    title: '적립금/포인트/쿠폰',
+    icon: 'heroicons-outline:home',
+    link: 'admin/home',
   },
   {
-    title: '통계',
-    icon: 'heroicons-outline:chart-bar',
-    link: '#',
-    child: [
-      {
-        childtitle: '통계 대시보드',
-        childlink: 'chart',
-      },
-      {
-        childtitle: '매출 분석',
-        childlink: 'chart2',
-        multi_menu: [
-          {
-            multiTitle: '일별 매출',
-            multiLink: 'chart3',
-          },
-          {
-            multiTitle: '주별 매출',
-            multiLink: 'chart4',
-          },
-          {
-            multiTitle: '월별 매출',
-            multiLink: 'chart5',
-          },
-          {
-            multiTitle: '결제 수단별 매출',
-            multiLink: 'chart6',
-          },
-          {
-            multiTitle: '매출 집계(판매 이익)',
-            multiLink: 'chart7',
-          },
-        ],
-      },
-      {
-        childtitle: '상품 분석',
-        childlink: 'chart8',
-        multi_menu: [
-          {
-            multiTitle: '판매 상품 순위',
-            multiLink: 'chart9',
-          },
-          {
-            multiTitle: '판매 분류 순위',
-            multiLink: 'chart10',
-          },
-          {
-            multiTitle: '취소/반품 순위',
-            multiLink: 'chart11',
-          },
-          {
-            multiTitle: '장바구니 상품 분석',
-            multiLink: 'chart12',
-          },
-          {
-            multiTitle: '장바구니 상세 내역',
-            multiLink: 'chart13',
-          },
-          {
-            multiTitle: '관심 상품 분석',
-            multiLink: 'chart14',
-          },
-        ],
-      },
-      {
-        childtitle: '고객 분석',
-        childlink: 'chart15',
-        multi_menu: [
-          {
-            multiTitle: '요일별 분석',
-            multiLink: 'chart16',
-          },
-          {
-            multiTitle: '시간별 분석',
-            multiLink: 'chart17',
-          },
-          {
-            multiTitle: '적립금/포인트 분석',
-            multiLink: 'chart18',
-          },
-        ],
-      },
-    ],
+    title: '장바구니 정보',
+    icon: 'heroicons-outline:home',
+    link: 'admin/home',
+  },
+  {
+    title: '관심상품 정보',
+    icon: 'heroicons-outline:home',
+    link: 'admin/home',
+  },
+  {
+    title: '로그인 로그',
+    icon: 'heroicons-outline:home',
+    link: 'admin/home',
+  },
+  {
+    title: '회원 메모',
+    icon: 'heroicons-outline:home',
+    link: 'admin/home',
   },
 ];
 

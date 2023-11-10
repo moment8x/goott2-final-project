@@ -1,7 +1,8 @@
 import { Dialog, Transition } from '@headlessui/react';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import Icon from '@/components/ui/Icon';
-import { preventScroll, allowScroll } from './utils/modal';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import MemberSearch from './member-search';
 
 const MemberInfoModal = ({
   activeModal,
@@ -21,8 +22,9 @@ const MemberInfoModal = ({
   ref,
   showModal,
   setShowModal,
+  selectedMemberId,
 }) => {
-  // const [showModal, setShowModal] = useState(false);
+  const location = useLocation();
 
   const closeModal = () => {
     setShowModal(false);
@@ -31,77 +33,48 @@ const MemberInfoModal = ({
   const openModal = () => {
     setShowModal(!showModal);
   };
+
   const returnNull = () => {
     return null;
   };
 
-  // useEffect(() => {
-  //   document.body.style.cssText = `
-  //     position: fixed;
-  //     top: -${window.scrollY}px;
-  //     overflow-y: scroll;
-  //     width: 100%;`;
-  //   return () => {
-  //     const scrollY = document.body.style.top;
-  //     document.body.style.cssText = '';
-  //     window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   const prevScrollY = preventScroll();
-  //   return () => {
-  //     allowScroll(prevScrollY);
-  //   };
-  // }, []);
-
-  const scrollY = document.body.style.top;
-
+  // 모달 닫은 뒤에도 위치 고정
   if (showModal) {
-    document.body.style.cssText = `
-      position: fixed;
-      top: -${window.scrollY}px;
-      overflow-y: scroll;
-      width: 100%;`;
-  } else if (!showModal) {
-    document.body.style.cssText = `
-      position: static;
-      top: -${window.scrollY}px;
-      overflow-y: scroll;
-      width: 100%;`;
-    window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
+    const scrollY = window.scrollY;
+
+    useEffect(() => {
+      // url 변경
+      window.history.replaceState(null, '', `/admin/members/search/${selectedMemberId}`);
+
+      localStorage.setItem('scrollY', scrollY);
+      document.body.style.cssText = `
+        position: fixed;
+        top: -${scrollY}px;
+        overflow-y: scroll;
+        width: 100%;`;
+
+      return () => {
+        // 이전 url로 복구
+        window.history.replaceState(null, '', `/admin/members/search`);
+
+        const savedScrollY = localStorage.getItem('scrollY');
+        document.body.style.cssText = '';
+        if (savedScrollY) {
+          console.log('savedScrollY:', savedScrollY);
+          window.scrollTo(0, savedScrollY);
+          localStorage.removeItem('scrollY');
+        }
+      };
+    }, []);
   }
-
-  // useEffect(() => {
-  //   document.body.style.cssText = `
-  //       position: fixed;
-  //       top: -${window.scrollY}px;
-  //       overflow-y: scroll;
-  //       width: 100%;`;
-  //   return () => {
-  //     const scrollY = document.body.style.top;
-  //     document.body.style.cssText = '';
-  //     window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
-  //   };
-  // }, []);
-
-  // if (showModal) {
-  //   document.body.style.overflow = 'hidden';
-  // } else {
-  //   document.body.style.overflow = 'auto';
-  // }
-
-  // document.body.style.cssText = `
-  //     position: static
-  //   `;
 
   return (
     <>
+      {/* <Routes location={location}>
+        <Route path=':home' element={<MemberSearch />} />
+      </Routes> */}
       {uncontrol ? (
         <>
-          {/* <button type="button" onClick={openModal} className={`btn ${labelClass}`}>
-            {label}
-          </button> */}
           <Transition appear show={showModal} as={Fragment}>
             <Dialog as='div' className='relative z-[99999]' onClose={!disableBackdrop ? closeModal : returnNull}>
               {!disableBackdrop && (

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import com.project.dao.kkb.admin.AdminMemberDAO;
@@ -24,17 +25,34 @@ import lombok.RequiredArgsConstructor;
 public class AdminMemberServiceImpl implements AdminMemberService {
 
 	private final AdminMemberDAO adminMemberRepository;
-//	private final MemberCountListener memberCount;
-//	private final ApplicationEventPublisher publisher;
+	private final MemberCountListener memberCount;
+	private final ApplicationEventPublisher publisher;
 	
 	@Override
 	public Map<String, Object> getTotalMemberCount() throws Exception {
-		int totalCount = adminMemberRepository.countAll();	
+		int totalCount = 0;
+		if(memberCount.getCurrentCount() > 0) {
+			// TotalMemberCountEvent에 저장해둔 값 가져옴
+			System.out.println("이벤트 객체에서 전체 회원 수 조회");
+			totalCount = memberCount.getCurrentCount(); 
+		} else {
+			System.out.println("DB에서 전체 회원 수 조회");
+			totalCount = adminMemberRepository.countAll();	
+			publisher.publishEvent(new TotalMemberCountEvent(totalCount));
+		}
 		Map<String, Object> result = new HashMap<>();
 		result.put("total", totalCount);
 		
 		return result;
 	}
+	
+	@Override
+	public void updateMemberCount() throws Exception {
+		int memberCount = adminMemberRepository.countAll();	
+		System.out.println("회원 수 갱신");
+		// 이벤트 발행
+		publisher.publishEvent(new TotalMemberCountEvent(memberCount));
+	}	
 	
 	@Override
 	public Map<String, Object> editMemberDetailInfo(MemberParam member) throws Exception {
@@ -77,39 +95,14 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	}
 	
 	
-//	@Override
-//	public Map<String, Object> getTotalMemberCount() throws Exception {
-//		// DB가 아니라 MemberCountListener에 미리 저장해둔 값 가져옴
-//		int totalCount = memberCount.getCurrentCount(); 
-//		System.out.println("memberCount.getCurrentCount():"+memberCount.getCurrentCount());
-//		Map<String, Object> result = new HashMap<>();
-//		result.put("total", totalCount);
-//		
-//		return result;
-//	}
-	
-//	@EventListener(ContextRefreshedEvent.class)
-//	public void updateMemberCount(ContextRefreshedEvent e) throws Exception {
-//		
-//		// Root WebApplicationContext 초기화 시에만 체크
-//		if (e.getApplicationContext().getParent() == null) {
-//			int updateCount = adminMemberRepository.countAll();	
-//			System.out.println("context refresh");
-//			
-//			// 전체 회원 수를 조회하는 이벤트 발행
-//	        publisher.publishEvent(new TotalMemberCountEvent(updateCount));
-//		}
-//	}
-//	
-	
 	@Override
-	public Map<String, Object> getMemberInfo(MemberCondition member ) throws Exception {
+	public Map<String, Object> getMemberInfo(MemberCondition memberCond ) throws Exception {
 		
 		//전화번호 "-" 제거
-		member.setCellPhoneNumber(member.getCellPhoneNumber().replace("-", "")); 
-		member.setPhoneNumber(member.getPhoneNumber().replace("-", ""));
+		memberCond.setCellPhoneNumber(memberCond.getCellPhoneNumber().replace("-", "")); 
+		memberCond.setPhoneNumber(memberCond.getPhoneNumber().replace("-", ""));
 		
-		List<MemberResponse> responseList = adminMemberRepository.findByInfo(member);
+		List<MemberResponse> responseList = adminMemberRepository.findByInfo(memberCond);
 		
 		for ( MemberResponse responseParam : responseList ) {
 			
@@ -141,7 +134,6 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 				Arrays.asList("서울","경기","인천","강원","충남", "충청북도","충북","충청북도",
 						"대전","경북","경상북도","경남","경상남도","대구","부산","울산",
 						"전북","전라북도","전남","전라남도","광주","세종","제주");
-		
 		
 		String region = "해외";
 		for( String value : regions ) {
@@ -176,7 +168,19 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	}
 
 	
-
+//	@EventListener(ContextRefreshedEvent.class)
+//	public void updateMemberCount(ContextRefreshedEvent e) throws Exception {
+//		
+//		// Root WebApplicationContext 초기화 시에만 체크
+//		if (e.getApplicationContext().getParent() == null) {
+//			int updateCount = adminMemberRepository.countAll();	
+//			System.out.println("context refresh");
+//			
+//			// 전체 회원 수를 조회하는 이벤트 발행
+//	        publisher.publishEvent(new TotalMemberCountEvent(updateCount));
+//		}
+//	}
+//	
 	
 
 

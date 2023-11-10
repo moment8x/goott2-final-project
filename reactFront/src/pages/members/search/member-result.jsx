@@ -5,15 +5,16 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Tooltip from '@/components/ui/Tooltip';
 import { useTable, useRowSelect, useSortBy, usePagination } from 'react-table';
-import { Link } from 'react-router-dom';
 import MemberInfoModal from './member-modal';
-import Modal from '@/components/ui/Modal';
+import Layout from './member-modal-detail/Layout';
+import Sidebar from '@/components/partials/sidebar';
 
 const COLUMNS = [
   {
     Header: '가입일',
     accessor: 'registrationDate',
     Cell: (row) => {
+      // 시간 제거
       return <span>{(row?.cell?.value).replace(' 00:00:00.0', '')}</span>;
     },
   },
@@ -122,11 +123,13 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
   const columns = useMemo(() => COLUMNS, []);
   // // const data = useMemo(() => searchedInfo, []);
   const [totalMember, setTotalMember] = useState(0);
-
   const [showModal, setShowModal] = useState(false);
+  const [selectedMemberId, setSelectedMemberId] = useState('');
 
-  const openModal = () => {
+  const openModal = (row) => {
     setShowModal(!showModal);
+    setSelectedMemberId(row.cells[3].value);
+    console.log('id: ', row.cells[3].value);
   };
 
   const tableInstance = useTable(
@@ -183,14 +186,16 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
     return Math.ceil(length / pageSize);
   }, [length, pageSize]);
 
+  // 페이징 블록 추가
   const pages = useMemo(() => {
     const start = Math.floor(pageIndex / 10) * 10;
     const end = start + 10 > totalPages ? totalPages : start + 10;
     return Array.from({ length: end - start }, (_, i) => start + i);
   }, [pageIndex, totalPages]);
 
+  // 총 회원 수 조회
   useEffect(() => {
-    fetch('http://localhost:8081/admin/members/member-info', { method: 'GET' })
+    fetch('http://localhost:8081/admin/members/count', { method: 'GET' })
       .then((res) => res.json())
       .then((res) => {
         console.log('res:', res);
@@ -200,21 +205,28 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
 
   return (
     <>
+      {/* <Routes location={location}>
+        <Route path=':modal' element={<Modal2 />} />
+      </Routes> */}
+      {/* state 값 true일 시 모달 오픈 */}
       {showModal && (
         <MemberInfoModal
           title='Extra large modal'
           label='Extra large modal'
           labelClass='btn-outline-dark'
           uncontrol
-          className='max-w-fit'
+          // scrollContent
+          noFade
+          className='max-w max-h'
           showModal={showModal}
           setShowModal={setShowModal}
+          selectedMemberId={selectedMemberId}
         >
-          <h4 class='font-medium text-lg mb-3 text-slate-900'>Lorem ipsum dolor sit.</h4>
-          <div class='text-base text-slate-600 dark:text-slate-300'>
-            Oat cake ice cream candy chocolate cake chocolate cake cotton candy dragée apple pie. Brownie carrot cake
-            candy canes bonbon fruitcake topping halvah. Cake sweet roll cake cheesecake cookie chocolate cake
-            liquorice.
+          {/* <h4 className='font-medium text-lg mb-3 text-slate-900'>Lorem ipsum dolor sit.</h4> */}
+
+          <div className='text-base text-slate-600 dark:text-slate-300'>
+            {/* <Layout /> */}
+            {/* <Sidebar /> */}
           </div>
         </MemberInfoModal>
       )}
@@ -223,6 +235,7 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
           <h4 className='card-title font-black'>{title}</h4>
           <Button className='btn-secondary ml-5 p-[7px] pointer-events-none'>
             <div className='space-x-1 rtl:space-x-reverse'>
+              {/* 총 회원 수 조회 */}
               <span>총 회원 수</span>
               <Badge label={totalMember} className='bg-white text-slate-900 ' />
               <span>명</span>
@@ -260,12 +273,24 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
                     prepareRow(row);
                     return (
                       <tr {...row.getRowProps()}>
-                        {row.cells.map((cell) => {
+                        {row.cells.map((cell, index) => {
                           return (
-                            <td {...cell.getCellProps()} className='table-td'>
-                              <Link to='' onClick={openModal}>
+                            <td
+                              {...cell.getCellProps()}
+                              className='table-td cursor-pointer'
+                              onClick={index !== 0 ? () => openModal(row) : null}
+                            >
+                              {/* row 클릭 시 모달 오픈 */}
+
+                              {cell.render('Cell')}
+
+                              {/* <Link to='' onClick={openModal}>
                                 {cell.render('Cell')}
-                              </Link>
+                              </Link> */}
+                              {/* <Link to='modal' state={{ background: location }}>
+                                {cell.render('Cell')}
+                                <Outlet />
+                              </Link> */}
                             </td>
                           );
                         })}

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.mappers.adminBoardMapper">
+	<select id="selectPostInfo" resultType="PostResponse">
+		SELECT b.post_no,
+			   c.category_name,
+			   c.subcategory,
+		       b.title,
+		       m.name,
+		       b.author,
+	    CASE   WHEN r.re > 0 
+    		   THEN '답변완료'       
+			   ELSE '답변전'
+		       END status
+		FROM board b
+		INNER JOIN board_categories c
+			ON b.category_id = c.category_id
+		INNER JOIN member m
+			ON b.author = m.member_id
+		LEFT JOIN board_uf f
+			ON b.post_no = f.post_no
+		LEFT JOIN (select s.post_no, s.re, s.ref, s.ref_order
+				from (select b.post_no, b.ref, b.ref_order,
+				(select count(*) from board where ref = b.ref and step = b.step + 1 and ref_order >= b.ref_order + 1) re
+				from board b) s) r
+			ON b.post_no = r.post_no
+		<where>
+			<if test='(createdDateStart != null and !createdDateStart.equals("")) and 
+	         		(createdDateEnd != null and !dcreatedDateEnd.equals(""))'>
+	         		AND created_date BETWEEN #{createdDateStart} AND #{createdDateEnd}
+         	</if>
+         	<if test='categoryId != null and !categoryId.equals("")' >
+				AND b.category_id = #{categoryId}
+			</if>
+			<if test='title != null and !title.equals("")' >
+				AND b.title = #{title}
+			</if>
+			<if test='content != null and !content.equals("")' >
+				AND b.content = #{content}
+			</if>
+			<if test='author != null and !author.equals("")' >
+				AND b.author = #{author}
+			</if>
+			<if test='reply = true'>
+				AND r.re > 0
+			</if>
+			<if test='reply = false'>
+				AND r.re = 0
+			</if>
+			<if test='file = true' >
+				f.upload_files_seq IS NOT NULL and f.upload_files_seq != ''
+			</if>
+			<if test='file = false' >
+				f.upload_files_seq IS NULL or f.upload_files_seq = ''
+			</if>
+		</where>
+		ORDER BY r.ref DESC, r.ref_order ASC;
+	</select>	
+</mapper>

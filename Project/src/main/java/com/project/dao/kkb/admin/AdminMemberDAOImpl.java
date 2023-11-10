@@ -29,9 +29,9 @@ public class AdminMemberDAOImpl implements AdminMemberDAO {
 	}
 	
 	@Override
-	public List<MemberResponse> findByInfo(MemberCondition member) throws Exception {
+	public List<MemberResponse> findByInfo(MemberCondition memberCond) throws Exception {
 		
-		return ses.selectList(ns + ".selectMemberInfo", member);
+		return ses.selectList(ns + ".selectMemberInfo", memberCond);
 	}
 
 	@Override

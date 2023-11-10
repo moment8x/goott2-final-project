@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MemberSearch from './member-search';
 import SearchedMembers from './member-result';
-import MemberInfoModal from './member-modal';
+import { Outlet } from 'react-router-dom';
 
 const MemberInfo = () => {
   const [searchedInfo, setSearchedInfo] = useState([
@@ -20,12 +20,11 @@ const MemberInfo = () => {
   ]);
 
   return (
-    <>
-      <div className="space-y-5">
-        <MemberSearch setSearchedInfo={setSearchedInfo} />
-        <SearchedMembers data={searchedInfo} />
-      </div>
-    </>
+    <div className='space-y-5'>
+      <MemberSearch setSearchedInfo={setSearchedInfo} />
+      <SearchedMembers data={searchedInfo} />
+      <Outlet />
+    </div>
   );
 };
 
