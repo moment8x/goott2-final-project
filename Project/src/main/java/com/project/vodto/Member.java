@@ -30,10 +30,10 @@ public class Member {
 	private char reciveAdvertising;
 	private String membershipGrade;
 	private int totalPoints;
-	private int totalReward;
+	private int totalRewards;
 	private int couponCount;
 	private int profileImage;
-	private int remember;
+	private String remember;
 	private Timestamp lastLoginDate;
 	private String refundBank;
 	private String refundAccount;
@@ -41,4 +41,5 @@ public class Member {
 	private String memberToken;
 	private String permission; //권한 등급
 	private String withdraw; //탈퇴여부
+	private String accountHolder;
 }

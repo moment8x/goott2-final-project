@@ -203,11 +203,15 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectOne(ns + ".login", param);
 	}
-	// ---------------------------------------- 김진솔 끝 -----------------------------------------
-
+	
 	@Override
-	public List<Integer> selectOrderNo(String memberId) {
-		// TODO Auto-generated method stub
-		return null;
+	public int updateProfile(String memberId, String newFileName) throws SQLException, NamingException {
+		System.out.println("======= 회원 정보 수정 DAO - 프로필 사진 변경 =======");
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("memberId", memberId);
+		params.put("newFileName", newFileName);
+		
+		return ses.insert(ns + ".updateProfile", params);
 	}
+	// ---------------------------------------- 김진솔 끝 -----------------------------------------
 }

@@ -8,11 +8,11 @@
       INSERT INTO payments (payment_number, non_order_no,
       payment_method, total_amount, shipping_fee, used_points, used_reward,
       actual_payment_amount, payment_time, card_name, card_number)
-      VALUES(#{payment_number}, #{non_order_no}, #{payment_method},
-      #{total_amount}, #{shipping_fee},
-      #{used_points}, #{used_reward},
-      #{actual_payment_amount},
-      #{payment_time},#{card_name},#{card_number})
+      VALUES(#{paymentNumber}, #{nonOrderNo}, #{paymentMethod},
+      #{totalAmount}, #{shippingFee},
+      #{usedPoints}, #{usedReward},
+      #{actualPaymentAmount},
+      #{paymentTime},#{cardName},#{cardNumber})
    </insert>
 
    <insert id="insertDetailOrderItem" parameterType="java.util.Map">
@@ -22,8 +22,8 @@
       VALUES
       <foreach item="item" index="index" collection="list"
          separator=",">
-         (#{item.non_order_no}, #{item.product_id},
-         #{item.product_price})
+         (#{item.nonOrderNo}, #{item.productId},
+         #{item.productPrice})
       </foreach>
    </insert>
 
@@ -34,14 +34,14 @@
       non_shipping_address, non_detailed_shipping_adress,
       non_delivery_message,
       non_password, non_email, non_delivery_status)
-      VALUES(#{non_order_no},
-      #{non_member_id}, #{recipient_name},
-      #{recipient_phone_number},
-      #{zip_code}, #{shipping_address},
-      #{detailed_shipping_address},
-      #{delivery_message}, #{non_password},
-      #{non_email},
-      #{delivery_status})
+      VALUES(#{nonOrderNo},
+      #{nonMemberId}, #{recipientName},
+      #{recipientPhoneNumber},
+      #{zipCode}, #{shippingAddress},
+      #{detailedShippingAddress},
+      #{deliveryMessage}, #{nonPassword},
+      #{nonEmail},
+      #{deliveryStatus})
    </insert>
 
    <select id="getPaymentDetail" resultType="map">
@@ -55,39 +55,56 @@
       non_order_history n
       on p.non_order_no = d.non_order_no and
       p.non_order_no = n.non_order_no
-      where p.non_order_no = #{non_order_no};
+      where p.non_order_no = #{nonOrderNo};
    </select>
 
-  
+
 
    <resultMap id="result" type="com.project.vodto.OrderInfo">
-   	
-      <result property="product_id" column="product_id" />
-      <result property="product_name" column="product_name" />
-      <result property="product_image" column="product_image" />
-      <result property="category_key" column="category_key" />
-      <result property="current_quantity" column="current_quantity" />
-      <result property="selling_price" column="selling_price" />
+
+      <result property="productId" column="product_id" />
+      <result property="productName" column="product_name" />
+      <result property="productImage" column="product_image" />
+      <result property="categoryKey" column="category_key" />
+      <result property="currentQuantity" column="current_quantity" />
+      <result property="sellingPrice" column="selling_price" />
 
    </resultMap>
 
-   <select id="getProductInfo" parameterType="com.project.vodto.OrderInfo"
-      resultMap="result">
-      select p.product_id, p.product_name, i.product_image, p.category_key, p.current_quantity,
+   <select id="getProductInfo"
+      parameterType="com.project.vodto.OrderInfo" resultMap="result">
+      select p.product_id, p.product_name, i.product_image, p.category_key,
+      p.current_quantity,
       p.selling_price from products p inner join product_images i on
-      p.product_id = i.product_id where p.product_id = #{product_id} limit
+      p.product_id = i.product_id where p.product_id = #{productId} limit
       1;
    </select>
-   
-
-
 
    <insert id="saveBankTransfer">
       INSERT INTO bank_transfers (non_order_no,
       payment_number, payer_name, amount_to_pay)
-      VALUES(#{non_order_no},
-      #{payment_number}, #{recipient_name}, #{amount_to_pay})
+      VALUES(#{nonOrderNo},
+      #{paymentNumber}, #{recipientName}, #{amountToPay})
    </insert>
 
+   <select id="getShippingAddr"
+      resultType="com.project.vodto.ShippingAddress">
+      select * from shipping_address where member_id =
+      #{memberId}
+   </select>
+
+   <select id="getCouponInfos"
+      resultType="com.project.vodto.CouponInfos">
+      select l.member_id, l.coupon_number, l.obtained_date, l.used_date,
+      l.expiration_date, c.coupon_name, c.discount_method, c.
+      discount_amount
+      from coupon_logs l inner join coupons c on l.coupon_number =
+      c.coupon_number where member_id = #{memberId};
+   </select>
+   
+   <select id="getCategoryKey" resultType="String">
+   select category_key from coupon_categories where coupon_number = #{couponNumber};
+   </select>
+   
 
 </mapper>

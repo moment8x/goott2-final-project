@@ -14,16 +14,16 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Payment {
-	private String payment_number;
-	private String order_no;
-	private String non_order_no;
-	private String payment_method;
-	private int total_amount;
-	private int shipping_fee;
-	private int used_reward;
-	private int used_points;
-	private int actual_payment_amount;
-	private Timestamp payment_time;
-	private String card_name;
-	private String card_number;
+	private String paymentNumber;
+	private String orderNo;
+	private String nonOrderNo;
+	private String paymentMethod;
+	private int totalAmount;
+	private int shippingFee;
+	private int usedReward;
+	private int usedPoints;
+	private int actualPaymentAmount;
+	private Timestamp paymentTime;
+	private String cardName;
+	private String cardNumber;
 }

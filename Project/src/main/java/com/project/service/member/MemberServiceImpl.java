@@ -20,7 +20,7 @@ import com.project.vodto.MyPageOrderList;
 import com.project.vodto.OrderHistory;
 import com.project.vodto.PointLog;
 import com.project.vodto.ShippingAddress;
-import com.project.vodto.UploadFile;
+import com.project.vodto.UploadFiles;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -192,15 +192,21 @@ public class MemberServiceImpl implements MemberService {
 	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public boolean insertMember(Member member, UploadFile file) throws SQLException, NamingException {
+	public boolean insertMember(Member member, UploadFiles file) throws SQLException, NamingException {
 		System.out.println("======= 멤버(회원가입) 서비스단 - 회원가입 =======");
 		boolean result = false;
-		
-		// 회원 가입
+		String newFileName = "";
+		// 회원 가입 - 프로필 사진 저장
 		if (file != null) {
 			uDao.insertUploadFile(file);
+			newFileName = file.getNewFileName();
 		};
+		// 회원 가입 - 회원 가입
 		if (mDao.insertMember(member) == 1) {
+			if (!newFileName.equals("")) {
+				// 프로필사진이 있을 시.(update)
+				mDao.updateProfile(member.getMemberId(), newFileName);
+			}
 			result = true;
 		}
 		System.out.println("member : " + member.toString());

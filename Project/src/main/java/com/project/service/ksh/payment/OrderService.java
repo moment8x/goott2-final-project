@@ -3,12 +3,14 @@ package com.project.service.ksh.payment;
 import java.util.List;
 import java.util.Map;
 
+import com.project.vodto.CouponInfos;
 import com.project.vodto.DetailOrderItem;
 import com.project.vodto.NonOrderHistory;
 import com.project.vodto.OrderInfo;
 import com.project.vodto.Payment;
 import com.project.vodto.PaymentDTO;
 import com.project.vodto.Product;
+import com.project.vodto.ShippingAddress;
 
 public interface OrderService {
 	// 비회원 주문 내역 저장
@@ -30,6 +32,11 @@ public interface OrderService {
 	Map<String, Object>getPaymentDetail(String orderNo) throws Exception;
 
 	List<OrderInfo> getProductInfo(List<String> product_id) throws Exception;
+
+	List<ShippingAddress> getShippingAddress(String memberId) throws Exception;
+
+	List<CouponInfos> getCouponInfos(String memberId) throws Exception;
+
 
 	
 

@@ -15,8 +15,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class OrderInfo2 {
-	private List<String> product_id;
-	private String non_order_no;
-	private List<Integer> product_quantity;
+	private List<String> productId;
+	private List<Integer> productQuantity;
 	
 }

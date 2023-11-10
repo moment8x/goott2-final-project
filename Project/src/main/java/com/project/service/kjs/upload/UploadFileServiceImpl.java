@@ -2,33 +2,40 @@ package com.project.service.kjs.upload;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.UUID;
 
+import javax.inject.Inject;
+import javax.naming.NamingException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 
-import com.project.vodto.UploadFile;
+import com.project.dao.kjs.upload.UploadDAO;
+import com.project.vodto.UploadFiles;
 
 @Service
 public class UploadFileServiceImpl implements UploadFileService {
 
+	@Inject
+	UploadDAO uDao;
+	
 	@Override
-	public UploadFile uploadFile(String originalFileName, long size, String contentType, byte[] data,
+	public UploadFiles uploadFile(String originalFileName, long size, String contentType, byte[] data,
 			String realPath) throws IOException {
 		System.out.println("======= 업로드 서비스단 - 업로드 파일 =======");
-		UploadFile result = null;
 		
 		String completePath = makeCalculatePath(realPath);	// 물리적 경로 + /년/월/일
-		
-		UploadFile uf = new UploadFile();
+		System.out.println("completePath : " + completePath);
+		UploadFiles uf = new UploadFiles();
 		
 		if (size > 0) {
-			uf.setOriginalFileName(uf.getOriginalFileName());
+			uf.setOriginalFileName(originalFileName);
 			uf.setFileSize(size);
-			
 			uf.setNewFileName(getNewFileName(originalFileName, realPath, completePath));
+			uf.setExtension(originalFileName.substring(originalFileName.lastIndexOf(".") + 1));
 			
 			// 실제 파일을 저장시키는 문장
 			FileCopyUtils.copy(data, new File(realPath + uf.getNewFileName()));
@@ -41,7 +48,7 @@ public class UploadFileServiceImpl implements UploadFileService {
 		}
 		
 		System.out.println("======= 업로드 서비스단 종료 =======");
-		return result;
+		return uf;
 	}
 	
 	public static String makeCalculatePath(String realPath) {
@@ -50,8 +57,6 @@ public class UploadFileServiceImpl implements UploadFileService {
 		String monthStr = "0" + (cal.get(Calendar.MONTH) + 1);
 		String month = year + File.separator + monthStr.substring(monthStr.length() - 2);
 		String date = month + File.separator + new DecimalFormat("00").format(cal.get(Calendar.DATE));
-		
-		System.out.println(realPath + date);
 		
 		makeDirectroy(realPath, year, month, date);
 		
@@ -64,7 +69,7 @@ public class UploadFileServiceImpl implements UploadFileService {
 			for (String path : strings) {
 				File tmp = new File(realPath + path);
 				if (!tmp.exists()) {
-					tmp.mkdir();
+					tmp.mkdirs();
 				}
 			}
 		}
@@ -79,6 +84,29 @@ public class UploadFileServiceImpl implements UploadFileService {
 		
 		return completePath.substring(realPath.length()) + File.separator + newFileName;
 	}
-	
-	
+
+	@Override
+	public void deleteFile(UploadFiles uf, String realPath) {
+		System.out.println("======= 업로드 서비스단 - 업로드 파일 삭제 =======");
+		
+		File file = new File(realPath + uf.getNewFileName());
+		if (file.exists()) {
+			file.delete();
+		}
+		
+		System.out.println("======= 업로드 서비스단 종료 =======");
+	}
+
+	@Override
+	public boolean isExist(UploadFiles uf) throws SQLException, NamingException {
+		System.out.println("======= 업로드 서비스단 - 업로드 파일 유무 조회 =======");
+		boolean result = false;
+		
+		if (uDao.selectUploadFile(uf) != null) {
+			result = true;
+		}
+		
+		System.out.println("======= 업로드 서비스단 종료 =======");
+		return result;
+	}
 }

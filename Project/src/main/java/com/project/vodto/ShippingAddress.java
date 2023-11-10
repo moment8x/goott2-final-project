@@ -14,6 +14,8 @@ import lombok.ToString;
 public class ShippingAddress {
 	private int addrSeq;
 	private String memberId;
+	private String recipient;
+	private String recipientContact;
 	private String zipCode;
 	private String address;
 	private String detailAddress;

@@ -23,7 +23,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.project.service.kjs.upload.UploadFileService;
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
-import com.project.vodto.UploadFile;
+import com.project.vodto.UploadFiles;
 
 
 @Controller
@@ -36,7 +36,7 @@ public class RegisterController {
 	private UploadFileService ufService;
 	
 //	private UploadFile file = new UploadFile();
-	private UploadFile file = null;
+	private UploadFiles file = null;
 	
 	@RequestMapping("register")
 	public ModelAndView moveRegister() {
@@ -79,6 +79,9 @@ public class RegisterController {
 		System.out.println("======= 회원가입 컨트롤러 - 회원가입 =======");
 		
 		try {
+			System.out.println("zipCode : " + member.getZipCode());
+			System.out.println("address : " + member.getAddress());
+			System.out.println("detailAddress : " + member.getDetailedAddress());
 			mService.insertMember(member, file);
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
@@ -88,7 +91,7 @@ public class RegisterController {
 	}
 	
 	@RequestMapping(value="uploadFile", method=RequestMethod.POST)
-	public @ResponseBody UploadFile uploadFile(HttpServletRequest request, MultipartFile uploadFile) {
+	public @ResponseBody UploadFiles uploadFile(HttpServletRequest request, MultipartFile uploadFile) {
 		System.out.println("======= 회원가입 컨트롤러 - 프로필 사진 등록 =======");
 		
 		// 1. 파일이 저장될 경로 확인
@@ -96,14 +99,33 @@ public class RegisterController {
 		
 		try {
 			// 2. 파일 업로드
+			if (file != null) {
+				// 기존 파일 삭제. 단, DB에 저장된 파일일 경우 삭제X
+				if (!ufService.isExist(file)) {
+					ufService.deleteFile(file, realPath);
+				}
+			}
+			// 새 파일 업로드.
 			file = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(), 
 					uploadFile.getContentType(), uploadFile.getBytes(), realPath);
-			
-		} catch (IOException e) {
+		} catch (IOException | SQLException | NamingException e) {
 			e.printStackTrace();
 		}
 		
 		System.out.println("======= 회원가입 컨트롤러 끝 =======");
 		return file;
+	}
+	
+	@RequestMapping("refreshFile")
+	public void refreshFile(HttpServletRequest request) {
+		System.out.println("======= 회원가입 컨트롤러 - 프로필 사진 초기화 =======");
+		
+		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
+		
+		if (file != null) {
+			ufService.deleteFile(file, realPath);
+		}
+		
+		System.out.println("======= 회원가입 컨트롤러 끝 =======");
 	}
 }

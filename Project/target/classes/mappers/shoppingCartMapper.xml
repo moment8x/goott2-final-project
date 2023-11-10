@@ -7,13 +7,45 @@
 	<insert id="insertShoppingCartNon">
 		INSERT INTO shopping_cart(non_member_id, product_id, member_check) VALUES(#{nonMemberId}, #{productId}, 0)
 	</insert>
+	<insert id="insertShoppingCart">
+		INSERT INTO shopping_cart(member_id, product_id, member_check) VALUES(#{memberId}, #{productId}, 1)
+	</insert>
 	<select id="selectNonMemberShoppingCart" resultType="com.project.vodto.ShoppingCart">
 		SELECT * FROM shopping_cart WHERE non_member_id = #{nonMemberId}
 	</select>
 	<select id="selectMemberShoppingCart" resultType="com.project.vodto.ShoppingCart">
 		SELECT * FROM shopping_cart WHERE member_id = #{memberId}
 	</select>
-	<select id="deleteNonMemberCartItem" resultType="com.project.vodto.ShoppingCart">
+	<delete id="deleteNonMemberCartItem">
 		DELETE FROM shopping_cart WHERE non_member_id = #{nonMemberId} AND product_id = #{productId}
+	</delete>
+	<delete id="deleteMemberCartItem">
+		DELETE FROM shopping_cart WHERE member_id = #{memberId} AND product_id = #{productId}
+	</delete>
+	<select id="getNonMemberShoppingCart" resultType="com.project.vodto.kjs.ShowCartDTO">
+		SELECT sc.non_member_id, sc.product_id, prod_img.product_image, p.product_name, p.selling_price 
+		FROM products p 
+		INNER JOIN shopping_cart sc 
+		ON sc.product_id = p.product_id 
+		INNER JOIN product_images prod_img 
+		ON prod_img.product_id = p.product_id 
+		WHERE sc.non_member_id = #{nonMemberId} 
+		GROUP BY product_id;
+	</select>
+	<select id="getMemberShoppingCart" resultType="com.project.vodto.kjs.ShowCartDTO">
+		SELECT sc.member_id, sc.product_id, prod_img.product_image, p.product_name, p.selling_price 
+		FROM products p 
+		INNER JOIN shopping_cart sc 
+		ON sc.product_id = p.product_id 
+		INNER JOIN product_images prod_img 
+		ON prod_img.product_id = p.product_id 
+		WHERE sc.member_id = #{memberId} 
+		GROUP BY product_id;
+	</select>
+	<select id="countListNon" resultType="_int">
+		SELECT count(*) FROM shopping_cart WHERE non_member_id = #{nonMemberId}
+	</select>
+	<select id="countList" resultType="_int">
+		SELECT count(*) FROM shopping_cart WHERE member_id = #{memberId}
 	</select>
 </mapper>

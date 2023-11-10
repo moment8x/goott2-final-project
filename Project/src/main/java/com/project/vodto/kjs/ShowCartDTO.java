@@ -1,6 +1,4 @@
-package com.project.vodto;
-
-import java.sql.Timestamp;
+package com.project.vodto.kjs;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,11 +11,11 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ShoppingCart {
-	private int shoppingCartSeq;
-	private String nonMemberId;
+public class ShowCartDTO {
 	private String memberId;
 	private String productId;
-	private int memberCheck;
-	private Timestamp registrationDate;
+	private String nonMemberId;
+	private String productImage;
+	private String productName;
+	private int sellingPrice;
 }

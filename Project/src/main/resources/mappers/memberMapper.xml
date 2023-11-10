@@ -89,21 +89,27 @@
 	<insert id="insertMember">
 		<choose>
 			<when test='#{phoneNumber} != null and #{cellPhoneNumber} != null'>
-				INSERT INTO member(member_id, password, name, phone_number, cell_phone_number, date_of_birth, email, gender) 
-				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender})
+				INSERT INTO member(member_id, password, name, phone_number, cell_phone_number, date_of_birth, email, gender, zip_code, address, detailed_address) 
+				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress})
 			</when>
 			<when test="#{phoneNumber} != null and #{cellPhoheNumber} == null">
-				INSERT INTO member(member_id, password, name, phone_number, date_of_birth, email, gender) 
-				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{dateOfBirth}, #{email}, #{gender})
+				INSERT INTO member(member_id, password, name, phone_number, date_of_birth, email, gender, zip_code, address, detailed_address) 
+				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress})
 			</when>
 			<otherwise>
-				INSERT INTO member(member_id, password, name, cell_phone_number, date_of_birth, email, gender) 
-				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender})
+				INSERT INTO member(member_id, password, name, cell_phone_number, date_of_birth, email, gender, zip_code, address, detailed_address) 
+				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress})
 			</otherwise>
 		</choose>
 	</insert>
 	<select id="login" resultType="com.project.vodto.Member">
 		SELECT * FROM member WHERE member_id = #{memberId} AND password = sha1(md5(#{password}))
 	</select>
+	<update id="updateProfile">
+		<selectKey keyProperty="ufSeq" resultType="_int" order="BEFORE">
+			SELECT upload_files_seq FROM upload_files WHERE new_file_name = #{newFileName}
+		</selectKey>
+		UPDATE member SET profile_image = #{ufSeq} where member_id = #{memberId}
+	</update>
 	<!-- =========================== 김진솔 끝 =========================== -->
 </mapper>

@@ -6,9 +6,11 @@ import javax.inject.Inject;
 import javax.naming.NamingException;
 
 import org.apache.ibatis.session.SqlSession;
+import org.springframework.stereotype.Repository;
 
-import com.project.vodto.UploadFile;
+import com.project.vodto.UploadFiles;
 
+@Repository
 public class UploadDAOImpl implements UploadDAO {
 
 	@Inject
@@ -17,10 +19,19 @@ public class UploadDAOImpl implements UploadDAO {
 	String ns = "com.project.mappers.uploadFileMapper";
 	
 	@Override
-	public int insertUploadFile(UploadFile file) throws SQLException, NamingException {
+	public int insertUploadFile(UploadFiles file) throws SQLException, NamingException {
 		System.out.println("======= 파일 업로드 DAO - insert file upload =======");
 		
 		return session.insert(ns + ".insertFile", file);
+	}
+
+	@Override
+	public Integer selectUploadFile(UploadFiles file) throws SQLException, NamingException {
+		System.out.println("======= 파일 업로드 DAO - select file upload =======");
+		
+		file.setNewFileName(file.getNewFileName().replace("\\", "\\\\"));
+		
+		return session.selectOne(ns + ".isExist", file);
 	}
 
 }

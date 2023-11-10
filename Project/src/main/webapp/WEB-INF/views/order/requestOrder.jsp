@@ -16,22 +16,55 @@
 <script>
 	$(function() {
 
-		$("#non_order_no").val(orderId);
-		$("#non_member_id").val("1232123");
-		$("#zip_code").val("12321");
-		$("#delivery_status").val("출고전");
-	});
+		$("#nonOrderNo").val(orderId);
+		$("#nonMemberId").val("1232123");
 	
-
+		$("#deliveryStatus").val("출고전");
+		
+		// discountAmount에 쿠폰도 넣어야함
+		//let discountAmount = (Number($("#points").val())) + (Number($("#reward").val()));	
+		
+	});
+		
+		//$("#subTotal").val();
+	
+	let totalAmount = Number('${requestScope.paymentInfo.totalAmount}');
+	let viewTotalAmount = Number('${requestScope.paymentInfo.totalAmount}');
+	let shippingFee = '${requestScope.paymentInfo.shippingFee}';
 	let IMP = window.IMP;
 	IMP.init("${impKey}") // 예: 'imp00000000a'
 	let isPaid = false;
 	let orderId = ('${requestScope.orderId}');
 	//console.log(orderId);
+	let product = new Object();
+	let product2 = [];
+	let product3 = [];
 	function getOrderId() {
 
-		console.log(orderId);
-		console.log($("#non_order_no").val());
+		
+
+		console.log($("#nonOrderNo").val());
+		
+		let itemLen = $(".summery-contain").find("li").length; // 2
+		for(i=0; i<itemLen; i++) {
+			let product = new Object();
+		}
+
+		
+		console.log(product2);
+		console.log(product3);
+		//console.log(itemLen);
+		for(i=0; i<itemLen; i++) { 
+			product.nonOrderNo = orderId;
+			product.productId = $(".summery-contain").find("li").eq(i).attr("id");
+			
+			product.productStatus = $("#deliveryStatus").val(),
+			products2[i] = product; 
+		}
+		
+		ob = {
+				
+		}
 		
 	}
 		
@@ -86,21 +119,21 @@
 					
 					// 결제 내역 저장 ajax
 					obj = {
-						"payment_number" : rsp.imp_uid, // 결제번호
-						"non_order_no" : rsp.merchant_uid, // 주문번호
-						"payment_method" : rsp.pay_method, // 결제수단
-						"total_amount" : rsp.paid_amount, // 총 상품 금액, 수정 필요
-						"shipping_fee" : 0, // 배송비
-						"used_points" : 0, // 사용한 포인트
-						"used_reward" : 0, // 사용한 적립금
-						"actual_payment_amount" : data.response.amount, // 실 결제 금액
-						"payment_time" : data.response.paidAt,// 결제 시각
-						"amount_to_pay" : rsp.paid_amount,
-						"product_id" : products,
-						"product_price" : price,
-						"card_name" : data.response.cardName,
-						"card_number" : data.response.cardNumber,
-						"recipient_name" : $("#recipient_name").val(),
+						"paymentNumber" : rsp.imp_uid, // 결제번호
+						"nonOrderNo" : rsp.merchant_uid, // 주문번호
+						"paymentMethod" : rsp.pay_method, // 결제수단
+						"totalAmount" : rsp.paid_amount, // 총 상품 금액, 수정 필요
+						"shippingFee" : 0, // 배송비
+						"usedPoints" : 0, // 사용한 포인트
+						"usedReward" : 0, // 사용한 적립금
+						"actualPaymentAmount" : data.response.amount, // 실 결제 금액
+						"paymentTime" : data.response.paidAt,// 결제 시각
+						"amountToPay" : rsp.paid_amount,
+						"productId" : products,
+						"productPrice" : price,
+						"cardName" : data.response.cardName,
+						"cardNumber" : data.response.cardNumber,
+						"recipientName" : $("#recipientName").val(),
 						
 
 					// 선택한 상품 보내줘야함
@@ -201,36 +234,36 @@
 			if (payMethod == "bkt") {
 				let bktPayNo = "bkt"
 						+ ((String(new Date().getTime())).substring(1));
-				$("#delivery_status").val("입금전");
+				$("#deliveryStatus").val("입금전");
 				
-				// 상품이 2개면
+				
 				products = [{
-					"non_order_no" : orderId,
-					"product_id" : 1,
-					"product_price" : 2,
-					"product_quantity" : 3,
-					"product_status" : $("#delivery_status").val(),
+					"nonOrderNo" : orderId,
+					"product_id" : S000210833411,
+					"product_price" : 16650,
+					"product_quantity" : 2,
+					"product_status" : $("#deliveryStatus").val(),
 					
 			},{
-				"non_order_no" : orderId,
-				"product_id" : 4,
+				"nonOrderNo" : orderId,
+				"product_id" : S000210833273,
 				"product_price" : 5,
 				"product_quantity" : 6,
-				"product_status" : $("#delivery_status").val(),
-
-				
+				"product_status" : $("#deliveryStatus").val(),
 			},];
+				
+				
 				obj = {
-					"payment_number" : bktPayNo, // 결제번호 생성 코드 필요
-					"non_order_no" : orderId, // 주문번호
-					"payment_method" : payMethod, // 결제수단
-					"total_amount" : 200, // 총 상품 금액, 수정 필요
-					"shipping_fee" : 0, // 배송비
-					"used_points" : 0, // 사용한 포인트
-					"used_reward" : 0, // 사용한 적립금
-					"amount_to_pay" : 200, // (total+배송비-포인트-적립금)
-					"actual_payment_amount" : 0, // 실 결제 금액(무통장입금은 default 0)
-					"recipient_name" : $("#recipient_name").val(),
+					"paymentNumber" : bktPayNo, // 결제번호 생성 코드 필요
+					"nonOrderNo" : orderId, // 주문번호
+					"paymentMethod" : payMethod, // 결제수단
+					"totalAmount" : 200, // 총 상품 금액, 수정 필요
+					"shippingFee" : 0, // 배송비
+					"usedPoints" : 0, // 사용한 포인트
+					"usedReward" : 0, // 사용한 적립금
+					"amountToPay" : 200, // (total+배송비-포인트-적립금)
+					"actualPaymentAmount" : 0, // 실 결제 금액(무통장입금은 default 0)
+					"recipientName" : $("#recipientName").val(),
 					products,
 					
 				};
@@ -246,7 +279,7 @@
 						
 						isPaid = true;
 						console.log(result);
-
+						
 						if (isPaid) {
 							// 주문 완료 페이지에 필요한 것
 							$("#requestOrder").submit();
@@ -264,10 +297,105 @@
 		}
 	}
 
+	function changeAddr() {
+		let checkVal = $('input[name=jack]:checked').val();
+		$('#recipient').text($('#recipient'+checkVal).text());
+		$('#address').text($('#address'+checkVal).text());
+		$('#detailAddress').text($('#detailAddress'+checkVal).text());
+		$('#zipCode').text($('#zipCode'+checkVal).text());
+		$('#recipientContact').text($('#recipientContact'+checkVal).text());
+		$("#myAddrModal").hide();
+	}
+	
+	function showAddrModal() {
+		$("#myAddrModal").show();
+	}
+	
+	let rewardBtn = 0;
+	function applyRewards() {
+	let myRewards = Number($('#totalRewards').text());
+		if(viewTotalAmount == 0 && rewardBtn == 0) {
+			alert('더이상 차감할 금액이 없습니다.');
+			return;
+		}
+		if(rewardBtn == 0) {
+			
+			if(myRewards > viewTotalAmount) {
+				$('#usingRewards').val(viewTotalAmount);
+				$('#totalRewards').text(myRewards - viewTotalAmount);
+				viewTotalAmount = 0;
+			} else {
+				$('#usingRewards').val(myRewards);
+				$('#totalRewards').text("");
+				viewTotalAmount = totalAmount - myRewards;
+			}
+			rewardBtn = 1;
+		} else {
+			$('#totalRewards').text(myRewards + Number($('#usingRewards').val()));
+			$('#usingRewards').val("");
+			viewTotalAmount = totalAmount;
+			rewardBtn = 0;
+		}
+		
+	}
+	let pointBtn = 0;
+	function applyPoints() {
+	let myPoints = Number($('#totalPoints').text());
+	if(viewTotalAmount == 0 && pointBtn == 0) {
+		alert('더이상 차감할 금액이 없습니다.');
+		return;
+	}
+		if(pointBtn == 0) {
+			// 처음 눌렀을 때
+			if(myPoints > viewTotalAmount) {
+				// 구매가격보다 포인트가 많을 때
+				$('#usingPoints').val(viewTotalAmount);
+				$('#totalPoints').text(myPoints - viewTotalAmount);
+				viewTotalAmount = 0;
+			
+			} else {
+				// 구매가격보다 포인트가 적을 때
+				$('#usingPoints').val(myPoints);
+				$('#totalPoints').text("");
+				viewTotalAmount = totalAmount - myPoints;
+			}
+			pointBtn = 1;
+		} else {
+			// 전액사용 되돌리기
+			$('#totalPoints').text(myPoints + Number($('#usingPoints').val()));
+			$('#usingPoints').val("");
+			viewTotalAmount = totalAmount;
+			pointBtn = 0;
+			 
+		}
+	
+	}
+	function checkNumber() {
+		
+		let check = /^[0-9]+$/; 
+		if (!check.test($('#usingRewards').val())) {
+		    console.log("숫자만 입력 가능합니다.");
+		}
+	}
+
+	function inputRewards() {
+		
+		if($('#usingRewards').val() == "") {
+			alert("사용하실 적립금을 입력해주세요");
+			$("input:checkbox[name='checkRewards']").prop("checked", false);
+		} 
+	}
+	
 	//function createBktPaymentNo() {
 	//	return 'bkt' + (new Date().getTime()).substring(1);
 	//}
 </script>
+<style>
+#iframeSon {
+	width: 100%;
+	background-color: white;
+}
+</style>
 </head>
 <body>
 	<jsp:include page="../header.jsp"></jsp:include>
@@ -322,248 +450,309 @@
 	<!-- Breadcrumb Section End -->
 	<!-- Checkout section Start -->
 	<section class="checkout-section-2 section-b-space">
-		<div>${requestScope.productInfos }</div>
-		<form action="orderComplete" method="post" id="requestOrder">
-			<input type="hidden" name="non_order_no" id="non_order_no" value="">
-			<input type="hidden" name="non_member_id" value="" id="non_member_id"><input
-				type="hidden" name="zip_code" value="" id="zip_code"><input
-				type="hidden" name="delivery_status" id="delivery_status" value="">
-			<div class="container-fluid-lg">
-				<div class="row g-sm-4 g-3">
-					<div class="col-lg-8">
-						<div class="left-sidebar-checkout">
-							<div class="checkout-detail-box">
-								<ul>
-									<li>
-										<div class="checkout-icon">
-											<lord-icon target=".nav-item"
-												src="https://cdn.lordicon.com/ggihhudh.json"
-												trigger="loop-on-hover"
-												colors="primary:#121331,secondary:#646e78,tertiary:#0baf9a"
-												class="lord-icon"> </lord-icon>
-										</div>
-										<div class="checkout-box">
-											<div class="checkout-title">
-												<h4>정보 입력</h4>
-											</div>
+		<div class="container-fluid-lg">
+			<div class="row g-sm-4 g-3">
+				<div class="col-lg-8">
+					<div class="left-sidebar-checkout">
+						<div class="checkout-detail-box">
+							<ul>
+								<li>
+									<div class="checkout-icon">
+										<lord-icon target=".nav-item"
+											src="https://cdn.lordicon.com/ggihhudh.json"
+											trigger="loop-on-hover"
+											colors="primary:#121331,secondary:#646e78,tertiary:#0baf9a"
+											class="lord-icon"> </lord-icon>
+									</div>
 
-											<div class="checkout-detail">
-												<div class="row g-4">
-													<div class="col-xxl-6 col-lg-12 col-md-6">
-														<div class="delivery-address-box">
-															<div>
-																<!--<div class="form-check">
-																<input class="form-check-input" type="radio" name="jack"
-																	id="flexRadioDefault1">
-															</div>
+									<div class="checkout-box">
+										<div class="checkout-title">
+											<h4>배송지</h4>
+											<!-- 모달 시작 -->
+											<!-- Button to Open the Modal -->
+											<button onclick="showAddrModal()" type="button"
+												class="btn btn-primary" data-bs-toggle="modal"
+												data-bs-target="myAddrModal">다른 배송지</button>
 
-															  <div class="label">
-																<label>기본 배송지</label>
-															</div>
-															<li>
-																	<h4 class="fw-500"><input  style="border:none" value="집"></h4>
-																</li>
-															-->
+											<!-- The Modal -->
+											<div class="modal" id="myAddrModal">
+												<div class="modal-dialog">
+													<div class="modal-content">
 
-																<ul class="delivery-address-detail">
+														<!-- Modal Header -->
+														<div class="modal-header">
+															<h4 class="modal-title">Modal Heading</h4>
+															<button type="button" class="btn-close"
+																data-bs-dismiss="modal"></button>
+														</div>
 
+														<!-- Modal body -->
+														<div class="modal-body">
+															<div class="checkout-detail">
+																<c:forEach var="addr"
+																	items="${requestScope.shippingAddr }"
+																	varStatus="status">
+																	<div class="row g-4">
+																		<div class="col-xxl-6 col-lg-12 col-md-6">
+																			<div class="delivery-address-box">
+																				<div>
+																					<div class="form-check">
+																						<input class="form-check-input" type="radio"
+																							name="jack" id="${status.index }"
+																							value="${status.index }">
+																					</div>
 
-																	<li>
-																		<h6 class="text-content">
-																			<span class="text-title"> 주소 : </span><input
-																				name="shipping_address">
+																					<div class="label">
+																						<label>${addr.recipient }</label>
+																					</div>
 
-																		</h6>
-																	</li>
-																	<li>
-																		<h6 class="text-content">
+																					<ul class="delivery-address-detail">
+																						<li>
+																							<h4 class="fw-500" id="recipient${status.index }">${addr.recipient }</h4>
+																						</li>
 
-																			<span class="text-title">상세주소:</span><input
-																				name="detailed_shipping_address">
-																		</h6>
-																	</li>
+																						<li>
+																							<p class="text-content"
+																								id="address${status.index }">
+																								<span class="text-title">주소 : </span>${addr.address }</p>
+																							<p id="detailAddress${status.index }">${addr.detailAddress }
+																							</p>
+																						</li>
 
-																	<li>
-																		<h6 class="text-content">
-																			<span class="text-title">수령인: </span> <input
-																				id="recipient_name" name="recipient_name">
-																		</h6>
-																	</li>
+																						<li>
+																							<h6 class="text-content"
+																								id="zipCode${status.index }">
+																								<span class="text-title">우편번호 :</span>
+																								${addr.zipCode }
+																							</h6>
+																						</li>
 
-																	<li>
-																		<h6 class="text-content mb-0">
-																			<span class="text-title">휴대폰: </span> <input
-																				name="recipient_phone_number">
-
-																		</h6>
-																	</li>
-																	<li>
-																		<h6 class="text-content mb-0">
-																			<span class="text-title">비밀번호: </span> <input
-																				type="password" name="non_password">
-
-																		</h6>
-																	</li>
-																	<li>
-																		<h6 class="text-content mb-0">
-																			<span class="text-title">이메일: </span> <input
-																				name="non_email">
-
-																		</h6>
-																	</li>
-																	<li>
-																		<div class="col-12">
-																			<div class="select-option">
-																				<div class="form-floating theme-form-floating">
-																					<select class="form-select theme-form-select"
-																						aria-label="Default select example"
-																						name="delivery_message">
-																						<option value="없음">배송메시지를 선택해 주세요.</option>
-																						<option>배송 전 연락주세요.</option>
-																						<option>부재 시 연락주세요.</option>
-																						<option>부재 시 경비실에 맡겨주세요.</option>
-																						<option>문 앞에 놓아주세요.</option>
-																						<option>직접입력</option>
-																					</select>
+																						<li>
+																							<h6 class="text-content mb-0"
+																								id="recipientContact${status.index }">
+																								<span class="text-title">휴대폰 :</span>
+																								${addr.recipientContact }
+																							</h6>
+																						</li>
+																					</ul>
 																				</div>
 																			</div>
+
 																		</div>
-																	</li>
-																	<li><input type="text" class="form-control"
-																		id="directInput" placeholder=""></li>
-																</ul>
 
 
-
+																	</div>
+																</c:forEach>
 															</div>
+														</div>
+
+														<!-- Modal footer -->
+														<div class="modal-footer">
+															<button type="button" class="btn btn-danger"
+																data-bs-dismiss="modal">Close</button>
+															<button type="button" class="btn btn-primary"
+																data-bs-dismiss="modal">작성</button>
+															<button type="button" class="btn btn-success"
+																onclick="changeAddr()">변경</button>
 
 														</div>
 
-
-
 													</div>
+												</div>
+											</div>
+											<!-- 모달 끝 -->
 
-													<!--  <div class="col-xxl-6 col-lg-12 col-md-6">
+										</div>
+
+										<div class="checkout-detail">
+											<div class="row g-4">
+												<div class="col-xxl-6 col-lg-12 col-md-6">
 													<div class="delivery-address-box">
 														<div>
 															<div class="form-check">
 																<input class="form-check-input" type="radio" name="jack"
-																	id="flexRadioDefault2" checked="checked">
+																	id="flexRadioDefault1">
 															</div>
 
 															<div class="label">
-																<label>Office</label>
+																<label id="recipientLabel">${requestScope.basicAddr.recipient }</label>
 															</div>
 
 															<ul class="delivery-address-detail">
 																<li>
-																	<h4 class="fw-500">Jack Jennas</h4>
+																	<h4 class="fw-500" id="recipient">${requestScope.basicAddr.recipient }</h4>
 																</li>
 
 																<li>
-																	<p class="text-content">
-																		<span class="text-title">Address :</span>Nakhimovskiy
-																		R-N / Lastovaya Ul., bld. 5/A, appt. 12
+																	<p class="text-content" id="address">
+																		<span class="text-title">주소 : </span>${requestScope.basicAddr.address }</p>
+																	<p id="detailAddress">${requestScope.basicAddr.detailAddress }
 																	</p>
 																</li>
 
 																<li>
-																	<h6 class="text-content">
-																		<span class="text-title">Pin Code :</span> +380
+																	<h6 class="text-content" id="zipCode">
+																		<span class="text-title">우편번호 :</span>
+																		${requestScope.basicAddr.zipCode }
 																	</h6>
 																</li>
 
 																<li>
-																	<h6 class="text-content mb-0">
-																		<span class="text-title">Phone :</span> + 380 (0564)
-																		53 - 29 - 68
+																	<h6 class="text-content mb-0" id="recipientContact">
+																		<span class="text-title">휴대폰 :</span>
+																		${requestScope.basicAddr.recipientContact }
 																	</h6>
 																</li>
 															</ul>
 														</div>
 													</div>
 												</div>
-												-->
+
+												<!--  <div class="col-xxl-6 col-lg-12 col-md-6">
+                                                    <div class="delivery-address-box">
+                                                        <div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="jack"
+                                                                    id="flexRadioDefault2" checked="checked">
+                                                            </div>
+
+                                                            <div class="label">
+                                                                <label>Office</label>
+                                                            </div>
+
+                                                            <ul class="delivery-address-detail">
+                                                                <li>
+                                                                    <h4 class="fw-500">Jack Jennas</h4>
+                                                                </li>
+
+                                                                <li>
+                                                                    <p class="text-content"><span
+                                                                            class="text-title">Address
+                                                                            :</span>Nakhimovskiy R-N / Lastovaya Ul.,
+                                                                        bld. 5/A, appt. 12
+                                                                    </p>
+                                                                </li>
+
+                                                                <li>
+                                                                    <h6 class="text-content"><span
+                                                                            class="text-title">Pin Code :</span>
+                                                                        +380</h6>
+                                                                </li>
+
+                                                                <li>
+                                                                    <h6 class="text-content mb-0"><span
+                                                                            class="text-title">Phone
+                                                                            :</span> + 380 (0564) 53 - 29 - 68</h6>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>-->
+											</div>
+										</div>
+									</div>
+								</li>
+
+								<li>
+									<div class="checkout-icon">
+										<lord-icon target=".nav-item"
+											src="https://cdn.lordicon.com/oaflahpk.json"
+											trigger="loop-on-hover" colors="primary:#0baf9a"
+											class="lord-icon"> </lord-icon>
+									</div>
+									<div class="checkout-box">
+										<div class="checkout-title">
+											<h4>Delivery Option</h4>
+										</div>
+
+										<div class="checkout-detail">
+											<div class="row g-4">
+												<div class="col-xxl-6">
+													<div class="delivery-option">
+														<div class="delivery-category">
+															<div class="shipment-detail">
+																<div class="form-check custom-form-check hide-check-box">
+																	<c:choose>
+																		<c:when test="${requestScope.couponInfos == 'N' }">
+																			<input class="form-check-input" type="checkbox"
+																				name="standard" id="standard" readonly>
+																			<label class="form-check-label" for="standard">보유한
+																				쿠폰이 없습니다.</label>
+																		</c:when>
+																		<c:otherwise>
+																			<input class="form-check-input" type="checkbox"
+																				name="standard" id="standard" readonly>
+																			<label class="form-check-label" for="standard">적용할
+																				쿠폰 선택</label>
+																		</c:otherwise>
+																	</c:choose>
+																</div>
+															</div>
+														</div>
+													</div>
 												</div>
-											</div>
-										</div>
-									</li>
-
-									<li>
-										<div class="checkout-icon">
-											<lord-icon target=".nav-item"
-												src="https://cdn.lordicon.com/oaflahpk.json"
-												trigger="loop-on-hover" colors="primary:#0baf9a"
-												class="lord-icon"> </lord-icon>
-										</div>
-										<div class="checkout-box">
-											<div class="checkout-title">
-												<h4>Delivery Option</h4>
-											</div>
-
-											<div class="checkout-detail">
-												<div class="row g-4">
-													<div class="col-xxl-6">
-														<div class="delivery-option">
-															<div class="delivery-category">
-																<div class="shipment-detail">
-																	<div
-																		class="form-check custom-form-check hide-check-box">
-																		<!--  <input class="form-check-input" type="radio"
-																		name="standard" id="standard" checked>-->
-																		<label class="form-check-label" for="standard">적용
-																			가능한 쿠폰이 없습니다.</label>
-																	</div>
+												<div class="col-xxl-6">
+													<div class="delivery-option">
+														<div class="delivery-category">
+															<div class="shipment-detail">
+																<div class="form-check custom-form-check hide-check-box">
+																	<c:choose>
+																		<c:when
+																			test="${requestScope.member.totalPoints == '0' }">
+																			<input class="form-check-input" type="checkbox"
+																				name="standard" id="standard" readonly>
+																			<label class="form-check-label" for="standard">보유한
+																				포인트가 없습니다.</label>
+																		</c:when>
+																		<c:otherwise>
+																			<input class="form-check-input" type="checkbox"
+																				name="standard" id="standard" readonly>
+																			<label class="form-check-label" for="standard">보유
+																				포인트 <span id="totalPoints">${requestScope.member.totalPoints}</span>
+																				&nbsp;&nbsp;&nbsp;
+																			</label>
+																			<input id="usingPoints" value="">
+																			<label><button onclick="applyPoints()"
+																					style="background-color: #0da487; color: white;">전액사용</button></label>
+																		</c:otherwise>
+																	</c:choose>
 																</div>
 															</div>
 														</div>
 													</div>
-
-													<div class="container mt-3">
-
-														<table class="table table-borderless">
-
-															<tbody>
-																<tr>
-																	<td>보유 포인트</td>
-																	<td>0</td>
-																	<td><input name="points"></td>
-																	<td><button>전액사용</button></td>
-																</tr>
-																<tr>
-																	<td>보유 적립금</td>
-																	<td>0</td>
-																	<td><input name="reward"></td>
-																	<td><button>전액사용</button></td>
-																</tr>
-
-															</tbody>
-														</table>
-													</div>
-
-
-													<div class="row g-4">
-														<div class="col-xxl-6">
-															<div class="delivery-option">
-																<div class="delivery-category">
-																	<div class="shipment-detail">
-																		<div
-																			class="form-check custom-form-check hide-check-box">
-																			<input class="form-check-input" type="radio"
-																				name="coupon" id="standard" checked> <label
-																				class="form-check-label btn" for="standard"
-																				data-bs-toggle="collapse" href="#collapseOne">적용
-																				가능한 쿠폰이 없습니다.</label>
-																		</div>
-																	</div>
+												</div>
+												<div class="col-xxl-6">
+													<div class="delivery-option">
+														<div class="delivery-category">
+															<div class="shipment-detail">
+																<div class="form-check custom-form-check hide-check-box">
+																	<c:choose>
+																		<c:when
+																			test="${requestScope.member.totalRewards == '0' }">
+																			<input class="form-check-input" type="checkbox"
+																				name="standard" id="standard" readonly>
+																			<label class="form-check-label" for="standard">보유한
+																				적립금이 없습니다.</label>
+																		</c:when>
+																		<c:otherwise>
+																			<input class="form-check-input" type="checkbox"
+																				name="checkRewards" id="standard" onclick="inputRewards()" readonly>
+																			<label class="form-check-label" for="standard">보유
+																				적립금 <span id="totalRewards">${requestScope.member.totalRewards }</span>
+																				&nbsp;&nbsp;&nbsp;
+																			</label>
+																			<input id="usingRewards" value="">
+																			<label><button onclick="applyRewards()"
+																					style="background-color: #0da487; color: white;">전액사용</button></label>
+																		</c:otherwise>
+																	</c:choose>
 																</div>
 															</div>
-
 														</div>
+													</div>
+												</div>
 
-
-
-														<!--<div class="col-xxl-6">
+												<!--  <div class="col-xxl-6">
 													<div class="delivery-option">
 														<div class="delivery-category">
 															<div class="shipment-detail">
@@ -571,315 +760,325 @@
 																	class="form-check mb-0 custom-form-check show-box-checked">
 																	<input class="form-check-input" type="radio"
 																		name="standard" id="future"> <label
-																		class="form-check-label" for="future">포인트/적립금</label>
+																		class="form-check-label" for="future">Future
+																		Delivery Option</label>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>-->
+
+												<!-- <div class="col-12 future-box">
+													<div class="future-option">
+														<div class="row g-md-0 gy-4">
+															<div class="col-md-6">
+																<div class="delivery-items">
+																	<div>
+																		<h5 class="items text-content">
+																			<span>3 Items</span>@ $693.48
+																		</h5>
+																		<h5 class="charge text-content">
+																			Delivery Charge $34.67
+																			<button type="button" class="btn p-0"
+																				data-bs-toggle="tooltip" data-bs-placement="top"
+																				title="Extra Charge">
+																				<i class="fa-solid fa-circle-exclamation"></i>
+																			</button>
+																		</h5>
+																	</div>
+																</div>
+															</div>
+
+															<div class="col-md-6">
+																<form class="form-floating theme-form-floating date-box">
+																	<input type="date" class="form-control"> <label>Select
+																		Date</label>
+																</form>
+															</div>
+															
+														</div>
+													</div>
+												</div>-->
+											</div>
+										</div>
+									</div>
+								</li>
+
+								<li>
+									<div class="checkout-icon">
+										<lord-icon target=".nav-item"
+											src="https://cdn.lordicon.com/qmcsqnle.json"
+											trigger="loop-on-hover"
+											colors="primary:#0baf9a,secondary:#0baf9a" class="lord-icon">
+										</lord-icon>
+									</div>
+									<div class="checkout-box">
+										<div class="checkout-title">
+											<h4>Payment Option</h4>
+										</div>
+
+										<div class="checkout-detail">
+											<div class="accordion accordion-flush custom-accordion"
+												id="accordionFlushExample">
+												<div class="accordion-item">
+													<div class="accordion-header" id="flush-headingFour">
+														<div class="accordion-button collapsed"
+															data-bs-toggle="collapse"
+															data-bs-target="#flush-collapseFour">
+															<div class="custom-form-check form-check mb-0">
+																<label class="form-check-label" for="cash"><input
+																	class="form-check-input mt-0" type="radio"
+																	name="flexRadioDefault" id="cash" checked> Cash
+																	On Delivery</label>
+															</div>
+														</div>
+													</div>
+													<div id="flush-collapseFour"
+														class="accordion-collapse collapse show"
+														data-bs-parent="#accordionFlushExample">
+														<div class="accordion-body">
+															<p class="cod-review">
+																Pay digitally with SMS Pay Link. Cash may not be
+																accepted in COVID restricted areas. <a
+																	href="javascript:void(0)">Know more.</a>
+															</p>
+														</div>
+													</div>
+												</div>
+
+												<div class="accordion-item">
+													<div class="accordion-header" id="flush-headingOne">
+														<div class="accordion-button collapsed"
+															data-bs-toggle="collapse"
+															data-bs-target="#flush-collapseOne">
+															<div class="custom-form-check form-check mb-0">
+																<label class="form-check-label" for="credit"><input
+																	class="form-check-input mt-0" type="radio"
+																	name="flexRadioDefault" id="credit"> Credit or
+																	Debit Card</label>
+															</div>
+														</div>
+													</div>
+													<div id="flush-collapseOne"
+														class="accordion-collapse collapse"
+														data-bs-parent="#accordionFlushExample">
+														<div class="accordion-body">
+															<div class="row g-2">
+																<div class="col-12">
+																	<div class="payment-method">
+																		<div
+																			class="form-floating mb-lg-3 mb-2 theme-form-floating">
+																			<input type="text" class="form-control" id="credit2"
+																				placeholder="Enter Credit & Debit Card Number">
+																			<label for="credit2">Enter Credit & Debit
+																				Card Number</label>
+																		</div>
+																	</div>
+																</div>
+
+																<div class="col-xxl-4">
+																	<div
+																		class="form-floating mb-lg-3 mb-2 theme-form-floating">
+																		<input type="text" class="form-control" id="expiry"
+																			placeholder="Enter Expiry Date"> <label
+																			for="expiry">Expiry Date</label>
+																	</div>
+																</div>
+
+																<div class="col-xxl-4">
+																	<div
+																		class="form-floating mb-lg-3 mb-2 theme-form-floating">
+																		<input type="text" class="form-control" id="cvv"
+																			placeholder="Enter CVV Number"> <label
+																			for="cvv">CVV Number</label>
+																	</div>
+																</div>
+
+																<div class="col-xxl-4">
+																	<div
+																		class="form-floating mb-lg-3 mb-2 theme-form-floating">
+																		<input type="password" class="form-control"
+																			id="password" placeholder="Enter Password"> <label
+																			for="password">Password</label>
+																	</div>
+																</div>
+
+																<div class="button-group mt-0">
+																	<ul>
+																		<li>
+																			<button class="btn btn-light shopping-button">Cancel</button>
+																		</li>
+
+																		<li>
+																			<button class="btn btn-animation">Use This
+																				Card</button>
+																		</li>
+																	</ul>
 																</div>
 															</div>
 														</div>
 													</div>
 												</div>
 
-
-													  <div class="col-12 future-box">
-														<div class="future-option">
-															<div class="row g-md-0 gy-4">
+												<div class="accordion-item">
+													<div class="accordion-header" id="flush-headingTwo">
+														<div class="accordion-button collapsed"
+															data-bs-toggle="collapse"
+															data-bs-target="#flush-collapseTwo">
+															<div class="custom-form-check form-check mb-0">
+																<label class="form-check-label" for="banking"><input
+																	class="form-check-input mt-0" type="radio"
+																	name="flexRadioDefault" id="banking">Net
+																	Banking</label>
+															</div>
+														</div>
+													</div>
+													<div id="flush-collapseTwo"
+														class="accordion-collapse collapse"
+														data-bs-parent="#accordionFlushExample">
+														<div class="accordion-body">
+															<h5 class="text-uppercase mb-4">Select Your Bank</h5>
+															<div class="row g-2">
 																<div class="col-md-6">
-																	<div class="delivery-items">
-																		<div>
-																			<h5 class="items text-content">
-																				<span>3 Items</span>@ $693.48
-																			</h5>
-																			<h5 class="charge text-content">
-																				Delivery Charge $34.67
-																				<button type="button" class="btn p-0"
-																					data-bs-toggle="tooltip" data-bs-placement="top"
-																					title="Extra Charge">
-																					<i class="fa-solid fa-circle-exclamation"></i>
-																				</button>
-																			</h5>
-																		</div>
+																	<div class="custom-form-check form-check">
+																		<input class="form-check-input mt-0" type="radio"
+																			name="flexRadioDefault" id="bank1"> <label
+																			class="form-check-label" for="bank1">Industrial
+																			& Commercial Bank</label>
 																	</div>
 																</div>
 
 																<div class="col-md-6">
-																	<form
-																		class="form-floating theme-form-floating date-box">
-																		<input type="date" class="form-control"> <label>Select
-																			Date</label>
-																	
+																	<div class="custom-form-check form-check">
+																		<input class="form-check-input mt-0" type="radio"
+																			name="flexRadioDefault" id="bank2"> <label
+																			class="form-check-label" for="bank2">Agricultural
+																			Bank</label>
+																	</div>
+																</div>
+
+																<div class="col-md-6">
+																	<div class="custom-form-check form-check">
+																		<input class="form-check-input mt-0" type="radio"
+																			name="flexRadioDefault" id="bank3"> <label
+																			class="form-check-label" for="bank3">Bank of
+																			America</label>
+																	</div>
+																</div>
+
+																<div class="col-md-6">
+																	<div class="custom-form-check form-check">
+																		<input class="form-check-input mt-0" type="radio"
+																			name="flexRadioDefault" id="bank4"> <label
+																			class="form-check-label" for="bank4">Construction
+																			Bank Corp.</label>
+																	</div>
+																</div>
+
+																<div class="col-md-6">
+																	<div class="custom-form-check form-check">
+																		<input class="form-check-input mt-0" type="radio"
+																			name="flexRadioDefault" id="bank5"> <label
+																			class="form-check-label" for="bank5">HSBC
+																			Holdings</label>
+																	</div>
+																</div>
+
+																<div class="col-md-6">
+																	<div class="custom-form-check form-check">
+																		<input class="form-check-input mt-0" type="radio"
+																			name="flexRadioDefault" id="bank6"> <label
+																			class="form-check-label" for="bank6">JPMorgan
+																			Chase & Co.</label>
+																	</div>
+																</div>
+
+																<div class="col-12">
+																	<div class="select-option">
+																		<div class="form-floating theme-form-floating">
+																			<select class="form-select theme-form-select"
+																				aria-label="Default select example">
+																				<option value="hsbc">HSBC Holdings</option>
+																				<option value="loyds">Lloyds Banking Group</option>
+																				<option value="natwest">Nat West Group</option>
+																				<option value="Barclays">Barclays</option>
+																				<option value="other">Others Bank</option>
+																			</select> <label>Select Other Bank</label>
+																		</div>
+																	</div>
 																</div>
 															</div>
 														</div>
-													</div>
-													-->
 													</div>
 												</div>
-											</div>
-										</div>
-									</li>
 
-									<li>
-										<div class="checkout-icon">
-											<lord-icon target=".nav-item"
-												src="https://cdn.lordicon.com/qmcsqnle.json"
-												trigger="loop-on-hover"
-												colors="primary:#0baf9a,secondary:#0baf9a" class="lord-icon">
-											</lord-icon>
-										</div>
-										<div class="checkout-box">
-											<div class="checkout-title">
-												<h4>Payment Option</h4>
-											</div>
-
-											<div class="checkout-detail">
-												<div class="accordion accordion-flush custom-accordion"
-													id="accordionFlushExample">
-													<div class="accordion-item">
-														<div class="accordion-header" id="flush-headingFour">
-															<div class="accordion-button collapsed"
-																data-bs-toggle="collapse"
-																data-bs-target="#flush-collapseFour">
-																<div class="custom-form-check form-check mb-0">
-																	<label class="form-check-label" for="cash"><input
-																		class="form-check-input mt-0" type="radio"
-																		name="payMethod" id="cash" checked> 신용카드</label>
-																</div>
-															</div>
-														</div>
-														<div id="flush-collapseFour"
-															class="accordion-collapse collapse show"
-															data-bs-parent="#accordionFlushExample">
-															<div class="accordion-body">
-																<p class="cod-review">
-																	Pay digitally with SMS Pay Link. Cash may not be
-																	accepted in COVID restricted areas. <a
-																		href="javascript:void(0)">Know more.</a>
-																</p>
+												<div class="accordion-item">
+													<div class="accordion-header" id="flush-headingThree">
+														<div class="accordion-button collapsed"
+															data-bs-toggle="collapse"
+															data-bs-target="#flush-collapseThree">
+															<div class="custom-form-check form-check mb-0">
+																<label class="form-check-label" for="wallet"><input
+																	class="form-check-input mt-0" type="radio"
+																	name="flexRadioDefault" id="wallet">My Wallet</label>
 															</div>
 														</div>
 													</div>
-
-													<div class="accordion-item">
-														<div class="accordion-header" id="flush-headingOne">
-															<div class="accordion-button collapsed"
-																data-bs-toggle="collapse"
-																data-bs-target="#flush-collapseOne">
-																<div class="custom-form-check form-check mb-0">
-																	<label class="form-check-label" for="credit"><input
-																		class="form-check-input mt-0" type="radio"
-																		name="payMethod" id="credit"> 카카오페이</label>
-																</div>
-															</div>
-														</div>
-														<div id="flush-collapseOne"
-															class="accordion-collapse collapse"
-															data-bs-parent="#accordionFlushExample">
-															<div class="accordion-body">
-																<div class="row g-2">
-																	<div class="col-12">
-																		<div class="payment-method">
-																			<div
-																				class="form-floating mb-lg-3 mb-2 theme-form-floating">
-																				<input type="text" class="form-control" id="credit2"
-																					placeholder="Enter Credit & Debit Card Number">
-																				<label for="credit2">Enter Credit & Debit
-																					Card Number</label>
-																			</div>
-																		</div>
-																	</div>
-
-																	<div class="col-xxl-4">
-																		<div
-																			class="form-floating mb-lg-3 mb-2 theme-form-floating">
-																			<input type="text" class="form-control" id="expiry"
-																				placeholder="Enter Expiry Date"> <label
-																				for="expiry">Expiry Date</label>
-																		</div>
-																	</div>
-
-																	<div class="col-xxl-4">
-																		<div
-																			class="form-floating mb-lg-3 mb-2 theme-form-floating">
-																			<input type="text" class="form-control" id="cvv"
-																				placeholder="Enter CVV Number"> <label
-																				for="cvv">CVV Number</label>
-																		</div>
-																	</div>
-
-																	<div class="col-xxl-4">
-																		<div
-																			class="form-floating mb-lg-3 mb-2 theme-form-floating">
-																			<input type="password" class="form-control"
-																				id="password" placeholder="Enter Password">
-																			<label for="password">Password</label>
-																		</div>
-																	</div>
-
-																	<div class="button-group mt-0">
-																		<ul>
-																			<li>
-																				<button class="btn btn-light shopping-button">Cancel</button>
-																			</li>
-
-																			<li>
-																				<button class="btn btn-animation">Use This
-																					Card</button>
-																			</li>
-																		</ul>
+													<div id="flush-collapseThree"
+														class="accordion-collapse collapse"
+														data-bs-parent="#accordionFlushExample">
+														<div class="accordion-body">
+															<h5 class="text-uppercase mb-4">Select Your Wallet</h5>
+															<div class="row">
+																<div class="col-md-6">
+																	<div class="custom-form-check form-check">
+																		<label class="form-check-label" for="amazon"><input
+																			class="form-check-input mt-0" type="radio"
+																			name="flexRadioDefault" id="amazon">Amazon
+																			Pay</label>
 																	</div>
 																</div>
-															</div>
-														</div>
-													</div>
 
-													<div class="accordion-item">
-														<div class="accordion-header" id="flush-headingTwo">
-															<div class="accordion-button collapsed"
-																data-bs-toggle="collapse"
-																data-bs-target="#flush-collapseTwo">
-																<div class="custom-form-check form-check mb-0">
-																	<label class="form-check-label" for="banking"><input
-																		class="form-check-input mt-0" type="radio"
-																		name="payMethod" id="banking">네이버페이</label>
-																</div>
-															</div>
-														</div>
-														<div id="flush-collapseTwo"
-															class="accordion-collapse collapse"
-															data-bs-parent="#accordionFlushExample">
-															<div class="accordion-body">
-																<h5 class="text-uppercase mb-4">Select Your Bank</h5>
-																<div class="row g-2">
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="bank1"> <label class="form-check-label"
-																				for="bank1">Industrial & Commercial Bank</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="bank2"> <label class="form-check-label"
-																				for="bank2">Agricultural Bank</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="bank3"> <label class="form-check-label"
-																				for="bank3">Bank of America</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="bank4"> <label class="form-check-label"
-																				for="bank4">Construction Bank Corp.</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="bank5"> <label class="form-check-label"
-																				for="bank5">HSBC Holdings</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="bank6"> <label class="form-check-label"
-																				for="bank6">JPMorgan Chase & Co.</label>
-																		</div>
-																	</div>
-
-																	<div class="col-12">
-																		<div class="select-option">
-																			<div class="form-floating theme-form-floating">
-																				<select class="form-select theme-form-select"
-																					aria-label="Default select example">
-																					<option value="hsbc">HSBC Holdings</option>
-																					<option value="loyds">Lloyds Banking Group</option>
-																					<option value="natwest">Nat West Group</option>
-																					<option value="Barclays">Barclays</option>
-																					<option value="other">Others Bank</option>
-																				</select> <label>Select Other Bank</label>
-																			</div>
-																		</div>
+																<div class="col-md-6">
+																	<div class="custom-form-check form-check">
+																		<input class="form-check-input mt-0" type="radio"
+																			name="flexRadioDefault" id="gpay"> <label
+																			class="form-check-label" for="gpay">Google
+																			Pay</label>
 																	</div>
 																</div>
-															</div>
-														</div>
-													</div>
 
-													<div class="accordion-item">
-														<div class="accordion-header" id="flush-headingThree">
-															<div class="accordion-button collapsed"
-																data-bs-toggle="collapse"
-																data-bs-target="#flush-collapseThree">
-																<div class="custom-form-check form-check mb-0">
-																	<label class="form-check-label" for="wallet"><input
-																		class="form-check-input mt-0" type="radio"
-																		name="payMethod" id="wallet" value="bkt">무통장입금</label>
+																<div class="col-md-6">
+																	<div class="custom-form-check form-check">
+																		<input class="form-check-input mt-0" type="radio"
+																			name="flexRadioDefault" id="airtel"> <label
+																			class="form-check-label" for="airtel">Airtel
+																			Money</label>
+																	</div>
 																</div>
-															</div>
-														</div>
-														<div id="flush-collapseThree"
-															class="accordion-collapse collapse"
-															data-bs-parent="#accordionFlushExample">
-															<div class="accordion-body">
-																<h5 class="text-uppercase mb-4">Select Your Wallet</h5>
-																<div class="row">
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<label class="form-check-label" for="amazon"><input
-																				class="form-check-input mt-0" type="radio"
-																				id="amazon">Amazon Pay</label>
-																		</div>
-																	</div>
 
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="gpay"> <label class="form-check-label"
-																				for="gpay">Google Pay</label>
-																		</div>
+																<div class="col-md-6">
+																	<div class="custom-form-check form-check">
+																		<input class="form-check-input mt-0" type="radio"
+																			name="flexRadioDefault" id="paytm"> <label
+																			class="form-check-label" for="paytm">Paytm
+																			Pay</label>
 																	</div>
+																</div>
 
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="airtel"> <label class="form-check-label"
-																				for="airtel">Airtel Money</label>
-																		</div>
+																<div class="col-md-6">
+																	<div class="custom-form-check form-check">
+																		<input class="form-check-input mt-0" type="radio"
+																			name="flexRadioDefault" id="jio"> <label
+																			class="form-check-label" for="jio">JIO Money</label>
 																	</div>
+																</div>
 
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="paytm"> <label class="form-check-label"
-																				for="paytm">Paytm Pay</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="jio"> <label class="form-check-label"
-																				for="jio">JIO Money</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="free"> <label class="form-check-label"
-																				for="free">Freecharge</label>
-																		</div>
+																<div class="col-md-6">
+																	<div class="custom-form-check form-check">
+																		<input class="form-check-input mt-0" type="radio"
+																			name="flexRadioDefault" id="free"> <label
+																			class="form-check-label" for="free">Freecharge</label>
 																	</div>
 																</div>
 															</div>
@@ -888,30 +1087,31 @@
 												</div>
 											</div>
 										</div>
-									</li>
-								</ul>
-							</div>
+									</div>
+								</li>
+							</ul>
 						</div>
 					</div>
+				</div>
 
-					<div class="col-lg-4">
-						<div class="right-side-summery-box">
-							<div class="summery-box-2">
-								<div class="summery-header">
-									<h3>Order Summery</h3>
-								</div>
-								<ul class="summery-contain">
-									<c:forEach var="info" items="${requestScope.productInfos }">
-										<li id="${info.product_id }"><img
-											src="${info.product_image }"
-											class="img-fluid blur-up lazyloaded checkout-image" alt="">
-											<h4>
-												${info.product_name } <span>X ${info.product_quantity }</span>
-											</h4>
-											<h4 class="price">${info.calculated_price }원</h4></li>
-									</c:forEach>
+				<div class="col-lg-4">
+					<div class="right-side-summery-box">
+						<div class="summery-box-2">
+							<div class="summery-header">
+								<h3>Order Summery</h3>
+							</div>
+							<ul class="summery-contain">
+								<c:forEach var="info" items="${requestScope.productInfos }">
+									<li id="${info.productId }"><img
+										src="${info.productImage }"
+										class="img-fluid blur-up lazyloaded checkout-image" alt="">
+										<h4>
+											${info.productName } <span>X ${info.productQuantity }</span>
+										</h4>
+										<h4 class="price">${info.sellingPrice }원</h4></li>
+								</c:forEach>
 
-									<!-- <li><img
+								<!-- <li><img
 										src="/resources/assets/images/vegetable/product/2.png"
 										class="img-fluid blur-up lazyloaded checkout-image" alt="">
 										<h4>
@@ -950,75 +1150,80 @@
 											Broccoli <span>X 2</span>
 										</h4>
 										<h4 class="price">$29.69</h4></li> -->
-								</ul>
+							</ul>
 
-								<ul class="summery-total">
-									<li>
-										<h4>Subtotal</h4>
-										<h4 class="price">$111.81</h4>
-									</li>
+							<ul class="summery-total">
+								<li>
+									<h4>총 상품 가격</h4>
+									<h4 class="price" id="subTotal">${requestScope.paymentInfo.totalAmount }원</h4>
+								</li>
 
-									<li>
-										<h4>Shipping</h4>
-										<h4 class="price">$8.90</h4>
-									</li>
+								<li>
+									<h4>배송비</h4>
+									<h4 class="price">${requestScope.paymentInfo.shippingFee }원</h4>
+								</li>
 
-									<li>
-										<h4>Tax</h4>
-										<h4 class="price">$29.498</h4>
-									</li>
 
-									<li>
-										<h4>Coupon/Code</h4>
-										<h4 class="price">$-23.10</h4>
-									</li>
 
-									<li class="list-total">
-										<h4>Total (USD)</h4>
-										<h4 class="price">$19.28</h4>
-									</li>
-								</ul>
+								<li>
+									<h4>할인금액(쿠폰, 포인트, 적립금)</h4>
+									<h4 class="price">$-23.10</h4>
+								</li>
+
+								<li class="list-total">
+									<h4>Total (USD)</h4>
+									<h4 class="price">$19.28</h4>
+								</li>
+							</ul>
+						</div>
+
+						<div class="checkout-offer">
+							<div class="offer-title">
+								<div class="offer-icon">
+									<img src="/resources/assets/images/inner-page/offer.svg"
+										class="img-fluid" alt="">
+								</div>
+								<div class="offer-name">
+									<h6>Notification</h6>
+								</div>
 							</div>
 
-							<div class="checkout-offer">
-								<div class="offer-title">
-									<div class="offer-icon">
-										<img src="/resources/assets/images/inner-page/offer.svg"
-											class="img-fluid" alt="">
-									</div>
-									<div class="offer-name">
-										<h6>Available Offers</h6>
-									</div>
-								</div>
-
-								<ul class="offer-detail">
-									<li>
-										<p>Combo: BB Royal Almond/Badam Californian, Extra Bold
-											100 gm...</p>
-									</li>
-									<li>
+							<ul class="offer-detail">
+								<li>
+									<p>카드를 제외한 결제 수단으로(간편결제 ex:카카오페이 등) 결제할 시 추후 부분취소의 경우 전체 취소
+										후 재결제가 필요합니다.</p>
+								</li>
+								<!--  <li>
 										<p>combo: Royal Cashew Californian, Extra Bold 100 gm + BB
 											Royal Honey 500 gm</p>
-									</li>
-								</ul>
-							</div>
+									</li>-->
+							</ul>
+						</div>
 
-							<button
-								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
-								type="button" onclick="checkPayMethod()">결제하기</button>
-							<button
+						<button
+							class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
+							type="button" onclick="checkPayMethod()">결제하기</button>
+						<div class="checkout-offer" id="iframeParent">
+							<label for="acc-or" class="offer-name"> 위 주문내용을 확인하였으며,
+								결제에 동의합니다. <input type="checkbox" id="acc-or"> <span
+								class="checkmark"></span>
+							</label>
+							<iframe id="iframeSon" src="../resources/terms.txt"></iframe>
+							<!-- 약관 -->
+						</div>
+						<!--  <button
 								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
 								type="button" onclick="cancelPayment()">취소하기</button>
 							<button type="button"
 								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
-								onclick="identify()">본인 인증</button>
-							<button type="button"
-								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
-								onclick="getOrderId()">테스트</button>
-						</div>
+								onclick="identify()">본인 인증</button>-->
+						<button type="button"
+							class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
+							onclick="getOrderId()">테스트</button>
 					</div>
 				</div>
 			</div>
+		</div>
 		</form>
 	</section>
 	<!-- Checkout section End -->

@@ -15,7 +15,7 @@ import com.project.vodto.MyPageOrderList;
 import com.project.vodto.OrderHistory;
 import com.project.vodto.PointLog;
 import com.project.vodto.ShippingAddress;
-import com.project.vodto.UploadFile;
+import com.project.vodto.UploadFiles;
 
 public interface MemberService {
 	// ----------------------------------- 장민정 시작 -----------------------------------
@@ -75,7 +75,7 @@ public interface MemberService {
 	// 회원 아이디 중복 조회
 	boolean checkedDuplication(String memberId) throws SQLException, NamingException;
 	// 회원 가입
-	boolean insertMember(Member member, UploadFile file) throws SQLException, NamingException;
+	boolean insertMember(Member member, UploadFiles file) throws SQLException, NamingException;
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------

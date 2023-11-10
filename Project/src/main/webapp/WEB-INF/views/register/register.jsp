@@ -43,6 +43,20 @@
     	let isValidZipCode = false;
     	let isValidAddress = false;
     	
+    	/*const entries = performance.getEntriesByType("navigation")[0];
+    	if (entries.type === "reload") {
+    		console.log("새로고침");
+    		$.ajax({
+    			url: "refreshFile",
+    			type: "get",
+    			async: false,
+    			success: function(data) {
+    				console.log(data);
+    			}, error: function(data) {
+    				console.log(data);
+    			}
+    		});
+    	}*/
     	
     	$(function () {
     		// 아이디 유효성 검사
@@ -136,7 +150,7 @@
     		
     		// 휴대폰 번호 유효성 검사
     		$('#cellPhoneNumber').on('blur', function () {
-    			let regNumber = /^01([0|1|6|7|8|9])-?([0-9]{3,4})->([0-9]{4})$/;
+    			let regNumber = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
     			if (regNumber.test($('#cellPhoneNumber').val())) {
     				isValidCellPhone = true;
     				$('#cellPhoneNumber').parent().next().html('');
@@ -164,6 +178,7 @@
     		$('#zipCode').on('change', function() {
     			if ($('#zipCode').val() !== "") {
     				isValidZipCode = true;
+    				console.log("zipCode", $('#zipCode').vla());
     			} else {
     				isValidZipCode = false;
     			}
@@ -173,6 +188,7 @@
     		$('#address').on('change', function() {
     			if ($('#address').val() != "") {
     				isvalidAddress = true;
+    				console.log("address", $('#address').vla());
     			} else {
     				isvalidAddress = false;
     			}
@@ -188,9 +204,9 @@
     			console.log(evt.originalEvent.dataTransfer.files);
     			
     			let files = evt.originalEvent.dataTransfer.files;
-    			for (let i = 0; i < files.length; i++) {
+    			for (let i = 0; i < 1/*files.length*/; i++) {
     				let form = new FormData();
-    				form.append("profileImage", files[i]);	// 파일의 이름을 컨트롤러단의 MultipartFile 객체명과 맞춘다.
+    				form.append("uploadFile", files[i]);	// 파일의 이름을 컨트롤러단의 MultipartFile 객체명과 맞춘다.
     				
     				$.ajax({
     					url : "/register/uploadFile",
@@ -201,12 +217,12 @@
     					processData : false,	// text데이터에 대해 쿼리스트링 처리를 하지 않겠다.  default = true
     					contentType : false,	// application/x-www-form-urlencoded 처리 안함.(인코딩 하지 않음)  default = true
     					success : function(data) {
-    						console.log(data);
+    						console.log("업로드성공", data);
     						if (data != null) {
     							showUploadedFile(data);
     						}
     					}, error : function(data) {
-    						console.log(data);
+    						console.log("업로드 실패", data);
     					}
     				});
     			}
@@ -216,19 +232,8 @@
 		// 업로드 된 파일 표시    	
     	function showUploadedFile(json) {
     		let output = "";
-
-    		$.each(json, function(i, elt) {
-    			let name = elt.new_file_name.replaceAll("\\", "/");
-    			if (elt.thumb_file_name != null) {	// 이미지
-    				let name = elt.thumb_file_name.replaceAll("\\", "/");
-    				output += `<img src='../resources/uploads\${name}' class='upImg' id="\${elt.originalFileName}"/>`;
-    			} else {
-    				output += `<a href="../resources/uploads\${name}" id="\${elt.originalFileName}">\${elt.originalFileName}</a>`;
-    			}
-    			output += `<img src='../resources/images/remove.png' class='remIcon' onclick="remFile(this);"/>`;
-    			
-    			console.log(output);
-    		});
+    		let name = json.newFileName.replaceAll("\\", "/");
+			output += `<img src='../resources/uploads\${name}'/>`; 
     		
     		$('.uploadFiles').html(output);
     	}
@@ -313,6 +318,17 @@
     		$('#' + value).parent().next().css("color", "#e33");
 			$('#' + value).parent().next().css("font-weight", "bold");
     	}
+    	
+    	// 페이지 나갈 시
+    	window.onbeforeunload = function (e) {
+    		console.log("beforeunload 실행");
+	 		window.navigator.sendBeacon('/register/refreshFile');
+   		};
+   		    	
+    	// form버튼으로 페이지 이동 시
+    	$(document).on("submit", "form", function (e) {
+    		window.onbeforeunload = null;
+    	});
     </script>
 </head>
 
@@ -510,6 +526,10 @@
                                         <label for="detailedAddress">상세주소</label>
                                     </div>
                                     <div class="validation"></div>
+                                    <div>
+                                    	<input id="baseAddr" type="checkbox" name="baseAddr" value="Y" checked/>
+                                    	<label for="baseAddr">기본 배송지로 설정</label>
+                                    </div>
                                 </div>
                                 
                                 <!-- 프로필 사진 

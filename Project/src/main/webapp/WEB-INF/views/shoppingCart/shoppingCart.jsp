@@ -43,16 +43,12 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 	<script>
 		let buyInfo = [];
+		let isFirst = true;
 		
 		$(function () {
 			// 받아 온 장바구니 정보 출력
 			spreadView();
 		});
-		
-		// 구매 버튼 클릭
-		function buy() {
-			
-		}
 		
 		// 선택된 항목 삭제.
 		function delCheckedItem() {
@@ -99,16 +95,17 @@
 		function spreadView() {
 			let data = getShoppingCart();
 			let output = "";
+			let output2 = "";
+			let output3 = "";
+			let subtotal = 0;
+			let total = 0;
 			if (data.status === "success") {
 				let items = data.items;
-				console.log("items : ",items);
-				console.log("items 길이 : ",items.length);
 				$.each(items, function(i, item) {
-					console.log(i,"번째 item : ", item);
 					output += `<tr class="product-box-contain">`;
 					output += `<td class="product-detail">`;
 					output += `<div class="product border-0">`;
-					output += `<a href="#" class="product-image"><img src="#" class="img-fluid blur-up lazyload" alt="\${item.productName}"/></a>`;
+					output += `<a href="#" class="product-image"><img src="\${item.productImage}" class="img-fluid blur-up lazyload" alt="\${item.productName}"/></a>`;
 					output += `<div class="product-detail">`;
 					output += `<ul>`;
 					output += `<li class="name"><a href="#">\${item.productName}</a></li>`;
@@ -133,13 +130,13 @@
 					output += `<h5>&#8361;\${item.sellingPrice} <del class="text-content">&#8361;\${item.consumerPrice}</del></h5>`;
 					output += `<h6 class="theme-color">You Save : &#8361;\${item.consumerPrice - item.sellingPrice}</h6></td>`;
 					// QTY
-					if (${item.currentQuantity} >  0) {
+					if (item.currentQuantity >  0) {
 						output += `<td class="quantity"><h4 class="table-title text-content">Qty</h4>`;
 						output += `<div class="quantity-price"><div class="cart_qty"><div class="input-group">`;
 						output += `<button type="button" class="btn qty-left-minus" onclick="qtyMinus('\${item.productId}', '\${item.sellingPrice}');">`;
 						output += `<i class="fa fa-minus ms-0" aria-hidden="true"></i></button>`;
 						output += `<input class="form-control input-number qty-input" id="\${item.productId}" type="text" name="quantity" value=1 onchange="renewTotal('\${item.productId}', '\${item.sellingPrice}');">`;
-						output += `<button type="button" class="btn qty-right-plus" onclick="qtyPlus('\${item.productId}', '\${item.sellingPrice}');">`;
+						output += `<button type="button" class="btn qty-right-plus" onclick="qtyPlus('\${item.productId}', '\${item.sellingPrice}', '\${item.currentQuantity}');">`;
 						output += `<i class="fa fa-plus ms-0" aria-hidden="true"></i></button></div></div></div></td>`;
 					} else {
 						output += `<td class="quantity"><h4 class="table-title text-content">Qty</h4>`;
@@ -159,18 +156,53 @@
 					output += `<button class="remove close_button" onclick="deleteItem(this);" value="\${item.productId}">Remove</button></td></tr>`;
 					
 					// 아오 ㅠㅠ
-					if (${item.currentQuantity} > 0) {
+					if (item.currentQuantity > 0) {
 						buyInfo.push({
 							productId : item.productId,
 							qty : 1
 						})
 					}
+					
+					subtotal += item.sellingPrice;
+					buy();
 				});
+				
+				total = subtotal + 3000;
+				
+				output2 += '<div class="coupon-cart"><h6 class="text-content mb-2">Coupon Apply</h6>';
+				output2 += '<div class="mb-3 coupon-box input-group">';
+				output2 += '<input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Enter Coupon Code Here...">';
+				output2 += '<button class="btn-apply">Apply</button></div></div>';
+				output2 += `<ul><li><h4>Subtotal</h4><h4 class="price" id="subtotal">&#8361;` + addComma(subtotal) + `</h4></li>`;
+				output2 += '<li><h4>Coupon Discount</h4><h4 class="price">(-) 0.00</h4></li>';
+				output2 += '<li class="align-items-start"><h4>Shipping</h4><h4 class="price text-end" id="shipping">&#8361;3,000</h4>';
+				output2 += '</li></ul>';
+				
 			} else if (data.status === "none") {
 				output += `<div>등록된 상품이 없습니다.</div>`;
 				output += `<div><button>로그인 하기</button></div>`;
 			}
+			
+			console.log(output2);
+			
+			output3 += '<li class="list-total border-top-0"><h4>Total (USD)</h4>';
+			output3 += '<h4 class="price theme-color" id="total_amount">&#8361;' + addComma(total) + '</h4></li>';
+			
 			$('.tbody').html(output);
+			$('.summery-contain').html(output2);
+			$('.summery-total').html(output3);
+		}
+		
+		// 결제 form 갱신
+		function buy() {
+			let output = "";
+			for (let i = 0; i < buyInfo.length; i++) {
+				output += `<input type="hidden" name="productId" value="\${buyInfo[i].productId}">`;
+				output += `<input type="hidden" name="productQuantity" value="\${buyInfo[i].qty}">`;
+				output += `<input type='hidden' name="fromCart" value="Y">`;
+				
+				$('.move-payment').html(output);
+			}
 		}
 		
 		// 숫자 3자리마다 콤마 찍어주기
@@ -199,7 +231,7 @@
 		
 		// QTY +
 		function qtyPlus(prod, price, stock) {
-			if ($('#' + prod).val() < stock) {
+			if (parseInt($('#' + prod).val()) < stock) {
 				digitize(prod);
 				$('#' + prod).val(Number($('#' + prod).val()) + 1);
 				$('#total' + prod).html("&#8361;" + addComma(price * $('#' + prod).val()));
@@ -207,12 +239,12 @@
 				$.each(buyInfo, function(i, info) {
 					if (info.productId === prod) {
 						info.qty = $('#' + prod).val();
-						break;
 					}
 				});
 				
 				subtotal();
 				totalAmount();
+				buy();
 			}
 		}
 		// QTY -
@@ -225,12 +257,12 @@
 				$.each(buyInfo, function(i, info) {
 					if (info.productId === prod) {
 						info.qty = $('#' + prod).val();
-						break;
 					}
 				});
 				
 				subtotal();
 				totalAmount();
+				buy();
 			}
 		}
 		
@@ -393,7 +425,7 @@
                         </div>
 
                         <div class="summery-contain">
-                            <div class="coupon-cart">
+                            <!-- <div class="coupon-cart">
                                 <h6 class="text-content mb-2">Coupon Apply</h6>
                                 <div class="mb-3 coupon-box input-group">
                                     <input type="email" class="form-control" id="exampleFormControlInput1"
@@ -416,21 +448,24 @@
                                     <h4>Shipping</h4>
                                     <h4 class="price text-end" id="shipping">&#8361;3,000</h4>
                                 </li>
-                            </ul>
+                            </ul> -->
                         </div>
 
                         <ul class="summery-total">
-                            <li class="list-total border-top-0">
+                            <!-- <li class="list-total border-top-0">
                                 <h4>Total (USD)</h4>
                                 <h4 class="price theme-color" id="total_amount">&#8361;---</h4>
-                            </li>
+                            </li> -->
                         </ul>
 
                         <div class="button-group cart-button">
                             <ul>
                                 <li>
-                                    <button onclick="buy();"
-                                        class="btn btn-animation proceed-btn fw-bold">Process To Checkout</button>
+                                	<form action="/order/requestOrder" method="post">
+	                                	<div class="move-payment"></div>
+	                                    <button type="submit" class="btn btn-animation proceed-btn fw-bold">
+	                                    Process To Checkout</button>
+                                	</form>
                                 </li>
 
                                 <li>

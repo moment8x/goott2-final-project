@@ -5,6 +5,10 @@
 
 <mapper namespace="com.project.mappers.uploadFileMapper">
 	<insert id="insertFile">
-		INSERT INTO upload_files()
+		INSERT INTO upload_files(extension, original_file_name, new_file_name, file_size) 
+		VALUES(#{extension}, #{originalFileName}, #{newFileName}, #{fileSize})
 	</insert>
+	<select id="isExist" resultType="Integer">
+		SELECT upload_files_seq FROM upload_files WHERE new_file_name = #{newFileName}
+	</select>
 </mapper>
