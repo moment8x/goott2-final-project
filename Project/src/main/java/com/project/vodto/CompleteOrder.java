@@ -13,18 +13,14 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Payment {
-	private String paymentNumber;
+public class CompleteOrder {
 	private String orderNo;
 	private String nonOrderNo;
 	private String paymentMethod;
-	private int totalAmount;
-	private int shippingFee;
-	private int usedReward;
-	private int usedPoints;
-	private int actualPaymentAmount;
-	private Timestamp paymentTime;
 	private String cardName;
-	private String cardNumber;
-	private String paymentStatus; // 11-05 추가
+	private int totalAmount;
+	private int actualPaymentAmount;
+	private String recipientName;
+	private String recipientPhoneNumber;
+	private String shippingAddress;
 }

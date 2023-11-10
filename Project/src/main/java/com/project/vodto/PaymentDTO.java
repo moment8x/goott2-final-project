@@ -15,22 +15,26 @@ import lombok.ToString;
 @Setter
 @ToString
 public class PaymentDTO {
-	private String payment_number;
-	private int order_no;
-	private String non_order_no;
-	private String payment_method;
-	private int total_amount;
-	private int shipping_fee;
-	private int used_reward;
-	private int used_points;
-	private int actual_payment_amount;
-	private Timestamp payment_time;
-	private int amount_to_pay;
+	private String paymentNumber;
+	private String orderNo;
+	private String nonOrderNo;
+	private String paymentMethod;
+	private int totalAmount;
+	private int shippingFee;
+	private int usedReward;
+	private int usedPoints;
+	private int actualPaymentAmount;
+	private Timestamp paymentTime;
+	private int amountToPay;
 //	private List<String> product_id;
 //	private List<Integer> product_price;// quantity
 	private List<DetailOrderItem> products;
-	private String card_name;
-	private String card_number;
-	private String recipient_name;
+	private String cardName;
+	private String cardNumber;
+	private String recipientName;
+	private List<String> couponNumbers;
+	private String paymentStatus;
+	private String compareOrderNo;
+	
 	
 }

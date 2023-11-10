@@ -528,6 +528,136 @@
 			}
 		});
 	}
+	
+	//전화번호 유효성 검사
+	function duplicatePhoneNumber() {
+		let newPhoneNumber = $('#newUserPhonNumber').val();
+		let regPhone = /^\d{2,3}-\d{3,4}-\d{4}$/;
+		
+		$.ajax({
+			url : '/user/duplicatePhoneNumber', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				newPhoneNumber
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data){ //중복
+					$('#newUserPhonNumber').val('');
+					printMsg("newUserPhonNumber", "newUserPhonNumber", "중복된 전화번호 입니다.", true)
+					$('.trueMsg').hide();
+				}else if(!regPhone.test(newPhoneNumber)){
+					$('#newUserPhonNumber').val('');
+					printMsg("newUserPhonNumber", "newUserPhonNumber", "전화번호 형식에 맞지 않습니다.", true)
+					$('.trueMsg').hide();
+				}else if(data == false && regPhone.test(newPhoneNumber)){
+					printMsg("", "newUserPhonNumber", "", false)
+					$('#successPhoneNumber').show();			
+				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//휴대폰번호 유효성 검사
+	function duplicateCellPhone() {
+		let newCellPhone = $('#newCellPhoneNumber').val();
+		let regCellPhone = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
+		
+		$.ajax({
+			url : '/user/duplicateCellPhone', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				newCellPhone
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data){//휴대폰번호 중복
+					$('#newCellPhoneNumber').val('');		
+					$('.trueMsg').hide();
+					printMsg("newCellPhoneNumber", "newCellPhoneNumber", "중복된 휴대폰번호 입니다.", true)
+				}else if(!regCellPhone.test(newCellPhone)){ //정규식에 맞지않음
+					$('#newCellPhoneNumber').val('');		
+					$('.trueMsg').hide();
+					printMsg("newCellPhoneNumber", "newCellPhoneNumber", "휴대폰번호 형식에 맞지 않습니다.", true)
+				}else if(data == false && regCellPhone.test(newCellPhone)){
+					printMsg("", "newCellPhoneNumber", "", false)
+					$('#successCellPhoneNumber').show();
+				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//배송주소록 추가
+	function addShippingAddress() {
+		let zipCode = $('#addZipNo').val()
+		let address = $('#addAddr').val()
+		let detailAddress = $('#addAddrDetail').val()
+		
+		$.ajax({
+			url : '/user/addShippingAddress', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				zipCode,
+				address,
+				detailAddress
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data == true){
+					$('#addZipNo').val('')
+					$('#addAddr').val('')
+					$('#addAddrDetail').val('')
+					
+					location.reload()
+				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//배송주소록 수정
+	function shippingAddrModify() {
+		let zipCode = $('#shippingZipNoModify').val()
+		let address = $('#shippingAddrModify').val()
+		let detailAddress = $('#shippingDetailAddrModify').val()
+			
+		$.ajax({
+			url : '/user/shippingAddrModify', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				zipCode,
+				address,
+				detailAddress
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				//if(data == true){
+				//	$('#addZipNo').val('')
+				//	$('#addAddr').val('')
+				//	$('#addAddrDetail').val('')
+					
+				//	location.reload()
+				//}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	
 </script>
 <style>
 #deliveryStatus, #successPwd, #successPhoneNumber,
@@ -1906,6 +2036,10 @@
 										</div>
 
 										<button
+											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3">
+											<i data-feather=check class="me-2"></i> 기본배송지로 설정
+										</button>
+										<button
 											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
 											data-bs-toggle="modal" data-bs-target="#add-address">
 											<i data-feather="plus" class="me-2"></i> 배송지 추가
@@ -2425,6 +2559,7 @@
 			</div>
 		</div>
 	</div>
+	</c:forEach>
 	<!-- Edit Profile End -->
 
 	<!-- Edit Card Start -->

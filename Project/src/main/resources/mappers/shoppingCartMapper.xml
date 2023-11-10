@@ -4,16 +4,22 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.project.mappers.shoppingCartMapper">
-	<insert id="insertShoppingCartNon">
-		INSERT INTO shopping_cart(non_member_id, product_id, member_check) VALUES(#{nonMemberId}, #{productId}, 0)
-	</insert>
-	<select id="selectNonMemberShoppingCart" resultType="com.project.vodto.ShoppingCart">
-		SELECT * FROM shopping_cart WHERE non_member_id = #{nonMemberId}
-	</select>
-	<select id="selectMemberShoppingCart" resultType="com.project.vodto.ShoppingCart">
-		SELECT * FROM shopping_cart WHERE member_id = #{memberId}
-	</select>
-	<select id="deleteNonMemberCartItem" resultType="com.project.vodto.ShoppingCart">
-		DELETE FROM shopping_cart WHERE non_member_id = #{nonMemberId} AND product_id = #{productId}
-	</select>
+   <insert id="insertShoppingCartNon">
+      INSERT INTO shopping_cart(non_member_id, product_id, member_check) VALUES(#{nonMemberId}, #{productId}, 0)
+   </insert>
+   <insert id="insertShoppingCart">
+      INSERT INTO shopping_cart(member_id, product_id, member_check) VALUES(#{memberId}, #{productId}, 1)
+   </insert>
+   <select id="selectNonMemberShoppingCart" resultType="com.project.vodto.ShoppingCart">
+      SELECT * FROM shopping_cart WHERE non_member_id = #{nonMemberId}
+   </select>
+   <select id="selectMemberShoppingCart" resultType="com.project.vodto.ShoppingCart">
+      SELECT * FROM shopping_cart WHERE member_id = #{memberId}
+   </select>
+   <delete id="deleteNonMemberCartItem">
+      DELETE FROM shopping_cart WHERE non_member_id = #{nonMemberId} AND product_id = #{productId}
+   </delete>
+   <delete id="deleteMemberCartItem">
+      DELETE FROM shopping_cart WHERE member_id = #{memberId} AND product_id = #{productId}
+   </delete>
 </mapper>

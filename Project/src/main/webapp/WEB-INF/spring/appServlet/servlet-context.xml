@@ -53,7 +53,7 @@
 	</interceptors>
 	
 	<beans:bean id="createOrderIdInterceptor"
-		class="com.project.interceptor.kjy.createOrderId">
+		class="com.project.interceptor.kjy.orderInterceptor">
 	</beans:bean>
 	
 	<interceptors>

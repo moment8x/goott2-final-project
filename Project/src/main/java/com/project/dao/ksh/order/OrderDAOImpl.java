@@ -10,12 +10,16 @@ import javax.inject.Inject;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.project.vodto.CompleteOrder;
+import com.project.vodto.CouponInfos;
 import com.project.vodto.DetailOrderItem;
 import com.project.vodto.NonOrderHistory;
+import com.project.vodto.OrderHistory;
 import com.project.vodto.OrderInfo;
 import com.project.vodto.Payment;
 import com.project.vodto.PaymentDTO;
 import com.project.vodto.Product;
+import com.project.vodto.ShippingAddress;
 
 @Repository
 public class OrderDAOImpl implements OrderDAO {
@@ -43,29 +47,33 @@ public class OrderDAOImpl implements OrderDAO {
 	}
 
 	@Override
-	public int insertNewOrderHistory(NonOrderHistory noh) throws Exception {
+	public int insertNewNonOrderHistory(NonOrderHistory noh) throws Exception {
 
-		return ses.insert(ns + ".insertNewOrderHistory", noh);
+		return ses.insert(ns + ".insertNewNonOrderHistory", noh);
 	}
 
 	@Override
-	public Payment getPaymentHistory(String orderNo) {
-		// TODO Auto-generated method stub
-		return null;
+	public int insertNewOrderHistory(OrderHistory oh) {
+		return ses.insert(ns + ".insertNewOrderHistory", oh);
+	}
+	
+	@Override
+	public CompleteOrder getPaymentHistory(String orderNo) {
+		return ses.selectOne(ns+".getPaymentDetail", orderNo);
 	}
 
 	@Override
-	public List<OrderInfo> getProductInfo(List<String> product_id) {
+	public List<OrderInfo> getProductInfo(List<String> productId) {
 		List<OrderInfo> productInfos = new ArrayList<OrderInfo>();
 
-		if (product_id.size() > 1) {
-			for (String s : product_id) {
+		if (productId.size() > 1) {
+			for (String s : productId) {
 				System.out.println(s.toString());
 				productInfos.add(ses.selectOne(ns + ".getProductInfo", s));
 
 			}
 		} else {
-			productInfos.add(ses.selectOne(ns + ".getProductInfo", product_id.get(0)));
+			productInfos.add(ses.selectOne(ns + ".getProductInfo", productId.get(0)));
 
 		}
 		return productInfos;
@@ -76,6 +84,35 @@ public class OrderDAOImpl implements OrderDAO {
 		// 무통장입금 테이블 저장
 		return ses.insert(ns + ".saveBankTransfer", pd);
 	}
+
+	@Override
+	public List<ShippingAddress> getShippingAddr(String memberId) throws Exception {
+		
+		return ses.selectList(ns+".getShippingAddr", memberId);
+	}
+
+	@Override
+	public List<CouponInfos> getCouponInfos(String memberId) throws Exception {
+		
+		return ses.selectList(ns+".getCouponInfos", memberId);
+	}
+
+	@Override
+	public List<CouponInfos> addCategoryKey(List<CouponInfos> couponInfos) throws Exception {
+		for(CouponInfos c : couponInfos) {
+			c.setCategoryKey(ses.selectList(ns + ".getCategoryKey", c.getCouponNumber())); 
+		}
+		
+		return couponInfos;
+	}
+
+	@Override
+	public List<DetailOrderItem> getDetailOrderItem(String orderNo) throws Exception {
+		
+		return ses.selectList(ns+".getDetailOrderItem", orderNo);
+	}
+
+	
 
 //	@Override
 //	public int insertNewOrder(NonOrderHistory noh) throws Exception {

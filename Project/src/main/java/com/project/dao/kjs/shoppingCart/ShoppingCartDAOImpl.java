@@ -92,4 +92,24 @@ public class ShoppingCartDAOImpl implements ShoppingCartDAO {
 		
 		return session.insert(ns + ".insertShoppingCartNon", params);
 	}
+
+	@Override
+	public int insertShoppingCart(String memberId, String productId) throws SQLException, NamingException {
+		System.out.println("장바구니 dao단 - 회원 장바구니 아이템 추가");
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("memberId", memberId);
+		params.put("productId", productId);
+		
+		return session.insert(ns + ".insertShoppingCart", params);
+	}
+
+	@Override
+	public int deleteItem(String memberId, String productId) throws SQLException, NamingException {
+		System.out.println("장바구니 dao단 - 회원 장바구니 아이템 단일 삭제");
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("memberId", memberId);
+		params.put("productId", productId);
+		
+		return session.delete(ns + ".deleteMemberCartItem", params);
+	}
 }
