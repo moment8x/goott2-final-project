@@ -134,6 +134,12 @@
         and o.order_no = pay.order_no 
         group by o.order_no order by order_time desc limit 3	
 	</select>
+	
+	<update id="updateDetailOrderAddr">
+		update order_history set recipient_name = #{recipientName}, recipient_phone_number = #{recipientPhoneNumber}, zip_code = #{zipCode}, 
+		shipping_address = #{shippingAddress}, detailed_shipping_address=#{detailedShippingAddress}, delivery_message=#{deliveryMessage}
+        where member_id = #{memberId} and order_no = #{orderNo}
+	</update>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">
 		SELECT member_id FROM member WHERE member_id = #{memberId}  

@@ -237,6 +237,17 @@ public class MemberServiceImpl implements MemberService {
 		return mDao.selectCurOrderHistory(memberId);
 	}
 
+	@Override
+	public boolean updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId)
+			throws SQLException, NamingException {
+		boolean result = false;
+		
+		if(mDao.updateDetailOrderAddr(updateDetailOrderAddr, memberId) != 0) {
+			result = true;
+		}
+		
+		return result;
+	}
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
 	@Override

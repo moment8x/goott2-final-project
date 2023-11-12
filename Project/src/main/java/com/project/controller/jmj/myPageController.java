@@ -64,6 +64,7 @@ public class myPageController {
 			model.addAttribute("curOrderHistory", list);			
 			System.out.println("최근주문내역 : " + list);
 			
+			
 			//회원정보
 			Member userInfo = mService.getMyInfo(memberId);
 			model.addAttribute("userInfo", userInfo);			
@@ -418,13 +419,23 @@ public class myPageController {
 	}
 	
 	@RequestMapping(value = "editDeliveryAddress", method = RequestMethod.POST)
-	public void editDeliveryAddress(@ModelAttribute DetailOrderInfo updateDetailOrderAddr, HttpServletRequest request, Model model) {
+	public ResponseEntity<String> editDeliveryAddress(@ModelAttribute DetailOrderInfo updateDetailOrderAddr, HttpServletRequest request, Model model) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
 	
+		ResponseEntity<String> result = null;
 		
-//		mService.updateDetailOrderAddr(updateDetailOrderAddr, memberId);
+		try {
+			if(mService.updateDetailOrderAddr(updateDetailOrderAddr, memberId)) {
+				System.out.println("배송지 변경 완");
+				result = new ResponseEntity<String>("success",HttpStatus.OK);
+			}
+		} catch (SQLException | NamingException e) {
+			result = new ResponseEntity<>(HttpStatus.CONFLICT);
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	@RequestMapping(value = "selectBasicAddr", method = RequestMethod.POST)
@@ -435,11 +446,10 @@ public class myPageController {
 		String memberId = member.getMemberId();
 	
 		ResponseEntity<String> result = null;
-		
-		System.out.println(addrSeq + "번 배송지로 변경하자 배송 메세지는 " + deliveryMessage);
+
 		try {
 			if(mService.selectBasicAddr(memberId, addrSeq, orderNo, deliveryMessage)) {
-				System.out.println("배송지 수정완");
+				System.out.println("배송지 변경 완");
 				result = new ResponseEntity<String>("success",HttpStatus.OK);
 			}
 		} catch (SQLException | NamingException e) {

@@ -89,6 +89,9 @@ public interface MemberService {
 	
 	//최근주문내역 3개 가져오기
 	List<MyPageOrderList> getCurOrderHistory(String memberId) throws SQLException, NamingException;
+	
+	// 출고전, 입금전 배송지를 새로운 배송지로 변경
+	boolean updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId) throws SQLException, NamingException;
 
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
@@ -99,6 +102,7 @@ public interface MemberService {
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
+	
 	
 	
 	

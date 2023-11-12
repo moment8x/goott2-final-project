@@ -258,6 +258,21 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectList(ns + ".getCurOrderHistory", memberId);
 	}
 	
+	@Override
+	public int updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId)
+			throws SQLException, NamingException {		
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", updateDetailOrderAddr.getOrderNo());
+		params.put("recipientName", updateDetailOrderAddr.getRecipientName());
+		params.put("recipientPhoneNumber", updateDetailOrderAddr.getRecipientPhoneNumber());
+		params.put("zipCode", updateDetailOrderAddr.getZipCode());
+		params.put("shippingAddress", updateDetailOrderAddr.getShippingAddress());
+		params.put("detailedShippingAddress", updateDetailOrderAddr.getDetailedShippingAddress());
+		params.put("deliveryMessage", updateDetailOrderAddr.getDeliveryMessage());
+		
+		return ses.update(ns + ".updateDetailOrderAddr", params);
+	}
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
 	@Override
@@ -299,4 +314,6 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".updateProfile", params);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+	
 }

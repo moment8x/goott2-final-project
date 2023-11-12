@@ -86,37 +86,41 @@ $(function () {
 
 
 //배송주소록 수정
-function shippingAddrModify(orderNo) {
+function shippingAddrModify() {
 	let zipCode = $('#editZipNo').val()
-	let address = $('#editAddr').val()
-	let detailAddress = $('#editAddrDetail').val()
-	let recipient = $('#recipient').val()
-	let recipientContact = $('#recipientContact').val()
+	let shippingAddress = $('#editAddr').val()
+	let detailedShippingAddress = $('#editAddrDetail').val()
+	let recipientName = $('#recipient').val()
+	let recipientPhoneNumber = $('#recipientContact').val()
 	let deliveryMessage = $('#editDeliveryMsg').val()
-	
+	let orderNo = "${detailOrder.orderNo }"
+
 	$.ajax({
 		url : '/user/editDeliveryAddress', // 데이터를 수신받을 서버 주소
 		type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 		data : {
 			zipCode,
-			address,
-			detailAddress,
-			recipient,
-			recipientContact,
+			shippingAddress,
+			detailedShippingAddress,
+			recipientName,
+			recipientPhoneNumber,
 			deliveryMessage,
 			orderNo
 		},
-		dataType : 'json',
+		dataType : 'text',
 		async : false,
 		success : function(data) {
 			console.log(data);
+			if(data == 'success'){
 				location.reload()
+			}
 		},
 		error : function() {
 		}
 	});
 }
 
+// 출고전, 입금전 배송주소록에서 배송지 선택해서 변경
 function editBasicShippingAddress() {
 		let addrSeq = $('input[name="checkAddr"]:checked').val()
 		let deliveryMessage = $('#changeDeliveryMessage').val()
@@ -130,6 +134,7 @@ function editBasicShippingAddress() {
 					deliveryMessage,
 					orderNo
 				},
+				dataType : 'text',
 				async : false,
 				success : function(data) {
 					console.log(data);
@@ -140,7 +145,10 @@ function editBasicShippingAddress() {
 				error : function() {
 				}
 			});
-        
+}
+
+function editShippingAddress(orderNo) {
+	
 }
 </script>
 <style type="text/css">
@@ -615,7 +623,7 @@ function editBasicShippingAddress() {
 					<button type="button" class="btn btn-secondary btn-md"
 						data-bs-dismiss="modal">닫기</button>
 					<button type="button" class="btn theme-bg-color btn-md text-white"
-						onclick="editShippingAddress(${detailOrder.orderNo });"
+						onclick="shippingAddrModify();"
 						data-bs-dismiss="modal">변경</button>
 				</div>
 			</div>
@@ -634,7 +642,7 @@ function editBasicShippingAddress() {
 					<button
 						class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
 						data-bs-toggle="modal" data-bs-target="#add-address">
-						<i data-feather="plus" class="me-2"></i> 배송지 변경
+						<i data-feather="plus" class="me-2"></i> 새로운 배송지
 					</button>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
