@@ -35,6 +35,7 @@ import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.kjy.Memberkjy;
 
@@ -408,18 +409,18 @@ public class myPageController {
 			Map<String, Object>  map = mService.getOrderInfo(memberId, orderNo);
 			//주문상세정보
 			DetailOrderInfo detailOrderInfo = (DetailOrderInfo)map.get("detailOrderInfo");
+			//쿠폰사용내역
 			List<CouponHistory> couponHistory = (List<CouponHistory>)map.get("couponsHistory");
+			//무통장 결제내역
+			GetBankTransfer bankTransfer = (GetBankTransfer)map.get("bankTransfer");
 			
 			model.addAttribute("detailOrder", detailOrderInfo);
 			model.addAttribute("couponHistory", couponHistory);
-			
-			System.out.println("주문상세정보@@" + detailOrderInfo.toString() + "쿠폰 사용내역!!!" + couponHistory);
+			model.addAttribute("bankTransfer", bankTransfer);
 			
 			//배송주소록
 			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
 			 model.addAttribute("userAddrList", userAddrList);
-			 System.out.println("배송지선택!!"  + userAddrList.toString());
-			
 			
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block

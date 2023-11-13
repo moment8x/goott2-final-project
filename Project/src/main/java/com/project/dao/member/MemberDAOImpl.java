@@ -18,6 +18,7 @@ import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.MyPageOrderList;
 
 @Repository
@@ -283,6 +284,13 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectList(ns + ".gerCouponsHistory", params);
 	}
+	
+	@Override
+	public GetBankTransfer getBankTransfer(String orderNo) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".getBankTransfer", orderNo);
+	}
+
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
@@ -325,6 +333,7 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".updateProfile", params);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
 
 	
 

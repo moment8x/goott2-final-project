@@ -14,6 +14,7 @@ import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.MyPageOrderList;
 
 @Repository
@@ -105,6 +106,9 @@ public interface MemberDAO {
 	//주문상세 쿠폰내역
 	List<CouponHistory> getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException;
 	
+	// 무통장 주문 내역 가져오기
+	GetBankTransfer getBankTransfer(String orderNo) throws SQLException, NamingException;
+	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -118,16 +122,6 @@ public interface MemberDAO {
 	// ----------------------------------- 김진솔 끝 ------------------------------------
 	
 	
-	
-	
-	
 
-	
-	
-	
-	
-	
-	
-	
 	
 }

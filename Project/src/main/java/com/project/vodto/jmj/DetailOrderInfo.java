@@ -38,5 +38,4 @@ public class DetailOrderInfo {
 	private String detailedShippingAddress;
 	private String deliveryStatus;
 	private String deliveryMessage;
-
 }

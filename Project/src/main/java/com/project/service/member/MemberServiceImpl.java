@@ -219,6 +219,7 @@ public class MemberServiceImpl implements MemberService {
 		
 		result.put("detailOrderInfo", mDao.selectDetailOrderInfo(memberId, orderNo));
 		result.put("couponsHistory", mDao.getCouponsHistory(memberId, orderNo));
+		result.put("bankTransfer", mDao.getBankTransfer(orderNo));
 		
 		return result;
 	}

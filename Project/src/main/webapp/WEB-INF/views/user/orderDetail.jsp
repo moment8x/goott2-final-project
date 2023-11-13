@@ -81,7 +81,12 @@ function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
 		newAddrDetail.value = addrDetail
 }
 $(function () {
+	let orderTime = $('.detailOrderOrderTime').text().substring(0,21)
+	$('.detailOrderOrderTime').text(orderTime)
 	
+	let icOrderTime = $('.infoContent.detailOrderOrderTime').text().substring(0,21)
+	$('.infoContent.detailOrderOrderTime').text(icOrderTime)
+
 })
 
 
@@ -163,6 +168,20 @@ function editShippingAddress(orderNo) {
 	font-size: 12px;
 }
 
+.btn.theme-bg-color.text-white.btn-sm.fw-bold.mt-lg-0.mt-3.changeAddr {
+	font-size: 12px;
+	width: 80px;
+	height: 25px;
+	margin-top: 10px;
+}
+
+.name.productStatusBtn, .completeBtn {
+	display: flex;
+	height: 126px;
+	align-items: center;
+	gap: 5px;
+}
+
 .col-xxl-3.col-lg-4.orderInfo {
 	width: 850px;
 }
@@ -206,18 +225,21 @@ function editShippingAddress(orderNo) {
 	border-top: 0.5px solid #E7E7E7;
 	padding-top: 10px;
 }
-.basicAddr{
+
+.basicAddr {
 	font-size: 12px;
 	border: 2px solid #0DA487;
 	border-radius: 10px;
 	padding: 3px;
 }
-#orderTime{
+
+#orderTime {
 	margin-bottom: 30px;
 }
-.couponsHistory{
+
+.couponsHistory {
 	display: flex;
-	gap:5px;
+	gap: 5px;
 }
 </style>
 </head>
@@ -263,7 +285,7 @@ function editShippingAddress(orderNo) {
 						<div class="table-responsive">
 							<h3>주문번호 ${detailOrder.orderNo }</h3>
 
-							<h4 id="orderTime">
+							<h4 id="orderTime" class="detailOrderOrderTime">
 								<fmt:formatDate value="${detailOrder.orderTime }" type="date" />
 							</h4>
 							<c:forEach var="order" items="${detailOrderInfo }">
@@ -272,6 +294,7 @@ function editShippingAddress(orderNo) {
 										<tr>
 											<td class="product-detail">
 												<div class="product border-0">
+
 													<c:choose>
 														<c:when test="${order.productImage != '' }">
 															<a href="product.left-sidebar.html" class="product-image">
@@ -288,10 +311,22 @@ function editShippingAddress(orderNo) {
 															</a>
 														</c:otherwise>
 													</c:choose>
+
+													<c:set var="productNameLength"
+														value="${fn:length(order.productName)}" />
+
 													<div class="product-detail">
 														<ul>
-															<li class="name"><a
-																href="product-left-thumbnail.html">${order.productName }</a></li>
+															<c:choose>
+																<c:when test="${productNameLength <= 5}">
+																	<li class="name"><a
+																		href="product-left-thumbnail.html" id="productName">${order.productName }</a></li>
+																</c:when>
+																<c:otherwise>
+																	<li class="name"><a
+																		href="product-left-thumbnail.html" id="productName">${fn:substring(order.productName, 0, 5)}...</a></li>
+																</c:otherwise>
+															</c:choose>
 														</ul>
 													</div>
 												</div>
@@ -307,16 +342,19 @@ function editShippingAddress(orderNo) {
 											</td>
 
 											<td class="name">
-												<h4 class="table-title text-content">수량</h4>
+												<h4 class="table-title text-content">수량</h4> 
+
 												<h4 class="text-title">${order.productQuantity }</h4>
+
 											</td>
 											<c:choose>
-												<c:when test="${order.productStatus eq '출고전' }">
+												<c:when
+													test="${order.productStatus eq '출고전' || order.productStatus eq '입금전' }">
 													<td class="name">
 														<h4 class="table-title text-content">상품상태</h4>
 														<h5>${order.productStatus }</h5>
 													</td>
-													<td class="name">
+													<td class="name productStatusBtn">
 														<button
 															class="btn theme-bg-color text-white m-0 productStatusBtn"
 															type="button" id="button-addon1">
@@ -324,39 +362,14 @@ function editShippingAddress(orderNo) {
 														</button>
 													</td>
 												</c:when>
-												<c:when test="${order.productStatus eq '입금전' }">
+
+												<c:when
+													test="${order.productStatus eq '출고완료' || order.productStatus eq '배송중' }">
 													<td class="name">
 														<h4 class="table-title text-content">상품상태</h4>
 														<h5>${order.productStatus }</h5>
 													</td>
-													<td class="name">
-														<button
-															class="btn theme-bg-color text-white m-0 productStatusBtn"
-															type="button" id="button-addon1">
-															<span>취소</span>
-														</button>
-													</td>
-												</c:when>
-												<c:when test="${order.productStatus eq '출고완료' }">
-													<td class="name">
-														<h4 class="table-title text-content">상품상태</h4>
-														<h5>${order.productStatus }</h5>
-													</td>
-													<td class="name">
-														<button
-															class="btn theme-bg-color text-white m-0 productStatusBtn"
-															type="button" id="button-addon1">
-															<span>배송조회</span>
-														</button>
-														<div>${order.productInvoiceNumber }</div>
-													</td>
-												</c:when>
-												<c:when test="${order.productStatus eq '배송중' }">
-													<td class="name">
-														<h4 class="table-title text-content">상품상태</h4>
-														<h5>${order.productStatus }</h5>
-													</td>
-													<td class="detailOrderBtn">
+													<td class="name productStatusBtn">
 														<button
 															class="btn theme-bg-color text-white m-0 productStatusBtn"
 															type="button" id="button-addon1">
@@ -399,6 +412,9 @@ function editShippingAddress(orderNo) {
 										</tr>
 									</tbody>
 								</table>
+								<c:if test="${order.productQuantity > 1}">
+									<div>더보기</div>
+								</c:if>
 							</c:forEach>
 
 							<div class="col-xxl-3 col-lg-4 orderInfo">
@@ -433,34 +449,35 @@ function editShippingAddress(orderNo) {
 												<li class="pb-0">
 													<h4 class="infoContent">${detailOrder.detailedShippingAddress }</h4>
 												</li>
-												<li class="pb-0">
-													<h4 class="infoTitle">배송메세지 :</h4>
-													<h4 class="infoContent">${detailOrder.deliveryMessage }</h4>
-												</li>
-												
-												<c:if test="${detailOrder.deliveryStatus eq '출고전' }">
-													<li class="deliverMsg">* 출고전 / 입금전 상품에 대해서 배송지 변경이
-														가능합니다.</li>
-													<li>
-														<button
-															class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
-															data-bs-toggle="modal" data-bs-target="#change-address">
-															<i data-feather="plus" class="me-2"></i> 배송지 변경
-														</button>
-													</li>
-												</c:if>
-												<c:if test="${detailOrder.deliveryStatus eq '입금전' }">
-													<li class="deliverMsg">* 출고전 / 입금전 상품에 대해서만 배송지 변경이
-														가능합니다.</li>
-													<li>
-														<button
-															class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
-															data-bs-toggle="modal" data-bs-target="#change-address">
-															<i data-feather="edit" class="me-2"></i> 배송지 변경
-														</button>
-													</li>
-												</c:if>
-											
+												<c:choose>
+													<c:when test="${detailOrder.deliveryMessage == null }">
+														<li class="pb-0">
+															<h4 class="infoTitle">배송메세지 :</h4>
+															<h4 class="infoContent">없음</h4>
+														</li>
+													</c:when>
+													<c:otherwise>
+														<li class="pb-0">
+															<h4 class="infoTitle">배송메세지 :</h4>
+															<h4 class="infoContent">${detailOrder.deliveryMessage }</h4>
+														</li>
+													</c:otherwise>
+												</c:choose>
+												<li class="deliverMsg">* 출고전 / 입금전 상품에 대해서 배송지 변경이
+													가능합니다.</li>
+												<c:forEach var="order" items="${detailOrderInfo }" begin="0"
+													end="0">
+													<c:if
+														test="${order.productStatus eq '출고전' || order.productStatus eq '입금전' }">
+														<li>
+															<button
+																class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
+																data-bs-toggle="modal" data-bs-target="#change-address">
+																<i data-feather="edit" class="me-2"></i> 배송지 변경
+															</button>
+														</li>
+													</c:if>
+												</c:forEach>
 											</ul>
 										</div>
 									</div>
@@ -470,13 +487,16 @@ function editShippingAddress(orderNo) {
 											<div class="summery-header d-block">
 												<h3>결제정보</h3>
 											</div>
-											
-												
-													<ul class="summery-contain pb-0 border-bottom-0">
+
+
+											<ul class="summery-contain pb-0 border-bottom-0">
 												<li class="pb-0">
 													<h4 class="infoTitle">배송비 :</h4>
-													<h4 class="infoContent"><fmt:formatNumber value="${detailOrder.shippingFee }"
-															type="NUMBER" />원</h4>
+													<h4 class="infoContent">
+														<fmt:formatNumber value="${detailOrder.shippingFee }"
+															type="NUMBER" />
+														원
+													</h4>
 												</li>
 
 												<li class="pb-0">
@@ -488,33 +508,53 @@ function editShippingAddress(orderNo) {
 													</h4>
 												</li>
 
+												<c:if test="${detailOrder.usedPoints != 0 }">
+													<li class="pb-0">
+														<h4 class="infoTitle">사용한 포인트 :</h4>
+														<h4 class="infoContent">
+															<fmt:formatNumber value="${detailOrder.usedPoints }"
+																type="NUMBER" />
+															점
+														</h4>
+													</li>
+												</c:if>
+
+												<c:if test="${detailOrder.usedReward != 0 }">
+													<li class="pb-0">
+														<h4 class="infoTitle">사용한 적립금 :</h4>
+														<h4 class="infoContent">
+															<fmt:formatNumber value="${detailOrder.usedReward }"
+																type="NUMBER" />
+															원
+														</h4>
+													</li>
+												</c:if>
 												<li class="pb-0">
-													<h4 class="infoTitle">사용한 포인트 :</h4>
-													<h4 class="infoContent"><fmt:formatNumber value="${detailOrder.usedPoints }"
-															type="NUMBER" />원</h4>
-												</li>
-												<li class="pb-0">
-													<h4 class="infoTitle">사용한 적립금 :</h4>
-													<h4 class="infoContent"><fmt:formatNumber value="${detailOrder.usedReward }"
-															type="NUMBER" />점</h4>
-												</li>
-												
-												<li class="pb-0">
-													<h4 class="infoTitle">사용한 쿠폰 :</h4>
-													<c:forEach var="coupons" items="${couponHistory }">
-													<div class="couponsHistory">
-													<h4 class="infoContent">${coupons.couponName }</h4>
-													
-													<c:if test="${fn:contains(coupons.discountMethod,'P')}">
-													<h4 class="infoContent">${coupons.discountAmount }%</h4>
-													<h4 class="infoContent"><fmt:formatNumber value="${detailOrder.totalAmount*coupons.discountAmount }" type="NUMBER" />원</h4>
-													</c:if>
-													
-													<c:if test="${fn:contains(coupons.discountMethod,'D')}">
-													<h4 class="infoContent"><fmt:formatNumber value="${coupons.discountAmount }" type="NUMBER" />원</h4>
-													</c:if>
-													</div>
-												</c:forEach>
+													<h4 class="infoTitle">사용한 쿠폰 :</h4> <c:forEach
+														var="coupons" items="${couponHistory }">
+														<div class="couponsHistory">
+															<h4 class="infoContent">${coupons.couponName }</h4>
+
+
+															<c:if test="${fn:contains(coupons.discountMethod,'P')}">
+																<h4 class="infoContent">${coupons.discountAmount }%</h4>
+																<h4 class="infoContent">
+																	<fmt:formatNumber
+																		value="${detailOrder.totalAmount*0.1 }" type="NUMBER" />
+																	원
+																</h4>
+															</c:if>
+
+															<c:if test="${fn:contains(coupons.discountMethod,'D')}">
+																<h4 class="infoContent">
+																	<fmt:formatNumber value="${coupons.discountAmount }"
+																		type="NUMBER" />
+																	원
+																</h4>
+															</c:if>
+
+														</div>
+													</c:forEach>
 												</li>
 
 											</ul>
@@ -529,81 +569,89 @@ function editShippingAddress(orderNo) {
 													</h4>
 												</li>
 											</ul>
-											
+											${detailOrder }
 											<c:choose>
-											<c:when test="${detailOrder.paymentMethod eq 'bkt' }">
-											<ul class="summery-contain pb-0 border-bottom-0">
-												<li class="pb-0">
-													<h4 class="infoTitle">결제수단 :</h4>
-													<c:if test="${detailOrder.paymentMethod eq 'bkt' }">
-														<h4 class="infoContent">무통장 입금</h4>
-													</c:if>
-												</li>
+												<c:when test="${detailOrder.paymentMethod eq 'bkt' }">
+													<ul class="summery-contain pb-0 border-bottom-0">
+														<li class="pb-0">
+															<h4 class="infoTitle">결제수단 :</h4> <c:if
+																test="${detailOrder.paymentMethod eq 'bkt' }">
+																<h4 class="infoContent">무통장 입금</h4>
+															</c:if>
+														</li>
 
-												<li class="pb-0">
-													<h4 class="infoTitle">결제 상태 :</h4>
-													<h4 class="infoContent">${detailOrder.paymentStatus }</h4>
-												</li>
-												
-												<li class="pb-0">
-													<h4 class="infoTitle">입금 은행 :</h4>
-													<h4 class="infoContent">${detailOrder.cardNumber }</h4>
-												</li>
-												
-												<li class="pb-0">
-													<h4 class="infoTitle">입금자명 :</h4>
-													<h4 class="infoContent">${detailOrder.cardNumber }</h4>
-												</li>
-												
-												<li class="pb-0">
-													<h4 class="infoTitle">입금 금액 :</h4>
-													<h4 class="infoContent">${detailOrder.cardNumber }</h4>
-												</li>
-												
-												<li class="pb-0">
-													<h4 class="infoTitle">결제 상태 :</h4>
-													<h4 class="infoContent">${detailOrder.cardNumber }</h4>
-												</li>
-											</ul>
+														<li class="pb-0">
+															<h4 class="infoTitle">결제 상태 :</h4>
+															<h4 class="infoContent">${detailOrder.paymentStatus }</h4>
+														</li>
+
+														<li class="pb-0">
+															<h4 class="infoTitle">입금 은행 :</h4>
+															<h4 class="infoContent">${bankTransfer.bankName }</h4>
+														</li>
+
+														<li class="pb-0">
+															<h4 class="infoTitle">입금 계좌 :</h4>
+															<h4 class="infoContent">${bankTransfer.depositedAccount }</h4>
+														</li>
+
+														<li class="pb-0">
+															<h4 class="infoTitle">입금자명 :</h4>
+															<h4 class="infoContent">${bankTransfer.payerName }</h4>
+														</li>
+
+														<c:if test="${bankTransfer.paymentTime != null }">
+															<li class="pb-0">
+																<h4 class="infoTitle detailOrderOrderTime">입금 시간 :</h4>
+																<h4 class="infoContent">
+																	<fmt:formatDate value="${bankTransfer.paymentTime }"
+																		type="date" />
+																</h4>
+															</li>
+														</c:if>
+													</ul>
 												</c:when>
-												
+
 												<c:otherwise>
-											<ul class="summery-contain pb-0 border-bottom-0">
-												<li class="pb-0">
-													<h4 class="infoTitle">결제수단 :</h4>
-														<h4 class="infoContent">${detailOrder.paymentMethod}</h4>											
-												</li>
-											
-												<li class="pb-0">
-													<h4 class="infoTitle">결제 상태 :</h4>
-													<h4 class="infoContent">${detailOrder.paymentStatus }</h4>
-												</li>
-												
-																				
-												<li class="pb-0">
-													<h4 class="infoTitle">결제시간 :</h4>
-													<h4 class="infoContent"><fmt:formatDate value="${detailOrder.paymentTime }" type="date" /></h4>
-												</li>
-												
-											
-												<c:if test="${detailOrder.cardName != null}">
-												<li class="pb-0">
-													<h4 class="infoTitle">결제카드 :</h4>
-													<h4 class="infoContent">${detailOrder.cardName }</h4>
-												</li>
-												</c:if>
+													<ul class="summery-contain pb-0 border-bottom-0">
+														<li class="pb-0">
+															<h4 class="infoTitle">결제수단 :</h4>
+															<h4 class="infoContent">${detailOrder.paymentMethod}</h4>
+														</li>
 
-												<c:if test="${detailOrder.cardNumber != null}">
-												<li class="pb-0">
-													<h4 class="infoTitle">결제 카드 번호 :</h4>
-													<h4 class="infoContent">${detailOrder.cardNumber }</h4>
-												</li>
-												</c:if>
+														<li class="pb-0">
+															<h4 class="infoTitle">결제 상태 :</h4>
+															<h4 class="infoContent">${detailOrder.paymentStatus }</h4>
+														</li>
 
-											</ul>
+
+														<li class="pb-0">
+															<h4 class="infoTitle">결제시간 :</h4>
+															<h4 class="infoContent detailOrderOrderTime">
+																<fmt:formatDate value="${detailOrder.paymentTime }"
+																	type="date" />
+															</h4>
+														</li>
+
+
+														<c:if test="${detailOrder.cardName != null}">
+															<li class="pb-0">
+																<h4 class="infoTitle">결제카드 :</h4>
+																<h4 class="infoContent">${detailOrder.cardName }</h4>
+															</li>
+														</c:if>
+
+														<c:if test="${detailOrder.cardNumber != null}">
+															<li class="pb-0">
+																<h4 class="infoTitle">결제 카드 번호 :</h4>
+																<h4 class="infoContent">${detailOrder.cardNumber }</h4>
+															</li>
+														</c:if>
+
+													</ul>
 												</c:otherwise>
 											</c:choose>
-											
+
 										</div>
 									</div>
 
@@ -712,8 +760,7 @@ function editShippingAddress(orderNo) {
 					<button type="button" class="btn btn-secondary btn-md"
 						data-bs-dismiss="modal">닫기</button>
 					<button type="button" class="btn theme-bg-color btn-md text-white"
-						onclick="shippingAddrModify();"
-						data-bs-dismiss="modal">변경</button>
+						onclick="shippingAddrModify();" data-bs-dismiss="modal">변경</button>
 				</div>
 			</div>
 		</div>
@@ -750,8 +797,7 @@ function editShippingAddress(orderNo) {
 										<c:if test="${fn:contains(addr.basicAddr,'Y')}">
 											<span class="basicAddr">기본배송지</span>
 										</c:if>
-										 <input
-											class="form-check-input" type="radio"
+										<input class="form-check-input" type="radio"
 											value="${addr.addrSeq }" id="checkAddr" name="checkAddr" />
 									</h4>
 								</div>

@@ -97,7 +97,8 @@
 	</update>
 	
 	<select id="getDetailOrder" resultType="com.project.vodto.jmj.DetailOrder"> 
-		select d.product_price, d.product_quantity, d.product_status,  p.product_image, prod.product_name, d.product_invoice_number
+		select d.product_price,d.product_quantity, d.product_status, 
+		(SELECT p.product_image FROM product_images p WHERE p.product_id = prod.product_id limit 1) AS product_image, prod.product_name, d.product_invoice_number
 	    from detailed_order_items d, products prod, order_history o, product_images p
 	    where member_id = #{memberId} and d.order_no = #{orderNo}
         and prod.product_id = d.product_id
@@ -106,11 +107,11 @@
 	</select>
 	
 	<select id="getDetailOrderInfo" resultType="com.project.vodto.jmj.DetailOrderInfo">
-		select o.*, pay.payment_method, pay.total_amount, pay.shipping_fee, pay.used_reward, 
+		select o.*, pay.payment_method, pay.total_amount, pay.shipping_fee, pay.used_reward,
 		pay.used_points, pay.actual_payment_amount, pay.card_name, pay.card_number, pay.payment_status, pay.payment_time
 		from order_history o, payments pay
 		where member_id = #{memberId} and o.order_no = #{orderNo}
-		and o.order_no = pay.order_no;		
+		and o.order_no = pay.order_no	
 	</select>
 
 	<select id="pwdCheck" resultType="com.project.vodto.Member">
@@ -146,6 +147,12 @@
 		from coupons c, coupon_logs cl
 		where cl.member_id = #{memberId} and cl.order_no = #{orderNo}
 		and c.coupon_number = cl.coupon_number
+	</select>
+	
+	<select id="getBankTransfer" resultType="com.project.vodto.jmj.GetBankTransfer">
+		select bank_name, payer_name, deposited_account, payment_time
+		from bank_transfers 
+		where order_no = #{orderNo}
 	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">

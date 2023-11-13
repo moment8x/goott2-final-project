@@ -210,6 +210,7 @@
 		$('#newCellPhoneNumber').blur(function() {
 			duplicateCellPhone();
 		})
+
 	})
 
 	// 유효성 검사 메세지
@@ -1031,7 +1032,7 @@
 											href="orderDetail?no=${curOrder.orderNo }"
 											id="intoDetailOrder">상세보기</a>
 										</span>
-										<div>
+										<div id="orderTime">
 											<fmt:formatDate value="${curOrder.orderTime }" type="date" />
 										</div>
 										<section class="cart-section section-b-space curOrderList">
@@ -1059,10 +1060,19 @@
 																							</c:otherwise>
 																						</c:choose>
 																					</a>
+																					<c:set var="productNameLength" value="${fn:length(curOrder.productName)}" />
 																					<div class="product-detail">
 																						<ul>
+																						<c:choose>
+																						<c:when test="${productNameLength <= 6}">
 																							<li class="name"><a
 																								href="product-left-thumbnail.html">${curOrder.productName }</a></li>
+																						</c:when>
+																						<c:otherwise>
+																						<li class="name"><a
+																								href="product-left-thumbnail.html">${fn:substring(curOrder.productName, 0, 6)}...</a></li>
+																						</c:otherwise>
+																						</c:choose>
 																						</ul>
 																					</div>
 																				</div>
@@ -1072,15 +1082,15 @@
 																				<div class="product border-0">
 																					<div class="product-detail">
 																						<ul>
-																							<li class="name"><fmt:formatNumber
+																							<li class="name">총 금액 : <fmt:formatNumber
 																									value="${curOrder.actualPaymentAmount}"
 																									type="NUMBER" />원</li>
 																						</ul>
 																						<ul>
-																							<li class="name">${curOrder.totalOrderCnt}권</li>
+																							<li class="name">총 권수 : ${curOrder.totalOrderCnt}권</li>
 																						</ul>
 																						<ul>
-																							<li class="name">${curOrder.deliveryStatus }</li>
+																							<li class="name">주문상태 : ${curOrder.deliveryStatus }</li>
 																						</ul>
 																					</div>
 																				</div>
@@ -1608,7 +1618,7 @@
 														<a href="orderDetail?no=${order.orderNo }"
 																id="clickDetailOrder">상세보기</a>
 													</div>
-														<p class="text-content">
+														<p class="text-content" id="orderTime">
 															<fmt:formatDate value="${order.orderTime }" type="date" />
 															
 														</p>
@@ -1638,7 +1648,7 @@
 
 															<li>
 																<div class="size-box">
-																	<h6 class="text-content">배송상태 :</h6>
+																	<h6 class="text-content">주문상태 :</h6>
 																	<h5>${order.deliveryStatus }</h5>
 																</div>
 															</li>
