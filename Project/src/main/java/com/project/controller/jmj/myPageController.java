@@ -32,6 +32,7 @@ import com.project.service.member.MemberService;
 import com.project.vodto.Member;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.jmj.ChangeShippingAddr;
+import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.MyPageOrderList;
@@ -395,16 +396,24 @@ public class myPageController {
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
 		
+		Map<String, Object> result = null;
+		
 		try {
 			//주문상품 상세정보
 			List<DetailOrder> detailOrder = mService.getDetailOrderInfo(memberId, orderNo);
 			model.addAttribute("detailOrderInfo", detailOrder);
 			System.out.println("주문상품상세정보!!!!!" + detailOrder.toString());
 			
+
+			Map<String, Object>  map = mService.getOrderInfo(memberId, orderNo);
 			//주문상세정보
-			DetailOrderInfo detailOrderInfo = mService.getOrderInfo(memberId, orderNo);
+			DetailOrderInfo detailOrderInfo = (DetailOrderInfo)map.get("detailOrderInfo");
+			List<CouponHistory> couponHistory = (List<CouponHistory>)map.get("couponsHistory");
+			
 			model.addAttribute("detailOrder", detailOrderInfo);
-			System.out.println("주문상세정보@@" + detailOrderInfo.toString());
+			model.addAttribute("couponHistory", couponHistory);
+			
+			System.out.println("주문상세정보@@" + detailOrderInfo.toString() + "쿠폰 사용내역!!!" + couponHistory);
 			
 			//배송주소록
 			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
@@ -416,6 +425,11 @@ public class myPageController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	@RequestMapping(value ="orderDetail", method = RequestMethod.POST )
+	public void orderDetailPost() {
+		System.out.println("상세페이지");
 	}
 	
 	@RequestMapping(value = "editDeliveryAddress", method = RequestMethod.POST)

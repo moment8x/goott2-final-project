@@ -11,6 +11,7 @@ import com.project.vodto.Member;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.jmj.ChangeShippingAddr;
+import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.MyPageOrderList;
@@ -101,6 +102,9 @@ public interface MemberDAO {
 	// 출고전, 입금전 배송지를 새로운 배송지로 변경
 	int updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId) throws SQLException, NamingException;
 	
+	//주문상세 쿠폰내역
+	List<CouponHistory> getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException;
+	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -112,6 +116,8 @@ public interface MemberDAO {
 	// 프로필사진 업데이트
 	int updateProfile(String memberId, String newFileName) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+	
+	
 	
 	
 	

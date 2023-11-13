@@ -23,6 +23,8 @@ public class DetailOrderInfo {
 	private int actualPaymentAmount;
 	private String cardName;
 	private String cardNumber;
+	private String paymentStatus;
+	private Timestamp paymentTime;
 	
 	//order_history
 	private String orderNo;
@@ -36,4 +38,5 @@ public class DetailOrderInfo {
 	private String detailedShippingAddress;
 	private String deliveryStatus;
 	private String deliveryMessage;
+
 }

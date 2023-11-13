@@ -768,6 +768,9 @@
 	display: flex;
 	gap: 10px;
 }
+.cart-section.section-b-space.curOrderList{
+	padding-bottom: 0px;
+}
 </style>
 </head>
 
@@ -1031,7 +1034,7 @@
 										<div>
 											<fmt:formatDate value="${curOrder.orderTime }" type="date" />
 										</div>
-										<section class="cart-section section-b-space">
+										<section class="cart-section section-b-space curOrderList">
 											<div class="container-fluid-lg recentOrderHistoy">
 												<div class="row g-sm-5 g-3">
 													<div class="col-xxl-9 recentOrder">

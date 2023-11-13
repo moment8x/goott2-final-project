@@ -1,7 +1,9 @@
 package com.project.service.member;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
@@ -212,9 +214,13 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public DetailOrderInfo getOrderInfo(String memberId, String orderNo) throws SQLException, NamingException {
-
-		return mDao.selectDetailOrderInfo(memberId, orderNo);
+	public Map<String, Object> getOrderInfo(String memberId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> result = new HashMap<String, Object>();
+		
+		result.put("detailOrderInfo", mDao.selectDetailOrderInfo(memberId, orderNo));
+		result.put("couponsHistory", mDao.getCouponsHistory(memberId, orderNo));
+		
+		return result;
 	}
 	
 	@Override

@@ -107,10 +107,10 @@
 	
 	<select id="getDetailOrderInfo" resultType="com.project.vodto.jmj.DetailOrderInfo">
 		select o.*, pay.payment_method, pay.total_amount, pay.shipping_fee, pay.used_reward, 
-		pay.used_points, pay.actual_payment_amount, pay.card_name, pay.card_number
+		pay.used_points, pay.actual_payment_amount, pay.card_name, pay.card_number, pay.payment_status, pay.payment_time
 		from order_history o, payments pay
 		where member_id = #{memberId} and o.order_no = #{orderNo}
-		and o.order_no = pay.order_no;
+		and o.order_no = pay.order_no;		
 	</select>
 
 	<select id="pwdCheck" resultType="com.project.vodto.Member">
@@ -140,6 +140,13 @@
 		shipping_address = #{shippingAddress}, detailed_shipping_address=#{detailedShippingAddress}, delivery_message=#{deliveryMessage}
         where member_id = #{memberId} and order_no = #{orderNo}
 	</update>
+
+	<select id="gerCouponsHistory" resultType="com.project.vodto.jmj.CouponHistory">
+		select c.discount_method, c.discount_amount, c.coupon_name 
+		from coupons c, coupon_logs cl
+		where cl.member_id = #{memberId} and cl.order_no = #{orderNo}
+		and c.coupon_number = cl.coupon_number
+	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">
 		SELECT member_id FROM member WHERE member_id = #{memberId}  

@@ -2,6 +2,7 @@ package com.project.service.member;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import javax.naming.NamingException;
 
@@ -79,10 +80,7 @@ public interface MemberService {
 	List<DetailOrder> getDetailOrderInfo(String memberId, String orderNo) throws SQLException, NamingException;
 	
 	//주문상세페이지 정보가져오기
-	DetailOrderInfo getOrderInfo(String memberId, String orderNo) throws SQLException, NamingException;
-	
-	//출고전, 입금전 배송지 변경하기
-//	int updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId) throws SQLException, NamingException;
+	Map<String, Object> getOrderInfo(String memberId, String orderNo) throws SQLException, NamingException;
 	
 	//출고전, 입금전 배송주소록에서 배송지선택해서 변경하기
 	boolean selectBasicAddr(String memberId, int addrSeq, String orderNo, String deliveryMessage) throws SQLException, NamingException;
