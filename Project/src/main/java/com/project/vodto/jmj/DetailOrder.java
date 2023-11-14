@@ -20,4 +20,5 @@ public class DetailOrder {
 	private String productName;
 	private String productImage;
 	private String productInvoiceNumber;
+	private String productId;
 }

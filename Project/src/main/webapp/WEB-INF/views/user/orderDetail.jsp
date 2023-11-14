@@ -297,14 +297,14 @@ function editShippingAddress(orderNo) {
 
 													<c:choose>
 														<c:when test="${order.productImage != '' }">
-															<a href="product.left-sidebar.html" class="product-image">
+															<a href="/detail/${order.productId }" class="product-image">
 																<img src="${order.productImage }"
 																class="img-fluid blur-up lazyload"
 																alt="${order.productName }">
 															</a>
 														</c:when>
 														<c:otherwise>
-															<a href="product.left-sidebar.html" class="product-image">
+															<a href="/detail/${order.productId }" class="product-image">
 																<img src="/resources/assets/images/noimage.jpg"
 																class="img-fluid blur-up lazyload"
 																alt="${order.productName }">
@@ -320,11 +320,11 @@ function editShippingAddress(orderNo) {
 															<c:choose>
 																<c:when test="${productNameLength <= 5}">
 																	<li class="name"><a
-																		href="product-left-thumbnail.html" id="productName">${order.productName }</a></li>
+																		href="/detail/${order.productId }" id="productName">${order.productName }</a></li>
 																</c:when>
 																<c:otherwise>
 																	<li class="name"><a
-																		href="product-left-thumbnail.html" id="productName">${fn:substring(order.productName, 0, 5)}...</a></li>
+																		href="/detail/${order.productId }" id="productName">${fn:substring(order.productName, 0, 5)}...</a></li>
 																</c:otherwise>
 															</c:choose>
 														</ul>
@@ -394,7 +394,7 @@ function editShippingAddress(orderNo) {
 														<h5>${order.productStatus }</h5>
 													</td>
 													<td class="completeBtn">
-														<button class="btn theme-bg-color text-white m-0"
+														<button class="btn theme-bg-color text-white m-0" onclick="location.href='/detail/${order.productId }';"
 															type="button" id="button-addon1">
 															<span>리뷰작성</span>
 														</button>
@@ -463,7 +463,7 @@ function editShippingAddress(orderNo) {
 														</li>
 													</c:otherwise>
 												</c:choose>
-												<li class="deliverMsg">* 출고전 / 입금전 상품에 대해서 배송지 변경이
+												<li class="deliverMsg">* 출고전 / 입금전 상품에 대해서만 배송지 변경이
 													가능합니다.</li>
 												<c:forEach var="order" items="${detailOrderInfo }" begin="0"
 													end="0">
@@ -535,12 +535,13 @@ function editShippingAddress(orderNo) {
 														<div class="couponsHistory">
 															<h4 class="infoContent">${coupons.couponName }</h4>
 
-
+															<c:set var="discountAmount" value="${coupons.discountAmount * 0.01}" />
+															
 															<c:if test="${fn:contains(coupons.discountMethod,'P')}">
 																<h4 class="infoContent">${coupons.discountAmount }%</h4>
 																<h4 class="infoContent">
 																	<fmt:formatNumber
-																		value="${detailOrder.totalAmount*0.1 }" type="NUMBER" />
+																		value="${detailOrder.totalAmount*discountAmount }" type="NUMBER" />
 																	원
 																</h4>
 															</c:if>
@@ -655,7 +656,7 @@ function editShippingAddress(orderNo) {
 										</div>
 									</div>
 
-									<div class="col-lg-12 col-sm-6 orderInfo">
+								<!--  <div class="col-lg-12 col-sm-6 orderInfo">
 										<div class="summery-box">
 											<div class="summery-header d-block">
 												<h3>포인트 / 적립금</h3>
@@ -669,7 +670,7 @@ function editShippingAddress(orderNo) {
 												</li>
 											</ul>
 										</div>
-									</div>
+									</div>-->
 								</div>
 							</div>
 							<div class="moveBtn">

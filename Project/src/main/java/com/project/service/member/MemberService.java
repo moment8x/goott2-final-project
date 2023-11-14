@@ -15,6 +15,7 @@ import com.project.vodto.ShippingAddress;
 import com.project.vodto.UploadFiles;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 
 public interface MemberService {
@@ -90,6 +91,9 @@ public interface MemberService {
 	
 	// 출고전, 입금전 배송지를 새로운 배송지로 변경
 	boolean updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId) throws SQLException, NamingException;
+	
+	//주문내역 상태별 검색
+	List<MyPageOrderList> searchOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword) throws SQLException, NamingException;
 
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
@@ -100,6 +104,7 @@ public interface MemberService {
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
+	
 	
 	
 	

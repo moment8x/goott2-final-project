@@ -25,6 +25,7 @@ import com.project.vodto.ShippingAddress;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.UploadFiles;
 
@@ -255,6 +256,13 @@ public class MemberServiceImpl implements MemberService {
 		
 		return result;
 	}
+	
+	@Override
+	public List<MyPageOrderList> searchOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword)
+			throws SQLException, NamingException {
+		
+		return null;
+	}
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
 	@Override
@@ -309,6 +317,8 @@ public class MemberServiceImpl implements MemberService {
 		System.out.println("======= 멤버(로그인) 서비스단 끝 =======");
 		return result;
 	}
+
+
 
 	// --------------------------------------- 김진솔 끝 ----------------------------------------
 

@@ -36,6 +36,7 @@ import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetBankTransfer;
+import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.kjy.Memberkjy;
 
@@ -125,7 +126,7 @@ public class myPageController {
 	}
 	
 	@RequestMapping(value = "shippingAddrModify", method = RequestMethod.POST)
-	public void shippingAddrModify(@ModelAttribute ShippingAddress tmpAddr, HttpServletRequest request, @RequestParam Map<String, Object> map) {
+	public ResponseEntity<ShippingAddress> shippingAddrModify(@ModelAttribute ShippingAddress tmpAddr, HttpServletRequest request, @RequestParam Map<String, Object> map) {
 		System.out.println("배송주소록 수정" + tmpAddr.toString());
 		
 		HttpSession session = request.getSession();
@@ -134,6 +135,11 @@ public class myPageController {
 		
 		Object addrSeqObj = map.get("addrSeq");
 
+		ResponseEntity<ShippingAddress> result = null;
+		
+		HttpHeaders header = new HttpHeaders();
+		header.add("Content-Type", "application/json; charset=UTF-8");
+		
 		if (addrSeqObj != null) {
 			try {
 				// String을 int로 변환
@@ -144,14 +150,18 @@ public class myPageController {
 				
 				if (mService.shippingAddrModify(memberId, tmpAddr, addrSeq)) {
 					System.out.println("배송주소록 수정 완");
+					result = new ResponseEntity<ShippingAddress>(tmpAddr, header, HttpStatus.OK);
 				}
 			} catch (Exception e) {
 				System.out.println("예외났음 : " + addrSeqObj);
+				result = new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
 		}else {
 		    // addrSeqObj가 null인 경우
 		    System.out.println("addrSeq null");
+		    result = new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
+		return result;
 	}
 	
 	@RequestMapping("jusoPopup")
@@ -472,5 +482,14 @@ public class myPageController {
 			result = new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
 		return result;
+	}
+	
+	@RequestMapping(value = "searchOrderStatus", method = RequestMethod.POST)
+	public void searchOrderStatus(@ModelAttribute GetOrderStatusSearchKeyword keyword, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
+		mService.searchOrderStatus(memberId, keyword);
 	}
 }

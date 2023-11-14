@@ -409,7 +409,11 @@
 			async : false,
 			success : function(data) {
 				console.log(data);
-					location.reload()
+				$('#addrRecipient').text(data.recipient)
+				$('#addrRecipientContact').text(data.recipientContact)
+				$('#addrZipCode').text(data.zipCode)
+				$('#addrAddress').text(data.address)
+				$('#addrDetailAddress').text(data.detailAddress)
 			},
 			error : function() {
 			}
@@ -627,31 +631,31 @@
 		});
 	}
 	
-	//배송주소록 수정
-	function shippingAddrModify() {
-		let zipCode = $('#shippingZipNoModify').val()
-		let address = $('#shippingAddrModify').val()
-		let detailAddress = $('#shippingDetailAddrModify').val()
-			
+	function statusBtn() {
+		let beforeShipping = $('#beforeShipping').text()
+		let beforeDeposit = $('#beforeDeposit').text()
+		let shipping = $('#shipping').text()
+		let deliveryCompleted = $('#deliveryCompleted').text()
+		let cancelList = $('#cancelList').text()
+		let exchangeList = $('#exchangeList').text()
+		let returnList = $('#returnList').text()
+		
 		$.ajax({
-			url : '/user/shippingAddrModify', // 데이터를 수신받을 서버 주소
+			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
-				zipCode,
-				address,
-				detailAddress
+				beforeShipping,
+				beforeDeposit,
+				shipping,
+				deliveryCompleted,
+				cancel,
+				exchange,
+				productReturn
 			},
 			dataType : 'json',
 			async : false,
 			success : function(data) {
 				console.log(data);
-				//if(data == true){
-				//	$('#addZipNo').val('')
-				//	$('#addAddr').val('')
-				//	$('#addAddrDetail').val('')
-					
-				//	location.reload()
-				//}
 			},
 			error : function() {
 			}
@@ -1046,7 +1050,7 @@
 																		<tr class="product-box-contain">
 																			<td class="product-detail">
 																				<div class="product border-0">
-																					<a href="product-left-thumbnail.html"
+																					<a href="/detail/${curOrder.productId }"
 																						class="product-image"> <c:choose>
 																							<c:when test="${curOrder.productImage != '' }">
 																								<img src="${curOrder.productImage }"
@@ -1066,11 +1070,11 @@
 																						<c:choose>
 																						<c:when test="${productNameLength <= 6}">
 																							<li class="name"><a
-																								href="product-left-thumbnail.html">${curOrder.productName }</a></li>
+																								href="/detail/${curOrder.productId }">${curOrder.productName }</a></li>
 																						</c:when>
 																						<c:otherwise>
 																						<li class="name"><a
-																								href="product-left-thumbnail.html">${fn:substring(curOrder.productName, 0, 6)}...</a></li>
+																								href="/detail/${curOrder.productId }">${fn:substring(curOrder.productName, 0, 6)}...</a></li>
 																						</c:otherwise>
 																						</c:choose>
 																						</ul>
@@ -1565,29 +1569,39 @@
 
 										<div id="deliveryStatus">
 											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn"
+												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="beforeDepositBtn();"
 												type="button" id="button-addon1">
-												<span>준비중</span> <span>0</span>
+												<span id="beforeDeposit">입금전</span> <span>0</span>
 											</button>
 											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn"
+												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="beforeShippingBtn();"
 												type="button" id="button-addon1">
-												<span>배송중</span> <span>0</span>
+												<span id="beforeShipping">출고전</span> <span>0</span>
 											</button>
 											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn"
+												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="shippingBtn()"
 												type="button" id="button-addon1">
-												<span>배송완료</span> <span>0</span>
+												<span id="shipping">배송중</span> <span>0</span>
 											</button>
 											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn"
+												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="deliveryCompletedBtn()"
 												type="button" id="button-addon1">
-												<span>취소</span> <span>0</span>
+												<span id="deliveryCompleted">배송완료</span> <span>0</span>
 											</button>
 											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn"
+												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="cancelListBtn()"
 												type="button" id="button-addon1">
-												<span>교환/반품</span> <span>0</span>
+												<span id="cancelList">취소</span> <span>0</span>
+											</button>
+											<button
+												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="exchangeListBtn()"
+												type="button" id="button-addon1">
+												<span id="exchangeList">교환</span> <span>0</span>
+											</button>
+											<button
+												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="returnListBtn()"
+												type="button" id="button-addon1">
+												<span id="returnList">반품</span> <span>0</span>
 											</button>
 										</div>
 									</div>
@@ -1598,13 +1612,13 @@
 												<div class="product-order-detail">
 													<c:choose>
 														<c:when test="${order.productImage != '' }">
-															<a href="#" class="order-image"> <img
+															<a href="/detail/${order.productId }" class="order-image"> <img
 																src="${order.productImage }" class="blur-up lazyload"
 																alt="${order.productName }" id="productImg" />
 															</a>
 														</c:when>
 														<c:otherwise>
-															<a href="#" class="order-image"> <img
+															<a href="/detail/${order.productId }" class="order-image"> <img
 																src="/resources/assets/images/noimage.jpg"
 																class="blur-up lazyload" alt="noImg" id="productImg" />
 															</a>
@@ -1623,7 +1637,7 @@
 															
 														</p>
 
-														<a href="#">
+														<a href="/detail/${order.productId }">
 															<h3>${order.productName }</h3>
 														</a>
 														<ul class="product-size">
@@ -2050,10 +2064,6 @@
 										</div>
 
 										<button
-											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3">
-											<i data-feather=check class="me-2"></i> 기본배송지로 설정
-										</button>
-										<button
 											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
 											data-bs-toggle="modal" data-bs-target="#add-address">
 											<i data-feather="plus" class="me-2"></i> 배송지 추가
@@ -2079,28 +2089,28 @@
 															<table class="table">
 																<tbody>
 																	<tr>
-																		<td colspan="2">${addr.recipient}</td>
+																		<td colspan="2" id="addrRecipient">${addr.recipient}</td>
 																	</tr>
 
 																	<tr>
-																		<td colspan="2">${addr.recipientContact}</td>
+																		<td colspan="2" id="addrRecipientContact">${addr.recipientContact}</td>
 																	</tr>
 
 																	<tr>
 																		<td>우편번호 :</td>
 																		<td>
-																			<p>${addr.zipCode }</p>
+																			<p id="addrZipCode">${addr.zipCode }</p>
 																		</td>
 																	</tr>
 
 																	<tr>
 																		<td>주소 :</td>
-																		<td>${addr.address }</td>
+																		<td id="addrAddress">${addr.address }</td>
 																	</tr>
 
 																	<tr>
 																		<td>상세주소 :</td>
-																		<td>${addr.detailAddress }</td>
+																		<td id="addrDetailAddress">${addr.detailAddress }</td>
 																	</tr>
 																</tbody>
 															</table>

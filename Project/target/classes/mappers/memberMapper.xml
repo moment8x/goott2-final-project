@@ -97,7 +97,7 @@
 	</update>
 	
 	<select id="getDetailOrder" resultType="com.project.vodto.jmj.DetailOrder"> 
-		select d.product_price,d.product_quantity, d.product_status, 
+		select d.product_price,d.product_quantity, d.product_status, prod.product_id,
 		(SELECT p.product_image FROM product_images p WHERE p.product_id = prod.product_id limit 1) AS product_image, prod.product_name, d.product_invoice_number
 	    from detailed_order_items d, products prod, order_history o, product_images p
 	    where member_id = #{memberId} and d.order_no = #{orderNo}
