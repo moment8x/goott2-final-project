@@ -16,7 +16,7 @@ public class InquiryCondition {
 	private String author;
 	private String name;
 	private String orderNo;
-	private String status;
+	private String answerStatus;
 	private String inquiryType;
 	private boolean file;
 }

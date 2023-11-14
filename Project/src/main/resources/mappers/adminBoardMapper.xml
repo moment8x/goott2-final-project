@@ -22,15 +22,15 @@
 			ON b.author = m.member_id
 		LEFT JOIN board_uf f
 			ON b.post_no = f.post_no
-		LEFT JOIN (select s.post_no, s.re, s.ref, s.ref_order
-				from (select b.post_no, b.ref, b.ref_order,
-				(select count(*) from board where ref = b.ref and step = b.step + 1 and ref_order >= b.ref_order + 1) re
+		LEFT JOIN (SELECT s.post_no, s.re, s.ref, s.ref_order
+				FROM (SELECT b.post_no, b.ref, b.ref_order,
+				(SELECT count(*) FROM board WHERE ref = b.ref AND step = b.step + 1 AND ref_order >= b.ref_order + 1) re
 				from board b) s) r
 			ON b.post_no = r.post_no
 		<where>
 			<if test='(createdDateStart != null and !createdDateStart.equals("")) and 
 	         		(createdDateEnd != null and !dcreatedDateEnd.equals(""))'>
-	         		AND created_date BETWEEN #{createdDateStart} AND #{createdDateEnd}
+	         		AND b.created_date BETWEEN #{createdDateStart} AND #{createdDateEnd}
          	</if>
          	<if test='categoryId != null and !categoryId.equals("")' >
 				AND b.category_id = #{categoryId}
