@@ -145,7 +145,7 @@
 	<select id="gerCouponsHistory" resultType="com.project.vodto.jmj.CouponHistory">
 		select c.discount_method, c.discount_amount, c.coupon_name 
 		from coupons c, coupon_logs cl
-		where cl.member_id = #{memberId} and cl.order_no = #{orderNo}
+		where cl.member_id = #{memberId} and cl.related_order = #{orderNo}
 		and c.coupon_number = cl.coupon_number
 	</select>
 	
@@ -153,6 +153,41 @@
 		select bank_name, payer_name, deposited_account, payment_time
 		from bank_transfers 
 		where order_no = #{orderNo}
+	</select>
+	
+	<select id="searchOrderStatus" resultType="com.project.vodto.jmj.MyPageOrderList">
+		SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, d.product_id,
+	    pay.actual_payment_amount, p.product_image,  prod.product_name, sum(d.product_quantity) as totalOrderCnt
+	    FROM products prod, detailed_order_items d, order_history o, payments pay, product_images p
+        where member_id = #{memberId} 
+        <choose>
+	        <when test="beforeShipping != null">
+		        and d.product_status = '출고전'        
+	        </when>
+	        <when test="beforeDeposit != null">
+		        and d.product_status = '입금전'        
+	        </when>
+	        <when test="shipping != null">
+		        and d.product_status = '배송중'        
+	        </when>
+	        <when test="deliveryCompleted != null">
+		        and o.delivery_status = '배송완료'        
+	        </when>
+	        <when test="cancelList != null">
+		        and d.product_status = '취소'        
+	        </when>
+	        <when test="exchangeList != null">
+		        and d.product_status = '교환'        
+	        </when>
+	        <when test="returnList != null">
+		        and d.product_status = '반품'        
+	        </when>
+        </choose>
+        and prod.product_id = d.product_id
+        and d.product_id = p.product_id
+        and d.order_no = o.order_no
+        and o.order_no = pay.order_no 
+        group by o.order_no order by order_time desc
 	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">
@@ -183,5 +218,7 @@
 		</selectKey>
 		UPDATE member SET profile_image = #{ufSeq} where member_id = #{memberId}
 	</update>
+	
+	
 	<!-- =========================== 김진솔 끝 =========================== -->
 </mapper>

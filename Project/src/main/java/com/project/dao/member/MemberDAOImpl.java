@@ -19,6 +19,7 @@ import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetBankTransfer;
+import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 
 @Repository
@@ -290,6 +291,22 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectOne(ns + ".getBankTransfer", orderNo);
 	}
+	
+	@Override
+	public List<MyPageOrderList> selectOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("beforeDeposit", keyword.getBeforeDeposit());
+		params.put("beforeShipping", keyword.getBeforeShipping());
+		params.put("shipping", keyword.getShipping());
+		params.put("deliveryCompleted", keyword.getDeliveryCompleted());
+		params.put("cancelList", keyword.getCancelList());
+		params.put("exchangeList", keyword.getExchangeList());
+		params.put("returnList", keyword.getReturnList());
+		
+		return ses.selectList(ns + ".searchOrderStatus", params);
+	}
 
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
@@ -333,10 +350,6 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".updateProfile", params);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
-
-
-	
-
 
 
 	

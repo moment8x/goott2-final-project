@@ -631,37 +631,249 @@
 		});
 	}
 	
-	function statusBtn() {
-		let beforeShipping = $('#beforeShipping').text()
+	//입금전 조회
+	function beforeDepositBtn() {
 		let beforeDeposit = $('#beforeDeposit').text()
-		let shipping = $('#shipping').text()
-		let deliveryCompleted = $('#deliveryCompleted').text()
-		let cancelList = $('#cancelList').text()
-		let exchangeList = $('#exchangeList').text()
-		let returnList = $('#returnList').text()
 		
 		$.ajax({
 			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
-				beforeShipping,
-				beforeDeposit,
-				shipping,
-				deliveryCompleted,
-				cancel,
-				exchange,
-				productReturn
+				beforeDeposit
 			},
 			dataType : 'json',
 			async : false,
 			success : function(data) {
 				console.log(data);
+				outputOrder(data)
 			},
 			error : function() {
 			}
 		});
 	}
 	
+	//출고전 조회
+	function beforeShippingBtn() {
+		let beforeShipping = $('#beforeShipping').text()
+		
+		$.ajax({
+			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				beforeShipping
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				outputOrder(data)
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//배송중 조회
+	function shippingBtn() {
+		let shipping = $('#shipping').text()
+		
+		$.ajax({
+			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				shipping
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				outputOrder(data)
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//배송완료 조회
+	function deliveryCompletedBtn() {
+		let deliveryCompleted = $('#deliveryCompleted').text()
+
+		$.ajax({
+			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				deliveryCompleted
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				outputOrder(data)
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//취소 조회
+	function cancelListBtn() {
+		let cancelList = $('#cancelList').text()
+		
+		$.ajax({
+			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				cancelList
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				outputOrder(data)
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//교환 조회
+	function exchangeListBtn() {
+		let exchangeList = $('#exchangeList').text()
+		
+		$.ajax({
+			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				exchangeList
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				outputOrder(data)
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//반품 조회
+	function returnListBtn() {
+		let returnList = $('#returnList').text()
+		
+		$.ajax({
+			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				returnList
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				outputOrder(data)
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	function outputOrder(order) {
+		let output = ''
+		$.each(order, function(i, e) {
+			output += `<div class="product-order-detail" id="productOrderDetail">`
+			output += `<a href="/detail/\${e.productId }" class="order-image">`
+			output += `<img src="\${e.productImage }" class="blur-up lazyload"
+					alt="\${e.productName }" id="productImg" />`
+			output += `</a>`
+			output += `<div class="order-wrap">`
+			output += `<div id="orderWrap">`
+			output += `<span class="orderDetailClick">주문번호 : \${e.orderNo }</span>`
+			output += `<a href="orderDetail?no=\${e.orderNo }" id="clickDetailOrder">상세보기</a>`
+			output += `</div>`	
+			let orderTime = formatDate(e.orderTime)
+			output += `<p class="text-content" id="orderTime">\${orderTime}</p>`
+			output += `<a href="/detail/\${e.productId }">`
+			output += `<h3>\${e.productName }</h3>`
+			output += `</a>`
+			output += `<ul class="product-size">`
+			output += `<li>`
+			output += `<div class="size-box">`
+			output += `<h6 class="text-content">총 수량 :</h6>`
+			output += `<h5>\${e.totalOrderCnt }권</h5>`
+			output += `</div>`
+			output += `</li>`
+			output += `<li>`
+			output += `<div class="size-box">`
+			output += `<h6 class="text-content">결제금액 :</h6>`
+			let actualPaymentAmount = Number(e.actualPaymentAmount)
+				actualPaymentAmount = actualPaymentAmount.toLocaleString()
+			output += `<h5>\${actualPaymentAmount}원</h5>`
+			output += `</div>`
+			output += `</li>`
+			output += `<li>`
+			output += `<div class="size-box">`
+			output += `<h6 class="text-content">주문상태 :</h6>`
+			output += `<h5>\${e.deliveryStatus }</h5>`
+			output += `</div>`
+			output += `</li>`
+			output += `<li>`
+			output += `<div class="size-box">`
+			output += `<div id="orderStatus">`
+			if(e.deliveryStatus == '출고전'){
+				output += `button class="btn theme-bg-color text-white m-0" type="button" id="button-addon1">`	
+				output += `<span>취소</span>`
+				output += `</button>`
+			}else if(e.deliveryStatus == '입금전'){
+				output += `<button class="btn theme-bg-color text-white m-0"
+					type="button" id="button-addon1">`
+				output += `<span>취소</span>`
+				output += `</button>`
+			}else if(e.deliveryStatus == '출고완료'){
+				output += `<button class="btn theme-bg-color text-white m-0"
+					type="button" id="button-addon1">`
+				output += `<span>배송조회</span>`
+					output += `</button>`
+				output += `<div>${order.invoiceNumber }</div>`
+			}else if(e.deliveryStatus == '배송중'){
+				output += `<button class="btn theme-bg-color text-white m-0"
+					type="button" id="button-addon1">`
+				output += `<span>배송조회</span>`
+					output += `</button>`
+				output += `<div>${order.invoiceNumber }</div>`
+			}else if(e.deliveryStatus == '취소'){
+				output += `<div>취소</div>`
+				output += ``
+			}else{
+				output += `<button class="btn theme-bg-color text-white m-0"
+					type="button" id="button-addon1">`
+				output += `<span>교환</span>`
+					output += `</button>`
+				output += `<button class="btn theme-bg-color text-white m-0"
+					type="button" id="button-addon1">`
+				output += `<span>반품</span>`
+					output += `</button>`
+			}
+			output += `</div>`
+			output += `</div>`
+			output += `</li>`
+			output += `</ul>`
+			output += `</div>`
+			output += `</div>`
+			output += `</div>`
+		})
+		$('.order-box.dashboard-bg-box').html(output)
+	}
+	
+	function formatDate(date) {
+		let orderDate = new Date(date)
+		let year = orderDate.getFullYear();
+		let month = orderDate.getMonth() + 1;
+		let day = orderDate.getDate();
+		let dateStr = year+'-'+month+'-'+day;
+		
+		return dateStr
+	}
 	
 </script>
 <style>
@@ -1609,7 +1821,7 @@
 										<div class="order-box dashboard-bg-box">
 
 											<c:forEach var="order" items="${orderList }">
-												<div class="product-order-detail">
+												<div class="product-order-detail" id="productOrderDetail">
 													<c:choose>
 														<c:when test="${order.productImage != '' }">
 															<a href="/detail/${order.productId }" class="order-image"> <img
@@ -1703,7 +1915,6 @@
 
 																			<c:when test="${order.deliveryStatus eq '취소' }">
 																				<div>취소</div>
-																				<div>${order.invoiceNumber }</div>
 																			</c:when>
 
 																			<c:otherwise>

@@ -152,9 +152,6 @@ function editBasicShippingAddress() {
 			});
 }
 
-function editShippingAddress(orderNo) {
-	
-}
 </script>
 <style type="text/css">
 .completeBtn Button, .btn.theme-bg-color.text-white.m-0.productStatusBtn

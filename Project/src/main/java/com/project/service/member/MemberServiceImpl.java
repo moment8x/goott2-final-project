@@ -261,7 +261,7 @@ public class MemberServiceImpl implements MemberService {
 	public List<MyPageOrderList> searchOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword)
 			throws SQLException, NamingException {
 		
-		return null;
+		return mDao.selectOrderStatus(memberId, keyword);
 	}
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
