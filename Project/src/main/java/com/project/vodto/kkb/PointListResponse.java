@@ -7,10 +7,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RewardResponse {
+public class PointListResponse {
 	private String reason;
 	private Timestamp date;
-	private int reward;
-	private int totalReward;
+	private int point;
+	private int balance;
 	private String relatedOrder;
 }

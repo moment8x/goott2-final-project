@@ -21,7 +21,7 @@
 		INNER JOIN member m
 			ON c.author = m.member_id
 		LEFT JOIN customer_inquiries_uf f
-			ON c.post_no = f.post_no;
+			ON c.post_no = f.post_no
 		<where>
 			<if test='(createdDateStart != null and !createdDateStart.equals("")) and 
 	         		(createdDateEnd != null and !dcreatedDateEnd.equals(""))'>

@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CouponResponse {
+public class CouponInfoResponse {
 	private String couponNumber;
 	private String couponName;
 	private String categoryName;
