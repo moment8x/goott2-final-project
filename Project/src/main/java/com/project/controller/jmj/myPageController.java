@@ -69,7 +69,7 @@ public class myPageController {
 			model.addAttribute("userAddrList", userAddrList);
 			
 			//주문상태별 갯수
-			mService.getOrderStatusCnt();
+			//mService.getOrderStatusCnt();
 			
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
@@ -484,12 +484,13 @@ public class myPageController {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
-		System.out.println("키워드@@@@@@@@@@@@@@@@@@@@@@@"+keyword.toString());
 
 		ResponseEntity<List<MyPageOrderList>> result = null;
 		
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
+		
+		System.out.println("@@@@@@@@@@@@@@키워드@@@@@@@@@@@@@@@" + keyword.toString());
 		
 		try {
 			List<MyPageOrderList> sos = mService.searchOrderStatus(memberId, keyword);

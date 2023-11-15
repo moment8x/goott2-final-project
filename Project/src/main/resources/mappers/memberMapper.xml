@@ -7,8 +7,8 @@
 	<select id="getOrderList"
 		resultType="com.project.vodto.jmj.MyPageOrderList">
 	SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, d.product_id,
-		pay.actual_payment_amount, p.product_image,  prod.product_name, sum(d.product_quantity) as totalOrderCnt
-		FROM products prod, detailed_order_items d, order_history o, payments pay, product_images p
+      pay.actual_payment_amount, p.product_image, prod.product_name, sum(d.product_quantity) as totalOrderCnt
+      FROM products prod, detailed_order_items d, order_history o, payments pay, (SELECT * FROM product_images GROUP BY product_id) p
         where member_id = #{memberId}
         and prod.product_id = d.product_id
         and d.product_id = p.product_id
@@ -58,7 +58,7 @@
 		update member set email=#{email} where member_id=#{memberId}
 	</update>
 	<update id="updateRefund">
-		update member set refund_bank=#{refundBank}, refund_account=#{refundAccount} where member_id=#{memberId}
+		update member set refund_bank=#{refundBank}, refund_account=#{refundAccount}, account_holder=#{accountHolder} where member_id=#{memberId}
 	</update>
 	
 	<update id="deleteUser">
@@ -99,7 +99,7 @@
 	<select id="getDetailOrder" resultType="com.project.vodto.jmj.DetailOrder"> 
 		select d.product_price,d.product_quantity, d.product_status, prod.product_id,
 		(SELECT p.product_image FROM product_images p WHERE p.product_id = prod.product_id limit 1) AS product_image, prod.product_name, d.product_invoice_number
-	    from detailed_order_items d, products prod, order_history o, product_images p
+	    from detailed_order_items d, products prod, order_history o, (SELECT * FROM product_images GROUP BY product_id) p
 	    where member_id = #{memberId} and d.order_no = #{orderNo}
         and prod.product_id = d.product_id
         and d.order_no = o.order_no
@@ -126,9 +126,9 @@
 	
 	<select id="getCurOrderHistory" resultType="com.project.vodto.jmj.MyPageOrderList">
 		SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, d.product_id,
-		pay.actual_payment_amount, p.product_image,  prod.product_name, sum(d.product_quantity) as totalOrderCnt
-		FROM products prod, detailed_order_items d, order_history o, payments pay, product_images p
-        where member_id = 'abcd123'
+      pay.actual_payment_amount, p.product_image, prod.product_name, sum(d.product_quantity) as totalOrderCnt
+      FROM products prod, detailed_order_items d, order_history o, payments pay, (SELECT * FROM product_images GROUP BY product_id) p
+        where member_id = #{memberId} and o.order_time between (NOW() - INTERVAL 7 day) and now() 
         and prod.product_id = d.product_id
         and d.product_id = p.product_id
         and d.order_no = o.order_no
@@ -157,33 +157,42 @@
 	
 	<select id="searchOrderStatus" resultType="com.project.vodto.jmj.MyPageOrderList">
 		SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, d.product_id,
-	    pay.actual_payment_amount, p.product_image,  prod.product_name, sum(d.product_quantity) as totalOrderCnt
-	    FROM products prod, detailed_order_items d, order_history o, payments pay, product_images p
-        where member_id = #{memberId} 
+      pay.actual_payment_amount, p.product_image, prod.product_name, sum(d.product_quantity) as totalOrderCnt
+      FROM products prod, detailed_order_items d, order_history o, payments pay, (SELECT * FROM product_images GROUP BY product_id) p
+      where member_id = #{memberId}
         <choose>
-	        <when test="beforeShipping != null">
-		        and d.product_status = '출고전'        
+	        <when test="beforeShipping != null and beforeShipping.equals('출고전')">
+		        and d.product_status = '출고전'     
 	        </when>
-	        <when test="beforeDeposit != null">
-		        and d.product_status = '입금전'        
+	        <when test="beforeDeposit != null and beforeDeposit.equals('입금전')">
+		         and d.product_status = '입금전' 
 	        </when>
-	        <when test="shipping != null">
-		        and d.product_status = '배송중'        
+	        <when test="shipping != null and shipping.equals('배송중')">
+		         and d.product_status = '배송중'      
 	        </when>
-	        <when test="deliveryCompleted != null">
-		        and o.delivery_status = '배송완료'        
+	        <when test="deliveryCompleted != null and deliveryCompleted.equals('배송완료')">
+		         and o.delivery_status = '배송완료'   
 	        </when>
-	        <when test="cancelList != null">
-		        and d.product_status = '취소'        
+	        <when test="cancelList != null and cancelList.equals('취소')">
+		         and d.product_status = '취소' 
 	        </when>
-	        <when test="exchangeList != null">
-		        and d.product_status = '교환'        
+	        <when test="exchangeList != null and exchangeList.equals('교환')">
+		         and d.product_status = '교환'    
 	        </when>
-	        <when test="returnList != null">
-		        and d.product_status = '반품'        
+	        <when test="returnList != null and returnList.equals('반품')">
+		         and d.product_status = '반품' 
+	        </when> 
+	        <when test="sevenDaysAgo != null and sevenDaysAgo.equals('일주일')">
+	        	and order_time between (NOW() - INTERVAL 7 DAY) and now()  
 	        </when>
-        </choose>
-        and prod.product_id = d.product_id
+	        <when test="fifteenDaysAgo != null and fifteenDaysAgo.equals('15일')">
+			    where member_id = #{memberId} and order_time between (NOW() - INTERVAL 15 DAY) and now()   
+	        </when>
+	        <when test="aMonthAgo != null and aMonthAgo.equals('1개월')">
+	        	where member_id = #{memberId} and order_time between (NOW() - INTERVAL 1 month) and now() 
+	        </when>
+      		</choose>
+        and prod.product_id = d.product_id 
         and d.product_id = p.product_id
         and d.order_no = o.order_no
         and o.order_no = pay.order_no 

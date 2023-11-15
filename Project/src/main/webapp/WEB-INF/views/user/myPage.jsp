@@ -210,7 +210,99 @@
 		$('#newCellPhoneNumber').blur(function() {
 			duplicateCellPhone();
 		})
+		
+		//주문 상태별 조회
+		$("select[id=orderStatusKeyword]").change(function(){
+			let beforeDeposit = null;
+			let beforeShipping = null;
+			let shipping = null;
+			let deliveryCompleted = null;
+			let cancelList = null;
+			let exchangeList = null;
+			let returnList = null;
+			let allList = null;			
+			
+			if($(this).val() == 'beforeDeposit'){
+				beforeDeposit = $("select[id=orderStatusKeyword] option:selected").text()				
+			}else if($(this).val() == 'beforeShipping'){
+				beforeShipping = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'shipping'){
+				shipping = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'deliveryCompleted'){
+				deliveryCompleted = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'cancelList'){
+				cancelList = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'exchangeList'){
+				exchangeList = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'returnList'){
+				returnList = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'allList'){
+				allList = $("select[id=orderStatusKeyword] option:selected").text()
+			}
+			
+			let orderStatusKeywordText = $("select[id=orderStatusKeyword] option:selected").text()
 
+		  	console.log(orderStatusKeywordText); 
+		  	$.ajax({
+				url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
+				type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+				data : {
+					beforeDeposit,
+					beforeShipping,
+					shipping,
+					deliveryCompleted,
+					cancelList,
+					exchangeList,
+					returnList,
+					allList
+				},
+				dataType : 'json',
+				async : false,
+				success : function(data) {
+					console.log(data);
+					outputOrder(data)
+				},
+				error : function() {
+				}
+			});
+		});
+		
+		//주문 기간별 조회
+		$("select[id=orderPeriod]").change(function () {
+			let sevenDaysAgo = null;
+			let fifteenDaysAgo = null;
+			let aMonthAgo = null;
+			
+			if($(this).val() == 'aMonthAgo'){
+				aMonthAgo = $("select[id=orderPeriod] option:selected").text()				
+			}else if($(this).val() == 'sevenDaysAgo'){
+				sevenDaysAgo = $("select[id=orderPeriod] option:selected").text()
+			}else if($(this).val() == 'fifteenDaysAgo'){
+				fifteenDaysAgo = $("select[id=orderPeriod] option:selected").text()
+			}
+			
+			let orderPeriodText = $("select[id=orderPeriod] option:selected").text()
+			console.log(orderPeriodText);
+			
+			$.ajax({
+				url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
+				type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+				data : {
+					sevenDaysAgo,
+					fifteenDaysAgo,
+					aMonthAgo,
+				},
+				dataType : 'json',
+				async : false,
+				success : function(data) {
+					console.log(data);
+					outputOrder(data)
+				},
+				error : function() {
+				}
+			});
+		})
+		
 	})
 
 	// 유효성 검사 메세지
@@ -631,153 +723,6 @@
 		});
 	}
 	
-	//입금전 조회
-	function beforeDepositBtn() {
-		let beforeDeposit = $('#beforeDeposit').text()
-		
-		$.ajax({
-			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
-			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-			data : {
-				beforeDeposit
-			},
-			dataType : 'json',
-			async : false,
-			success : function(data) {
-				console.log(data);
-				outputOrder(data)
-			},
-			error : function() {
-			}
-		});
-	}
-	
-	//출고전 조회
-	function beforeShippingBtn() {
-		let beforeShipping = $('#beforeShipping').text()
-		
-		$.ajax({
-			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
-			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-			data : {
-				beforeShipping
-			},
-			dataType : 'json',
-			async : false,
-			success : function(data) {
-				console.log(data);
-				outputOrder(data)
-			},
-			error : function() {
-			}
-		});
-	}
-	
-	//배송중 조회
-	function shippingBtn() {
-		let shipping = $('#shipping').text()
-		
-		$.ajax({
-			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
-			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-			data : {
-				shipping
-			},
-			dataType : 'json',
-			async : false,
-			success : function(data) {
-				console.log(data);
-				outputOrder(data)
-			},
-			error : function() {
-			}
-		});
-	}
-	
-	//배송완료 조회
-	function deliveryCompletedBtn() {
-		let deliveryCompleted = $('#deliveryCompleted').text()
-
-		$.ajax({
-			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
-			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-			data : {
-				deliveryCompleted
-			},
-			dataType : 'json',
-			async : false,
-			success : function(data) {
-				console.log(data);
-				outputOrder(data)
-			},
-			error : function() {
-			}
-		});
-	}
-	
-	//취소 조회
-	function cancelListBtn() {
-		let cancelList = $('#cancelList').text()
-		
-		$.ajax({
-			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
-			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-			data : {
-				cancelList
-			},
-			dataType : 'json',
-			async : false,
-			success : function(data) {
-				console.log(data);
-				outputOrder(data)
-			},
-			error : function() {
-			}
-		});
-	}
-	
-	//교환 조회
-	function exchangeListBtn() {
-		let exchangeList = $('#exchangeList').text()
-		
-		$.ajax({
-			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
-			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-			data : {
-				exchangeList
-			},
-			dataType : 'json',
-			async : false,
-			success : function(data) {
-				console.log(data);
-				outputOrder(data)
-			},
-			error : function() {
-			}
-		});
-	}
-	
-	//반품 조회
-	function returnListBtn() {
-		let returnList = $('#returnList').text()
-		
-		$.ajax({
-			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
-			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-			data : {
-				returnList
-			},
-			dataType : 'json',
-			async : false,
-			success : function(data) {
-				console.log(data);
-				outputOrder(data)
-			},
-			error : function() {
-			}
-		});
-	}
-	
 	function outputOrder(order) {
 		let output = ''
 		$.each(order, function(i, e) {
@@ -878,7 +823,7 @@
 </script>
 <style>
 #deliveryStatus, #successPwd, #successPhoneNumber,
-	#successCellPhoneNumber, #successEmail, #successAddr, #successRefund {
+	#successCellPhoneNumber, #successEmail, #successAddr, #successRefund, #checkOrder {
 	display: flex;
 }
 
@@ -888,7 +833,7 @@
 
 .newPhoneNumberEdit, .newEmailEdit, .newCellPhoneNumberEdit,
 	.editNewUserPwd, .editRefund, #successPwd, #successPhoneNumber,
-	#successCellPhoneNumber, #successEmail {
+	#successCellPhoneNumber, #successEmail{
 	display: none;
 }
 
@@ -949,7 +894,7 @@
 	height: 30px;
 }
 
-#orderStatus {
+#orderStatus, #checkOrder {
 	gap: 7px;
 }
 
@@ -981,13 +926,19 @@
 	padding: 5px;
 	text-align: center;
 }
-#orderWrap{
+
+#orderWrap {
 	display: flex;
 	gap: 10px;
 }
-.cart-section.section-b-space.curOrderList{
+
+.cart-section.section-b-space.curOrderList {
 	padding-bottom: 0px;
 }
+#selectOrderStatus, #checkOrderPeriod{
+	margin-top: 30px;
+}
+
 </style>
 </head>
 
@@ -1276,19 +1227,20 @@
 																							</c:otherwise>
 																						</c:choose>
 																					</a>
-																					<c:set var="productNameLength" value="${fn:length(curOrder.productName)}" />
+																					<c:set var="productNameLength"
+																						value="${fn:length(curOrder.productName)}" />
 																					<div class="product-detail">
 																						<ul>
-																						<c:choose>
-																						<c:when test="${productNameLength <= 6}">
-																							<li class="name"><a
-																								href="/detail/${curOrder.productId }">${curOrder.productName }</a></li>
-																						</c:when>
-																						<c:otherwise>
-																						<li class="name"><a
-																								href="/detail/${curOrder.productId }">${fn:substring(curOrder.productName, 0, 6)}...</a></li>
-																						</c:otherwise>
-																						</c:choose>
+																							<c:choose>
+																								<c:when test="${productNameLength <= 6}">
+																									<li class="name"><a
+																										href="/detail/${curOrder.productId }">${curOrder.productName }</a></li>
+																								</c:when>
+																								<c:otherwise>
+																									<li class="name"><a
+																										href="/detail/${curOrder.productId }">${fn:substring(curOrder.productName, 0, 6)}...</a></li>
+																								</c:otherwise>
+																							</c:choose>
 																						</ul>
 																					</div>
 																				</div>
@@ -1300,13 +1252,16 @@
 																						<ul>
 																							<li class="name">총 금액 : <fmt:formatNumber
 																									value="${curOrder.actualPaymentAmount}"
-																									type="NUMBER" />원</li>
+																									type="NUMBER" />원
+																							</li>
 																						</ul>
 																						<ul>
-																							<li class="name">총 권수 : ${curOrder.totalOrderCnt}권</li>
+																							<li class="name">총 권수 :
+																								${curOrder.totalOrderCnt}권</li>
 																						</ul>
 																						<ul>
-																							<li class="name">주문상태 : ${curOrder.deliveryStatus }</li>
+																							<li class="name">주문상태 :
+																								${curOrder.deliveryStatus }</li>
 																						</ul>
 																					</div>
 																				</div>
@@ -1778,75 +1733,68 @@
 													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
-
-										<div id="deliveryStatus">
-											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="beforeDepositBtn();"
-												type="button" id="button-addon1">
-												<span id="beforeDeposit">입금전</span> <span>0</span>
-											</button>
-											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="beforeShippingBtn();"
-												type="button" id="button-addon1">
-												<span id="beforeShipping">출고전</span> <span>0</span>
-											</button>
-											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="shippingBtn()"
-												type="button" id="button-addon1">
-												<span id="shipping">배송중</span> <span>0</span>
-											</button>
-											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="deliveryCompletedBtn()"
-												type="button" id="button-addon1">
-												<span id="deliveryCompleted">배송완료</span> <span>0</span>
-											</button>
-											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="cancelListBtn()"
-												type="button" id="button-addon1">
-												<span id="cancelList">취소</span> <span>0</span>
-											</button>
-											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="exchangeListBtn()"
-												type="button" id="button-addon1">
-												<span id="exchangeList">교환</span> <span>0</span>
-											</button>
-											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn" onclick="returnListBtn()"
-												type="button" id="button-addon1">
-												<span id="returnList">반품</span> <span>0</span>
-											</button>
+									<div id="checkOrder">
+										<div class="col-12" id="selectOrderStatus">
+											<div class="form-floating theme-form-floating">
+												<select class="form-select" id="orderStatusKeyword" 
+													aria-label="Floating label select example">
+													<option value="allList">전체</option>
+													<option value="beforeDeposit">입금전</option>
+													<option value="beforeShipping">출고전</option>
+													<option value="shipping">배송중</option>
+													<option value="deliveryCompleted">배송완료</option>
+													<option value="cancelList">취소</option>
+													<option value="exchangeList">교환</option>
+													<option value="returnList">반품</option>
+												</select> <label for="floatingSelect">주문상태별 조회</label>
+											</div>
+										</div>
+										
+										<div class="col-12" id="checkOrderPeriod">
+											<div class="form-floating theme-form-floating">
+												<select class="form-select" id="orderPeriod"
+													aria-label="Floating label select example">
+													<option value="allList">전체</option>
+													<option value="sevenDaysAgo">일주일</option>
+													<option value="fifteenDaysAgo">15일</option>
+													<option value="aMonthAgo">1개월</option>
+												</select> <label for="floatingSelect">주문기간별 조회</label>
+											</div>
 										</div>
 									</div>
-									<div class="order-contain orderHistory">
+										
+									</div>
+								<div class="order-contain orderHistory">
 										<div class="order-box dashboard-bg-box">
 
 											<c:forEach var="order" items="${orderList }">
 												<div class="product-order-detail" id="productOrderDetail">
 													<c:choose>
 														<c:when test="${order.productImage != '' }">
-															<a href="/detail/${order.productId }" class="order-image"> <img
-																src="${order.productImage }" class="blur-up lazyload"
-																alt="${order.productName }" id="productImg" />
+															<a href="/detail/${order.productId }" class="order-image">
+																<img src="${order.productImage }"
+																class="blur-up lazyload" alt="${order.productName }"
+																id="productImg" />
 															</a>
 														</c:when>
 														<c:otherwise>
-															<a href="/detail/${order.productId }" class="order-image"> <img
-																src="/resources/assets/images/noimage.jpg"
+															<a href="/detail/${order.productId }" class="order-image">
+																<img src="/resources/assets/images/noimage.jpg"
 																class="blur-up lazyload" alt="noImg" id="productImg" />
 															</a>
 														</c:otherwise>
 													</c:choose>
 
 													<div class="order-wrap">
-													<div id="orderWrap">
-														<span class="orderDetailClick">주문번호 :
-															${order.orderNo }</span>
-														<a href="orderDetail?no=${order.orderNo }"
+														<div id="orderWrap">
+															<span class="orderDetailClick">주문번호 :
+																${order.orderNo }</span> <a
+																href="orderDetail?no=${order.orderNo }"
 																id="clickDetailOrder">상세보기</a>
-													</div>
+														</div>
 														<p class="text-content" id="orderTime">
 															<fmt:formatDate value="${order.orderTime }" type="date" />
-															
+
 														</p>
 
 														<a href="/detail/${order.productId }">
@@ -1936,8 +1884,31 @@
 												</div>
 											</c:forEach>
 										</div>
-									</div>
+									</div> 
 								</div>
+								<nav class="custome-pagination">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="javascript:void(0)" tabindex="-1" aria-disabled="true">
+                                    <i class="fa-solid fa-angles-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item active">
+                                <a class="page-link" href="javascript:void(0)">1</a>
+                            </li>
+                            <li class="page-item" aria-current="page">
+                                <a class="page-link" href="javascript:void(0)">2</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="javascript:void(0)">3</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="javascript:void(0)">
+                                    <i class="fa-solid fa-angles-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
 							</div>
 
 							<div class="tab-pane fade show" id="pills-profile"
@@ -2168,12 +2139,21 @@
 															<div class="col-12">
 																<div class="form-floating theme-form-floating">
 																	<input type="text" class="form-control"
+																		id="accountHolder" value="${userInfo.accountHolder}"
+																		placeholder="예금주" readonly /> <label
+																		for="accountHolder">예금주</label> 
+																</div>
+															</div>
+															
+															<div class="col-12">
+																<div class="form-floating theme-form-floating">
+																	<input type="text" class="form-control"
 																		id="refundAccount" value="${userInfo.refundAccount}"
 																		placeholder="환불계좌" readonly /> <label
 																		for="refundAccount">환불계좌</label> <i
 																		class="fa-regular fa-pen-to-square fa-xl refund"></i>
 																</div>
-															</div>
+															</div>													
 
 															<div class="col-12 editRefund">
 																<div class="form-floating theme-form-floating">
@@ -2203,12 +2183,22 @@
 																	</select> <label for="floatingSelect">환불은행</label>
 																</div>
 															</div>
+															
+															<div class="col-12 editRefund">
+																<div class="form-floating theme-form-floating">
+																	<input type="text" class="form-control" name="accountHolder"
+																		id="editAccountHolder" value="${userInfo.accountHolder}"
+																		placeholder="예금주" /> <label
+																		for="accountHolder">예금주</label> 
+																</div>
+															</div>
 
 															<div class="col-12 editRefund">
 																<div class="form-floating theme-form-floating">
 																	<input type="text" class="form-control"
 																		id="newRefundAccount" name="refundAccount"
 																		placeholder="환불계좌" /> <label for="newRefundAccount">환불계좌</label>
+																		<p>14자 이내로 입력해주세요.</p>
 																	<div id="successRefund">
 																		<button class="btn theme-bg-color btn-md text-white"
 																			type="submit">변경</button>

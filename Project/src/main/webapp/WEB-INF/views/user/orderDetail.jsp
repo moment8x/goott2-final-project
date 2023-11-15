@@ -567,7 +567,7 @@ function editBasicShippingAddress() {
 													</h4>
 												</li>
 											</ul>
-											${detailOrder }
+										
 											<c:choose>
 												<c:when test="${detailOrder.paymentMethod eq 'bkt' }">
 													<ul class="summery-contain pb-0 border-bottom-0">
@@ -598,7 +598,7 @@ function editBasicShippingAddress() {
 															<h4 class="infoContent">${bankTransfer.payerName }</h4>
 														</li>
 
-														<c:if test="${bankTransfer.paymentTime != null }">
+												<!-- 	<c:if test="${bankTransfer.paymentTime != null }">
 															<li class="pb-0">
 																<h4 class="infoTitle detailOrderOrderTime">입금 시간 :</h4>
 																<h4 class="infoContent">
@@ -606,7 +606,7 @@ function editBasicShippingAddress() {
 																		type="date" />
 																</h4>
 															</li>
-														</c:if>
+														</c:if> -->
 													</ul>
 												</c:when>
 

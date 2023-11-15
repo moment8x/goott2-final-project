@@ -12,11 +12,16 @@ import lombok.ToString;
 @Setter
 @ToString
 public class GetOrderStatusSearchKeyword {
-	private String beforeShipping; //출고전
+	private String allList; //전체목록
 	private String beforeDeposit; //입금전
+	private String beforeShipping; //출고전
 	private String shipping; //배송중
 	private String deliveryCompleted; //배송완료
 	private String cancelList; //취소
 	private String exchangeList; //교환
 	private String returnList; //반품
+	
+	private String sevenDaysAgo; //일주일
+	private String fifteenDaysAgo; //15일
+	private String aMonthAgo; //한달
 }

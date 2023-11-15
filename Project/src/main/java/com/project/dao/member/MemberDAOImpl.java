@@ -143,6 +143,7 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("memberId", memberId);
 		params.put("refundBank", modifyMemberInfo.getRefundBank());
 		params.put("refundAccount", modifyMemberInfo.getRefundAccount());
+		params.put("accountHolder", modifyMemberInfo.getAccountHolder());
 
 		return ses.update(ns + ".updateRefund", params);
 	}
@@ -304,6 +305,10 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("cancelList", keyword.getCancelList());
 		params.put("exchangeList", keyword.getExchangeList());
 		params.put("returnList", keyword.getReturnList());
+		
+		params.put("sevenDaysAgo", keyword.getSevenDaysAgo());
+		params.put("fifteenDaysAgo", keyword.getFifteenDaysAgo());
+		params.put("aMonthAgo", keyword.getAMonthAgo());
 		
 		return ses.selectList(ns + ".searchOrderStatus", params);
 	}
