@@ -27,6 +27,7 @@ import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.UploadFiles;
 
 @Service
@@ -124,13 +125,52 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public List<MyPageOrderList> getOrderHistory(String memberId) throws SQLException, NamingException {
+	public Map<String, Object> getOrderHistory(String memberId, int pageNo) throws SQLException, NamingException {
+		PagingInfo pi = pagenation(pageNo);
 		
-		return mDao.selectOrderHistory(memberId);
+		List<MyPageOrderList> lst = mDao.selectOrderHistory(memberId, pi);
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("orderHistory", lst);
+		result.put("pagenation", pi);
+		 
+		return result;
+	}
+
+	private PagingInfo pagenation(int pageNo) throws SQLException, NamingException {
+		PagingInfo result = new PagingInfo();
+		
+		//현재 페이지 번호 셋팅
+		result.setPageNo(pageNo);
+				
+		//전체 글의 갯수
+		result.setTotalPostCnt(mDao.getTotalOrderCnt());
+				
+		//총페이지 수 구하기
+		result.setTotalPageCnt(result.getTotalPostCnt(), result.getViewPostCntPerPage());
+				
+		// 보여주기 시작할 row index번호 구하기
+		result.setStartRowIndex();
+				
+		//몇개의 페이징 블럭이 나오는지
+		result.setTotalPagingBlockCnt();
+				
+		//현재 페이지가 속한 페이징 블럭 번호
+		result.setPageBlockOfCurrentPage();
+				
+		//현재 블럭의 시작 페이지 번호
+		result.setStartNumOfCurrentPagingBlock();
+				
+		//현재 블럭의 끝 페이지 번호 구하기
+		result.setEndNumOfCurrentPagingBlock();
+				
+		
+		return result;
 	}
 
 	@Override
 	public int getOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException {
+		
 		
 		return mDao.selectOrderProductCount(orderNo);
 	}

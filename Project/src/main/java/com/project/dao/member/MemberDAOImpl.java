@@ -21,6 +21,7 @@ import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.jmj.PagingInfo;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO {
@@ -49,9 +50,13 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public List<MyPageOrderList> selectOrderHistory(String memberId) throws SQLException, NamingException {
-
-		return ses.selectList(ns + ".getOrderList", memberId);
+	public List<MyPageOrderList> selectOrderHistory(String memberId, PagingInfo pi) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("startRowIndex", pi.getStartRowIndex());
+		params.put("viewPostCntPerPage", pi.getViewPostCntPerPage());
+		params.put("memberId", memberId);
+		
+		return ses.selectList(ns + ".getOrderList", params);
 	}
 
 	@Override
@@ -312,6 +317,12 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectList(ns + ".searchOrderStatus", params);
 	}
+	
+	@Override
+	public int getTotalOrderCnt() throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".getTotalOrderCnt");
+	}
 
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
@@ -355,6 +366,8 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".updateProfile", params);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+	
 
 
 	

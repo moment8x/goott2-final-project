@@ -810,6 +810,7 @@
 		$('.order-box.dashboard-bg-box').html(output)
 	}
 	
+	//날짜포맷
 	function formatDate(date) {
 		let orderDate = new Date(date)
 		let year = orderDate.getFullYear();
@@ -820,10 +821,59 @@
 		return dateStr
 	}
 	
+	function orderHistoryPaging(pageNo) {
+		$.ajax({
+			url : '/user/myPage', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				pageNo
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				outputOrder(data);
+				//pagination()
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	function pagination() {
+		let pageNo = ${page.pageNo}
+		let startNumOfCurrentPagingBlock = ${page.startNumOfCurrentPagingBlock}
+		let totalPageCnt = ${page.totalPageCnt}
+		
+		output = `<ul class="pagination justify-content-center">`;
+		if(pageNo > 1){
+			output += `<li class="page-item disabled">`
+			output += `<a class="page-link"
+				href="javascript:void(0);" tabindex="-1" aria-disabled="true">`
+			output += `<i class="fa-solid fa-angles-left"></i>`
+			output += `</a>`
+			output += `</li>`
+		}
+		for (let i = 1; i < startNumOfCurrentPagingBlock; i++) {
+			output += `<li class="page-item active">`
+			output += `<a class="page-link" href="javascript:void(0);">i</a>`
+			output += `</li>`
+		}
+		if(pageNo < totalPageCnt){
+			output += `<li class="page-item"><a class="page-link" href="javascript:void(0);">`
+			output += `<i class="fa-solid fa-angles-right"></i>`
+			output += `</a>`
+			output += `</li>`
+		}
+		output += `</ul>`
+		
+		$('.custome-pagination').html(output)
+	}
 </script>
 <style>
 #deliveryStatus, #successPwd, #successPhoneNumber,
-	#successCellPhoneNumber, #successEmail, #successAddr, #successRefund, #checkOrder {
+	#successCellPhoneNumber, #successEmail, #successAddr, #successRefund,
+	#checkOrder {
 	display: flex;
 }
 
@@ -833,7 +883,7 @@
 
 .newPhoneNumberEdit, .newEmailEdit, .newCellPhoneNumberEdit,
 	.editNewUserPwd, .editRefund, #successPwd, #successPhoneNumber,
-	#successCellPhoneNumber, #successEmail{
+	#successCellPhoneNumber, #successEmail {
 	display: none;
 }
 
@@ -935,10 +985,10 @@
 .cart-section.section-b-space.curOrderList {
 	padding-bottom: 0px;
 }
-#selectOrderStatus, #checkOrderPeriod{
+
+#selectOrderStatus, #checkOrderPeriod {
 	margin-top: 30px;
 }
-
 </style>
 </head>
 
@@ -1051,7 +1101,7 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="pills-order-tab"
+								<button class="nav-link" id="pills-order-tab" onclick="orderHistoryPaging(1)"
 									data-bs-toggle="pill" data-bs-target="#pills-order"
 									type="button" role="tab" aria-controls="pills-order"
 									aria-selected="false">
@@ -1733,40 +1783,40 @@
 													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
-									<div id="checkOrder">
-										<div class="col-12" id="selectOrderStatus">
-											<div class="form-floating theme-form-floating">
-												<select class="form-select" id="orderStatusKeyword" 
-													aria-label="Floating label select example">
-													<option value="allList">전체</option>
-													<option value="beforeDeposit">입금전</option>
-													<option value="beforeShipping">출고전</option>
-													<option value="shipping">배송중</option>
-													<option value="deliveryCompleted">배송완료</option>
-													<option value="cancelList">취소</option>
-													<option value="exchangeList">교환</option>
-													<option value="returnList">반품</option>
-												</select> <label for="floatingSelect">주문상태별 조회</label>
+										<div id="checkOrder">
+											<div class="col-12" id="selectOrderStatus">
+												<div class="form-floating theme-form-floating">
+													<select class="form-select" id="orderStatusKeyword"
+														aria-label="Floating label select example">
+														<option value="allList">전체</option>
+														<option value="beforeDeposit">입금전</option>
+														<option value="beforeShipping">출고전</option>
+														<option value="shipping">배송중</option>
+														<option value="deliveryCompleted">배송완료</option>
+														<option value="cancelList">취소</option>
+														<option value="exchangeList">교환</option>
+														<option value="returnList">반품</option>
+													</select> <label for="floatingSelect">주문상태별 조회</label>
+												</div>
 											</div>
-										</div>
-										
-										<div class="col-12" id="checkOrderPeriod">
-											<div class="form-floating theme-form-floating">
-												<select class="form-select" id="orderPeriod"
-													aria-label="Floating label select example">
-													<option value="allList">전체</option>
-													<option value="sevenDaysAgo">일주일</option>
-													<option value="fifteenDaysAgo">15일</option>
-													<option value="aMonthAgo">1개월</option>
-												</select> <label for="floatingSelect">주문기간별 조회</label>
-											</div>
-										</div>
-									</div>
-										
-									</div>
-								<div class="order-contain orderHistory">
-										<div class="order-box dashboard-bg-box">
 
+											<div class="col-12" id="checkOrderPeriod">
+												<div class="form-floating theme-form-floating">
+													<select class="form-select" id="orderPeriod"
+														aria-label="Floating label select example">
+														<option value="allList">전체</option>
+														<option value="sevenDaysAgo">일주일</option>
+														<option value="fifteenDaysAgo">15일</option>
+														<option value="aMonthAgo">1개월</option>
+													</select> <label for="floatingSelect">주문기간별 조회</label>
+												</div>
+											</div>
+										</div>
+
+									</div>
+									<div class="order-contain orderHistory">
+										<div class="order-box dashboard-bg-box">
+<!-- 
 											<c:forEach var="order" items="${orderList }">
 												<div class="product-order-detail" id="productOrderDetail">
 													<c:choose>
@@ -1883,32 +1933,34 @@
 													</div>
 												</div>
 											</c:forEach>
+											 -->
 										</div>
-									</div> 
+									</div>
 								</div>
 								<nav class="custome-pagination">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="javascript:void(0)" tabindex="-1" aria-disabled="true">
-                                    <i class="fa-solid fa-angles-left"></i>
-                                </a>
-                            </li>
-                            <li class="page-item active">
-                                <a class="page-link" href="javascript:void(0)">1</a>
-                            </li>
-                            <li class="page-item" aria-current="page">
-                                <a class="page-link" href="javascript:void(0)">2</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="javascript:void(0)">3</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="javascript:void(0)">
-                                    <i class="fa-solid fa-angles-right"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+								<!-- 	<ul class="pagination justify-content-center">
+									
+									<c:if test="${page.pageNo > 1 }">
+										<li class="page-item disabled"><a class="page-link"
+											href="myPage" tabindex="-1" aria-disabled="true">
+												<i class="fa-solid fa-angles-left"></i>
+										</a></li>
+										</c:if>
+										
+										<c:forEach var="i" begin="${page.startNumOfCurrentPagingBlock }" end="${pgae.endNumOfCurrentPagingBlock }">
+										<li class="page-item active"><a class="page-link"
+											href="myPage">${i }</a></li>
+										</c:forEach>
+										
+										<c:if test="${param.pageNo < page.totalPageCnt }">
+										<li class="page-item"><a class="page-link"
+											href="myPage"> <i
+												class="fa-solid fa-angles-right"></i>
+										</a></li>
+										</c:if>
+										
+									</ul> -->
+								</nav>
 							</div>
 
 							<div class="tab-pane fade show" id="pills-profile"
@@ -2141,10 +2193,10 @@
 																	<input type="text" class="form-control"
 																		id="accountHolder" value="${userInfo.accountHolder}"
 																		placeholder="예금주" readonly /> <label
-																		for="accountHolder">예금주</label> 
+																		for="accountHolder">예금주</label>
 																</div>
 															</div>
-															
+
 															<div class="col-12">
 																<div class="form-floating theme-form-floating">
 																	<input type="text" class="form-control"
@@ -2153,7 +2205,7 @@
 																		for="refundAccount">환불계좌</label> <i
 																		class="fa-regular fa-pen-to-square fa-xl refund"></i>
 																</div>
-															</div>													
+															</div>
 
 															<div class="col-12 editRefund">
 																<div class="form-floating theme-form-floating">
@@ -2183,13 +2235,13 @@
 																	</select> <label for="floatingSelect">환불은행</label>
 																</div>
 															</div>
-															
+
 															<div class="col-12 editRefund">
 																<div class="form-floating theme-form-floating">
-																	<input type="text" class="form-control" name="accountHolder"
-																		id="editAccountHolder" value="${userInfo.accountHolder}"
-																		placeholder="예금주" /> <label
-																		for="accountHolder">예금주</label> 
+																	<input type="text" class="form-control"
+																		name="accountHolder" id="editAccountHolder"
+																		value="${userInfo.accountHolder}" placeholder="예금주" />
+																	<label for="accountHolder">예금주</label>
 																</div>
 															</div>
 
@@ -2198,7 +2250,7 @@
 																	<input type="text" class="form-control"
 																		id="newRefundAccount" name="refundAccount"
 																		placeholder="환불계좌" /> <label for="newRefundAccount">환불계좌</label>
-																		<p>14자 이내로 입력해주세요.</p>
+																	<p>14자 이내로 입력해주세요.</p>
 																	<div id="successRefund">
 																		<button class="btn theme-bg-color btn-md text-white"
 																			type="submit">변경</button>

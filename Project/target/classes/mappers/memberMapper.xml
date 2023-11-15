@@ -14,7 +14,7 @@
         and d.product_id = p.product_id
         and d.order_no = o.order_no
         and o.order_no = pay.order_no 
-        group by o.order_no order by order_time desc
+        group by o.order_no order by order_time desc limit #{startRowIndex}, #{viewPostCntPerPage}
 	</select>
 
 	<select id="getProductCount" resultType="int">
@@ -197,6 +197,10 @@
         and d.order_no = o.order_no
         and o.order_no = pay.order_no 
         group by o.order_no order by order_time desc
+	</select>
+	
+	<select id="getTotalOrderCnt" resultType="int">
+		select count(order_no) from order_history
 	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">

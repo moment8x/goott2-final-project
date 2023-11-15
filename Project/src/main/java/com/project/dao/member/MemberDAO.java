@@ -17,6 +17,7 @@ import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.jmj.PagingInfo;
 
 @Repository
 public interface MemberDAO {
@@ -30,7 +31,7 @@ public interface MemberDAO {
 	// 특정 회원 탈퇴(기록 저장)
 	int updateWithdraw(String memberId) throws SQLException, NamingException;
 	// 주문건당 주문 내역 가져오기
-	List<MyPageOrderList> selectOrderHistory (String memberId) throws SQLException, NamingException;
+	List<MyPageOrderList> selectOrderHistory (String memberId, PagingInfo pi) throws SQLException, NamingException;
 	
 	// 주문건당 상품 총 갯수 가져오기
 	int selectOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException;
@@ -113,6 +114,8 @@ public interface MemberDAO {
 	//주문상태별 조회
 	List<MyPageOrderList> selectOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword) throws SQLException, NamingException;
 	
+	//주문갯수 가져오기
+	int getTotalOrderCnt() throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회

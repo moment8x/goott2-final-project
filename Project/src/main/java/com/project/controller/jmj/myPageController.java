@@ -30,6 +30,7 @@ import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.kjy.Memberkjy;
 
 @Controller
@@ -40,19 +41,23 @@ public class myPageController {
 	private MemberService mService;
 
 	@RequestMapping(value = "myPage")
-	public void myPage(Model model, HttpServletRequest request) {
-
-		System.out.println("마이페이지");
+	public void myPage(Model model, HttpServletRequest request, @RequestParam(value = "pageNo", defaultValue = "1") int pageNo) {
 
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
-
+		System.out.println("@@@@@@@@@@@@@페이지번호 : " + pageNo);
 		try {
-			//주문내역
-			List<MyPageOrderList> lst = mService.getOrderHistory(memberId);
-			model.addAttribute("orderList", lst);			
-			System.out.println("주문내역 페이지 : " + lst);
+//			//주문내역
+//			Map<String, Object> map = mService.getOrderHistory(memberId, pageNo);
+//			
+//			List<MyPageOrderList>lst = (List<MyPageOrderList>)map.get("orderHistory");
+//			PagingInfo pi = (PagingInfo)map.get("pagenation");
+//			
+//			model.addAttribute("orderList", lst);			
+//			model.addAttribute("page", pi);			
+//			System.out.println("주문내역 페이지 : " + lst);
+//			System.out.println("@@@@@@@@@@@@@페이징 : " + pi.toString());
 			
 			//최근 주문내역
 			List<MyPageOrderList> list = mService.getCurOrderHistory(memberId);
@@ -68,8 +73,6 @@ public class myPageController {
 			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
 			model.addAttribute("userAddrList", userAddrList);
 			
-			//주문상태별 갯수
-			//mService.getOrderStatusCnt();
 			
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
@@ -79,8 +82,36 @@ public class myPageController {
 	}
 
 	@RequestMapping(value = "myPage", method = RequestMethod.POST)
-	public void myPage(@ModelAttribute ShippingAddress addShippingAddress) {
-		System.out.println(addShippingAddress.toString());
+	public ResponseEntity<List<MyPageOrderList>> myPage(@RequestParam("pageNo") int pageNo, Model model, HttpServletRequest request) {
+		System.out.println("@@@@@@@@@@@@마이페이지 포스트" + pageNo);
+		
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
+		HttpHeaders header = new HttpHeaders();
+		header.add("Content-Type", "application/json; charset=UTF-8");
+		
+		ResponseEntity<List<MyPageOrderList>> result = null;
+		try {
+			//주문내역
+			Map<String, Object> map = mService.getOrderHistory(memberId, pageNo);
+			
+			List<MyPageOrderList> lst = (List<MyPageOrderList>)map.get("orderHistory");
+			PagingInfo pi = (PagingInfo)map.get("pagenation");
+			
+			model.addAttribute("orderList", lst);			
+			model.addAttribute("page", pi);			
+			System.out.println("주문내역 페이지 : " + lst);
+			System.out.println("@@@@@@@@@@@@@페이징 : " + pi.toString());
+			
+			result = new ResponseEntity<List<MyPageOrderList>>(lst, header, HttpStatus.OK);
+			
+		} catch (SQLException | NamingException e) {
+			result = new ResponseEntity<>(HttpStatus.CONFLICT);
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	@RequestMapping(value = "myPage/modifyShippingAddr", method = RequestMethod.POST)
