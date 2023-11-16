@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import ImageUploading from "react-images-uploading";
 import "./imagesUploader.css";
+import Button from "@/components/ui/Button";
 
 const ImagesUploader = () => {
   const [images, setImages] = useState([]);
@@ -19,7 +20,7 @@ const ImagesUploader = () => {
         onChange={onChange}
         maxNumber={maxNumber}
         dataURLKey="data_url"
-        acceptType={["jpg", "png"]}
+        acceptType={["jpg", "png", "webp"]}
       >
         {({
           imageList,
@@ -33,26 +34,29 @@ const ImagesUploader = () => {
           // write your building UI
           <div className="upload__image-wrapper">
             <button
-              className="h-4"
+              className="w-[250px] h-[32px] border-2 border-black"
               style={isDragging ? { color: "red" } : null}
               onClick={onImageUpload}
               {...dragProps}
             >
-              사진 드로그
+              사진 드래그해서 넣어주세요!
             </button>
             &nbsp;
-            <button className="ml-10" onClick={onImageRemoveAll}>
-              이미지 제거
-            </button>
             {imageList.map((image, index) => (
               <div key={index} className="image-item">
                 <img src={image.data_url} alt="" width="100" />
                 <div className="image-item__btn-wrapper">
-                  <button onClick={() => onImageUpdate(index)}>Update</button>
-                  <button onClick={() => onImageRemove(index)}>Remove</button>
+                  <button onClick={() => onImageUpdate(index)}>수정</button>
+                  <button onClick={() => onImageRemove(index)}>제거</button>
                 </div>
               </div>
             ))}
+            <button
+              className="ml-5 p-0.5 border-4 border-slate-950 border-double"
+              onClick={onImageRemoveAll}
+            >
+              이미지 제거
+            </button>
           </div>
         )}
       </ImageUploading>

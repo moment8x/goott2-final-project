@@ -5,9 +5,9 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Tooltip from "@/components/ui/Tooltip";
 import { useTable, useRowSelect, useSortBy, usePagination } from "react-table";
-import { Link } from "react-router-dom";
 import ProductInfoModal from "./product-modal";
-import Modal from "@/components/ui/Modal";
+import Layout from "./product-modal-detail/Layout";
+import ProductRegistrationModal from "./product-modal-detail/product-modal-register";
 
 const COLUMNS = [
   {
@@ -144,12 +144,14 @@ const IndeterminateCheckbox = React.forwardRef(
 const SearchedProduct = ({ title = "상품 목록", data }) => {
   const columns = useMemo(() => COLUMNS, []);
   // // const data = useMemo(() => searchedInfo, []);
-  const [totalMember, setTotalMember] = useState(0);
-
+  const [totalProduct, setTotalProduct] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState("");
 
-  const openModal = () => {
+  const openModal = (row) => {
     setShowModal(!showModal);
+    setSelectedMemberId(row.cells[3].value);
+    console.log("id: ", row.cells[3].value);
   };
 
   const tableInstance = useTable(
@@ -206,6 +208,7 @@ const SearchedProduct = ({ title = "상품 목록", data }) => {
     return Math.ceil(length / pageSize);
   }, [length, pageSize]);
 
+  // 페이징 블록 추가
   const pages = useMemo(() => {
     const start = Math.floor(pageIndex / 10) * 10;
     const end = start + 10 > totalPages ? totalPages : start + 10;
@@ -213,38 +216,45 @@ const SearchedProduct = ({ title = "상품 목록", data }) => {
   }, [pageIndex, totalPages]);
 
   useEffect(() => {
-    fetch("http://localhost:8081/admin/products/product-info", {
+    fetch("http://localhost:8081/admin/products/count", {
       method: "GET",
     })
       .then((res) => res.json())
       .then((res) => {
         console.log("res:", res);
-        setTotalMember(res.total);
+        setTotalProduct(res.total);
       });
   }, []);
 
   return (
     <>
+      {/* <Routes location={location}>
+        <Route path=':modal' element={<Modal2 />} />
+      </Routes> */}
+      {/* state 값 true일 시 모달 오픈 */}
       {showModal && (
-        <MemberInfoModal
-          title="Extra large modal"
-          label="Extra large modal"
+        <ProductInfoModal
+          title="product register modal"
+          label="product register modal"
           labelClass="btn-outline-dark"
           uncontrol
-          className="max-w-fit"
+          // scrollContent
+          noFade
+          className="max-w max-h"
           showModal={showModal}
           setShowModal={setShowModal}
+          selectedProductId={selectedProductId}
         >
-          <h4 class="font-medium text-lg mb-3 text-slate-900">
+          {/* <h4 className="font-medium text-lg mb-3 text-slate-900">
             Lorem ipsum dolor sit.
-          </h4>
-          <div class="text-base text-slate-600 dark:text-slate-300">
-            Oat cake ice cream candy chocolate cake chocolate cake cotton candy
-            dragée apple pie. Brownie carrot cake candy canes bonbon fruitcake
-            topping halvah. Cake sweet roll cake cheesecake cookie chocolate
-            cake liquorice.
+          </h4> */}
+          <ProductRegistrationModal />
+
+          <div className="text-base text-slate-600 dark:text-slate-300">
+            {/* <Layout /> */}
+            {/* <Sidebar /> */}
           </div>
-        </MemberInfoModal>
+        </ProductInfoModal>
       )}
       <Card>
         <div className="md:flex items-center mb-6">
@@ -252,7 +262,10 @@ const SearchedProduct = ({ title = "상품 목록", data }) => {
           <Button className="btn-secondary ml-5 p-[7px] pointer-events-none">
             <div className="space-x-1 rtl:space-x-reverse">
               <span>총 상품 수</span>
-              <Badge label={totalMember} className="bg-white text-slate-900 " />
+              <Badge
+                label={totalProduct}
+                className="bg-white text-slate-900 "
+              />
               <span>개</span>
             </div>
           </Button>
@@ -296,12 +309,26 @@ const SearchedProduct = ({ title = "상품 목록", data }) => {
                     prepareRow(row);
                     return (
                       <tr {...row.getRowProps()}>
-                        {row.cells.map((cell) => {
+                        {row.cells.map((cell, index) => {
                           return (
-                            <td {...cell.getCellProps()} className="table-td">
-                              <Link to="" onClick={openModal}>
-                                {cell.render("Cell")}
-                              </Link>
+                            <td
+                              {...cell.getCellProps()}
+                              className="table-td cursor-pointer"
+                              onClick={
+                                index !== 0 ? () => openModal(row) : null
+                              }
+                            >
+                              {/* row 클릭 시 모달 오픈 */}
+
+                              {cell.render("Cell")}
+
+                              {/* <Link to='' onClick={openModal}>
+                                {cell.render('Cell')}
+                              </Link> */}
+                              {/* <Link to='modal' state={{ background: location }}>
+                                {cell.render('Cell')}
+                                <Outlet />
+                              </Link> */}
                             </td>
                           );
                         })}
@@ -356,8 +383,8 @@ const SearchedProduct = ({ title = "상품 목록", data }) => {
                 Prev
               </button>
             </li>
-            {pages.map((page, pageIdx) => (
-              <li key={pageIdx}>
+            {pages.map((page, pageIndex) => (
+              <li key={pageIndex}>
                 <button
                   href="#"
                   aria-current="page"

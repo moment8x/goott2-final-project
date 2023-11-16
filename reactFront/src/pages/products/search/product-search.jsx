@@ -6,6 +6,7 @@ import Flatpickr from "react-flatpickr";
 import Button from "@/components/ui/Button";
 import Checkbox from "@/components/ui/Checkbox";
 import Card from "@/components/ui/Card";
+import { Korean } from "flatpickr/dist/l10n/ko.js";
 
 // select
 const category = [
@@ -241,7 +242,7 @@ const ProductSearch = ({ setSearchedInfo }) => {
 
   // 초기화 버튼
   const handleReset = () => {
-    setSearchMember({
+    setSearchProduct({
       ...searchProduct,
       productId: "",
       productName: "",
@@ -315,7 +316,7 @@ const ProductSearch = ({ setSearchedInfo }) => {
                           {productDivision.map((Division, i) => (
                             <Radio
                               key={i}
-                              name="gender"
+                              name="product"
                               label={Division.label}
                               value={Division.value}
                               checked={selectDivision === Division.value}
@@ -379,6 +380,10 @@ const ProductSearch = ({ setSearchedInfo }) => {
                             className="form-control py-2 w-[120px] align-middle inline-block"
                             value={picker}
                             onChange={(date) => handlePicker(date)}
+                            options={{
+                              locale: Korean,
+                              dateFormat: "Y-m-d", // 원하는 날짜 형식을 설정
+                            }}
                           />
                           <p className="ml-[10px] mr-[10px] align-middle inline-block">
                             {" "}
@@ -389,6 +394,10 @@ const ProductSearch = ({ setSearchedInfo }) => {
                             value={picker2}
                             onChange={(date) => setPicker2(date)}
                             id="default-picker2"
+                            options={{
+                              locale: Korean,
+                              dateFormat: "Y-m-d", // 원하는 날짜 형식을 설정
+                            }}
                           />
                         </td>
                       </tr>
