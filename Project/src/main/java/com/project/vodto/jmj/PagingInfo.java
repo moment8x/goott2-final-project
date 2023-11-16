@@ -4,7 +4,7 @@ package com.project.vodto.jmj;
 public class PagingInfo {
 	//1페이지당 보여줄 글의 갯수를 끊어 내기 위해 필요한 멤버들
 	private int totalPostCnt;  // 전체 게시판 글의 갯수
-	private int viewPostCntPerPage = 5; // 1페이당 보여줄 글의 갯수
+	private int viewPostCntPerPage = 2; // 1페이당 보여줄 글의 갯수
 	private int totalPageCnt; // 총 페이지 수
 	private int startRowIndex; // 보여주기 시작할 글의 row index 번호
 	private int pageNo;   // 유저가 클릭한 현재 페이지 번호

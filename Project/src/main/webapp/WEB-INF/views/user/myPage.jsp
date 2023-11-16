@@ -260,7 +260,12 @@
 				async : false,
 				success : function(data) {
 					console.log(data);
-					outputOrder(data)
+					if(data != null){
+						outputOrder(data.orderStatus)		
+						pagination(data.pagination)
+					}else{
+						dataIsnNullOutput()
+					}
 				},
 				error : function() {
 				}
@@ -296,7 +301,12 @@
 				async : false,
 				success : function(data) {
 					console.log(data);
-					outputOrder(data)
+					if(data != null){
+						outputOrder(data.orderStatus)	
+						pagination(data.pagination) 
+					}else{
+						dataIsnNullOutput()
+					}
 				},
 				error : function() {
 				}
@@ -441,18 +451,20 @@
 	}
 	
 	//배송주소록 추가
-	function addShippingAddress(addrSeq) {
+	function addShippingAddress() {
 		let zipCode = $('#addZipNo').val()
 		let address = $('#addAddr').val()
 		let detailAddress = $('#addAddrDetail').val()
 		let recipient = $('#recipient').val()
 		let recipientContact = $('#recipientContact').val()
-		
+	//	let basicAddr = null;
+	//	if($('#choiceBasicAddr').is(':checked')){
+	//		basicAddr = 'Y'
+	//	}
 		$.ajax({
 			url : '/user/addShippingAddress', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
-				addrSeq,
 				zipCode,
 				address,
 				detailAddress,
@@ -463,13 +475,8 @@
 			async : false,
 			success : function(data) {
 				console.log(data);
-				if(data == true){
-					$('#addZipNo').val('')
-					$('#addAddr').val('')
-					$('#addAddrDetail').val('')
-					$('#recipient').val('')
-					$('#recipientContact').val('')
-					
+				if(data == true){		
+					alert("배송지 추가가 완료되었습니다.")
 					location.reload()
 				}
 			},
@@ -606,6 +613,7 @@
 		});
 	}
 	
+	// 기본배송지 설정
 	function setBasicAddr(addrSeq) {
 		$.ajax({
 			url : '/user/setBasicAddr', // 데이터를 수신받을 서버 주소
@@ -692,37 +700,6 @@
 		});
 	}
 	
-	//배송주소록 추가
-	function addShippingAddress() {
-		let zipCode = $('#addZipNo').val()
-		let address = $('#addAddr').val()
-		let detailAddress = $('#addAddrDetail').val()
-		
-		$.ajax({
-			url : '/user/addShippingAddress', // 데이터를 수신받을 서버 주소
-			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-			data : {
-				zipCode,
-				address,
-				detailAddress
-			},
-			dataType : 'json',
-			async : false,
-			success : function(data) {
-				console.log(data);
-				if(data == true){
-					$('#addZipNo').val('')
-					$('#addAddr').val('')
-					$('#addAddrDetail').val('')
-					
-					location.reload()
-				}
-			},
-			error : function() {
-			}
-		});
-	}
-	
 	function outputOrder(order) {
 		let output = ''
 		$.each(order, function(i, e) {
@@ -788,7 +765,6 @@
 				output += `<div>${order.invoiceNumber }</div>`
 			}else if(e.deliveryStatus == '취소'){
 				output += `<div>취소</div>`
-				output += ``
 			}else{
 				output += `<button class="btn theme-bg-color text-white m-0"
 					type="button" id="button-addon1">`
@@ -810,13 +786,18 @@
 		$('.order-box.dashboard-bg-box').html(output)
 	}
 	
+	function dataIsnNullOutput() {
+		let output =`<div>조회된 주문내역이 없습니다.</div>`
+		$('.order-box.dashboard-bg-box').html(output)
+	}
+	
 	//날짜포맷
 	function formatDate(date) {
 		let orderDate = new Date(date)
 		let year = orderDate.getFullYear();
 		let month = orderDate.getMonth() + 1;
 		let day = orderDate.getDate();
-		let dateStr = year+'-'+month+'-'+day;
+		let dateStr = year+'.'+month+'.'+day;
 		
 		return dateStr
 	}
@@ -826,46 +807,54 @@
 			url : '/user/myPage', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
-				pageNo
+				"pageNo" : pageNo
 			},
 			dataType : 'json',
 			async : false,
 			success : function(data) {
 				console.log(data);
 				outputOrder(data);
-				//pagination()
+				pagination(data.pagination)
+				
 			},
 			error : function() {
 			}
 		});
+		console.log("현재페이지 : " + pageNo)
 	}
 	
-	function pagination() {
-		let pageNo = ${page.pageNo}
-		let startNumOfCurrentPagingBlock = ${page.startNumOfCurrentPagingBlock}
-		let totalPageCnt = ${page.totalPageCnt}
+	function pagination(page) {
+		console.log(page)
+		let endNumOfCurrentPagingBlock = page.endNumOfCurrentPagingBlock;
+		let pageNo = page.pageNo
+		let totalPageCnt = page.totalPageCnt
 		
-		output = `<ul class="pagination justify-content-center">`;
-		if(pageNo > 1){
-			output += `<li class="page-item disabled">`
-			output += `<a class="page-link"
-				href="javascript:void(0);" tabindex="-1" aria-disabled="true">`
+		console.log(pageNo)
+		console.log(endNumOfCurrentPagingBlock)
+		console.log(totalPageCnt)
+		
+		let output = '';			
+		output += `<ul class="pagination justify-content-center">`;
+		
+			output += `<li class="page-item">`
+			output += `<a class="page-link" href="javascript:void(0);" onclick="orderHistoryPaging(\${page.pageNo}); return false;">`
 			output += `<i class="fa-solid fa-angles-left"></i>`
 			output += `</a>`
 			output += `</li>`
-		}
-		for (let i = 1; i < startNumOfCurrentPagingBlock; i++) {
-			output += `<li class="page-item active">`
-			output += `<a class="page-link" href="javascript:void(0);">i</a>`
+		
+		for (let i = page.startNumOfCurrentPagingBlock; i < page.endNumOfCurrentPagingBlock + 1 ; i++) {
+			output += `<li class="page-item">`
+			output += `<a class="page-link" href="javascript:void(0);" onclick="orderHistoryPaging(\${i}); return false;">\${i}</a> `
 			output += `</li>`
 		}
-		if(pageNo < totalPageCnt){
-			output += `<li class="page-item"><a class="page-link" href="javascript:void(0);">`
+		
+			output += `<li class="page-item">`
+			output += `<a class="page-link" href="javascript:void(0);" onclick="orderHistoryPaging(\${page.pageNo + 1}); return false;">` 
 			output += `<i class="fa-solid fa-angles-right"></i>`
 			output += `</a>`
 			output += `</li>`
-		}
-		output += `</ul>`
+		
+		output += `</ul>`		
 		
 		$('.custome-pagination').html(output)
 	}
@@ -1101,7 +1090,7 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="pills-order-tab" onclick="orderHistoryPaging(1)"
+								<button class="nav-link" id="pills-order-tab"
 									data-bs-toggle="pill" data-bs-target="#pills-order"
 									type="button" role="tab" aria-controls="pills-order"
 									aria-selected="false">
@@ -1816,7 +1805,7 @@
 									</div>
 									<div class="order-contain orderHistory">
 										<div class="order-box dashboard-bg-box">
-<!-- 
+
 											<c:forEach var="order" items="${orderList }">
 												<div class="product-order-detail" id="productOrderDetail">
 													<c:choose>
@@ -1933,33 +1922,37 @@
 													</div>
 												</div>
 											</c:forEach>
-											 -->
+
 										</div>
 									</div>
 								</div>
+								${page }
+								<div id="custome-pagination"></div>
 								<nav class="custome-pagination">
-								<!-- 	<ul class="pagination justify-content-center">
-									
-									<c:if test="${page.pageNo > 1 }">
-										<li class="page-item disabled"><a class="page-link"
-											href="myPage" tabindex="-1" aria-disabled="true">
-												<i class="fa-solid fa-angles-left"></i>
-										</a></li>
-										</c:if>
+									<ul class="pagination justify-content-center">
+
 										
-										<c:forEach var="i" begin="${page.startNumOfCurrentPagingBlock }" end="${pgae.endNumOfCurrentPagingBlock }">
-										<li class="page-item active"><a class="page-link"
-											href="myPage">${i }</a></li>
+											<li class="page-item"><a class="page-link" href="#"
+												
+												onclick="orderHistoryPaging(${page.pageNo}); return false;">
+													<i class="fa-solid fa-angles-left"></i>
+											</a></li>
+										
+
+										<c:forEach var="i"
+											begin="${page.startNumOfCurrentPagingBlock }"
+											end="${page.endNumOfCurrentPagingBlock }">
+											<li class="page-item"><a class="page-link"
+												onclick="orderHistoryPaging(${i}); return false;" href="#">${i }</a></li>
 										</c:forEach>
+
 										
-										<c:if test="${param.pageNo < page.totalPageCnt }">
-										<li class="page-item"><a class="page-link"
-											href="myPage"> <i
-												class="fa-solid fa-angles-right"></i>
-										</a></li>
-										</c:if>
-										
-									</ul> -->
+											<li class="page-item"><a class="page-link"
+												onclick="orderHistoryPaging(${page.pageNo +1}); return false;"
+												href="#"> <i class="fa-solid fa-angles-right"></i>
+											</a></li>
+
+									</ul>
 								</nav>
 							</div>
 
@@ -2332,7 +2325,7 @@
 													<div>
 
 														<c:if test="${fn:contains(addr.basicAddr,'Y')}">
-															<div class="label">
+															<div class="label"> 
 																<label>기본배송지</label>
 															</div>
 														</c:if>
@@ -2721,6 +2714,10 @@
 							for="addAddrDetail">상세주소</label>
 					</div>
 
+				<!-- <input class="checkbox_animated check-box" type="checkbox"
+						id="choiceBasicAddr" name="basicAddr"/> <label
+						class="form-check-label" for="choiceBasicAddr"><span
+						id="choiceBasicAddr">기본배송지로 설정</span></label>  -->
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary btn-md"

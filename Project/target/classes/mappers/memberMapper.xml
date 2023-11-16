@@ -186,21 +186,59 @@
 	        	and order_time between (NOW() - INTERVAL 7 DAY) and now()  
 	        </when>
 	        <when test="fifteenDaysAgo != null and fifteenDaysAgo.equals('15일')">
-			    where member_id = #{memberId} and order_time between (NOW() - INTERVAL 15 DAY) and now()   
+			   and order_time between (NOW() - INTERVAL 15 DAY) and now()   
 	        </when>
 	        <when test="aMonthAgo != null and aMonthAgo.equals('1개월')">
-	        	where member_id = #{memberId} and order_time between (NOW() - INTERVAL 1 month) and now() 
+	        	and order_time between (NOW() - INTERVAL 1 month) and now() 
 	        </when>
       		</choose>
         and prod.product_id = d.product_id 
         and d.product_id = p.product_id
         and d.order_no = o.order_no
         and o.order_no = pay.order_no 
-        group by o.order_no order by order_time desc
+        group by o.order_no order by order_time desc limit #{startRowIndex}, #{viewPostCntPerPage}
+	</select>
+	
+	<select id="getOrderStatusCnt" resultType="int">
+		select count(o.order_no) from order_history o, (SELECT * FROM detailed_order_items GROUP BY order_no) d
+		 where member_id = 'abcd123' 
+		 <choose>
+	        <when test="beforeShipping != null and beforeShipping.equals('출고전')">
+		        and d.product_status = '출고전'     
+	        </when>
+	        <when test="beforeDeposit != null and beforeDeposit.equals('입금전')">
+		         and d.product_status = '입금전' 
+	        </when>
+	        <when test="shipping != null and shipping.equals('배송중')">
+		         and d.product_status = '배송중'      
+	        </when>
+	        <when test="deliveryCompleted != null and deliveryCompleted.equals('배송완료')">
+		         and o.delivery_status = '배송완료'   
+	        </when>
+	        <when test="cancelList != null and cancelList.equals('취소')">
+		         and d.product_status = '취소' 
+	        </when>
+	        <when test="exchangeList != null and exchangeList.equals('교환')">
+		         and d.product_status = '교환'    
+	        </when>
+	        <when test="returnList != null and returnList.equals('반품')">
+		         and d.product_status = '반품' 
+	        </when> 
+	        <when test="sevenDaysAgo != null and sevenDaysAgo.equals('일주일')">
+	        	and order_time between (NOW() - INTERVAL 7 DAY) and now()  
+	        </when>
+	        <when test="fifteenDaysAgo != null and fifteenDaysAgo.equals('15일')">
+			   and order_time between (NOW() - INTERVAL 15 DAY) and now()   
+	        </when>
+	        <when test="aMonthAgo != null and aMonthAgo.equals('1개월')">
+	        	and order_time between (NOW() - INTERVAL 1 month) and now() 
+	        </when>
+      		</choose>
+      		and o.order_no = d.order_no
 	</select>
 	
 	<select id="getTotalOrderCnt" resultType="int">
-		select count(order_no) from order_history
+		select count(order_no) from order_history where member_id = #{memberId}
 	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">

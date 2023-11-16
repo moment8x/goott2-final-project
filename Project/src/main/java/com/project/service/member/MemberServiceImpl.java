@@ -126,25 +126,25 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public Map<String, Object> getOrderHistory(String memberId, int pageNo) throws SQLException, NamingException {
-		PagingInfo pi = pagenation(pageNo);
+		PagingInfo pi = pagination(pageNo, memberId);
 		
 		List<MyPageOrderList> lst = mDao.selectOrderHistory(memberId, pi);
 		
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("orderHistory", lst);
-		result.put("pagenation", pi);
+		result.put("pagination", pi);
 		 
 		return result;
 	}
 
-	private PagingInfo pagenation(int pageNo) throws SQLException, NamingException {
+	private PagingInfo pagination(int pageNo, String memberId) throws SQLException, NamingException {
 		PagingInfo result = new PagingInfo();
 		
 		//현재 페이지 번호 셋팅
 		result.setPageNo(pageNo);
 				
-		//전체 글의 갯수
-		result.setTotalPostCnt(mDao.getTotalOrderCnt());
+		//전체 주문 갯수
+		result.setTotalPostCnt(mDao.getTotalOrderCnt(memberId));
 				
 		//총페이지 수 구하기
 		result.setTotalPageCnt(result.getTotalPostCnt(), result.getViewPostCntPerPage());
@@ -163,8 +163,7 @@ public class MemberServiceImpl implements MemberService {
 				
 		//현재 블럭의 끝 페이지 번호 구하기
 		result.setEndNumOfCurrentPagingBlock();
-				
-		
+						
 		return result;
 	}
 
@@ -298,10 +297,46 @@ public class MemberServiceImpl implements MemberService {
 	}
 	
 	@Override
-	public List<MyPageOrderList> searchOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword)
+	public Map<String, Object> searchOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword, int pageNo)
 			throws SQLException, NamingException {
+		PagingInfo pi = orderStatusPagination(pageNo, memberId, keyword);
 		
-		return mDao.selectOrderStatus(memberId, keyword);
+		List<MyPageOrderList> lst = mDao.selectOrderStatus(memberId, keyword, pi);
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("orderStatus", lst);
+		result.put("pagination", pi);
+		return result;
+	}
+	
+	private PagingInfo orderStatusPagination(int pageNo, String memberId, GetOrderStatusSearchKeyword keyword) throws SQLException, NamingException {
+		PagingInfo result = new PagingInfo();
+		
+		//현재 페이지 번호 셋팅
+		result.setPageNo(pageNo);
+				
+		//전체 주문 갯수
+		result.setTotalPostCnt(mDao.getTotalOrderStatusCnt(memberId, keyword));
+				
+		//총페이지 수 구하기
+		result.setTotalPageCnt(result.getTotalPostCnt(), result.getViewPostCntPerPage());
+				
+		// 보여주기 시작할 row index번호 구하기
+		result.setStartRowIndex();
+				
+		//몇개의 페이징 블럭이 나오는지
+		result.setTotalPagingBlockCnt();
+				
+		//현재 페이지가 속한 페이징 블럭 번호
+		result.setPageBlockOfCurrentPage();
+				
+		//현재 블럭의 시작 페이지 번호
+		result.setStartNumOfCurrentPagingBlock();
+				
+		//현재 블럭의 끝 페이지 번호 구하기
+		result.setEndNumOfCurrentPagingBlock();
+						
+		return result;
 	}
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------

@@ -299,7 +299,7 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	
 	@Override
-	public List<MyPageOrderList> selectOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword)
+	public List<MyPageOrderList> selectOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword, PagingInfo pi)
 			throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("memberId", memberId);
@@ -315,13 +315,35 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("fifteenDaysAgo", keyword.getFifteenDaysAgo());
 		params.put("aMonthAgo", keyword.getAMonthAgo());
 		
+		params.put("startRowIndex", pi.getStartRowIndex());
+		params.put("viewPostCntPerPage", pi.getViewPostCntPerPage());
+		
 		return ses.selectList(ns + ".searchOrderStatus", params);
 	}
 	
 	@Override
-	public int getTotalOrderCnt() throws SQLException, NamingException {
+	public int getTotalOrderCnt(String memberId) throws SQLException, NamingException {
 		
-		return ses.selectOne(ns + ".getTotalOrderCnt");
+		return ses.selectOne(ns + ".getTotalOrderCnt", memberId);
+	}
+	
+	@Override
+	public int getTotalOrderStatusCnt(String memberId, GetOrderStatusSearchKeyword keyword) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("beforeDeposit", keyword.getBeforeDeposit());
+		params.put("beforeShipping", keyword.getBeforeShipping());
+		params.put("shipping", keyword.getShipping());
+		params.put("deliveryCompleted", keyword.getDeliveryCompleted());
+		params.put("cancelList", keyword.getCancelList());
+		params.put("exchangeList", keyword.getExchangeList());
+		params.put("returnList", keyword.getReturnList());
+		
+		params.put("sevenDaysAgo", keyword.getSevenDaysAgo());
+		params.put("fifteenDaysAgo", keyword.getFifteenDaysAgo());
+		params.put("aMonthAgo", keyword.getAMonthAgo());
+		
+		return ses.selectOne(ns + ".getOrderStatusCnt", params);
 	}
 
 
@@ -366,6 +388,8 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".updateProfile", params);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+	
 
 	
 

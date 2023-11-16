@@ -93,7 +93,7 @@ public interface MemberService {
 	boolean updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId) throws SQLException, NamingException;
 	
 	//주문내역 상태별 검색
-	List<MyPageOrderList> searchOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword) throws SQLException, NamingException;
+	Map<String, Object> searchOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword, int pageNo) throws SQLException, NamingException;
 
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------

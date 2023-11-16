@@ -42,22 +42,22 @@ public class myPageController {
 
 	@RequestMapping(value = "myPage")
 	public void myPage(Model model, HttpServletRequest request, @RequestParam(value = "pageNo", defaultValue = "1") int pageNo) {
-
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
+		
 		System.out.println("@@@@@@@@@@@@@페이지번호 : " + pageNo);
 		try {
-//			//주문내역
-//			Map<String, Object> map = mService.getOrderHistory(memberId, pageNo);
-//			
-//			List<MyPageOrderList>lst = (List<MyPageOrderList>)map.get("orderHistory");
-//			PagingInfo pi = (PagingInfo)map.get("pagenation");
-//			
-//			model.addAttribute("orderList", lst);			
-//			model.addAttribute("page", pi);			
-//			System.out.println("주문내역 페이지 : " + lst);
-//			System.out.println("@@@@@@@@@@@@@페이징 : " + pi.toString());
+			//주문내역
+			Map<String, Object> map = mService.getOrderHistory(memberId, pageNo);
+			
+			List<MyPageOrderList>lst = (List<MyPageOrderList>)map.get("orderHistory");
+			PagingInfo pi = (PagingInfo)map.get("pagination");
+			
+			model.addAttribute("orderList", lst);			
+			model.addAttribute("page", pi);			
+			System.out.println("주문내역 페이지 : " + lst);
+			System.out.println("@@@@@@@@@@@@@페이징 : " + pi.toString());
 			
 			//최근 주문내역
 			List<MyPageOrderList> list = mService.getCurOrderHistory(memberId);
@@ -82,7 +82,7 @@ public class myPageController {
 	}
 
 	@RequestMapping(value = "myPage", method = RequestMethod.POST)
-	public ResponseEntity<List<MyPageOrderList>> myPage(@RequestParam("pageNo") int pageNo, Model model, HttpServletRequest request) {
+	public ResponseEntity<List<MyPageOrderList>> myPage(@RequestParam(value = "pageNo", defaultValue = "1") int pageNo, Model model, HttpServletRequest request) {
 		System.out.println("@@@@@@@@@@@@마이페이지 포스트" + pageNo);
 		
 		HttpSession session = request.getSession();
@@ -99,10 +99,13 @@ public class myPageController {
 			
 			List<MyPageOrderList> lst = (List<MyPageOrderList>)map.get("orderHistory");
 			PagingInfo pi = (PagingInfo)map.get("pagenation");
+
+//			Object lst = map.get("orderHistory");
+//			Object pi = map.get("pagination");
 			
 			model.addAttribute("orderList", lst);			
 			model.addAttribute("page", pi);			
-			System.out.println("주문내역 페이지 : " + lst);
+//			System.out.println("주문내역 페이지 : " + lst);
 			System.out.println("@@@@@@@@@@@@@페이징 : " + pi.toString());
 			
 			result = new ResponseEntity<List<MyPageOrderList>>(lst, header, HttpStatus.OK);
@@ -195,15 +198,6 @@ public class myPageController {
 		System.out.println("주소 검색");
 	}
 	
-	@RequestMapping("orderList")
-	public void getOrderList(Model model, HttpServletRequest req) {
-		
-	}
-	
-	@RequestMapping("detailOrderList")
-	public void getDetailOrderList() {
-		System.out.println("주문 상세 내역");
-	}
 	
 	@RequestMapping("pwdCheck")
 	public void pwdCheck() {
@@ -511,12 +505,13 @@ public class myPageController {
 	}
 	
 	@RequestMapping(value = "searchOrderStatus", method = RequestMethod.POST)
-	public ResponseEntity<List<MyPageOrderList>> searchOrderStatus(@ModelAttribute GetOrderStatusSearchKeyword keyword, HttpServletRequest request) {
+	public ResponseEntity<Map<String, Object>> searchOrderStatus(@ModelAttribute GetOrderStatusSearchKeyword keyword, HttpServletRequest request, 
+			@RequestParam(value = "pageNo", defaultValue = "1") int pageNo, Model model) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
 
-		ResponseEntity<List<MyPageOrderList>> result = null;
+		ResponseEntity<Map<String, Object>> result = null;
 		
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
@@ -524,9 +519,13 @@ public class myPageController {
 		System.out.println("@@@@@@@@@@@@@@키워드@@@@@@@@@@@@@@@" + keyword.toString());
 		
 		try {
-			List<MyPageOrderList> sos = mService.searchOrderStatus(memberId, keyword);
+			Map<String, Object> map = mService.searchOrderStatus(memberId, keyword, pageNo);
+			List<MyPageOrderList> sos = (List<MyPageOrderList>)map.get("orderStatus");
+			PagingInfo page =(PagingInfo)map.get("pagination");
+			model.addAttribute("pi", page);
+			System.out.println("@@@@@@@@@@@@@@@@@@키워드 페이징" + page.toString());
 			if(sos != null) {
-				result = new ResponseEntity<List<MyPageOrderList>>(sos, header, HttpStatus.OK);				
+				result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);				
 			}else {
 				result = new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
