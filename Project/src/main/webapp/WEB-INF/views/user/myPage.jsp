@@ -262,9 +262,7 @@
 					console.log(data);
 					if(data != null){
 						outputOrder(data.orderStatus)		
-						pagination(data.pagination)
-					}else{
-						dataIsnNullOutput()
+						orderStatusPagination(data.pagination)
 					}
 				},
 				error : function() {
@@ -303,9 +301,7 @@
 					console.log(data);
 					if(data != null){
 						outputOrder(data.orderStatus)	
-						pagination(data.pagination) 
-					}else{
-						dataIsnNullOutput()
+						orderStatusPagination(data.pagination) 
 					}
 				},
 				error : function() {
@@ -786,11 +782,6 @@
 		$('.order-box.dashboard-bg-box').html(output)
 	}
 	
-	function dataIsnNullOutput() {
-		let output =`<div>조회된 주문내역이 없습니다.</div>`
-		$('.order-box.dashboard-bg-box').html(output)
-	}
-	
 	//날짜포맷
 	function formatDate(date) {
 		let orderDate = new Date(date)
@@ -813,46 +804,109 @@
 			async : false,
 			success : function(data) {
 				console.log(data);
-				outputOrder(data);
-				pagination(data.pagination)
+				outputOrder(data.orderHistory);
+				let page = data.pagination
+				let output = `<ul class="pagination justify-content-center">`;
+				if(page.pageNo > 1){
+					output += `<li class="page-item">`
+					output += `<a class="page-link" href="javascript:void(0);" onclick="orderHistoryPaging(\${page.pageNo - 1}); return false;">`
+					output += `<i class="fa-solid fa-angles-left"></i>`
+					output += `</a>`
+					output += `</li>`			
+				}
 				
+				for (let i = page.startNumOfCurrentPagingBlock; i < page.endNumOfCurrentPagingBlock + 1 ; i++) {
+					output += `<li class="page-item">`
+					output += `<a class="page-link" href="javascript:void(0);" onclick="orderHistoryPaging(\${i}); return false;">\${i}</a> `
+					output += `</li>`
+				}
+				if(page.pageNo < page.totalPageCnt){
+					output += `<li class="page-item">`
+					output += `<a class="page-link" href="javascript:void(0);" onclick="orderHistoryPaging(\${page.pageNo + 1}); return false;">` 
+					output += `<i class="fa-solid fa-angles-right"></i>`
+					output += `</a>`
+					output += `</li>`			
+				}
+				
+				output += `</ul>`		
+				
+				$('.custome-pagination').html(output)
+				//pagination(data.pagination)
+				console.log("현재페이지 : " + pageNo)
 			},
 			error : function() {
 			}
 		});
-		console.log("현재페이지 : " + pageNo)
 	}
 	
-	function pagination(page) {
-		console.log(page)
-		let endNumOfCurrentPagingBlock = page.endNumOfCurrentPagingBlock;
-		let pageNo = page.pageNo
-		let totalPageCnt = page.totalPageCnt
-		
-		console.log(pageNo)
-		console.log(endNumOfCurrentPagingBlock)
-		console.log(totalPageCnt)
-		
-		let output = '';			
-		output += `<ul class="pagination justify-content-center">`;
-		
+	function orderStatusPaging(pageNo) {
+		$.ajax({
+			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				"pageNo" : pageNo
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				outputOrder(data.orderStatus);
+				//pagination(data.pagination)
+				let page = data.pagination
+				let output = `<ul class="pagination justify-content-center">`;
+				if(page.pageNo > 1){
+					output += `<li class="page-item">`
+					output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${page.pageNo - 1}); return false;">`
+					output += `<i class="fa-solid fa-angles-left"></i>`
+					output += `</a>`
+					output += `</li>`			
+				}
+				
+				for (let i = page.startNumOfCurrentPagingBlock; i < page.endNumOfCurrentPagingBlock + 1 ; i++) {
+					output += `<li class="page-item">`
+					output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${i}); return false;">\${i}</a> `
+					output += `</li>`
+				}
+				if(page.pageNo < page.totalPageCnt){
+					output += `<li class="page-item">`
+					output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${page.pageNo + 1}); return false;">` 
+					output += `<i class="fa-solid fa-angles-right"></i>`
+					output += `</a>`
+					output += `</li>`			
+				}
+				
+				output += `</ul>`		
+				
+				$('.custome-pagination').html(output)
+				console.log("현재페이지 : " + pageNo)
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	function orderStatusPagination(page) {		
+		let output = `<ul class="pagination justify-content-center">`;
+		if(page.pageNo > 1){
 			output += `<li class="page-item">`
-			output += `<a class="page-link" href="javascript:void(0);" onclick="orderHistoryPaging(\${page.pageNo}); return false;">`
+			output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${page.pageNo - 1}); return false;">`
 			output += `<i class="fa-solid fa-angles-left"></i>`
 			output += `</a>`
-			output += `</li>`
+			output += `</li>`			
+		}
 		
 		for (let i = page.startNumOfCurrentPagingBlock; i < page.endNumOfCurrentPagingBlock + 1 ; i++) {
 			output += `<li class="page-item">`
-			output += `<a class="page-link" href="javascript:void(0);" onclick="orderHistoryPaging(\${i}); return false;">\${i}</a> `
+			output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${i}); return false;">\${i}</a> `
 			output += `</li>`
 		}
-		
+		if(page.pageNo < page.totalPageCnt){
 			output += `<li class="page-item">`
-			output += `<a class="page-link" href="javascript:void(0);" onclick="orderHistoryPaging(\${page.pageNo + 1}); return false;">` 
+			output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${page.pageNo + 1}); return false;">` 
 			output += `<i class="fa-solid fa-angles-right"></i>`
 			output += `</a>`
-			output += `</li>`
+			output += `</li>`			
+		}
 		
 		output += `</ul>`		
 		
@@ -1090,7 +1144,7 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="pills-order-tab"
+								<button class="nav-link" id="pills-order-tab" 
 									data-bs-toggle="pill" data-bs-target="#pills-order"
 									type="button" role="tab" aria-controls="pills-order"
 									aria-selected="false">
@@ -1926,18 +1980,17 @@
 										</div>
 									</div>
 								</div>
-								${page }
-								<div id="custome-pagination"></div>
-								<nav class="custome-pagination">
-									<ul class="pagination justify-content-center">
 
-										
+								<nav class="custome-pagination">
+								  	<ul class="pagination justify-content-center">
+
+									<!--  	<c:if test="${page.pageNo > 1 }">
 											<li class="page-item"><a class="page-link" href="#"
 												
-												onclick="orderHistoryPaging(${page.pageNo}); return false;">
+												onclick="orderHistoryPaging(${page.pageNo -1}); return false;">
 													<i class="fa-solid fa-angles-left"></i>
 											</a></li>
-										
+										</c:if>-->
 
 										<c:forEach var="i"
 											begin="${page.startNumOfCurrentPagingBlock }"
@@ -1946,12 +1999,13 @@
 												onclick="orderHistoryPaging(${i}); return false;" href="#">${i }</a></li>
 										</c:forEach>
 
-										
+										<c:if test="${page.pageNo < page.totalPageCnt }">
 											<li class="page-item"><a class="page-link"
 												onclick="orderHistoryPaging(${page.pageNo +1}); return false;"
 												href="#"> <i class="fa-solid fa-angles-right"></i>
 											</a></li>
-
+										</c:if>
+											
 									</ul>
 								</nav>
 							</div>

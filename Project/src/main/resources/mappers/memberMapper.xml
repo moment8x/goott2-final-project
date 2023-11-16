@@ -200,8 +200,8 @@
 	</select>
 	
 	<select id="getOrderStatusCnt" resultType="int">
-		select count(o.order_no) from order_history o, (SELECT * FROM detailed_order_items GROUP BY order_no) d
-		 where member_id = 'abcd123' 
+		select count(distinct o.order_no) from order_history o, detailed_order_items d
+		 where member_id = #{memberId}
 		 <choose>
 	        <when test="beforeShipping != null and beforeShipping.equals('출고전')">
 		        and d.product_status = '출고전'     

@@ -82,7 +82,7 @@ public class myPageController {
 	}
 
 	@RequestMapping(value = "myPage", method = RequestMethod.POST)
-	public ResponseEntity<List<MyPageOrderList>> myPage(@RequestParam(value = "pageNo", defaultValue = "1") int pageNo, Model model, HttpServletRequest request) {
+	public ResponseEntity<Map<String, Object>> myPage(@RequestParam("pageNo") int pageNo, Model model, HttpServletRequest request) {
 		System.out.println("@@@@@@@@@@@@마이페이지 포스트" + pageNo);
 		
 		HttpSession session = request.getSession();
@@ -92,23 +92,20 @@ public class myPageController {
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
 		
-		ResponseEntity<List<MyPageOrderList>> result = null;
+		ResponseEntity<Map<String, Object>> result = null;
 		try {
 			//주문내역
 			Map<String, Object> map = mService.getOrderHistory(memberId, pageNo);
 			
 			List<MyPageOrderList> lst = (List<MyPageOrderList>)map.get("orderHistory");
 			PagingInfo pi = (PagingInfo)map.get("pagenation");
-
-//			Object lst = map.get("orderHistory");
-//			Object pi = map.get("pagination");
 			
 			model.addAttribute("orderList", lst);			
 			model.addAttribute("page", pi);			
 //			System.out.println("주문내역 페이지 : " + lst);
-			System.out.println("@@@@@@@@@@@@@페이징 : " + pi.toString());
+//			System.out.println("@@@@@@@@@@@@@페이징 : " + pi.toString());
 			
-			result = new ResponseEntity<List<MyPageOrderList>>(lst, header, HttpStatus.OK);
+			result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);
 			
 		} catch (SQLException | NamingException e) {
 			result = new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -522,7 +519,9 @@ public class myPageController {
 			Map<String, Object> map = mService.searchOrderStatus(memberId, keyword, pageNo);
 			List<MyPageOrderList> sos = (List<MyPageOrderList>)map.get("orderStatus");
 			PagingInfo page =(PagingInfo)map.get("pagination");
-			model.addAttribute("pi", page);
+			
+			model.addAttribute("page", page);
+			
 			System.out.println("@@@@@@@@@@@@@@@@@@키워드 페이징" + page.toString());
 			if(sos != null) {
 				result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);				
