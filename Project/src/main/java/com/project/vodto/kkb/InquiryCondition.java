@@ -18,5 +18,5 @@ public class InquiryCondition {
 	private String orderNo;
 	private String answerStatus;
 	private String inquiryType;
-	private boolean file;
+	private byte file;
 }

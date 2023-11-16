@@ -51,12 +51,15 @@
 			<if test='inquiryType != null and !inquiryType.equals("")' >
 				AND c.inquiry_type = #{inquiryType}
 			</if>
-			<if test='file = true' >
-				AND f.upload_files_seq IS NOT NULL and f.upload_files_seq != ''
-			</if>
-			<if test='file = false' >
-				AND f.upload_files_seq IS NULL or f.upload_files_seq = ''
-			</if>
+						
+			<choose>
+				<when test='file == 1'>
+					AND (f.upload_files_seq IS NOT NULL and f.upload_files_seq != '')
+				</when>
+				<when test='file == 0'>
+					AND (f.upload_files_seq IS NULL or f.upload_files_seq = '')
+				</when>
+			</choose>	
 		</where>
 		ORDER BY c.ref DESC, c.ref_order ASC
 	</select>	

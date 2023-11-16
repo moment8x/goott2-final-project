@@ -10,11 +10,11 @@ import lombok.Setter;
 public class PostCondition {
 	private Date createdDateStart;
 	private Date createdDateEnd;
-	private int categoryId;
+	private String categoryId;
 	private String title;
 	private String content;
 	private String author;
-	private boolean reply;
+	private byte reply;
 //	private boolean comment;
-	private boolean file;
+	private byte file;
 }

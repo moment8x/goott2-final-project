@@ -6,8 +6,8 @@
 <mapper namespace="com.project.mappers.adminCouponMapper">
 	<select id="selectCouponInfo" resultType="CouponInfoResponse">
 		SELECT count(c.coupon_number) issued, 
-			   a.available,
-		       b.unused
+			   if(a.available IS NULL, 0, a.available ) available,
+               if(b.unused IS NULL, 0, b.unused ) unused
 		FROM coupon_logs c
 		LEFT JOIN (SELECT count(coupon_number) available, coupon_logs_seq 
 		FROM coupon_logs 

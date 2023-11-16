@@ -1,19 +1,12 @@
 package com.project.vodto.kkb;
 
-import java.sql.Timestamp;
-
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class CouponInfoResponse {
-	private String couponNumber;
-	private String couponName;
-	private String categoryName;
-	private int discountAmount;
-	private Timestamp obtainedDate;
-	private Timestamp expirationDate;
-	private Timestamp usedDate;
-	private String relatedOrder;
+	private String issued;
+	private String available;
+	private String unused;
 }
