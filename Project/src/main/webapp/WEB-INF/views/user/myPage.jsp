@@ -504,11 +504,12 @@
 			async : false,
 			success : function(data) {
 				console.log(data);
-				$('#addrRecipient').text(data.recipient)
-				$('#addrRecipientContact').text(data.recipientContact)
-				$('#addrZipCode').text(data.zipCode)
-				$('#addrAddress').text(data.address)
-				$('#addrDetailAddress').text(data.detailAddress)
+				//$('#addrRecipient').text(data.recipient)
+				//$('#addrRecipientContact').text(data.recipientContact)
+				//$('#addrZipCode').text(data.zipCode)
+				//$('#addrAddress').text(data.address)
+				//$('#addrDetailAddress').text(data.detailAddress)
+				location.href='/user/myPage'
 			},
 			error : function() {
 			}
