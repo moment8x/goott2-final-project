@@ -3,12 +3,18 @@ package com.project.controller.kjy;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 
+import java.io.BufferedReader;
 import java.io.Console;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.ibatis.annotations.Param;
@@ -26,7 +32,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.service.kjy.ListService;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.Product;
@@ -157,7 +164,6 @@ public class ListController {
 		return res;
 		
 	}
-	
 	@RequestMapping("/searchPage")
 	public Model goSearching(@RequestParam(value="val", defaultValue = "notSearch") String val,
 			@RequestParam(value="page", defaultValue = "1") int page, 
@@ -165,6 +171,7 @@ public class ListController {
 		if("notSearch".equals(val)) {
 			model.addAttribute("products", val);
 		} else {
+			naverBookSearch(val);
 			try {
 				// 검색에 해당하는 상품 가져오기
 				Map<String, Object> map = lService.searchProducts(val, sort, page);
@@ -184,6 +191,44 @@ public class ListController {
 			}
 		}
 		return model;
+	}
+	
+	private void naverBookSearch(String val) {
+		String baseUrl = "https://openapi.naver.com/v1/search/book.json";
+		// 검색어
+		String query = "?query=val";
+		// 보여줄 상품 개수
+		String display = "&display=10";
+		String sort = "&sort=sim";
+		String bookUrl = baseUrl + query + display + sort;
+		try {
+			URLEncoder.encode(bookUrl, "UTF-8");
+			URL url = new URL(bookUrl);
+			HttpsURLConnection conn = (HttpsURLConnection)url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("X-Naver-Client-Id", "QvibsLi5PSZRGzsKS_Zp");
+			conn.setRequestProperty("X-Naver-Client-Secret", "o6h8h8IDEQ");
+			int responseCode = conn.getResponseCode();
+			
+			if(responseCode == 200) {
+				 BufferedReader bookReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                 StringBuilder bookResponse = new StringBuilder();
+                 String bookInputLine;
+                 while ((bookInputLine = bookReader.readLine()) != null) {
+                	 bookResponse.append(bookInputLine);
+                 }
+                 bookReader.close(); 
+                 
+               ObjectMapper objectMapper = new ObjectMapper();
+               JsonNode jsonMapper = new ObjectMapper().readTree(bookResponse.toString());
+//               objectMapper.treeToValue(jsonMapper, null);
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	@RequestMapping(value="/searchPageWithFilter", method = RequestMethod.POST)
