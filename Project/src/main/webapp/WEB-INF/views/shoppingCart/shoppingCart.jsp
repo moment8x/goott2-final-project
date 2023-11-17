@@ -89,6 +89,7 @@
 				async : false,
 				success : function(data) {
 					result = data;
+					console.log("data", data);
 				}, error : function() {
 					console.log("help!me!");
 				}
@@ -105,7 +106,7 @@
 			let subtotal = 0;
 			let total = 0;
 			if (data.status === "success") {
-				let items = data.items;
+				let items = data.list.items;
 				isLogin = data.isLogin;
 				$.each(items, function(i, item) {
 					let qty = data.list.list[i].quantity;
