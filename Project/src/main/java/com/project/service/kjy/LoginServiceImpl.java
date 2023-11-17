@@ -42,4 +42,16 @@ public class LoginServiceImpl implements LoginService {
 		// TODO Auto-generated method stub
 		return loginDao.selectMemberById(id);
 	}
+
+
+	@Override
+	public boolean saveRemember(String memberId, String key) throws Exception {
+		boolean result = false;
+		int upddateRemember = loginDao.updateRemember(memberId, key);
+		if(upddateRemember == 1) {
+			result = true;
+		}
+		
+		return result;
+	}
 }

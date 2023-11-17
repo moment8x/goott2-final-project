@@ -20,13 +20,11 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 
 	@Override
 	public List<OrderNoResponse> findOrderByInfo(OrderCondition order) throws Exception {
-		
 		return ses.selectList(ns + ".selectOrderNoInfo", order);
 	}
 
 	@Override
 	public List<OrderProductResponse> findProductByInfo(OrderCondition order) throws Exception {
-		
 		return ses.selectList(ns + ".selectOrderProductInfo", order);
 	}
 

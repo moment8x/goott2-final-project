@@ -16,9 +16,9 @@ public interface ShoppingCartDAO {
 	// 비회원 장바구니 삭제
 	int deleteItemNon(String nonMemberId, String productId) throws SQLException, NamingException;
 	// 비회원 장바구니 저장
-	int insertShoppingCartNon(String nonMemberId, String productId) throws SQLException, NamingException;
+	int insertShoppingCartNon(String nonMemberId, String productId, int quantity) throws SQLException, NamingException;
 	// 회원 장바구니 저장
-	int insertShoppingCart(String memberId, String productId) throws SQLException, NamingException;
+	int insertShoppingCart(String memberId, String productId, int quantity) throws SQLException, NamingException;
 	// 회원 장바구니 삭제
 	int deleteItem(String memberId, String productId) throws SQLException, NamingException;
 	// 비회원 헤더 장바구니 조회
@@ -29,4 +29,8 @@ public interface ShoppingCartDAO {
 	int countListNon(String nonMemberId) throws SQLException, NamingException;
 	// 회원 장바구니 수량 체크
 	int countList(String memberId) throws SQLException, NamingException;
+	// 회원 장바구니 수량 수정
+	int updateQTY(String memberId, String productId, int quantity) throws SQLException, NamingException;
+	// 비회원 장바구니 수량 수정
+	int updateQTYNon(String nonMemberId, String productId, int quantity) throws SQLException, NamingException;
 }

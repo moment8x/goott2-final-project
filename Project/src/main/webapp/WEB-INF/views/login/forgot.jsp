@@ -94,7 +94,6 @@
                         <div class="log-in-box">
                             <div class="log-in-title">
                                 <h3>아이디 찾기</h3>
-                                <h4>Forgot your password</h4>
                             </div>
 
                             <div class="input-box">
@@ -137,8 +136,7 @@
                     <div class="d-flex align-items-center justify-content-center h-100">
                         <div class="log-in-box">
                             <div class="log-in-title">
-                                <h3>Welcome To Fastkart</h3>
-                                <h4>Forgot your password</h4>
+                                <h3>비밀번호 찾기</h3>
                             </div>
 
                             <div class="input-box">

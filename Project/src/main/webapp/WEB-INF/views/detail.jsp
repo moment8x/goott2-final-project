@@ -50,12 +50,83 @@
    href="/resources/assets/css/style.css">
    
 <!-- latest jquery -->
-<script src="/resources/assets/js/jquery-3.6.0.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 
 <script>
 	
 	$(function () {
 		$('.single-item').slick();
+		
+		// 첨부파일
+		$(".upFileArea").on("dragenter dragover", function(e) {
+			e.preventDefault();
+		});
+		$(".upFileArea").on("drop", function(e) {
+			e.preventDefault();
+			
+			console.log(e.originalEvent.dataTransfer.files);
+			
+			let files = e.originalEvent.dataTransfer.files;
+			for (let i = 0; i < files.length; i++) {
+				let form = new FormData();
+				form.append("uploadFile", files[i]);	// 파일의 이름을 컨트롤러단의 MultipartFile 객체명과 맞춘다.
+				
+				$.ajax({
+					url : "/review/uploadFile",
+					type : "post",
+					data : form,
+					dataType : "json",
+					async : false,
+					processData : false,	// text데이터에 대해 쿼리스트링 처리를 하지 않겠다.  default = true
+					contentType : false,	// application/x-www-form-urlencoded 처리 안함.(인코딩 하지 않음)  default = true
+					success : function(data) {
+						console.log("업로드성공", data);
+						if (data != null) {
+							showUploadedFile(data);
+						}
+					}, error : function(data) {
+						console.log("업로드 실패", data);
+					}
+				});
+			}
+		});
+		
+		// 별 변경!
+		$(".star").on("click", function(e) {
+			// 누른 별표까지 색칠, 이 후 별표는 X
+			let selectValue = $(this).prev().val();
+			for (let i = 1; i < 6; i++) {
+				if (selectValue < $('#' + i + '-stars').val()) {
+					$('#' + i + '-span').html('<i class="fa-regular fa-star" style="color: #f9e50b;"></i>');
+				} else {
+					$('#' + i + '-span').html('<i class="fa-solid fa-star" style="color: #f9e50b;"></i>');
+				}
+			}
+		});
+		
+		// 리뷰 작성하려 할 시 검증!
+		$("form").click(function(e) {
+			if (${sessionScope.loginMember == null}) {
+				if (window.confirm("회원만 리뷰 등록이 가능합니다. 로그인 페이지로 이동하시겠습니까?")) {
+					location.href="/login/";
+				}
+			} else {
+				$.ajax({
+					url : "/review/isValid",
+					type : "GET",
+					data : {
+						"productId" : ${product.productId}
+					},
+					dataType : "json",
+					async : false,
+					success : function(data) {
+						console.log(data);
+					}, error : function(data) {
+						console.log(data);
+					}
+				});
+			}
+		});
 	});
 	
 	function plusQTY() {
@@ -77,7 +148,8 @@
 			url: "/shoppingCart/insert",
 			type: "POST",
 			data: {
-				product_id : "${product.productId}"
+				productId : "${product.productId}",
+				quantity : $('#qty').val()
 			},
 			dataType: "JSON",
 			async: false,
@@ -93,6 +165,36 @@
 			}
 		});
 	}
+	
+	// 리뷰달기 버튼 클릭 시 유효성 검사
+	/*function isValid() {
+		boolean result = false;
+		
+		return result;
+	}*/
+	
+	// 업로드 된 파일 표시    	
+	function showUploadedFile(json) {
+		console.log("newFileName", json);
+		let output = "";
+		for(let data of json){
+			let name = data.newFileName.replaceAll("\\", "/");
+			//output += "<img src='../resources/uploads" + name + "'/>";
+			output += `<img src='../resources/uploads\${name}'/>`;
+		}
+		$('.uploadFiles').html(output);
+	}
+	
+	// 페이지 나갈 시
+	window.onbeforeunload = function (e) {
+		console.log("beforeunload 실행");
+ 		window.navigator.sendBeacon('/review/refreshFile');
+	};
+		    	
+	// form버튼으로 페이지 이동 시
+	$(document).on("submit", "form", function (e) {
+		window.onbeforeunload = null;
+	});
 </script>
    
 <style type="text/css">
@@ -137,6 +239,16 @@
    background-color: #2980b9;
    color: white;
    transform: rotateY(180deg);
+}
+
+.upFileArea {
+	width: 100%;
+	height: 200px;
+	border: 1px solid black;
+}
+
+.star-rating input{
+	display: none;
 }
 </style>
 
@@ -217,8 +329,7 @@
 						<div class="col-xl-6 wow fadeInUp">
 							<div class="product-left-box">
 								<div class="row g-2">
-									<div
-										class="col-xxl-10 col-lg-12 col-md-10 order-xxl-2 order-lg-1 order-md-2">
+									<div class="col-xxl-10 col-lg-12 col-md-10 order-xxl-2 order-lg-1 order-md-2">
 										<!-- 플립 카드 or 단일? 이미지 -->
 										<c:choose>
 											<c:when test="${productImages.size() > 2}">
@@ -320,59 +431,6 @@
       								<div class="procuct-contain">
       									<p>${product.introductionIntro}</p>
       								</div>
-      								
-                           <!-- <div class="product-packege">
-                              <div class="product-title">
-                                 <h4>Weight</h4>
-                              </div>
-                              <ul class="select-packege">
-                                 <li><a href="javascript:void(0)" class="active">1/2
-                                       KG</a></li>
-                                 <li><a href="javascript:void(0)">1 KG</a></li>
-                              </ul>
-                           </div> -->
-
-                           <!-- <div class="time deal-timer product-deal-timer mx-md-0 mx-auto"
-                              id="clockdiv-1" data-hours="1" data-minutes="2"
-                              data-seconds="3">
-                              <div class="product-title">
-                                 <h4>Hurry up! Sales Ends In</h4>
-                              </div>
-                              <ul>
-                                 <li>
-                                    <div class="counter d-block">
-                                       <div class="days d-block">
-                                          <h5></h5>
-                                       </div>
-                                       <h6>Days</h6>
-                                    </div>
-                                 </li>
-                                 <li>
-                                    <div class="counter d-block">
-                                       <div class="hours d-block">
-                                          <h5></h5>
-                                       </div>
-                                       <h6>Hours</h6>
-                                    </div>
-                                 </li>
-                                 <li>
-                                    <div class="counter d-block">
-                                       <div class="minutes d-block">
-                                          <h5></h5>
-                                       </div>
-                                       <h6>Min</h6>
-                                    </div>
-                                 </li>
-                                 <li>
-                                    <div class="counter d-block">
-                                       <div class="seconds d-block">
-                                          <h5></h5>
-                                       </div>
-                                       <h6>Sec</h6>
-                                    </div>
-                                 </li>
-                              </ul>
-                           </div> -->
                            			<div class="note-box product-packege">
                            				<div class="cart_qty qty-box product-qty">
                            					<div class="input-group">
@@ -405,58 +463,6 @@
                            				</a>
                            			</div>
 
-                           <!-- <div class="pickup-box">
-                              <div class="product-title">
-                                 <h4>Store Information</h4>
-                              </div>
-
-                              <div class="pickup-detail">
-                                 <h4 class="text-content">Lollipop cake chocolate
-                                    chocolate cake dessert jujubes. Shortbread sugar plum
-                                    dessert powder cookie sweet brownie.</h4>
-                              </div>
-
-                              <div class="product-info">
-                                 <ul class="product-info-list product-info-list-2">
-                                    <li>Type : <a href="javascript:void(0)">Black
-                                          Forest</a></li>
-                                    <li>SKU : <a href="javascript:void(0)">SDFVW65467</a></li>
-                                    <li>MFG : <a href="javascript:void(0)">Jun 4, 2022</a></li>
-                                    <li>Stock : <a href="javascript:void(0)">2 Items
-                                          Left</a></li>
-                                    <li>Tags : <a href="javascript:void(0)">Cake,</a> <a
-                                       href="javascript:void(0)">Backery</a></li>
-                                 </ul>
-                              </div>
-                           </div> -->
-
-                           <!-- <div class="paymnet-option">
-                              <div class="product-title">
-                                 <h4>Guaranteed Safe Checkout</h4>
-                              </div>
-                              <ul>
-                                 <li><a href="javascript:void(0)"> <img
-                                       src="/resources/assets/images/product/payment/1.svg"
-                                       class="blur-up lazyload" alt="">
-                                 </a></li>
-                                 <li><a href="javascript:void(0)"> <img
-                                       src="/resources/assets/images/product/payment/2.svg"
-                                       class="blur-up lazyload" alt="">
-                                 </a></li>
-                                 <li><a href="javascript:void(0)"> <img
-                                       src="/resources/assets/images/product/payment/3.svg"
-                                       class="blur-up lazyload" alt="">
-                                 </a></li>
-                                 <li><a href="javascript:void(0)"> <img
-                                       src="/resources/assets/images/product/payment/4.svg"
-                                       class="blur-up lazyload" alt="">
-                                 </a></li>
-                                 <li><a href="javascript:void(0)"> <img
-                                       src="/resources/assets/images/product/payment/5.svg"
-                                       class="blur-up lazyload" alt="">
-                                 </a></li>
-                              </ul>
-                           </div> -->
                            			</div>
                            		</div>
                            		<div class="col-12">
@@ -487,26 +493,26 @@
                            					</li>
                            				</ul>
                            				<div class="tab-content custom-tab" id="myTabContent">
-                           				<div class="tab-pane fade show active" id="description"
-                           					role="tabpanel" aria-labelledby="description-tab">
-                           					<div class="product-description">
-                           						<div class="nav-desh">
-                           							<c:choose>
-                           								<c:when test="${product.productInfoImage != ''}">
-                           									<img src="${product.productInfoImage }">
-                           								</c:when>
-                           								<c:otherwise>
-		                           							<h5>책 소개</h5>
-		                           							<p>${product.introductionDetail}</p>
-                           								</c:otherwise>
-                           							</c:choose>
-                           						</div>
-                           						<div class="nav-desh">
-                           							<div class="desh-title">
-                           								<h5>목차</h5>
+                           					<div class="tab-pane fade show active" id="description"
+                           						role="tabpanel" aria-labelledby="description-tab">
+                           						<div class="product-description">
+                           							<div class="nav-desh">
+                           								<c:choose>
+	                           								<c:when test="${product.productInfoImage != ''}">
+                           										<img src="${product.productInfoImage }">
+                           									</c:when>
+                           									<c:otherwise>
+			                           							<h5>책 소개</h5>
+		                           								<p>${product.introductionDetail}</p>
+                           									</c:otherwise>
+                           								</c:choose>
                            							</div>
-                           							<p>${product.tableOfContents }</p>
-                           						</div>
+                           							<div class="nav-desh">
+                           								<div class="desh-title">
+                           									<h5>목차</h5>
+                           								</div>
+                           								<p>${product.tableOfContents }</p>
+                           							</div>
                            						<!-- 
                            						<div class="banner-contain nav-desh">
 	                           						<img src="/resources/assets/images/vegetable/banner/14.jpg"
@@ -702,44 +708,61 @@
 	                           								<h4 class="fw-500">Add a review</h4>
 	                           							</div>
 	                           							
-	                           							<div class="row g-4">
-	                           								<div class="col-md-6">
-	                           									<div class="form-floating theme-form-floating">
-	                           										<input type="text" class="form-control" id="name" placeholder="Name">
-	                           										<label for="name">Your Name</label>
-	                           									</div>
-	                           								</div>
-	                           								
-	                           								<div class="col-md-6">
-	                           									<div class="form-floating theme-form-floating">
-	                           										<input type="email" class="form-control" id="email" placeholder="Email Address">
-	                           										<label for="email">Email Address</label>
-	                           									</div>
-	                           								</div>
-	                           								
-	                           								<div class="col-md-6">
-	                           									<div class="form-floating theme-form-floating">
-	                           										<input type="url" class="form-control" id="website" placeholder="Website">
-	                           										<label for="website">Website</label>
-	                           									</div>
-	                           								</div>
-	                           								
-	                           								<div class="col-md-6">
-	                           									<div class="form-floating theme-form-floating">
-	                           										<input type="url" class="form-control" id="review1" placeholder="Give your review a title">
-	                           										<label for="review1">Review Title</label>
-	                           									</div>
-	                           								</div>
-	                           								
-	                           								<div class="col-12">
-	                           									<div class="form-floating theme-form-floating">
-	                           										<textarea class="form-control"
-	                           										placeholder="Leave a comment here"
-	                           										id="floatingTextarea2" style="height: 150px"></textarea>
-	                           										<label for="floatingTextarea2">Write Your Comment</label>
-	                           									</div>
-	                           								</div>
-	                           							</div>
+	                           							<form action="/review/saveReview" method="POST" enctype="multipart/form-data">
+	                           								<input type="hidden" name="productId" value="${product.productId }">
+		                           							<div class="row g-4">
+		                           								<!-- 평점 넣기 -->
+		                           								<div class="col-md-12">
+		                           									<div class="form-floating theme-form-floating">
+		                           										<div>평점</div>
+		                           										<div class="star-rating space-x-4 mx-auto">
+			                           										<input type="radio" id="1-stars" name="rating" value=1 />
+																			<label for="1-stars" class="star" id="1-span"><i class="fa-regular fa-star" style="color: #f9e50b;"></i></label>
+			                           										<input type="radio" id="2-stars" name="rating" value=2 />
+																			<label for="2-stars" class="star" id="2-span"><i class="fa-regular fa-star" style="color: #f9e50b;"></i></label>
+			                           										<input type="radio" id="3-stars" name="rating" value=3 />
+																			<label for="3-stars" class="star" id="3-span"><i class="fa-regular fa-star" style="color: #f9e50b;"></i></label>
+			                           										<input type="radio" id="4-stars" name="rating" value=4 />
+																			<label for="4-stars" class="star" id="4-span"><i class="fa-regular fa-star" style="color: #f9e50b;"></i></label>
+			                           										<input type="radio" id="5-stars" name="rating" value=5 />
+																			<label for="5-stars" class="star" id="5-span"><i class="fa-regular fa-star" style="color: #f9e50b;"></i></label>
+																		</div>
+		                           									</div>
+		                           								</div>
+		                           								<!-- 본문 --> 
+		                           								<div class="col-12">
+		                           									<div class="form-floating theme-form-floating">
+		                           										<textarea class="form-control"
+		                           										placeholder="Leave a comment here"
+		                           										id="floatingTextarea2" style="height: 150px; resize: none;" name="content"></textarea>
+		                           										<label for="floatingTextarea2">Write Your Comment</label>
+		                           									</div>
+		                           								</div>
+		                           								<!-- 이미지 넣기 -->
+		                           								<!-- <div class="col-md-12">
+		                           									<div class="form-floating theme-form-floating">
+		                           										<input type="url" class="form-control" id="review1" placeholder="Give your review a title">
+		                           										<label for="review1">Review Title</label>
+		                           									</div>
+		                           								</div> -->
+		                           								
+		                           								<div class="col-md-12">
+								                                    <div class="form-floating theme-form-floating">
+								                                    	<div style="color: #4a5568;">파일 업로드</div>
+								                                        <div class="upFileArea">
+															    			업로드 할 파일을 드래그 앤 드랍 하세요.
+															    		</div>
+															    		<div class="uploadFiles"></div>
+								                                    </div>
+								                                </div>
+		                           								
+		                           								<div class="col-md-12">
+		                           									<div class="form-floating theme-form-floating">
+		                           										<button class="btn" style="background-color: #198754; color: #fff;">리뷰 달기</button>
+		                           									</div>
+		                           								</div>
+		                           							</div>
+	                           							</form>
 	                           						</div>
 	                           						
 	                           						<div class="col-12">
@@ -1596,7 +1619,7 @@
 
    <jsp:include page="./footer.jsp"></jsp:include>
 
-   <script>
+   <!-- <script>
       function getAllReview() {
          const subcategory = $(this).data("productId");
 
@@ -1619,7 +1642,7 @@
       }
 
       $(".getAllReview").on("click", getAllReview);
-   </script>
+   </script> -->
 
 
   

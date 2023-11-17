@@ -68,6 +68,18 @@
 		</interceptor>
 	</interceptors>
 	
+	<beans:bean id="AuthenticationInterceptor"
+		class="com.project.interceptor.kjy.AuthenticationInterceptor">
+	</beans:bean>
+	
+	<interceptors>
+		<interceptor>
+			<mapping path="/login/"/>
+			<beans:ref bean="AuthenticationInterceptor"/>
+		</interceptor>
+	</interceptors>
+	
 	<!-- 아래의 패키지를 스캔하여 객체 확보 -->
 	<context:component-scan base-package="com.project.controller" />
+	<context:component-scan base-package="com.project.exception" />
 </beans:beans>
