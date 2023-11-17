@@ -33,6 +33,8 @@
 		<typeAlias type="com.project.vodto.kkb.ShoppingCartResponse" alias="ShoppingCartResponse" />
 		<typeAlias type="com.project.vodto.kkb.AppliedCategory" alias="AppliedCategory" />
 		<typeAlias type="com.project.vodto.kkb.CouponAppliedCategory" alias="CouponAppliedCategory" />
+		<typeAlias type="com.project.vodto.kkb.MemoResponse" alias="MemoResponse" />
+		<typeAlias type="com.project.vodto.kkb.CartResponse" alias="CartResponse" />
 		<typeAlias type="com.project.vodto.Product" alias="product" />
 		<typeAlias type="com.project.vodto.Board" alias="Board" />
 	</typeAliases>

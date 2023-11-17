@@ -15,12 +15,15 @@ import com.project.service.kkb.admin.AdminBoardService;
 import com.project.service.kkb.admin.AdminCouponService;
 import com.project.service.kkb.admin.AdminInquiryService;
 import com.project.service.kkb.admin.AdminMemberService;
+import com.project.service.kkb.admin.AdminMemoService;
 import com.project.service.kkb.admin.AdminOrderService;
 import com.project.service.kkb.admin.AdminPointService;
 import com.project.service.kkb.admin.AdminRewardService;
+import com.project.service.kkb.admin.AdminShoppingCartService;
 import com.project.vodto.kkb.InquiryCondition;
 import com.project.vodto.kkb.MemberCondition;
 import com.project.vodto.kkb.MemberParam;
+import com.project.vodto.kkb.MemoCondition;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.PostCondition;
 
@@ -39,6 +42,8 @@ public class AdminMemberController {
 	private final AdminRewardService adminRewardService;
 	private final AdminPointService adminPointService;
 	private final AdminCouponService adminCouponService;
+	private final AdminShoppingCartService adminShoppingCartService;
+	private final AdminMemoService adminMemoService;
 	
 	/* 회원 수 변경 시 이벤트 발행(test) */
 	@GetMapping("/test")
@@ -116,5 +121,17 @@ public class AdminMemberController {
 	@GetMapping("/detail/category/{couponNumber}")
 	public Map<String, Object> checkAppliedCategory(@PathVariable("couponNumber") String couponNumber) throws Exception {
 		return adminCouponService.getCategoryByCouponNo(couponNumber);
+	}
+	
+	/* CRM 장바구니 정보 */
+	@GetMapping("/detail/cart/{memberId}")
+	public Map<String, Object> checkCartInfo(@PathVariable("memberId") String memberId) throws Exception {
+		return adminShoppingCartService.getCartInfoById(memberId);
+	}
+	
+	/* CRM 회원 메모 검색 */
+	@PostMapping("/detail/memo")
+	public Map<String, Object> searchMemoInfo(@RequestBody MemoCondition memoCond) throws Exception {
+		return adminMemoService.getMemoById(memoCond);
 	}
 }
