@@ -131,7 +131,7 @@ public class ListController {
 	public ResponseEntity<Map<String, String>> checkLogin(HttpServletRequest request){
 		ResponseEntity<Map<String, String>> data = null;
 		Map<String, String> loginMap = new HashMap<String, String>();
-		if(request.getSession().getAttribute("loginMe") != null) {
+		if(request.getSession().getAttribute("loginMemeber") != null) {
 			loginMap.put("isLogin", "loginOK");
 			data = new ResponseEntity<Map<String,String>>(loginMap, HttpStatus.OK);
 		} else {

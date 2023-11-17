@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,6 +29,7 @@ import com.project.controller.HomeController;
 import com.project.service.kjs.shoppingcart.ShoppingCartService;
 import com.project.vodto.Member;
 import com.project.vodto.kjs.DisPlayedProductDTO;
+import com.project.vodto.kjy.Memberkjy;
 
 /**
  * @author goott1
@@ -54,27 +56,30 @@ public class ShoppingCartController {
 	}
 	
 	@RequestMapping("shoppingCart/all")
-	public ResponseEntity<Map<String, Object>> shoppingCartList(HttpServletRequest request) {
+	public ResponseEntity<Map<String, Object>> shoppingCartList(HttpServletRequest request, Model model) {
 		System.out.println("======= 장바구니 컨트롤러 - 장바구니 내역 불러오기 =======");
 		ResponseEntity<Map<String, Object>> result = null;
 		Map<String, Object> map = new HashMap<String, Object>();
+		// 상희
+		String isLogin = "N";
 		// 로그인 여부 확인
 		HttpSession session = request.getSession();
 		Map<String, Object> list = null;
 		try {
 			if (session.getAttribute("loginMember") != null) {
 				// 로그인을 했으면
-				Member member = (Member) session.getAttribute("loginMember");
+				Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 				list = scService.getShoppingCart(member.getMemberId(), true);
 				List<DisPlayedProductDTO> items = (List<DisPlayedProductDTO>)list.get("items");
-				result = output(list, items);
+				isLogin = "Y";
+				result = output(list, items, isLogin);
 			} else {
 				// 로그인을 안했으면(비회원이면)			
 				Cookie cookie = WebUtils.getCookie(request, "nom");
 				if (cookie != null) {
 					list = scService.getShoppingCart(cookie.getValue(), false);
 					List<DisPlayedProductDTO> items = (List<DisPlayedProductDTO>)list.get("items");
-					result = output(list, items);
+					result = output(list, items, isLogin);
 				} // else : 타이밍 맞게 쿠키 유효기간이 지나 삭제됐을 경우
 			}			
 		} catch (SQLException | NamingException e) {
@@ -83,14 +88,16 @@ public class ShoppingCartController {
 			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.BAD_REQUEST);
 		}
 		System.out.println("======= 장바구니 컨트롤러단 끝 =======");
+				
 		return result;
 	}
 	
-	private ResponseEntity<Map<String,Object>> output(Map<String, Object> list, List<DisPlayedProductDTO> items) {
+	private ResponseEntity<Map<String,Object>> output(Map<String, Object> list, List<DisPlayedProductDTO> items, String isLogin) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		if (items != null && items.size() > 0) {
 			map.put("items", items);
+			map.put("isLogin", isLogin);
 			map.put("status", "success");
 		}
 		else {
@@ -185,7 +192,7 @@ public class ShoppingCartController {
 		try {
 			if (session.getAttribute("loginMember") != null) {
 				// 로그인 했을 시
-				if (scService.insertItem(((Member)session.getAttribute("loginMember")).getMemberId(), true, productId)) {
+				if (scService.insertItem(((Memberkjy)session.getAttribute("loginMember")).getMemberId(), true, productId)) {
 					map.put("status", "success");
 				} else {
 					// 이미 담긴 상품일 시

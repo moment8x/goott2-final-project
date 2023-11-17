@@ -1,7 +1,9 @@
-package com.project.vodto;
+package com.project.vodto.ksh;
 
 import java.sql.Timestamp;
 import java.util.List;
+
+import com.project.vodto.DetailOrderItem;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +36,11 @@ public class PaymentDTO {
 	private String recipientName;
 	private List<String> couponNumbers;
 	private String paymentStatus;
-	private String compareOrderNo;
+	private String memberId;
+	private String pointReason;
+	private String rewardReason;
+	private String impUid;
+	private String phoneNumber;
 	
 	
 }

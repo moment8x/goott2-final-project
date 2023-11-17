@@ -23,11 +23,12 @@ import com.project.vodto.DetailOrderItem;
 import com.project.vodto.Member;
 import com.project.vodto.NonOrderHistory;
 import com.project.vodto.OrderHistory;
-import com.project.vodto.OrderInfo;
-import com.project.vodto.OrderInfo2;
-import com.project.vodto.PaymentDTO;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.kjy.Memberkjy;
+import com.project.vodto.ksh.OrderInfo;
+import com.project.vodto.ksh.OrderInfo2;
+import com.project.vodto.ksh.PaymentDTO;
 
 @Controller
 @RequestMapping(value = "/order/*")
@@ -97,8 +98,11 @@ public class OrderController {
 		if(orderId.contains("O")) {
 			// 쿠폰, 포인트, 적립금, 배송 주소록 
 			HttpSession session = request.getSession();
-			Member member = (Member) session.getAttribute("loginMember");
+			Memberkjy member = (Memberkjy)session.getAttribute("loginMember");
+			
+			// member 다시 조회
 			try {
+				Memberkjy memberInfo = os.getMemberInfo(member.getMemberId());
 				List<ShippingAddress> shippingAddr = os.getShippingAddress(member.getMemberId());
 //				List<ShippingAddress> otherAddr = new ArrayList<ShippingAddress>();
 				
@@ -108,7 +112,7 @@ public class OrderController {
 						model.addAttribute("basicAddr", saddr);
 					} 
 				}
-				model.addAttribute("member", member);
+				model.addAttribute("member", memberInfo);
 				model.addAttribute("shippingAddr", shippingAddr);
 				System.out.println(shippingAddr.toString());
 			    // 쿠폰이 한 개라도 있으면
@@ -123,7 +127,7 @@ public class OrderController {
 				e.printStackTrace();
 			}
 		} else {
-			path = "/order/requestOrder2";
+			path = "/order/requestNonOrder";
 		}
 
 	
@@ -142,6 +146,7 @@ public class OrderController {
 			for (OrderInfo i : productInfos) {
 				if (i.getCurrentQuantity() < items.getProductQuantity().get(index)) {
 					i.setAdequacy("N");
+					path = "/commonError";
 				} else {
 					i.setAdequacy("Y");
 				}
@@ -164,12 +169,14 @@ public class OrderController {
 		}
 		
 		
+		
 		model.addAttribute("productCategory", productCategory);
 		model.addAttribute("paymentInfo", pd);
 		model.addAttribute("orderId", orderId);
 		model.addAttribute("productInfos", productInfos);
 		model.addAttribute("impKey", impKey);
 		System.out.println(productInfos.toString());
+		System.out.println(path);
 
 		return path;
 	}
@@ -182,20 +189,11 @@ public class OrderController {
 		System.out.println("결제 완료하고 주문 내역 저장하기");
 		System.out.println(noh.toString());
 
-//		System.out.println(pd.toString());
-//		System.out.println(itemList.toString());
-//		if (pd.getPayment_method() != null) {
-//			if (pd.getPayment_method().equals("bkt")) {
-//				noh.setDelivery_status("입금확인중");
-//				pd.setPayment_method("무통장입금");
-//			}
-//		}
-
 		try {
 			// 주문내역 테이블 저장
 			if (os.saveNonOrderHistory(noh)) {
 //				 결제랑 주문상세 조회
-				Map<String, Object> paymentDetail = os.getPaymentDetail(noh.getNonOrderNo());
+				Map<String, Object> paymentDetail = os.getPaymentDetail(noh);
 				System.out.println("paymentDetail 조회 - " + paymentDetail.toString());
 			}
 
@@ -204,32 +202,33 @@ public class OrderController {
 			e.printStackTrace();
 
 		}
+		
+		
 
 	}
 	
+	@RequestMapping("jusoPopup")
+	public String findAddr() {
+		System.out.println("주소 검색");
+		return "/user/jusoPopup";
+	}
+	
 	@RequestMapping(value = "orderComplete", method = RequestMethod.POST)
-	public void orderComplete(OrderHistory oh, Model model) {
+	public void orderComplete(OrderHistory oh, Model model, @RequestParam("products") List<String> productId) {
 
 		// 주문 결제 완료하고 주문 내역 창 띄우기
 
 		System.out.println("결제 완료하고 주문 내역 저장하기");
 		System.out.println(oh.toString());
 
-//		System.out.println(pd.toString());
-//		System.out.println(itemList.toString());
-//		if (pd.getPayment_method() != null) {
-//			if (pd.getPayment_method().equals("bkt")) {
-//				noh.setDelivery_status("입금확인중");
-//				pd.setPayment_method("무통장입금");
-//			}
-//		}
-
+		Map<String, Object> paymentDetail = new HashMap<String, Object>();
 		try {
 			// 주문내역 테이블 저장
 			if (os.saveOrderHistory(oh)) {
 //				 결제랑 주문상세 조회
-				Map<String, Object> paymentDetail = os.getPaymentDetail(oh.getOrderNo());
-//				List<DetailOrderItem>
+				paymentDetail = os.getPaymentDetail(oh, productId);
+				
+
 				System.out.println("paymentDetail 조회 - " + paymentDetail.toString());
 			}
 			
@@ -238,49 +237,10 @@ public class OrderController {
 			e.printStackTrace();
 		}
 		
+		model.addAttribute("paymentDetail", paymentDetail);
+		
 		
 	}
-
-//	@RequestMapping(value = "orderComplete", method = RequestMethod.POST)
-//	public ResponseEntity<Map<String, Object>> orderComplete(NonOrderHistory noh, Model model) {
-//
-//		// 비회원 주문 결제 완료하고 주문 내역 창 띄우기
-//		
-//		
-//		System.out.println("결제 완료하고 주문 내역 저장하기");
-//		System.out.println(noh.toString());
-//
-//
-//
-////		System.out.println(pd.toString());
-////		System.out.println(itemList.toString());
-////		if (pd.getPayment_method() != null) {
-////			if (pd.getPayment_method().equals("bkt")) {
-////				noh.setDelivery_status("입금확인중");
-////				pd.setPayment_method("무통장입금");
-////			}
-////		}
-//		
-//		try {
-//			// 주문내역 테이블 저장
-//			if(os.saveOrderHistory(noh)) {
-//				
-//				// 결제랑 주문상세 조회
-//				//os.getPaymentDetail(noh.getNon_order_no());
-//				// 상품 재고 차감
-//				
-//				// 포인트랑 적립금이랑 쿠폰 차감은 어디서할지?
-//			}
-//			
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			
-//		}
-//		
-//		return orderComplete;
-//		
-//	}
 
 	@RequestMapping(value = "get/", method = RequestMethod.GET)
 	public void getOrderHistory(@RequestParam("orderId") String orderId) {

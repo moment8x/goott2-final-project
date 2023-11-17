@@ -14,12 +14,34 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 
 <script>
+	let couponQty = $('.categoryKeys').length;
+	let itemLen = $(".summery-contain").find("li").length; // 상품 종류
+	let viewTotalAmount = 0;
+	// let viewTotalAmount = Number('${requestScope.paymentInfo.totalAmount}');
+	let couponAmount = 0;
+	let couponDiscoutAmount = 0;
+	let discountCount = 0;
+	let output = "";
+	let discountAmount = 0;	
+	let totalAmount = Number('${requestScope.paymentInfo.totalAmount}');
+	let shippingFee = Number('${requestScope.paymentInfo.shippingFee}');
+	let IMP = window.IMP;
+	IMP.init("${impKey}") // 예: 'imp00000000a'
+	let isPaid = false;
+	let orderId = ('${requestScope.orderId}');
+	let productCategory = '${requestScope.productCategory}';
+	productCategories = productCategory.substr(1).slice(0, -1).replaceAll(" ", "").split(',');
+	let products = [];
+	let couponNumbers = [];
+	let createName = "";
+	
 	$(function() {
+		
 		
 		$("#orderNo").val(orderId);
 		$("#memberId").val('${requestScope.member.memberId}');
 	
-		$("#deliveryStatus").val("입금전");
+		$("#deliveryStatus").val("결제완료");
 		$("#payToAmount").text(totalAmount + shippingFee - discountAmount);
 		// discountAmount에 쿠폰도 넣어야함
 		$('#discountAmount').text(discountAmount);
@@ -31,6 +53,8 @@
 					console.log($('#categoryKey'+i).val());
 					console.log(item);
 					console.log("야호");
+					$('#couponSelect').attr('style', 'display:');
+					$('#couponShow').text("쿠폰 선택");
 					$('#categoryKey'+i).attr('style','display:');
 				} else {
 					console.log("되나?")
@@ -83,25 +107,7 @@
 		
 	});
 	
-	let couponQty = $('.categoryKeys').length;
-	let itemLen = $(".summery-contain").find("li").length; // 상품 종류
-	let viewTotalAmount = 0;
-	// let viewTotalAmount = Number('${requestScope.paymentInfo.totalAmount}');
-	let couponAmount = 0;
-	let couponDiscoutAmount = 0;
-	let discountCount = 0;
-	let output = "";
-	let discountAmount = 0;	
-	let totalAmount = Number('${requestScope.paymentInfo.totalAmount}');
-	let shippingFee = Number('${requestScope.paymentInfo.shippingFee}');
-	let IMP = window.IMP;
-	IMP.init("${impKey}") // 예: 'imp00000000a'
-	let isPaid = false;
-	let orderId = ('${requestScope.orderId}');
-	let productCategory = '${requestScope.productCategory}';
-	productCategories = productCategory.substr(1).slice(0, -1).replaceAll(" ", "").split(',');
-	let products = [];
-	let couponNumbers = [];
+	
 	
 	function packData() {
 		for(i=0; i<itemLen; i++) {
@@ -139,6 +145,13 @@
 		} else {
 			couponNumbers[0] = "N";
 		}
+		
+		if(itemLen > 1) {
+			createName = $('#productName0').text()+" 외 "+(itemLen - 1)+"개";
+		} else {
+			createName = $('#productName0').text();
+		}
+		console.log(createName);
 		console.log(products);
 		console.log(couponNumbers);
 	}
@@ -167,76 +180,67 @@
 	}
 
 	function kg_pay() {
-		console.log("!!");
-		IMP.request_pay({ // 결제 정보 채우기
-			pg : "html5_inicis",
-			pay_method : "card",
-			merchant_uid : orderId, // 주문번호
-			name : $('#productQty0').text()+"외 " +(itemLen - 1), // 수정필______________________________________
-			amount : viewTotalAmount, // 숫자 타입
-			buyer_email : "ssingfly3232@gmail.com",
-			buyer_name : "김상희",
-			buyer_tel : "010-4242-4242",
-			buyer_addr : "서울특별시 강남구 신사동",
-			buyer_postcode : "01181"
-		}, function(rsp) { // callback
-			//rsp.imp_uid 값으로 결제 단건조회 API를 호출하여 결제결과를 판단합니다.
-			if (rsp.success) { // 결제 내역 받기
-				// 결제 검증 ajax
-				$.ajax({
-					url : '/pay/verify/' + rsp.imp_uid,
-					type : "POST",
-					data : rsp.imp_uid,
-					async : false,
-				}).done(function(data) {
-					console.log(data);
-					packData();
-					// 결제 내역 저장 ajax
-					obj = {
-						"paymentNumber" : rsp.imp_uid, // 결제번호
-						"nonOrderNo" : rsp.merchant_uid, // 주문번호
-						"paymentMethod" : rsp.pay_method, // 결제수단
-						"totalAmount" : rsp.paid_amount, // 총 상품 금액, 수정 필요
-						"shippingFee" : 0, // 배송비
-						"usedPoints" : 0, // 사용한 포인트
-						"usedReward" : 0, // 사용한 적립금
-						"actualPaymentAmount" : data.response.amount, // 실 결제 금액
-						"paymentTime" : data.response.paidAt,// 결제 시각
-						"amountToPay" : rsp.paid_amount,
-						"cardName" : data.response.cardName,
-						"cardNumber" : data.response.cardNumber,
-						"recipientName" : $("#recipientName").val(),
-						products,
-						couponNumbers
-					// 선택한 상품 보내줘야함
-					};
-					
-
-					$.ajax({
-						url : "/pay/output/",
-						type : "POST",
-						contentType : "application/json",
-						data : JSON.stringify(obj),
-						async : false,
-						success : function(result) {
-							isPaid = true;
-							console.log("ajax 결과 : ", isPaid);
-							if (isPaid) {
-								$("#requestOrder").submit();
-							}
-							// alert("결제 완료");
-						},
-						error : function(error) {
-							console.log(error);
-							//failVerification();
-						}
-					})
-				})
-			} else {
-				alert("결제에 실패하였습니다. 에러 내용: " + rsp.error_msg);
-			}
-		})
-	}
+		  console.log("!!");
+		  IMP.request_pay({ // 결제 정보 채우기
+		    pg : "html5_inicis",
+		    pay_method : "card",
+		    merchant_uid : orderId, // 주문번호
+		    name : createName, // 수정필______________________________________
+		    amount : Number($('#payToAmount').text()), // 숫자 타입
+		    buyer_email : "",
+		    buyer_name : $('#recipient').text(),
+		    buyer_tel : $('#recipientContact').text(),
+		    buyer_addr : $('#address').text(),
+		    buyer_postcode :  $('#zipCode').text(),
+		  }, function(rsp) { // callback
+		    //rsp.imp_uid 값으로 결제 단건조회 API를 호출하여 결제결과를 판단합니다.
+		    if (rsp.success) { // 결제 내역 받기
+		      // 결제 검증 ajax		  
+		        // 결제 내역 저장 ajax
+		        obj = {
+		          "paymentNumber" : rsp.imp_uid, // 결제번호
+		          "nonOrderNo" : rsp.merchant_uid, // 주문번호
+		          "paymentMethod" : rsp.pay_method, // 결제수단
+		          "totalAmount" : totalAmount, // 총 상품 금액, 수정 필요
+		          "shippingFee" : shippingFee, // 배송비
+		          "usedPoints" : Number($('#usingPoints').val()), // 사용한 포인트
+		          "usedReward" : Number($('#usingRewards').val()), // 사용한 적립금
+		          //"actualPaymentAmount" : data.response.amount, // 실 결제 금액
+		          //"paymentTime" : data.response.paidAt,// 결제 시각
+		          "amountToPay" : rsp.paid_amount,
+		          //"cardName" : data.response.cardName,
+		          //"cardNumber" : data.response.cardNumber,	주석 처리 한 것은 백에서 작업.
+		          "recipientName" : $("#recipient").text(),
+		          "paymentStatus" : $('#deliveryStatus').val(),
+		          "impUid" : rsp.imp_uid,
+		          products,
+		          couponNumbers
+		        }
+		        $.ajax({
+		          url : "/pay/output/",
+		          type : "POST",
+		          contentType : "application/json",
+		          data : JSON.stringify(obj),
+		          async : false,
+		          success : function(result) {
+		            isPaid = true;
+		            console.log("ajax 결과 : ", isPaid);
+		            if (isPaid) {
+		            	console.log("띠용?");
+		              $("#requestOrder").submit();
+		            }
+		            // alert("결제 완료");
+		          },
+		          error : function(error) {
+		            console.log(error);
+		            alert("검증 실패로 인해 결제가 취소되었습니다.")
+		          },
+		        })
+		      } else {
+		      alert("결제에 실패하였습니다. 에러 내용: " + rsp.error_msg);
+		    }
+		  })
+		}
 
 	// 검증 실패로 인한 취소
 	function failVerification() {
@@ -312,9 +316,9 @@
 					"actualPaymentAmount" : 0, // 실 결제 금액(무통장입금은 default 0)
 					"recipientName" : $("#recipientName").val(),
 					"paymentStatus" : $('#deliveryStatus').val(),
-					"compareOrderNo" : orderId,
+					"phoneNumber" : "01075197377",
 					products,
-					
+					couponNumbers,
 				};
 				console.log(obj);
 				$.ajax({
@@ -337,6 +341,7 @@
 					}
 				})
 			} else {
+				packData();
 				kg_pay();
 			}
 		}
@@ -536,7 +541,9 @@
 					alert("할인금액이 상품 금액을 넘어 포인트와 적립금을 초기화 시켰습니다.");
 				}
 			}
+			
 			finalTotal = totalAmount - couponAmount - Number($('#usingRewards').val()) - Number($('#usingPoints').val());
+			console.log("과연?", finalTotal);
 		}
 		$('#discountAmount').text(discountAmount1);
 		$("#payToAmount").text(finalTotal);
@@ -707,11 +714,12 @@
 		</div>
 	</section>
 	<!-- Breadcrumb Section End -->
+
 	<!-- Checkout section Start -->
 	<section class="checkout-section-2 section-b-space">
 		<form action="orderComplete" method="post" id="requestOrder">
-			<input type="hidden" name="orderNo" id="orderNo" value="">
-			<input type="hidden" name="memberId" value="" id="memberId"><input
+			<input type="hidden" name="orderNo" id="orderNo" value=""> <input
+				type="hidden" name="memberId" value="" id="memberId"><input
 				type="hidden" name="deliveryStatus" id="deliveryStatus" value="">
 			<div class="container-fluid-lg">
 				<div class="row g-sm-4 g-3">
@@ -776,26 +784,25 @@
 																							</li>
 
 																							<li>
-																								<p class="text-content"
-																									>
-																									<span class="text-title">주소 : </span><span id="address${status.index }">${addr.address }</span></p>
+																								<p class="text-content">
+																									<span class="text-title">주소 : </span><span
+																										id="address${status.index }">${addr.address }</span>
+																								</p>
 																								<p id="detailAddress${status.index }">${addr.detailAddress }
 																								</p>
 																							</li>
 
 																							<li>
-																								<h6 class="text-content"
-																									>
-																									<span class="text-title">우편번호 :</span>
-																									<span id="zipCode${status.index }">${addr.zipCode }</span>
+																								<h6 class="text-content">
+																									<span class="text-title">우편번호 :</span> <span
+																										id="zipCode${status.index }">${addr.zipCode }</span>
 																								</h6>
 																							</li>
 
 																							<li>
-																								<h6 class="text-content mb-0"
-																									>
-																									<span class="text-title">휴대폰 :</span>
-																									<span id="recipientContact${status.index }">${addr.recipientContact }</span>
+																								<h6 class="text-content mb-0">
+																									<span class="text-title">휴대폰 :</span> <span
+																										id="recipientContact${status.index }">${addr.recipientContact }</span>
 																								</h6>
 																							</li>
 																						</ul>
@@ -848,30 +855,33 @@
 																	</li>
 
 																	<li>
-																		<p class="text-content" >
-																			<span class="text-title">주소 : </span><span id="address">${requestScope.basicAddr.address }</span></p>
+																		<p class="text-content">
+																			<span class="text-title">주소 : </span><span
+																				id="address">${requestScope.basicAddr.address }</span>
+																		</p>
 																		<p id="detailAddress">${requestScope.basicAddr.detailAddress }
 																		</p>
 																	</li>
 
 																	<li>
 																		<h6 class="text-content">
-																			<span class="text-title">우편번호 :</span>
-																			<span id="zipCode">${requestScope.basicAddr.zipCode }</span>
+																			<span class="text-title">우편번호 :</span> <span
+																				id="zipCode">${requestScope.basicAddr.zipCode }</span>
 																		</h6>
 																	</li>
 
 																	<li>
 																		<h6 class="text-content mb-0">
-																			<span class="text-title">휴대폰 :</span>
-																			<span id="recipientContact">${requestScope.basicAddr.recipientContact }</span>
+																			<span class="text-title">휴대폰 :</span> <span
+																				id="recipientContact">${requestScope.basicAddr.recipientContact }</span>
 																		</h6>
 																	</li>
 																</ul>
 															</div>
 														</div>
 													</div>
-													<div class="col-xxl-6 col-lg-12 col-md-6" style="display: none">
+													<div class="col-xxl-6 col-lg-12 col-md-6"
+														style="display: none">
 														<div class="delivery-address-box">
 															<div>
 																<div class="form-check">
@@ -884,30 +894,22 @@
 																</div>
 
 																<ul class="delivery-address-detail">
-																	<li>
-																		<input class="fw-500" id="addRecipient" name="recipientName" value=""/>
-																	</li>
+																	<li><input class="fw-500" id="addRecipient"
+																		name="recipientName" value="" /></li>
 
-																	<li>
-																		<input class="text-content" name="shippingAddress" id="addAddress" value="" />
-																			<span class="text-title">주소 : </span>
-																		<input id="addDetailAddress" name="detailedShippingAddress"value="" />
-																		
-																	</li>
+																	<li><input class="text-content"
+																		name="shippingAddress" id="addAddress" value="" /> <span
+																		class="text-title">주소 : </span> <input
+																		id="addDetailAddress" name="detailedShippingAddress"
+																		value="" /></li>
 
-																	<li>
-																		<input class="text-content" id="addZipCode" name="zipCode" value="">
-																			<span class="text-title">우편번호 :</span>
-																			
-																		
-																	</li>
+																	<li><input class="text-content" id="addZipCode"
+																		name="zipCode" value=""> <span
+																		class="text-title">우편번호 :</span></li>
 
-																	<li>
-																		<input class="text-content mb-0" id="addRecipientContact" name="recipientPhoneNumber" value=""/>
-																			<span class="text-title">휴대폰 :</span>
-																			
-																		
-																	</li>
+																	<li><input class="text-content mb-0"
+																		id="addRecipientContact" name="recipientPhoneNumber"
+																		value="" /> <span class="text-title">휴대폰 :</span></li>
 																</ul>
 															</div>
 														</div>
@@ -983,8 +985,8 @@
 																			<c:when test="${requestScope.couponInfos != null }">
 																				<input class="form-check-input" type="checkbox"
 																					name="standard" id="couponCheck" readonly>
-																				<label class="form-check-label" for="standard">
-																					쿠폰 선택</label>
+																				<label class="form-check-label" for="standard"
+																					id="couponShow"> 적용 가능한 쿠폰이 없습니다.</label>
 																				<c:forEach var="coupon"
 																					items="${requestScope.couponInfos }"
 																					varStatus="status">
@@ -992,11 +994,11 @@
 																						style="display: none">${coupon.discountMethod}</div>
 																					<div id="discountAmount${status.index }"
 																						style="display: none">${coupon.discountAmount}</div>
-																						
-																						<div id="couponName${status.index }"
+
+																					<div id="couponName${status.index }"
 																						style="display: none">${coupon.couponName}</div>
 																				</c:forEach>
-																				<select id="couponSelect">
+																				<select id="couponSelect" style="display: none">
 																					<option>쿠폰 초기화</option>
 																					<c:forEach var="coupon"
 																						items="${requestScope.couponInfos }"
@@ -1031,7 +1033,7 @@
 																			<c:when
 																				test="${requestScope.member.totalPoints == '0' }">
 																				<input class="form-check-input" type="checkbox"
-																					name="standard" id="checkPoint" readonly>
+																					name="standard" id="usingPoints" value="0" readonly>
 																				<label class="form-check-label" for="standard">보유한
 																					포인트가 없습니다.</label>
 																			</c:when>
@@ -1045,7 +1047,7 @@
 																				<input id="usingPoints" value="">
 																				<label><button type="button"
 																						class="greenBtn" onclick="applyPoints()">전액사용</button></label>
-																						<label><button id=pointBtn type="button"
+																				<label><button id=pointBtn type="button"
 																						class="greenBtn" onclick="inputPoints()">적용</button></label>
 																			</c:otherwise>
 																		</c:choose>
@@ -1064,7 +1066,8 @@
 																			<c:when
 																				test="${requestScope.member.totalRewards == '0' }">
 																				<input class="form-check-input" type="checkbox"
-																					name="standard" id="checkRewards" readonly>
+																					name="standard" id="usingRewards" value="0"
+																					readonly>
 																				<label class="form-check-label" for="standard">보유한
 																					적립금이 없습니다.</label>
 																			</c:when>
@@ -1080,7 +1083,7 @@
 																				<label><button type="button"
 																						onclick="applyRewards()"
 																						style="background-color: #0da487; color: white;">전액사용</button></label>
-																						<label><button id="rewardBtn" type="button"
+																				<label><button id="rewardBtn" type="button"
 																						class="greenBtn" onclick="inputRewards()">적용</button></label>
 																			</c:otherwise>
 																		</c:choose>
@@ -1428,13 +1431,17 @@
 								<ul class="summery-contain">
 									<c:forEach var="info" items="${requestScope.productInfos }"
 										varStatus="status">
+										<input type="hidden" name="products"
+											value="${info.productId }" />
 										<li id="${info.productId }"><img
 											src="${info.productImage }"
 											class="img-fluid blur-up lazyloaded checkout-image" alt="">
 											<h4>
-												${info.productName } X<span id="productQty${status.index }">${info.productQuantity }</span>
+												<span id="productName${status.index }">${info.productName }</span> X<span id="productQty${status.index }">${info.productQuantity }</span>
 											</h4>
-											<h4 class="price"><span id="productPrice${status.index }">${info.sellingPrice }</span>원</h4></li>
+											<h4 class="price">
+												<span id="productPrice${status.index }">${info.sellingPrice }</span>원
+											</h4></li>
 									</c:forEach>
 
 									<!-- <li><img

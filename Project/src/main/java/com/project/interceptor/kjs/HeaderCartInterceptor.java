@@ -80,8 +80,10 @@ public class HeaderCartInterceptor extends HandlerInterceptorAdapter {
 		} else {
 			// 비회원일 시
 			Cookie cookie = WebUtils.getCookie(request, "nom");
-			if (scService.countList(cookie.getValue(), false) > 0) {
-				items = scService.getCartList(cookie.getValue(), false);
+			if (cookie != null) {
+				if (scService.countList(cookie.getValue(), false) > 0) {
+					items = scService.getCartList(cookie.getValue(), false);
+				}
 			}
 		}
 		System.out.println("items : " + items);

@@ -16,6 +16,32 @@
 <script>
 	$(function() {
 
+		// 이메일 유효성 검사
+		// =========================================================== 수정 필요!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		$('#email').on('blur', function() {
+			let regEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
+			if (regEmail.test($('#email').val())) {
+				isValidEmail = true;
+				$('#email').parent().next().html('');
+			} else {
+				alert("올바른 이메일이 아닙니다.");
+				isValidEmail = false;
+			}
+		});
+		
+		// 휴대폰 번호 유효성 검사
+		$('#recipientPhoneNumber').on('blur', function () {
+			let regNumber = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
+			if (regNumber.test($('#recipientPhoneNumber').val())) {
+				isValidCellPhone = true;
+				
+			} else {
+				alert("올바른 전화번호가 아닙니다.")
+				
+				isValidCellPhone = false;
+			}
+		});
+		
 		$("#nonOrderNo").val(orderId);
 		$("#nonMemberId").val("1232123");
 		$("#zipCode").val("12321");
@@ -23,14 +49,28 @@
 		let totalAmount = '${requestScope.paymentInfo.totalAmount}';
 		let shippingFee = '${requestScope.paymentInfo.shippingFee}';
 		// discountAmount에 쿠폰도 넣어야함
-		let discountAmount = (Number($("#points").val())) + (Number($("#reward").val()));	
-		console.log(totalAmount);
-		console.log(shippingFee);
-		console.log(discountAmount);
+		let discountAmount = (Number($("#points").val())) + (Number($("#reward").val()));
+		
+		$("#selectMessage").on("change", function(){
+
+		if($("option:selected", this).text() == "직접입력") {
+			$('#directInput').attr('style', 'display:');
+			console.log("hi");
+		} else {
+			$('#directInput').attr('style', 'display:none');	
+		}
+		});
 	});
 		
 		//$("#subTotal").val();
 	
+	let addrValid = false;
+	let detailAddrValid = false;
+	let zipCodeValid = false;
+	let recipientValid = false;
+	let phoneNumberValid = false;
+	let passwordValid = false;
+	let emailValid = false;
 	
 	let IMP = window.IMP;
 	IMP.init("${impKey}") // 예: 'imp00000000a'
@@ -40,10 +80,44 @@
 	let product = new Object();
 	let product2 = [];
 	let product3 = [];
-	function getOrderId() {
+	
+	function goPopup() {
+		// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
+		var pop = window.open("jusoPopup", "pop",
+				"width=570,height=420, scrollbars=yes, resizable=yes");
+
+		// 모바일 웹인 경우, 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrMobileLinkUrl.do)를 호출하게 됩니다.
+		//var pop = window.open("/popup/jusoPopup.jsp","pop","scrollbars=yes, resizable=yes"); 
+	}
+	/** API 서비스 제공항목 확대 (2017.02) **/
+	function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
+			roadAddrPart2, engAddr, jibunAddr, zipNo, admCd, rnMgtSn, bdMgtSn,
+			detBdNmList, bdNm, bdKdcd, siNm, sggNm, emdNm, liNm, rn, udrtYn,
+			buldMnnm, buldSlno, mtYn, lnbrMnnm, lnbrSlno, emdNo) {
+		// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
 
 		
+		
+		// 배송주소록 추가 주소찾기
+		let addZipNo = null
+		let addAddr = null
+		let addAddrDetail = null
 
+		if(document.querySelector("#addZipNo")){
+			addZipNo = document.querySelector("#addZipNo")
+			addZipNo.value = zipNo;
+		}
+		if(document.querySelector("#addAddr")){
+			addAddr = document.querySelector("#addAddr")
+			addAddr.value = roadAddrPart1;
+		}
+		if(document.querySelector("#addAddrDetail")){
+			addAddrDetail = document.querySelector("#addAddrDetail")
+			addAddrDetail.value = addrDetail
+		}
+	}
+	
+	function getOrderId() {
 		console.log($("#nonOrderNo").val());
 		
 		let itemLen = $(".summery-contain").find("li").length; // 2
@@ -222,80 +296,117 @@
 		})
 	}
 
-	function checkPayMethod() {
-
-		if ($("input[name='payMethod']").is(':checked')) {
-			// 전체 radio 중에서 하나라도 체크되어 있는지 확인
-			// 아무것도 선택안되어있으면, false
+	function validateAll() {
+		if($('#addAddr').val() != "") {
 			
-			let payMethod = $("input[name='payMethod']:checked").val();
-			// score의 라디오 중 체크된 것의 값만 가져옴
-			// 아무것도 선택안되어있으면, undefined
-			console.log(payMethod);
-			if (payMethod == "bkt") {
-				let bktPayNo = "bkt"
-						+ ((String(new Date().getTime())).substring(1));
-				$("#deliveryStatus").val("입금전");
-				
-				
-				products = [{
-					"nonOrderNo" : orderId,
-					"product_id" : S000210833411,
-					"product_price" : 16650,
-					"product_quantity" : 2,
-					"product_status" : $("#deliveryStatus").val(),
-					
-			},{
-				"nonOrderNo" : orderId,
-				"product_id" : S000210833273,
-				"product_price" : 5,
-				"product_quantity" : 6,
-				"product_status" : $("#deliveryStatus").val(),
-			},];
-				
-				
-				obj = {
-					"paymentNumber" : bktPayNo, // 결제번호 생성 코드 필요
-					"nonOrderNo" : orderId, // 주문번호
-					"paymentMethod" : payMethod, // 결제수단
-					"totalAmount" : 200, // 총 상품 금액, 수정 필요
-					"shippingFee" : 0, // 배송비
-					"usedPoints" : 0, // 사용한 포인트
-					"usedReward" : 0, // 사용한 적립금
-					"amountToPay" : 200, // (total+배송비-포인트-적립금)
-					"actualPaymentAmount" : 0, // 실 결제 금액(무통장입금은 default 0)
-					"recipientName" : $("#recipientName").val(),
-					products,
-					
-				};
-				console.log(obj);
-
-				$.ajax({
-					url : "/pay/output",
-					type : "POST",
-					contentType : "application/json",
-					data : JSON.stringify(obj),
-					async : false,
-					success : function(result) {
-						
-						isPaid = true;
-						console.log(result);
-						
-						if (isPaid) {
-							// 주문 완료 페이지에 필요한 것
-							$("#requestOrder").submit();
-						}
-						// alert("결제 완료");
-					},
-					error : function(error) {
-
-						alert("결제 실패" + error);
-					}
-				})
-			} else {
-				kg_pay();
-			}
+			addrValid = true;
 		}
+		if($('#addAddrDetail').val() != "") {
+			detailAddrValid = true;
+		}
+		if($('#addZipNo').val() != "") {
+			zipCodeValid = true;
+		}
+		if($('#recipientName').val() != "") {
+			recipientValid = true;
+		}
+		if($('#recipientPhoneNumber').val() != "") {
+			phoneNumberValid = true;
+		}
+		if($('#nonPassword').val() != "") {
+			passwordValid = true;
+		}
+		if($('#nonEmail').val() != "") {
+			emailValid = true;
+		}
+	
+		if(addrValid && detailAddrValid && zipCodeValid && recipientValid && phoneNumberValid && passwordValid && emailValid) {
+			console.log("통과하셨습니다~")
+			return false;
+		} else {
+			console.log("제대로 입력해");
+			console.log(addrValid);
+		}
+		
+	}
+	
+	function checkPayMethod() {
+		if(validateAll()) {
+			if ($("input[name='payMethod']").is(':checked')) {
+				// 전체 radio 중에서 하나라도 체크되어 있는지 확인
+				// 아무것도 선택안되어있으면, false
+				
+				let payMethod = $("input[name='payMethod']:checked").val();
+				// score의 라디오 중 체크된 것의 값만 가져옴
+				// 아무것도 선택안되어있으면, undefined
+				console.log(payMethod);
+				if (payMethod == "bkt") {
+					let bktPayNo = "bkt"
+							+ ((String(new Date().getTime())).substring(1));
+					$("#deliveryStatus").val("입금전");
+					
+					
+					products = [{
+						"nonOrderNo" : orderId,
+						"product_id" : S000210833411,
+						"product_price" : 16650,
+						"product_quantity" : 2,
+						"product_status" : $("#deliveryStatus").val(),
+						
+				},{
+					"nonOrderNo" : orderId,
+					"product_id" : S000210833273,
+					"product_price" : 5,
+					"product_quantity" : 6,
+					"product_status" : $("#deliveryStatus").val(),
+				},];
+					
+					
+					obj = {
+						"paymentNumber" : bktPayNo, // 결제번호 생성 코드 필요
+						"nonOrderNo" : orderId, // 주문번호
+						"paymentMethod" : payMethod, // 결제수단
+						"totalAmount" : 200, // 총 상품 금액, 수정 필요
+						"shippingFee" : 0, // 배송비
+						"usedPoints" : 0, // 사용한 포인트
+						"usedReward" : 0, // 사용한 적립금
+						"amountToPay" : 200, // (total+배송비-포인트-적립금)
+						"actualPaymentAmount" : 0, // 실 결제 금액(무통장입금은 default 0)
+						"recipientName" : $("#recipientName").val(),
+						products,
+						
+					};
+					console.log(obj);
+
+					$.ajax({
+						url : "/pay/output",
+						type : "POST",
+						contentType : "application/json",
+						data : JSON.stringify(obj),
+						async : false,
+						success : function(result) {
+							
+							isPaid = true;
+							console.log(result);
+							
+							if (isPaid) {
+								// 주문 완료 페이지에 필요한 것
+								$("#requestOrder").submit();
+							}
+							// alert("결제 완료");
+						},
+						error : function(error) {
+
+							alert("결제 실패" + error);
+						}
+					})
+				} else {
+					kg_pay();
+				}
+			}
+		};
+		
+		
 	}
 
 
@@ -365,7 +476,7 @@
 	<!-- Checkout section Start -->
 	<section class="checkout-section-2 section-b-space">
 		<div>${requestScope.productInfos }</div>
-		<form action="orderComplete" method="post" id="requestOrder">
+		<form action="nonOrderComplete" method="post" id="requestOrder">
 			<input type="hidden" name="nonOrderNo" id="nonOrderNo" value="">
 			<input type="hidden" name="nonMemberId" value="" id="nonMemberId"><input
 				type="hidden" name="zipCode" value="" id="zipCode"><input
@@ -408,48 +519,56 @@
 															-->
 
 																<ul class="delivery-address-detail">
+																	<li>
+																		<h6 class="text-content">
 
+																			<span class="text-title">우편번호:</span><input class="form-control"
+																				name="detailedShippingAddress" id="addZipNo" value="" readOnly>
+																		</h6>
+																	</li>
 
 																	<li>
 																		<h6 class="text-content">
-																			<span class="text-title"> 주소 : </span><input
-																				name="shippingAddress">
+																			<span class="text-title"> 주소 : </span><input class="form-control"
+																				name="shippingAddress" id="addAddr" value="" readOnly>
 
 																		</h6>
 																	</li>
 																	<li>
 																		<h6 class="text-content">
 
-																			<span class="text-title">상세주소:</span><input
-																				name="detailedShippingAddress">
+																			<span class="text-title">상세주소:</span><input class="form-control"
+																				name="detailedShippingAddress" id="addAddrDetail" value="">
 																		</h6>
 																	</li>
+																	
+																	
 
 																	<li>
 																		<h6 class="text-content">
-																			<span class="text-title">수령인: </span> <input
+																			<span class="text-title">수령인: </span> <input class="form-control"
 																				id="recipientName" name="recipientName">
 																		</h6>
 																	</li>
 
 																	<li>
 																		<h6 class="text-content mb-0">
-																			<span class="text-title">휴대폰: </span> <input
-																				name="recipientPhoneNumber">
+																			<span class="text-title">휴대폰: </span> <input class="form-control"
+																				name="recipientPhoneNumber" id="recipientPhoneNumber">
 
 																		</h6>
 																	</li>
 																	<li>
 																		<h6 class="text-content mb-0">
-																			<span class="text-title">비밀번호: </span> <input
-																				type="password" name="nonPassword">
+																			<span class="text-title">비밀번호: </span> <input class="form-control"
+																				type="password" name="nonPassword" id="nonPassword">
 
 																		</h6>
 																	</li>
 																	<li>
 																		<h6 class="text-content mb-0">
-																			<span class="text-title">이메일: </span> <input
-																				name="nonEmail">
+																			<span class="text-title">이메일: </span> <input class="form-control"
+																				name="nonEmail" id="nonEmail">
 
 																		</h6>
 																	</li>
@@ -459,7 +578,7 @@
 																				<div class="form-floating theme-form-floating">
 																					<select class="form-select theme-form-select"
 																						aria-label="Default select example"
-																						name="deliveryMessage">
+																						name="deliveryMessage" id="selectMessage">
 																						<option value="없음">배송메시지를 선택해 주세요.</option>
 																						<option>배송 전 연락주세요.</option>
 																						<option>부재 시 연락주세요.</option>
@@ -472,7 +591,7 @@
 																		</div>
 																	</li>
 																	<li><input type="text" class="form-control"
-																		id="directInput" placeholder=""></li>
+																		id="directInput" name="directMessage" placeholder="" style="display:none"></li>
 																</ul>
 
 
@@ -480,10 +599,12 @@
 															</div>
 
 														</div>
+															<button type="button" onclick="goPopup()">주소 찾기2</button>
 
 
 
 													</div>
+													
 
 													<!--  <div class="col-xxl-6 col-lg-12 col-md-6">
 													<div class="delivery-address-box">
@@ -553,15 +674,17 @@
 																		class="form-check custom-form-check hide-check-box">
 																		<!--  <input class="form-check-input" type="radio"
 																		name="standard" id="standard" checked>-->
-																		<label class="form-check-label" for="standard">적용
+																		<label class="form-check-label" for="standard">비회원 적용
 																			가능한 쿠폰이 없습니다.</label>
 																	</div>
 																</div>
 															</div>
+															
 														</div>
 													</div>
+													
 
-													<div class="container mt-3">
+													<!-- <div class="container mt-3">
 
 														<table class="table table-borderless">
 
@@ -581,7 +704,7 @@
 
 															</tbody>
 														</table>
-													</div>
+													</div> -->
 
 
 													<div class="row g-4">
@@ -591,17 +714,17 @@
 																	<div class="shipment-detail">
 																		<div
 																			class="form-check custom-form-check hide-check-box">
-																			<input class="form-check-input" type="radio"
-																				name="coupon" id="standard" checked> <label
+																			<label
 																				class="form-check-label btn" for="standard"
-																				data-bs-toggle="collapse" href="#collapseOne">적용
-																				가능한 쿠폰이 없습니다.</label>
+																				data-bs-toggle="collapse" href="#collapseOne">비회원 포인트와 적립금 사용이 불가합니다.
+																			</label>
 																		</div>
 																	</div>
 																</div>
 															</div>
 
 														</div>
+														
 
 
 
@@ -653,7 +776,7 @@
 														</div>
 													</div>
 													-->
-													</div>
+													
 												</div>
 											</div>
 										</div>
@@ -1005,15 +1128,9 @@
 										<h4 class="price">${requestScope.paymentInfo.shippingFee }원</h4>
 									</li>
 
-									
-
-									<li>
-										<h4>할인금액(쿠폰, 포인트, 적립금)</h4>
-										<h4 class="price">$-23.10</h4>
-									</li>
 
 									<li class="list-total">
-										<h4>Total (USD)</h4>
+										<h4>총 결제 금액</h4>
 										<h4 class="price">$19.28</h4>
 									</li>
 								</ul>

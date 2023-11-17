@@ -1,5 +1,6 @@
 package com.project.dao.ksh.order;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,16 +11,18 @@ import javax.inject.Inject;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
-import com.project.vodto.CompleteOrder;
 import com.project.vodto.CouponInfos;
 import com.project.vodto.DetailOrderItem;
 import com.project.vodto.NonOrderHistory;
 import com.project.vodto.OrderHistory;
-import com.project.vodto.OrderInfo;
 import com.project.vodto.Payment;
-import com.project.vodto.PaymentDTO;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.kjy.Memberkjy;
+import com.project.vodto.ksh.CompleteOrder;
+import com.project.vodto.ksh.CompleteOrderItem;
+import com.project.vodto.ksh.OrderInfo;
+import com.project.vodto.ksh.PaymentDTO;
 
 @Repository
 public class OrderDAOImpl implements OrderDAO {
@@ -43,6 +46,7 @@ public class OrderDAOImpl implements OrderDAO {
 
 		// 실행 결과 row 갯수를 리턴합니다.
 		count += ses.insert(ns + ".insertDetailOrderItem", map);
+		System.out.println(count + "개 insert 완료");
 		return count;
 	}
 
@@ -56,10 +60,10 @@ public class OrderDAOImpl implements OrderDAO {
 	public int insertNewOrderHistory(OrderHistory oh) {
 		return ses.insert(ns + ".insertNewOrderHistory", oh);
 	}
-	
+
 	@Override
 	public CompleteOrder getPaymentHistory(String orderNo) {
-		return ses.selectOne(ns+".getPaymentDetail", orderNo);
+		return ses.selectOne(ns + ".getPaymentDetail", orderNo);
 	}
 
 	@Override
@@ -87,32 +91,146 @@ public class OrderDAOImpl implements OrderDAO {
 
 	@Override
 	public List<ShippingAddress> getShippingAddr(String memberId) throws Exception {
-		
-		return ses.selectList(ns+".getShippingAddr", memberId);
+
+		return ses.selectList(ns + ".getShippingAddr", memberId);
 	}
 
 	@Override
 	public List<CouponInfos> getCouponInfos(String memberId) throws Exception {
-		
-		return ses.selectList(ns+".getCouponInfos", memberId);
+
+		return ses.selectList(ns + ".getCouponInfos", memberId);
 	}
 
 	@Override
 	public List<CouponInfos> addCategoryKey(List<CouponInfos> couponInfos) throws Exception {
-		for(CouponInfos c : couponInfos) {
-			c.setCategoryKey(ses.selectList(ns + ".getCategoryKey", c.getCouponNumber())); 
+		for (CouponInfos c : couponInfos) {
+			c.setCategoryKey(ses.selectList(ns + ".getCategoryKey", c.getCouponNumber()));
 		}
-		
+
 		return couponInfos;
 	}
 
 	@Override
-	public List<DetailOrderItem> getDetailOrderItem(String orderNo) throws Exception {
+	public List<CompleteOrderItem> getDetailOrderItem(String orderNo, List<String> productId) throws Exception {
+		List<CompleteOrderItem> orderItems = new ArrayList<CompleteOrderItem>();
+		Map<String, Object> map = new HashMap<>();
+		map.put("orderNo", orderNo);
+		for(String s : productId) {
+			map.put("productId", s);
+			orderItems.add(ses.selectOne(ns+".getDetailOrderItem", map));
+		}
+
+		System.out.println("=========================상희================================");
+		System.out.println(orderItems.toString());
 		
-		return ses.selectList(ns+".getDetailOrderItem", orderNo);
+		
+
+		return orderItems;
 	}
 
-	
+	@Override
+	public int updateCouponLogs(PaymentDTO pd) throws Exception {
+		Timestamp date = new Timestamp(System.currentTimeMillis());
+		int count = 0;
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", pd.getMemberId());
+		params.put("relatedOrder", pd.getOrderNo());
+
+		params.put("usedDate", date);
+
+		for (String coupon : pd.getCouponNumbers()) {
+			params.put("coupon", coupon);
+			count += ses.update(ns + ".updateCouponLogs", params);
+		}
+		return count;
+	}
+
+	@Override
+	public int updatePointLogs(PaymentDTO pd) throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
+		pd.setPointReason("구매");
+		params.put("memberId", pd.getMemberId());
+		params.put("pointReason", pd.getPointReason());
+		params.put("point", pd.getUsedPoints() * -1);
+		params.put("relatedOrder", pd.getOrderNo());
+		
+
+		return ses.insert(ns + ".updatePointLogs", params);
+	}
+
+	@Override
+	public int updateRewardLogs(PaymentDTO pd) throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
+		pd.setRewardReason("구매");
+		System.out.println(pd.toString());
+		params.put("memberId", pd.getMemberId());
+		params.put("rewardReason", pd.getRewardReason());
+		params.put("reward", pd.getUsedReward() * -1);
+		params.put("relatedOrder", pd.getOrderNo());
+
+		return ses.insert(ns + ".updateRewardLogs", params);
+	}
+
+	@Override
+	public int updateProducts(List<DetailOrderItem> itemList) throws Exception {
+		int count = 0;
+
+		System.out.println(itemList.toString());
+		Map<String, Object> map = new HashMap<>();
+		map.put("list", itemList);
+
+		// 실행 결과 row 갯수를 리턴합니다.
+		count += ses.update(ns + ".updateDetailOrderItem", map);
+		System.out.println(count + "개 재고 업데이트 완료");
+		return count;
+	}
+
+	@Override
+	public int updateMemberCoupon(PaymentDTO pd) throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", pd.getMemberId());
+		params.put("usedCouponCount", pd.getCouponNumbers().size());
+
+		return ses.update(ns + ".updateMemberCoupon", params);
+	}
+
+	@Override
+	public int updateMemberPoints(PaymentDTO pd) throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", pd.getMemberId());
+		params.put("usedPoints", pd.getUsedPoints());
+
+		return ses.update(ns + ".updateMemberPoints", params);
+	}
+
+	@Override
+	public int updateMemberRewards(PaymentDTO pd) throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", pd.getMemberId());
+		params.put("usedRewards", pd.getUsedReward());
+
+		return ses.update(ns + ".updateMemberRewards", params);
+	}
+
+	@Override
+	public Memberkjy getMemberInfo(String memberId) throws Exception {
+
+		return ses.selectOne(ns + ".getMemberInfo", memberId);
+	}
+
+	@Override
+	public int updateMemberAcumPayment(int actualPaymentAmount, String memberId) throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("actualPaymentAmount", actualPaymentAmount);
+		return ses.update(ns+(".updateMeberAcumPayment"), params);
+	}
+
+	@Override
+	public int getRealAmount(List<String> productId) throws Exception {
+		
+		return 0;
+	}
 
 //	@Override
 //	public int insertNewOrder(NonOrderHistory noh) throws Exception {

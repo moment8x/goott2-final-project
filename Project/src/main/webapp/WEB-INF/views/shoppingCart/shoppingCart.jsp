@@ -44,10 +44,16 @@
 	<script>
 		let buyInfo = [];
 		let isFirst = true;
+		let isLogin = "N";
 		
 		$(function () {
 			// 받아 온 장바구니 정보 출력
 			spreadView();
+			
+			if(isLogin != "N") {
+			isLogin = "Y";
+			}
+			console.log(isLogin);
 		});
 		
 		// 선택된 항목 삭제.
@@ -101,6 +107,7 @@
 			let total = 0;
 			if (data.status === "success") {
 				let items = data.items;
+				isLogin = data.isLogin;
 				$.each(items, function(i, item) {
 					output += `<tr class="product-box-contain">`;
 					output += `<td class="product-detail">`;
@@ -200,6 +207,7 @@
 				output += `<input type="hidden" name="productId" value="\${buyInfo[i].productId}">`;
 				output += `<input type="hidden" name="productQuantity" value="\${buyInfo[i].qty}">`;
 				output += `<input type='hidden' name="fromCart" value="Y">`;
+				output += `<input type='hidden' name="isLogin" value="\${isLogin}">`;
 				
 				$('.move-payment').html(output);
 			}

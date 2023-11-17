@@ -1,4 +1,4 @@
-package com.project.vodto;
+package com.project.vodto.ksh;
 
 import java.sql.Timestamp;
 import java.util.List;

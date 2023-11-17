@@ -1,4 +1,4 @@
-package com.project.vodto;
+package com.project.vodto.ksh;
 
 import java.sql.Timestamp;
 
@@ -23,4 +23,6 @@ public class CompleteOrder {
 	private String recipientName;
 	private String recipientPhoneNumber;
 	private String shippingAddress;
+	private String detailedShippingAddress;
+	
 }
