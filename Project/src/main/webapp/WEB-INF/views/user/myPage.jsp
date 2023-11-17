@@ -60,6 +60,50 @@
 <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
 
 <script type="text/javascript">
+
+function goPopup(){
+	// IE에서 opener관련 오류가 발생하는 경우, window에 이름을 명시해줍니다.
+	window.name="jusoPopup";
+	
+	// 주소검색을 수행할 팝업 페이지를 호출합니다.
+	// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(http://www.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
+	var pop = window.open("jusoPopup","pop","width=570,height=420, scrollbars=yes, resizable=yes"); 
+}
+
+
+function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAddr, jibunAddr, zipNo, admCd, rnMgtSn, bdMgtSn,detBdNmList,bdNm,bdKdcd,siNm,sggNm,emdNm,liNm,rn,udrtYn,buldMnnm,buldSlno,mtYn,lnbrMnnm,lnbrSlno,emdNo){
+		// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
+		document.form.roadFullAddr.value = roadFullAddr;
+		document.form.roadAddrPart1.value = roadAddrPart1;
+		document.form.roadAddrPart2.value = roadAddrPart2;
+		document.form.addrDetail.value = addrDetail;
+		document.form.engAddr.value = engAddr;
+		document.form.jibunAddr.value = jibunAddr;
+		document.form.zipNo.value = zipNo;
+		document.form.admCd.value = admCd;
+		document.form.rnMgtSn.value = rnMgtSn;
+		document.form.bdMgtSn.value = bdMgtSn;
+		document.form.detBdNmList.value = detBdNmList;
+		/** 2017년 2월 추가제공 **/
+		document.form.bdNm.value = bdNm;
+		document.form.bdKdcd.value = bdKdcd;
+		document.form.siNm.value = siNm;
+		document.form.sggNm.value = sggNm;
+		document.form.emdNm.value = emdNm;
+		document.form.liNm.value = liNm;
+		document.form.rn.value = rn;
+		document.form.udrtYn.value = udrtYn;
+		document.form.buldMnnm.value = buldMnnm;
+		document.form.buldSlno.value = buldSlno;
+		document.form.mtYn.value = mtYn;
+		document.form.lnbrMnnm.value = lnbrMnnm;
+		document.form.lnbrSlno.value = lnbrSlno;
+		/** 2017년 3월 추가제공 **/
+		document.form.emdNo.value = emdNo;
+		
+}
+
+
 	//도로명주소API 
 	function goPopup() {
 		// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
@@ -219,8 +263,9 @@
 			let deliveryCompleted = null;
 			let cancelList = null;
 			let exchangeList = null;
-			let returnList = null;
-			let allList = null;			
+			let returnList = null;		
+			let returnApply = null;			
+			let exchangeApply = null;			
 			
 			if($(this).val() == 'beforeDeposit'){
 				beforeDeposit = $("select[id=orderStatusKeyword] option:selected").text()				
@@ -236,8 +281,10 @@
 				exchangeList = $("select[id=orderStatusKeyword] option:selected").text()
 			}else if($(this).val() == 'returnList'){
 				returnList = $("select[id=orderStatusKeyword] option:selected").text()
-			}else if($(this).val() == 'allList'){
-				allList = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'returnApply'){
+				returnApply = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'exchangeApply'){
+				exchangeApply = $("select[id=orderStatusKeyword] option:selected").text()
 			}
 			
 			let orderStatusKeywordText = $("select[id=orderStatusKeyword] option:selected").text()
@@ -254,7 +301,8 @@
 					cancelList,
 					exchangeList,
 					returnList,
-					allList
+					exchangeApply,
+					returnApply
 				},
 				dataType : 'json',
 				async : false,
@@ -509,7 +557,7 @@
 				//$('#addrZipCode').text(data.zipCode)
 				//$('#addrAddress').text(data.address)
 				//$('#addrDetailAddress').text(data.detailAddress)
-				location.href='/user/myPage'
+				location.reload()
 			},
 			error : function() {
 			}
@@ -736,45 +784,45 @@
 			output += `<h5>\${e.deliveryStatus }</h5>`
 			output += `</div>`
 			output += `</li>`
-			output += `<li>`
-			output += `<div class="size-box">`
-			output += `<div id="orderStatus">`
-			if(e.deliveryStatus == '출고전'){
-				output += `button class="btn theme-bg-color text-white m-0" type="button" id="button-addon1">`	
-				output += `<span>취소</span>`
-				output += `</button>`
-			}else if(e.deliveryStatus == '입금전'){
-				output += `<button class="btn theme-bg-color text-white m-0"
-					type="button" id="button-addon1">`
-				output += `<span>취소</span>`
-				output += `</button>`
-			}else if(e.deliveryStatus == '출고완료'){
-				output += `<button class="btn theme-bg-color text-white m-0"
-					type="button" id="button-addon1">`
-				output += `<span>배송조회</span>`
-					output += `</button>`
-				output += `<div>${order.invoiceNumber }</div>`
-			}else if(e.deliveryStatus == '배송중'){
-				output += `<button class="btn theme-bg-color text-white m-0"
-					type="button" id="button-addon1">`
-				output += `<span>배송조회</span>`
-					output += `</button>`
-				output += `<div>${order.invoiceNumber }</div>`
-			}else if(e.deliveryStatus == '취소'){
-				output += `<div>취소</div>`
-			}else{
-				output += `<button class="btn theme-bg-color text-white m-0"
-					type="button" id="button-addon1">`
-				output += `<span>교환</span>`
-					output += `</button>`
-				output += `<button class="btn theme-bg-color text-white m-0"
-					type="button" id="button-addon1">`
-				output += `<span>반품</span>`
-					output += `</button>`
-			}
-			output += `</div>`
-			output += `</div>`
-			output += `</li>`
+		//	output += `<li>`
+		//	output += `<div class="size-box">`
+		//	output += `<div id="orderStatus">`
+		//	if(e.deliveryStatus == '출고전'){
+		//		output += `button class="btn theme-bg-color text-white m-0" type="button" id="button-addon1">`	
+		//		output += `<span>취소</span>`
+		//		output += `</button>`
+		//	}else if(e.deliveryStatus == '입금전'){
+		//		output += `<button class="btn theme-bg-color text-white m-0"
+		//			type="button" id="button-addon1">`
+		//		output += `<span>취소</span>`
+		//		output += `</button>`
+		//	}else if(e.deliveryStatus == '출고완료'){
+		//		output += `<button class="btn theme-bg-color text-white m-0"
+		//			type="button" id="button-addon1">`
+		//		output += `<span>배송조회</span>`
+		//			output += `</button>`
+		//		output += `<div>${order.invoiceNumber }</div>`
+		//	}else if(e.deliveryStatus == '배송중'){
+		///		output += `<button class="btn theme-bg-color text-white m-0"
+		//			type="button" id="button-addon1">`
+		//		output += `<span>배송조회</span>`
+		//			output += `</button>`
+		//		output += `<div>${order.invoiceNumber }</div>`
+		//	}else if(e.deliveryStatus == '취소'){
+		//		output += `<div>취소</div>`
+		//	}else{
+		//		output += `<button class="btn theme-bg-color text-white m-0"
+		//			type="button" id="button-addon1">`
+		//		output += `<span>교환</span>`
+		//			output += `</button>`
+		//		output += `<button class="btn theme-bg-color text-white m-0"
+		//			type="button" id="button-addon1">`
+		//		output += `<span>반품</span>`
+		//			output += `</button>`
+		//	}
+		//	output += `</div>`
+		//	output += `</div>`
+		//	output += `</li>`
 			output += `</ul>`
 			output += `</div>`
 			output += `</div>`
@@ -1145,7 +1193,7 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="pills-order-tab" 
+								<button class="nav-link" id="pills-order-tab"
 									data-bs-toggle="pill" data-bs-target="#pills-order"
 									type="button" role="tab" aria-controls="pills-order"
 									aria-selected="false">
@@ -1837,6 +1885,8 @@
 														<option value="beforeShipping">출고전</option>
 														<option value="shipping">배송중</option>
 														<option value="deliveryCompleted">배송완료</option>
+														<option value="returnApply">반품신청</option>
+														<option value="exchangeApply">교환신청</option>
 														<option value="cancelList">취소</option>
 														<option value="exchangeList">교환</option>
 														<option value="returnList">반품</option>
@@ -1921,7 +1971,7 @@
 																</div>
 															</li>
 
-															<li>
+															<!-- <li>
 																<div class="size-box">
 																	<div id="orderStatus">
 																		<c:choose>
@@ -1972,7 +2022,7 @@
 																		</c:choose>
 																	</div>
 																</div>
-															</li>
+															</li> -->
 														</ul>
 													</div>
 												</div>
@@ -1983,9 +2033,9 @@
 								</div>
 
 								<nav class="custome-pagination">
-								  	<ul class="pagination justify-content-center">
+									<ul class="pagination justify-content-center">
 
-									<!--  	<c:if test="${page.pageNo > 1 }">
+										<!--  	<c:if test="${page.pageNo > 1 }">
 											<li class="page-item"><a class="page-link" href="#"
 												
 												onclick="orderHistoryPaging(${page.pageNo -1}); return false;">
@@ -2006,7 +2056,7 @@
 												href="#"> <i class="fa-solid fa-angles-right"></i>
 											</a></li>
 										</c:if>
-											
+
 									</ul>
 								</nav>
 							</div>
@@ -2188,6 +2238,44 @@
 																</div>
 															</div>
 														</form>
+
+														<form name="form" id="form" method="post">
+
+	<input type="button" onClick="goPopup();" value="팝업_domainChk"/>
+	<div id="list"></div>
+	<div id="callBackDiv">
+		<table>
+			<tr><td>도로명주소 전체(포멧)</td><td><input type="text"  style="width:500px;" id="roadFullAddr"  name="roadFullAddr" /></td></tr>
+			<tr><td>도로명주소           </td><td><input type="text"  style="width:500px;" id="roadAddrPart1"  name="roadAddrPart1" /></td></tr>
+			<tr><td>고객입력 상세주소    </td><td><input type="text"  style="width:500px;" id="addrDetail"  name="addrDetail" /></td></tr>
+			<tr><td>참고주소             </td><td><input type="text"  style="width:500px;" id="roadAddrPart2"  name="roadAddrPart2" /></td></tr>
+			<tr><td>영문 도로명주소      </td><td><input type="text"  style="width:500px;" id="engAddr"  name="engAddr" /></td></tr>
+			<tr><td>지번                 </td><td><input type="text"  style="width:500px;" id="jibunAddr"  name="jibunAddr" /></td></tr>
+			<tr><td>우편번호             </td><td><input type="text"  style="width:500px;" id="zipNo"  name="zipNo" /></td></tr>
+			<tr><td>행정구역코드        </td><td><input type="text"  style="width:500px;" id="admCd"  name="admCd" /></td></tr>
+			<tr><td>도로명코드          </td><td><input type="text"  style="width:500px;" id="rnMgtSn"  name="rnMgtSn" /></td></tr>
+			<tr><td>건물관리번호        </td><td><input type="text"  style="width:500px;" id="bdMgtSn"  name="bdMgtSn" /></td></tr>
+			<tr><td>상세번물명        	</td><td><input type="text"  style="width:500px;" id="detBdNmList"  name="detBdNmList" /></td></tr>
+			<tr><td>건물명        		</td><td><input type="text"  style="width:500px;" id="bdNm"  name="bdNm" /></td></tr>
+			<tr><td>공동주택여부       </td><td><input type="text"  style="width:500px;" id="bdKdcd"  name="bdKdcd" /></td></tr>
+			<tr><td>시도명        		</td><td><input type="text"  style="width:500px;" id="siNm"  name="siNm" /></td></tr>
+			<tr><td>시군구명        	</td><td><input type="text"  style="width:500px;" id="sggNm"  name="sggNm" /></td></tr>
+			<tr><td>읍면동명        	</td><td><input type="text"  style="width:500px;" id="emdNm"  name="emdNm" /></td></tr>
+			<tr><td>법정리명        	</td><td><input type="text"  style="width:500px;" id="liNm"  name="liNm" /></td></tr>
+			<tr><td>도로명        		</td><td><input type="text"  style="width:500px;" id="rn"  name="rn" /></td></tr>
+			<tr><td>지하여부        	</td><td><input type="text"  style="width:500px;" id="udrtYn"  name="udrtYn" /></td></tr>
+			<tr><td>건물본번        	</td><td><input type="text"  style="width:500px;" id="buldMnnm"  name="buldMnnm" /></td></tr>
+			<tr><td>건물부번        	</td><td><input type="text"  style="width:500px;" id="buldSlno"  name="buldSlno" /></td></tr>
+			<tr><td>산여부        		</td><td><input type="text"  style="width:500px;" id="mtYn"  name="mtYn" /></td></tr>
+			<tr><td>지번본번(번지)     </td><td><input type="text"  style="width:500px;" id="lnbrMnnm"  name="lnbrMnnm" /></td></tr>
+			<tr><td>지번부번(호)       </td><td><input type="text"  style="width:500px;" id="lnbrSlno"  name="lnbrSlno" /></td></tr>
+			<tr><td>읍면동일련번호       </td><td><input type="text"  style="width:500px;" id="emdNo"  name="emdNo" /></td></tr>
+		</table>
+	</div>
+
+</form>
+
+
 
 														<form class="row g-4" action="modifyUser" method="post">
 															<div class="col-12">
@@ -2380,7 +2468,7 @@
 													<div>
 
 														<c:if test="${fn:contains(addr.basicAddr,'Y')}">
-															<div class="label"> 
+															<div class="label">
 																<label>기본배송지</label>
 															</div>
 														</c:if>
@@ -2769,7 +2857,7 @@
 							for="addAddrDetail">상세주소</label>
 					</div>
 
-				<!-- <input class="checkbox_animated check-box" type="checkbox"
+					<!-- <input class="checkbox_animated check-box" type="checkbox"
 						id="choiceBasicAddr" name="basicAddr"/> <label
 						class="form-check-label" for="choiceBasicAddr"><span
 						id="choiceBasicAddr">기본배송지로 설정</span></label>  -->

@@ -338,6 +338,8 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("cancelList", keyword.getCancelList());
 		params.put("exchangeList", keyword.getExchangeList());
 		params.put("returnList", keyword.getReturnList());
+		params.put("returnApply", keyword.getReturnApply());
+		params.put("exchangeApply", keyword.getExchangeApply());
 		
 		params.put("sevenDaysAgo", keyword.getSevenDaysAgo());
 		params.put("fifteenDaysAgo", keyword.getFifteenDaysAgo());

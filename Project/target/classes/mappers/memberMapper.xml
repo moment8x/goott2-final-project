@@ -215,6 +215,12 @@
 	        <when test="deliveryCompleted != null and deliveryCompleted.equals('배송완료')">
 		         and o.delivery_status = '배송완료'   
 	        </when>
+	        <when test="returnApply != null and returnApply.equals('반품신청')">
+		         and o.delivery_status = '반품신청'   
+	        </when>
+	        <when test="exchangeApply != null and exchangeApply.equals('교환신청')">
+		         and o.delivery_status = '교환신청'   
+	        </when>
 	        <when test="cancelList != null and cancelList.equals('취소')">
 		         and d.product_status = '취소' 
 	        </when>

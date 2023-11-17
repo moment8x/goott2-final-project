@@ -1,6 +1,11 @@
 
 package com.project.controller.jmj;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +13,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpHeaders;
@@ -39,41 +45,77 @@ public class myPageController {
 
 	@Inject
 	private MemberService mService;
+	
+	@RequestMapping(value="getAddrApi", method = RequestMethod.POST)
+	public void getAddrApi(HttpServletRequest req,
+	 HttpServletResponse response){
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@주소검색1");
+		// 요청변수 설정
+	    String currentPage = req.getParameter("currentPage");    //요청 변수 설정 (현재 페이지. currentPage : n > 0)
+			String countPerPage = req.getParameter("countPerPage");  //요청 변수 설정 (페이지당 출력 개수. countPerPage 범위 : 0 < n <= 100)
+			String resultType = req.getParameter("resultType");      //요청 변수 설정 (검색결과형식 설정, json)
+			String confmKey = req.getParameter("confmKey");          //요청 변수 설정 (승인키)
+			String keyword = req.getParameter("keyword");            //요청 변수 설정 (키워드)
+			// OPEN API 호출 URL 정보 설정
+			String apiUrl;
+			try {
+				apiUrl = "https://business.juso.go.kr/addrlink/addrLinkApi.do?currentPage="+currentPage+"&countPerPage="+countPerPage+"&keyword="+
+			URLEncoder.encode(keyword,"UTF-8")+"&confmKey="+confmKey+"&resultType="+resultType;
+				URL url = new URL(apiUrl);
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(),"UTF-8"));
+		    	StringBuffer sb = new StringBuffer();
+		    	String tempStr = null;
+
+		    	while(true){
+		    		tempStr = br.readLine();
+		    		if(tempStr == null) break;
+		    		sb.append(tempStr);								// 응답결과 JSON 저장
+		    	}
+		    	br.close();
+		    	response.setCharacterEncoding("UTF-8");
+				response.setContentType("application/json");
+				response.getWriter().write(sb.toString());	
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+					// 응답결과 반환
+	    }
 
 	@RequestMapping(value = "myPage")
-	public void myPage(Model model, HttpServletRequest request, @RequestParam(value = "pageNo", defaultValue = "1") int pageNo) {
+	public void myPage(Model model, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
 		
+		int pageNo=1;
+		
 		System.out.println("@@@@@@@@@@@@@페이지번호 : " + pageNo);
 		try {
-			//주문내역
+			// 주문내역
 			Map<String, Object> map = mService.getOrderHistory(memberId, pageNo);
-			
-			List<MyPageOrderList>lst = (List<MyPageOrderList>)map.get("orderHistory");
-			PagingInfo pi = (PagingInfo)map.get("pagination");
-			
-			model.addAttribute("orderList", lst);			
-			model.addAttribute("page", pi);			
+
+			List<MyPageOrderList> lst = (List<MyPageOrderList>) map.get("orderHistory");
+			PagingInfo pi = (PagingInfo) map.get("pagination");
+
+			model.addAttribute("orderList", lst);
+			model.addAttribute("page", pi);
 			System.out.println("주문내역 페이지 : " + lst);
 			System.out.println("@@@@@@@@@@@@@페이징 : " + pi.toString());
-			
-			//최근 주문내역
-			List<MyPageOrderList> list = mService.getCurOrderHistory(memberId);
-			model.addAttribute("curOrderHistory", list);			
-			System.out.println("최근주문내역 : " + list);
-			
-			
-			//회원정보
-			Member userInfo = mService.getMyInfo(memberId);
-			model.addAttribute("userInfo", userInfo);			
 
-			//배송주소록
+			// 최근 주문내역
+			List<MyPageOrderList> list = mService.getCurOrderHistory(memberId);
+			model.addAttribute("curOrderHistory", list);
+			System.out.println("최근주문내역 : " + list);
+
+			// 회원정보
+			Member userInfo = mService.getMyInfo(memberId);
+			model.addAttribute("userInfo", userInfo);
+
+			// 배송주소록
 			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
 			model.addAttribute("userAddrList", userAddrList);
-			
-			
+
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -82,31 +124,34 @@ public class myPageController {
 	}
 
 	@RequestMapping(value = "myPage", method = RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> myPage(@RequestParam("pageNo") int pageNo, Model model, HttpServletRequest request) {
+	public ResponseEntity<Map<String, Object>> myPagePost(Model model,
+			HttpServletRequest request) {
+		int pageNo = 1;
 		System.out.println("@@@@@@@@@@@@마이페이지 포스트" + pageNo);
-		
+
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
 		
+
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
-		
+
 		ResponseEntity<Map<String, Object>> result = null;
 		try {
-			//주문내역
+			// 주문내역
 			Map<String, Object> map = mService.getOrderHistory(memberId, pageNo);
-			
-			List<MyPageOrderList> lst = (List<MyPageOrderList>)map.get("orderHistory");
-			PagingInfo pi = (PagingInfo)map.get("pagenation");
-			
-			model.addAttribute("orderList", lst);			
-			model.addAttribute("page", pi);			
+
+			List<MyPageOrderList> lst = (List<MyPageOrderList>) map.get("orderHistory");
+			PagingInfo pi = (PagingInfo) map.get("pagenation");
+
+			model.addAttribute("orderList", lst);
+			model.addAttribute("page", pi);
 //			System.out.println("주문내역 페이지 : " + lst);
 //			System.out.println("@@@@@@@@@@@@@페이징 : " + pi.toString());
-			
+
 			result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);
-			
+
 		} catch (SQLException | NamingException e) {
 			result = new ResponseEntity<>(HttpStatus.CONFLICT);
 			e.printStackTrace();
@@ -115,18 +160,19 @@ public class myPageController {
 	}
 
 	@RequestMapping(value = "myPage/modifyShippingAddr", method = RequestMethod.POST)
-	public ResponseEntity<ShippingAddress> modifyShippingAddr(@RequestParam Map<String, Object> map, HttpServletRequest request) {
+	public ResponseEntity<ShippingAddress> modifyShippingAddr(@RequestParam Map<String, Object> map,
+			HttpServletRequest request) {
 		System.out.println("배송지 수정");
-		
+
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
 
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
-		
+
 		ResponseEntity<ShippingAddress> result = null;
-		
+
 		Object addrSeqObj = map.get("addrSeq");
 
 		if (addrSeqObj != null) {
@@ -140,32 +186,35 @@ public class myPageController {
 
 			} catch (Exception e) {
 				System.out.println("예외났음 : " + addrSeqObj);
-				
+
 				result = new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
-		}else {
-		    // addrSeqObj가 null인 경우
-		    System.out.println("addrSeq null");
+		} else {
+			// addrSeqObj가 null인 경우
+			System.out.println("addrSeq null");
 		}
-		
+
 		return result;
 	}
-	
+
 	@RequestMapping(value = "shippingAddrModify", method = RequestMethod.POST)
-	public ResponseEntity<ShippingAddress> shippingAddrModify(@ModelAttribute ShippingAddress tmpAddr, HttpServletRequest request, @RequestParam Map<String, Object> map) {
+	public ResponseEntity<ShippingAddress> shippingAddrModify(@ModelAttribute ShippingAddress tmpAddr,
+			HttpServletRequest request, @RequestParam Map<String, Object> map) {
 		System.out.println("배송주소록 수정" + tmpAddr.toString());
-		
+
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@로그인멤버: " + member.toString());
+
 		String memberId = member.getMemberId();
-		
+
 		Object addrSeqObj = map.get("addrSeq");
 
 		ResponseEntity<ShippingAddress> result = null;
-		
+
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
-		
+
 		if (addrSeqObj != null) {
 			try {
 				// String을 int로 변환
@@ -173,7 +222,7 @@ public class myPageController {
 
 				ShippingAddress sa = mService.getShippingAddr(addrSeq, memberId);
 				System.out.println(addrSeq + "번 배송지를 수정하자!@ " + sa.toString());
-				
+
 				if (mService.shippingAddrModify(memberId, tmpAddr, addrSeq)) {
 					System.out.println("배송주소록 수정 완");
 					result = new ResponseEntity<ShippingAddress>(tmpAddr, header, HttpStatus.OK);
@@ -182,20 +231,19 @@ public class myPageController {
 				System.out.println("예외났음 : " + addrSeqObj);
 				result = new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
-		}else {
-		    // addrSeqObj가 null인 경우
-		    System.out.println("addrSeq null");
-		    result = new ResponseEntity<>(HttpStatus.CONFLICT);
+		} else {
+			// addrSeqObj가 null인 경우
+			System.out.println("addrSeq null");
+			result = new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
-		return result;
+		return null;
 	}
-	
+
 	@RequestMapping("jusoPopup")
 	public void findAddr() {
 		System.out.println("주소 검색");
 	}
-	
-	
+
 	@RequestMapping("pwdCheck")
 	public void pwdCheck() {
 		System.out.println("비밀번호 확인");
@@ -308,22 +356,23 @@ public class myPageController {
 	}
 
 	@RequestMapping(value = "withdrawal", method = RequestMethod.POST)
-	public ResponseEntity<String> withdrawMember(HttpServletRequest request, @RequestParam("password") String password) {
+	public ResponseEntity<String> withdrawMember(HttpServletRequest request,
+			@RequestParam("password") String password) {
 
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
 
 		System.out.println(memberId + " 탈퇴시도");
-		
+
 		ResponseEntity<String> result = null;
 
 		try {
 			boolean delUser = mService.withdraw(memberId, password);
 			if (delUser) {
 				System.out.println(memberId + "탈퇴 완");
-				session.removeAttribute("loginMember");
-				session.invalidate();
+//				session.removeAttribute("loginMember");
+//				session.invalidate();
 				System.out.println("로그아웃 완");
 				result = new ResponseEntity<String>("success", HttpStatus.OK);
 			}
@@ -371,19 +420,20 @@ public class myPageController {
 
 				int delAddr = mService.deleteShippingAddr(memberId, addrSeq);
 				System.out.println(addrSeq + "번 배송지를 삭제하자! ");
-				
+
 				if (mService.deleteShippingAddr(memberId, addrSeq) == 0) {
-					System.out.println("배송주소록 삭제 완");;
+					System.out.println("배송주소록 삭제 완");
+					;
 				}
 			} catch (Exception e) {
 				System.out.println("예외났음 : " + addrSeqObj);
 			}
-		}else {
-		    // addrSeqObj가 null인 경우
-		    System.out.println("addrSeq null");
+		} else {
+			// addrSeqObj가 null인 경우
+			System.out.println("addrSeq null");
 		}
 	}
-	
+
 	@RequestMapping(value = "setBasicAddr", method = RequestMethod.POST)
 	public ResponseEntity<String> setBasicAddr(@RequestParam Map<String, Object> map, HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -391,87 +441,87 @@ public class myPageController {
 		String memberId = member.getMemberId();
 
 		ResponseEntity<String> result = null;
-		
+
 		Object addrSeqObj = map.get("addrSeq");
 
 		if (addrSeqObj != null) {
 			try {
 				// String을 int로 변환
 				int addrSeq = Integer.parseInt((String) addrSeqObj);
-				
-				if(mService.setBasicAddr(memberId, addrSeq)) {
+
+				if (mService.setBasicAddr(memberId, addrSeq)) {
 					System.out.println(addrSeq + "번 배송지가 기본배송지로 바뀌었습니다.");
 					result = new ResponseEntity<String>("success", HttpStatus.OK);
 				}
-				
+
 			} catch (Exception e) {
 				System.out.println("예외났음 : " + addrSeqObj);
 				result = new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
-		}else {
-		    // addrSeqObj가 null인 경우
-		    System.out.println("addrSeq null");
-		    result = new ResponseEntity<>(HttpStatus.CONFLICT);
+		} else {
+			// addrSeqObj가 null인 경우
+			System.out.println("addrSeq null");
+			result = new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
 		return result;
 	}
-	
+
 	@RequestMapping("orderDetail")
 	public void orderDetail(@RequestParam("no") String orderNo, HttpServletRequest request, Model model) {
 		System.out.println("주문상세페이지입니당.");
-		
+
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
-		
+
 		Map<String, Object> result = null;
-		
+
 		try {
-			//주문상품 상세정보
+			// 주문상품 상세정보
 			List<DetailOrder> detailOrder = mService.getDetailOrderInfo(memberId, orderNo);
 			model.addAttribute("detailOrderInfo", detailOrder);
 			System.out.println("주문상품상세정보!!!!!" + detailOrder.toString());
-			
 
-			Map<String, Object>  map = mService.getOrderInfo(memberId, orderNo);
-			//주문상세정보
-			DetailOrderInfo detailOrderInfo = (DetailOrderInfo)map.get("detailOrderInfo");
-			//쿠폰사용내역
-			List<CouponHistory> couponHistory = (List<CouponHistory>)map.get("couponsHistory");
-			//무통장 결제내역
-			GetBankTransfer bankTransfer = (GetBankTransfer)map.get("bankTransfer");
-			
+			Map<String, Object> map = mService.getOrderInfo(memberId, orderNo);
+			// 주문상세정보
+			DetailOrderInfo detailOrderInfo = (DetailOrderInfo) map.get("detailOrderInfo");
+			// 쿠폰사용내역
+			List<CouponHistory> couponHistory = (List<CouponHistory>) map.get("couponsHistory");
+			// 무통장 결제내역
+			GetBankTransfer bankTransfer = (GetBankTransfer) map.get("bankTransfer");
+
 			model.addAttribute("detailOrder", detailOrderInfo);
 			model.addAttribute("couponHistory", couponHistory);
 			model.addAttribute("bankTransfer", bankTransfer);
-			
-			//배송주소록
+
+			// 배송주소록
 			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
-			 model.addAttribute("userAddrList", userAddrList);
-			
+			model.addAttribute("userAddrList", userAddrList);
+
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	@RequestMapping(value ="orderDetail", method = RequestMethod.POST )
+
+	@RequestMapping(value = "orderDetail", method = RequestMethod.POST)
 	public void orderDetailPost() {
 		System.out.println("상세페이지");
 	}
-	
+
 	@RequestMapping(value = "editDeliveryAddress", method = RequestMethod.POST)
-	public ResponseEntity<String> editDeliveryAddress(@ModelAttribute DetailOrderInfo updateDetailOrderAddr, HttpServletRequest request, Model model) {
+	public ResponseEntity<String> editDeliveryAddress(@ModelAttribute DetailOrderInfo updateDetailOrderAddr,
+			HttpServletRequest request, Model model) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
-	
+
 		ResponseEntity<String> result = null;
-		
+
 		try {
-			if(mService.updateDetailOrderAddr(updateDetailOrderAddr, memberId)) {
+			if (mService.updateDetailOrderAddr(updateDetailOrderAddr, memberId)) {
 				System.out.println("배송지 변경 완");
-				result = new ResponseEntity<String>("success",HttpStatus.OK);
+				result = new ResponseEntity<String>("success", HttpStatus.OK);
 			}
 		} catch (SQLException | NamingException e) {
 			result = new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -481,18 +531,18 @@ public class myPageController {
 	}
 
 	@RequestMapping(value = "selectBasicAddr", method = RequestMethod.POST)
-	public ResponseEntity<String> getBasicAddrList(HttpServletRequest request, @RequestParam("addrSeq") int addrSeq, @RequestParam("deliveryMessage") String deliveryMessage, 
-		 @RequestParam("orderNo") String orderNo) {
+	public ResponseEntity<String> getBasicAddrList(HttpServletRequest request, @RequestParam("addrSeq") int addrSeq,
+			@RequestParam("deliveryMessage") String deliveryMessage, @RequestParam("orderNo") String orderNo) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
-	
+
 		ResponseEntity<String> result = null;
 
 		try {
-			if(mService.selectBasicAddr(memberId, addrSeq, orderNo, deliveryMessage)) {
+			if (mService.selectBasicAddr(memberId, addrSeq, orderNo, deliveryMessage)) {
 				System.out.println("배송지 변경 완");
-				result = new ResponseEntity<String>("success",HttpStatus.OK);
+				result = new ResponseEntity<String>("success", HttpStatus.OK);
 			}
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
@@ -500,32 +550,32 @@ public class myPageController {
 		}
 		return result;
 	}
-	
+
 	@RequestMapping(value = "searchOrderStatus", method = RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> searchOrderStatus(@ModelAttribute GetOrderStatusSearchKeyword keyword, HttpServletRequest request, 
-			@RequestParam(value = "pageNo", defaultValue = "1") int pageNo, Model model) {
+	public ResponseEntity<Map<String, Object>> searchOrderStatus(@ModelAttribute GetOrderStatusSearchKeyword keyword,
+			HttpServletRequest request, @RequestParam(value = "pageNo", defaultValue = "1") int pageNo, Model model) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
 
 		ResponseEntity<Map<String, Object>> result = null;
-		
+
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
-		
+
 		System.out.println("@@@@@@@@@@@@@@키워드@@@@@@@@@@@@@@@" + keyword.toString());
-		
+
 		try {
 			Map<String, Object> map = mService.searchOrderStatus(memberId, keyword, pageNo);
-			List<MyPageOrderList> sos = (List<MyPageOrderList>)map.get("orderStatus");
-			PagingInfo page =(PagingInfo)map.get("pagination");
-			
+			List<MyPageOrderList> sos = (List<MyPageOrderList>) map.get("orderStatus");
+			PagingInfo page = (PagingInfo) map.get("pagination");
+
 			model.addAttribute("page", page);
-			
+
 			System.out.println("@@@@@@@@@@@@@@@@@@키워드 페이징" + page.toString());
-			if(sos != null) {
-				result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);				
-			}else {
+			if (sos != null) {
+				result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);
+			} else {
 				result = new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
 		} catch (SQLException | NamingException e) {
