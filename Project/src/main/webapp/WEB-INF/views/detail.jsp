@@ -148,7 +148,8 @@
 			url: "/shoppingCart/insert",
 			type: "POST",
 			data: {
-				product_id : "${product.productId}"
+				productId : "${product.productId}",
+				quantity : $('#qty').val()
 			},
 			dataType: "JSON",
 			async: false,
