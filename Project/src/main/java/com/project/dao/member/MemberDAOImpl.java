@@ -15,9 +15,13 @@ import com.project.vodto.Member;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.jmj.ChangeShippingAddr;
+import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.GetBankTransfer;
+import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.jmj.PagingInfo;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO {
@@ -46,9 +50,13 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public List<MyPageOrderList> selectOrderHistory(String memberId) throws SQLException, NamingException {
-
-		return ses.selectList(ns + ".getOrderList", memberId);
+	public List<MyPageOrderList> selectOrderHistory(String memberId, PagingInfo pi) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("startRowIndex", pi.getStartRowIndex());
+		params.put("viewPostCntPerPage", pi.getViewPostCntPerPage());
+		params.put("memberId", memberId);
+		
+		return ses.selectList(ns + ".getOrderList", params);
 	}
 
 	@Override
@@ -140,6 +148,7 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("memberId", memberId);
 		params.put("refundBank", modifyMemberInfo.getRefundBank());
 		params.put("refundAccount", modifyMemberInfo.getRefundAccount());
+		params.put("accountHolder", modifyMemberInfo.getAccountHolder());
 
 		return ses.update(ns + ".updateRefund", params);
 	}
@@ -252,6 +261,92 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.update(ns + ".selectBasicShippingAddr", params);
 	}
 	
+	@Override
+	public List<MyPageOrderList> selectCurOrderHistory(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".getCurOrderHistory", memberId);
+	}
+	
+	@Override
+	public int updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId)
+			throws SQLException, NamingException {		
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", updateDetailOrderAddr.getOrderNo());
+		params.put("recipientName", updateDetailOrderAddr.getRecipientName());
+		params.put("recipientPhoneNumber", updateDetailOrderAddr.getRecipientPhoneNumber());
+		params.put("zipCode", updateDetailOrderAddr.getZipCode());
+		params.put("shippingAddress", updateDetailOrderAddr.getShippingAddress());
+		params.put("detailedShippingAddress", updateDetailOrderAddr.getDetailedShippingAddress());
+		params.put("deliveryMessage", updateDetailOrderAddr.getDeliveryMessage());
+		
+		return ses.update(ns + ".updateDetailOrderAddr", params);
+	}
+	
+	@Override
+	public List<CouponHistory> getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.selectList(ns + ".gerCouponsHistory", params);
+	}
+	
+	@Override
+	public GetBankTransfer getBankTransfer(String orderNo) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".getBankTransfer", orderNo);
+	}
+	
+	@Override
+	public List<MyPageOrderList> selectOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword, PagingInfo pi)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("beforeDeposit", keyword.getBeforeDeposit());
+		params.put("beforeShipping", keyword.getBeforeShipping());
+		params.put("shipping", keyword.getShipping());
+		params.put("deliveryCompleted", keyword.getDeliveryCompleted());
+		params.put("cancelList", keyword.getCancelList());
+		params.put("exchangeList", keyword.getExchangeList());
+		params.put("returnList", keyword.getReturnList());
+		
+		params.put("sevenDaysAgo", keyword.getSevenDaysAgo());
+		params.put("fifteenDaysAgo", keyword.getFifteenDaysAgo());
+		params.put("aMonthAgo", keyword.getAMonthAgo());
+		
+		params.put("startRowIndex", pi.getStartRowIndex());
+		params.put("viewPostCntPerPage", pi.getViewPostCntPerPage());
+		
+		return ses.selectList(ns + ".searchOrderStatus", params);
+	}
+	
+	@Override
+	public int getTotalOrderCnt(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".getTotalOrderCnt", memberId);
+	}
+	
+	@Override
+	public int getTotalOrderStatusCnt(String memberId, GetOrderStatusSearchKeyword keyword) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("beforeDeposit", keyword.getBeforeDeposit());
+		params.put("beforeShipping", keyword.getBeforeShipping());
+		params.put("shipping", keyword.getShipping());
+		params.put("deliveryCompleted", keyword.getDeliveryCompleted());
+		params.put("cancelList", keyword.getCancelList());
+		params.put("exchangeList", keyword.getExchangeList());
+		params.put("returnList", keyword.getReturnList());
+		
+		params.put("sevenDaysAgo", keyword.getSevenDaysAgo());
+		params.put("fifteenDaysAgo", keyword.getFifteenDaysAgo());
+		params.put("aMonthAgo", keyword.getAMonthAgo());
+		
+		return ses.selectOne(ns + ".getOrderStatusCnt", params);
+	}
+
+
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
 	@Override
@@ -281,6 +376,7 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectOne(ns + ".login", param);
 	}
+
 	
 	@Override
 	public int updateProfile(String memberId, String newFileName) throws SQLException, NamingException {
@@ -292,4 +388,11 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".updateProfile", params);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+	
+
+	
+
+
+	
 }

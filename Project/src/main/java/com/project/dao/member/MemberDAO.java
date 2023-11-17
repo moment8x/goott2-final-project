@@ -11,9 +11,13 @@ import com.project.vodto.Member;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.jmj.ChangeShippingAddr;
+import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.GetBankTransfer;
+import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.jmj.PagingInfo;
 
 @Repository
 public interface MemberDAO {
@@ -27,7 +31,7 @@ public interface MemberDAO {
 	// 특정 회원 탈퇴(기록 저장)
 	int updateWithdraw(String memberId) throws SQLException, NamingException;
 	// 주문건당 주문 내역 가져오기
-	List<MyPageOrderList> selectOrderHistory (String memberId) throws SQLException, NamingException;
+	List<MyPageOrderList> selectOrderHistory (String memberId, PagingInfo pi) throws SQLException, NamingException;
 	
 	// 주문건당 상품 총 갯수 가져오기
 	int selectOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException;
@@ -65,7 +69,7 @@ public interface MemberDAO {
 	//배송주소록 불러오기
 	List<ShippingAddress> getShippingAddress(String memberId) throws SQLException, NamingException;
 	
-	//배송주소록 수정 추가
+	//배송주소록 추가
 	int addShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException;
 	
 	//배송주소록 수정
@@ -95,7 +99,26 @@ public interface MemberDAO {
 	// 출고전, 입금전 배송주소록에서 선택해서 배송지 변경
 	int updateShippingAddr(String memberId, String orderNo, ChangeShippingAddr cs) throws SQLException, NamingException;
 	
+	//최근 주문 3개 가져오기
+	List<MyPageOrderList> selectCurOrderHistory(String memberId) throws SQLException, NamingException;
 	
+	// 출고전, 입금전 배송지를 새로운 배송지로 변경
+	int updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId) throws SQLException, NamingException;
+	
+	//주문상세 쿠폰내역
+	List<CouponHistory> getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException;
+	
+	// 무통장 주문 내역 가져오기
+	GetBankTransfer getBankTransfer(String orderNo) throws SQLException, NamingException;
+	
+	//주문상태별 조회
+	List<MyPageOrderList> selectOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword, PagingInfo pi) throws SQLException, NamingException;
+	
+	//주문갯수 가져오기
+	int getTotalOrderCnt(String memberId) throws SQLException, NamingException;
+	
+	//주문상태별로 주문갯수
+	int getTotalOrderStatusCnt(String memberId, GetOrderStatusSearchKeyword keyword) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -108,13 +131,9 @@ public interface MemberDAO {
 	int updateProfile(String memberId, String newFileName) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
 	
+	
+	
+	
 
-	
-	
-	
-	
-	
-	
-	
 	
 }
