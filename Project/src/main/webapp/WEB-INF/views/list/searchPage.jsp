@@ -9,9 +9,165 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop Right Sidebar</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 </head>
-<script type="text/javascript">
+<script>
+	let checkedList = [];
+	let checkedLang = [];
+	let sort = "aToz";
+	let page = 1;
+	let totalPagingBlockCnt = 0;
+$(function() {
+	totalPagingBlockCnt = "${paging.totalPagingBlockCnt}";
+	
+	$('.key-category input[type="checkbox"]').on("change", function() {
+		if($(this).prop("checked")){
+			checkedList.push($(this).val());
+			console.log(checkedList);
+			getProduct(checkedList,checkedLang, sort, page);
+		} else {
+			if(checkedList.includes($(this).val())){
+				checkedList.splice(checkedList.indexOf($(this).val()), 1);
+				console.log(checkedList);
+				getProduct(checkedList,checkedLang, sort, page);
+			}
+		}
+	});
+	
+	$(".pagingBtnDiv").on("click", "button" , function() {
+		page = $(this).html();
+		getProduct(checkedList ,checkedLang, sort, page);
+		$(".pagingBtnDiv button").removeClass("clicked"); 
+	    $(".page-"+page).addClass("clicked");
+	});
+	
+	$('.lang-category input[type="checkbox"]').on("change", function() {
+		if($(this).prop("checked")){
+			checkedLang.push($(this).val());
+			console.log(checkedLang);
+			getProduct(checkedList,checkedLang, sort, page);
+		} else {
+			if(checkedLang.includes($(this).val())){
+				checkedLang.splice(checkedLang.indexOf($(this).val()), 1);
+				console.log(checkedLang);
+				getProduct(checkedList,checkedLang, sort, page);
+			}
+		}
+	});
+	
+	$('#dropDownUl a').on("click", function() {
+		sort = $(this).attr("id");
+		getProduct(checkedList ,checkedLang, sort, page);
+	});
+	
+});
+function setPagingLink() {
+	for(let i = 1; i < 11; i++){
+		$('.link'+i).attr("href",($(".link"+i).attr("href")+"&active="+activeClass));
+	}
+}
+
+function getProduct(listCategory, listLang, sortValue, pageValue) {
+	let val = getParamsVal();
+	$.ajax({
+		url : '/list/searchPageWithFilter',
+		type : 'POST',
+		data : {
+			"val" : val,
+			"checkedList[]" : listCategory,
+			"checkedLang[]" : listLang,
+			"sort" : sortValue,
+			"page" : pageValue,
+		},
+		dataType : 'json',
+		async : false,
+		success : function(data) {
+			// 전송에 성공하면 이 콜백 함수를 실행 (data 에는 응답받은 데이터가 저장된다)
+			parse(data.pList);
+			makePageButton(data.paging);
+		},
+		error : function() {
+			// 전송에 실패하면 이 콜백 함수를 실행
+		}
+	});
+}
+function getParamsVal() {
+	let queryString = decodeURIComponent(window.location.search);
+	let val = queryString.split("=")[1];
+	return val
+}
+function parse(data) {
+	let output = "";
+	$.each(data, function(i, product) {
+     		output += `<div><div class="product-box-3 h-100 wow fadeInUp"><div class="product-header"><div class="product-image">`
+     		output += `<a href="product-left-thumbnail.html"><img src="\${product.product_image }"class="img-fluid blur-up lazyload" alt=""></a>`
+            output += `<ul class="product-option">`
+     		output += `<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="\${product.product_id }" title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i></a></li>`
+     		output += `<li  data-bs-toggle="tooltip" data-bs-placement="top" title="장바구니" ><a href="/shoppingCart/insert?product_id='\${product.product_id }"><i data-feather="shopping-cart"></i></a></li>`
+			output += `<li data-bs-toggle="tooltip" data-bs-placement="top"title="Wishlist"><a href="wishlist.html"class="notifi-wishlist"> <i data-feather="heart"></i></a></li>`
+			output += `</ul></div></div>`
+			output += `<div class="product-footer"><div class="product-detail"><span class="span-name">Vegetable</span><a href="product-left-thumbnail.html"><h5 class="name">\${product.product_name }</h5></a>`
+			output += `<p class="text-content mt-1 mb-2 product-content">\${product.introduction_intro }</p>`
+			output += `<div class="product-rating mt-2"><ul class="rating">`
+			output += `<li><i data-feather="star" class="fill"></i></li><li><i data-feather="star" class="fill"></i></li><li><i data-feather="star" class="fill"></i></li><li><i data-feather="star" class="fill"></i></li><li><i data-feather="star"></i></li></ul><span>(4.0)</span>`
+			let sellPrice = product.selling_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+			let consumerPrice = product.consumer_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+			output += `</div><h6 class="unit">\${product.page_count }</h6><h5 class="price"><span class="theme-color"><span class="theme-color">\${sellPrice}원</span><del>\${consumerPrice}원</del></h5></div></div></div></div>`
+	})
+	$(".product-list-section").html(output);
+	feather.replace();
+}
+function pagingbutton(button) {
+	page = button.innerHTML;
+	getProduct(checkedList ,checkedLang, sort, page);
+	$(".pagingBtnDiv .page-link").removeClass("clicked"); 
+    $(button).addClass("clicked");
+}
+function beforePaging() {
+	if(page > 10){
+	page = (Math.floor(page / 10)-1)* 10 + 1;
+	getProduct(checkedList ,checkedLang, sort, page);
+	 $(".page-"+page).addClass("clicked");
+	} else {
+		return false;
+	}
+}
+function afterPaging() {
+	if(Math.ceil(page / 10) < (totalPagingBlockCnt/10)){
+	page = Math.floor((page - 1) / 10) * 10 + 11;
+	getProduct(checkedList ,checkedLang, sort, page);
+	 $(".page-"+page).addClass("clicked");
+	} else {
+		return false;
+	}
+}
+function makePageButton(paging) {
+	console.log(paging);
+	let output = "";
+	if (paging.totalPagingBlockCnt > paging.endNumOfCurrentPagingBlock){
+		for(let i = paging.startNumOfCurrentPagingBlock; i <paging.endNumOfCurrentPagingBlock+1; i++){	
+			output += `<li class="page-item active">`;
+			output += `<button class="page-link page-\${i}">\${i}</button>`;
+			output += `</li>`;
+		}
+	} else {
+		for(let i = paging.startNumOfCurrentPagingBlock; i <paging.totalPagingBlockCnt+1; i++){	
+			output += `<li class="page-item active">`;
+			output += `<button class="page-link page-\${i}">\${i}</button>`;
+			output += `</li>`;
+		}
+	}
+	   $(".pagingBtnDiv").html(output);
+	   
+}
+
 </script>
+<style>
+.clicked {
+	background-color: white !important;
+	color: black !important;
+}
+</style>
 <body>
 <jsp:include page="../header.jsp"></jsp:include>
 
@@ -91,30 +247,6 @@
                                 <h3><i class="fa-solid fa-arrow-left"></i> Back</h3>
                             </div>
 
-                            <div class="filter-category">
-                                <div class="filter-title">
-                                    <h2>Filters</h2>
-                                    <a href="javascript:void(0)">Clear All</a>
-                                </div>
-                                <ul>
-                                    <li>
-                                        <a href="javascript:void(0)">Vegetable</a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:void(0)">Fruit</a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:void(0)">Fresh</a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:void(0)">Milk</a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:void(0)">Meat</a>
-                                    </li>
-                                </ul>
-                            </div>
-
                             <div class="accordion custome-accordion" id="accordionExample">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="headingOne">
@@ -132,143 +264,18 @@
                                                     placeholder="Search ..">
                                                 <label for="search">Search</label>
                                             </div>
-
-                                            <ul class="category-list custom-padding custom-height">
+                                            <ul class="category-list custom-padding custom-height"> 
+                                            <c:forEach var="category" items="${categories }" varStatus="loop">  
                                                 <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="fruit">
-                                                        <label class="form-check-label" for="fruit">
-                                                            <span class="name">Fruits & Vegetables</span>
-                                                            <span class="number">(15)</span>
+                                                    <div class="form-check ps-0 m-0 category-list-box key-category">
+                                                        <input class="checkbox_animated" type="checkbox" id="categories${loop.index }" value="${category.category_key }">
+                                                        <label class="form-check-label" for="categories${loop.index }">
+                                                            <span class="name">${category.category_name }</span>
+                                                            <span class="number">${category.category_count }</span>
                                                         </label>
                                                     </div>
                                                 </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="cake">
-                                                        <label class="form-check-label" for="cake">
-                                                            <span class="name">Bakery, Cake & Dairy</span>
-                                                            <span class="number">(12)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="behe">
-                                                        <label class="form-check-label" for="behe">
-                                                            <span class="name">Beverages</span>
-                                                            <span class="number">(20)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="snacks">
-                                                        <label class="form-check-label" for="snacks">
-                                                            <span class="name">Snacks & Branded Foods</span>
-                                                            <span class="number">(05)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="beauty">
-                                                        <label class="form-check-label" for="beauty">
-                                                            <span class="name">Beauty & Household</span>
-                                                            <span class="number">(30)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="pets">
-                                                        <label class="form-check-label" for="pets">
-                                                            <span class="name">Kitchen, Garden & Pets</span>
-                                                            <span class="number">(50)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="egg">
-                                                        <label class="form-check-label" for="egg">
-                                                            <span class="name">Eggs, Meat & Fish</span>
-                                                            <span class="number">(19)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="food">
-                                                        <label class="form-check-label" for="food">
-                                                            <span class="name">Gourment & World Food</span>
-                                                            <span class="number">(30)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="care">
-                                                        <label class="form-check-label" for="care">
-                                                            <span class="name">Baby Care</span>
-                                                            <span class="number">(20)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="fish">
-                                                        <label class="form-check-label" for="fish">
-                                                            <span class="name">Fish & Seafood</span>
-                                                            <span class="number">(10)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="marinades">
-                                                        <label class="form-check-label" for="marinades">
-                                                            <span class="name">Marinades</span>
-                                                            <span class="number">(05)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="lamb">
-                                                        <label class="form-check-label" for="lamb">
-                                                            <span class="name">Mutton & Lamb</span>
-                                                            <span class="number">(09)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="other">
-                                                        <label class="form-check-label" for="other">
-                                                            <span class="name">Port & other Meats</span>
-                                                            <span class="number">(06)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="pour">
-                                                        <label class="form-check-label" for="pour">
-                                                            <span class="name">Pourltry</span>
-                                                            <span class="number">(01)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="salami">
-                                                        <label class="form-check-label" for="salami">
-                                                            <span class="name">Sausages, bacon & Salami</span>
-                                                            <span class="number">(03)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
+                                            </c:forEach>
                                             </ul>
                                         </div>
                                     </div>
@@ -279,29 +286,38 @@
                                         <button class="accordion-button collapsed" type="button"
                                             data-bs-toggle="collapse" data-bs-target="#collapseTwo"
                                             aria-expanded="false" aria-controls="collapseTwo">
-                                            <span>Food Preference</span>
+                                            <span>언어별</span>
                                         </button>
                                     </h2>
                                     <div id="collapseTwo" class="accordion-collapse collapse show"
                                         aria-labelledby="headingTwo">
                                         <div class="accordion-body">
-                                            <ul class="category-list custom-padding">
+                                            <ul class="category-list custom-padding lang-category">
                                                 <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="veget">
-                                                        <label class="form-check-label" for="veget">
-                                                            <span class="name">Vegetarian</span>
-                                                            <span class="number">(08)</span>
+                                                    <div class="form-check ps-0 m-0 category-list-box ">
+                                                        <input class="checkbox_animated" type="checkbox" id="ko" value="KOR">
+                                                        <label class="form-check-label" for="ko">
+                                                            <span class="name">국내 도서</span>
+                                                            <span class="number">${lang[0] }</span>
                                                         </label>
                                                     </div>
                                                 </li>
 
                                                 <li>
                                                     <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox" id="non">
-                                                        <label class="form-check-label" for="non">
-                                                            <span class="name">Non Vegetarian</span>
-                                                            <span class="number">(09)</span>
+                                                        <input class="checkbox_animated" type="checkbox" id="en"  value="ENG">
+                                                        <label class="form-check-label" for="en">
+                                                            <span class="name">해외 도서</span>
+                                                            <span class="number">${lang[1] }</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox" id="ja"  value="JAP">
+                                                        <label class="form-check-label" for="ja">
+                                                            <span class="name">일본 도서</span>
+                                                            <span class="number">${lang[2] }</span>
                                                         </label>
                                                     </div>
                                                 </li>
@@ -544,244 +560,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="headingFive">
-                                        <button class="accordion-button collapsed" type="button"
-                                            data-bs-toggle="collapse" data-bs-target="#collapseFive"
-                                            aria-expanded="false" aria-controls="collapseFive">
-                                            <span>Pack Size</span>
-                                        </button>
-                                    </h2>
-                                    <div id="collapseFive" class="accordion-collapse collapse show"
-                                        aria-labelledby="headingFive">
-                                        <div class="accordion-body">
-                                            <ul class="category-list custom-padding custom-height">
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault5">
-                                                        <label class="form-check-label" for="flexCheckDefault5">
-                                                            <span class="name">400 to 500 g</span>
-                                                            <span class="number">(05)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault6">
-                                                        <label class="form-check-label" for="flexCheckDefault6">
-                                                            <span class="name">500 to 700 g</span>
-                                                            <span class="number">(02)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault7">
-                                                        <label class="form-check-label" for="flexCheckDefault7">
-                                                            <span class="name">700 to 1 kg</span>
-                                                            <span class="number">(04)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault8">
-                                                        <label class="form-check-label" for="flexCheckDefault8">
-                                                            <span class="name">120 - 150 g each Vacuum 2 pcs</span>
-                                                            <span class="number">(06)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault9">
-                                                        <label class="form-check-label" for="flexCheckDefault9">
-                                                            <span class="name">1 pc</span>
-                                                            <span class="number">(09)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault10">
-                                                        <label class="form-check-label" for="flexCheckDefault10">
-                                                            <span class="name">1 to 1.2 kg</span>
-                                                            <span class="number">(06)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault11">
-                                                        <label class="form-check-label" for="flexCheckDefault11">
-                                                            <span class="name">2 x 24 pcs Multipack</span>
-                                                            <span class="number">(03)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault12">
-                                                        <label class="form-check-label" for="flexCheckDefault12">
-                                                            <span class="name">2x6 pcs Multipack</span>
-                                                            <span class="number">(04)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault13">
-                                                        <label class="form-check-label" for="flexCheckDefault13">
-                                                            <span class="name">4x6 pcs Multipack</span>
-                                                            <span class="number">(05)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault14">
-                                                        <label class="form-check-label" for="flexCheckDefault14">
-                                                            <span class="name">5x6 pcs Multipack</span>
-                                                            <span class="number">(09)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault15">
-                                                        <label class="form-check-label" for="flexCheckDefault15">
-                                                            <span class="name">Combo 2 Items</span>
-                                                            <span class="number">(10)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault16">
-                                                        <label class="form-check-label" for="flexCheckDefault16">
-                                                            <span class="name">Combo 3 Items</span>
-                                                            <span class="number">(14)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault17">
-                                                        <label class="form-check-label" for="flexCheckDefault17">
-                                                            <span class="name">2 pcs</span>
-                                                            <span class="number">(19)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault18">
-                                                        <label class="form-check-label" for="flexCheckDefault18">
-                                                            <span class="name">3 pcs</span>
-                                                            <span class="number">(14)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault19">
-                                                        <label class="form-check-label" for="flexCheckDefault19">
-                                                            <span class="name">2 pcs Vacuum (140 g to 180 g each
-                                                                )</span>
-                                                            <span class="number">(13)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault20">
-                                                        <label class="form-check-label" for="flexCheckDefault20">
-                                                            <span class="name">4 pcs</span>
-                                                            <span class="number">(18)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault21">
-                                                        <label class="form-check-label" for="flexCheckDefault21">
-                                                            <span class="name">4 pcs Vacuum (140 g to 180 g each
-                                                                )</span>
-                                                            <span class="number">(07)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault22">
-                                                        <label class="form-check-label" for="flexCheckDefault22">
-                                                            <span class="name">6 pcs</span>
-                                                            <span class="number">(09)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault23">
-                                                        <label class="form-check-label" for="flexCheckDefault23">
-                                                            <span class="name">6 pcs carton</span>
-                                                            <span class="number">(11)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-
-                                                <li>
-                                                    <div class="form-check ps-0 m-0 category-list-box">
-                                                        <input class="checkbox_animated" type="checkbox"
-                                                            id="flexCheckDefault24">
-                                                        <label class="form-check-label" for="flexCheckDefault24">
-                                                            <span class="name">6 pcs Pouch</span>
-                                                            <span class="number">(16)</span>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -801,33 +579,20 @@
                                 <div class="dropdown">
                                     <button class="dropdown-toggle" type="button" id="dropdownMenuButton1"
                                         data-bs-toggle="dropdown">
-                                        <span>Most Popular</span> <i class="fa-solid fa-angle-down"></i>
+                                        <span>이름 순</span> <i class="fa-solid fa-angle-down"></i>
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" id="dropDownUl">
                                         <li>
-                                            <a class="dropdown-item" id="pop" href="javascript:void(0)">Popularity</a>
+                                            <a class="dropdown-item" id="aToz" href="javascript:void(0)">이름 순</a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" id="low" href="javascript:void(0)">Low - High
-                                                Price</a>
+                                            <a class="dropdown-item" id="low" href="javascript:void(0)">낮은 가격순</a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" id="high" href="javascript:void(0)">High - Low
-                                                Price</a>
+                                            <a class="dropdown-item" id="high" href="javascript:void(0)">높은 가격순</a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" id="rating" href="javascript:void(0)">Average
-                                                Rating</a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" id="aToz" href="javascript:void(0)">A - Z Order</a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" id="zToa" href="javascript:void(0)">Z - A Order</a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" id="off" href="javascript:void(0)">% Off - Hight To
-                                                Low</a>
+                                            <a class="dropdown-item" id="pop" href="javascript:void(0)">인기순</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -852,19 +617,19 @@
                                                 class="img-fluid blur-up lazyload" alt="">
                                         </a>
                                         <ul class="product-option">
-															<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="${product.product_id }"
-															title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i>
-															</a></li>
+													<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="${product.product_id }"
+														title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i>
+													</a></li>
 														
 
-														<li  data-bs-toggle="tooltip" data-bs-placement="top"
-															title="장바구니" ><a href="/shoppingCart/insert?product_id='${product.product_id }"><i data-feather="shopping-cart"></i></a>
-														</li>
+												<li  data-bs-toggle="tooltip" data-bs-placement="top"
+													title="장바구니" ><a href="/shoppingCart/insert?product_id='${product.product_id }"><i data-feather="shopping-cart"></i></a>
+												</li>
 
-														<li data-bs-toggle="tooltip" data-bs-placement="top"
-															title="Wishlist"><a href="wishlist.html"
-															class="notifi-wishlist"> <i data-feather="heart"></i>
-														</a></li>
+												<li data-bs-toggle="tooltip" data-bs-placement="top"
+													title="Wishlist"><a href="wishlist.html"
+													class="notifi-wishlist"> <i data-feather="heart"></i>
+												</a></li>
 										</ul>
                                     </div>
                                 </div>
@@ -904,27 +669,6 @@
                                         <fmt:formatNumber value="${product.selling_price}" pattern="#,###원" /> 
                                         <del><fmt:formatNumber value="${product.consumer_price}" pattern="#,###원" /></del>
                                         </h5>
-                                        <div class="add-to-cart-box bg-white">
-                                            <button class="btn btn-add-cart addcart-button">Add
-                                                <span class="add-icon bg-light-gray">
-                                                    <i class="fa-solid fa-plus"></i>
-                                                </span>
-                                            </button>
-                                            <div class="cart_qty qty-box">
-                                                <div class="input-group bg-white">
-                                                    <button type="button" class="qty-left-minus bg-gray"
-                                                        data-type="minus" data-field="">
-                                                        <i class="fa fa-minus" aria-hidden="true"></i>
-                                                    </button>
-                                                    <input class="form-control input-number qty-input" type="text"
-                                                        name="quantity" value="0">
-                                                    <button type="button" class="qty-right-plus bg-gray"
-                                                        data-type="plus" data-field="">
-                                                        <i class="fa fa-plus" aria-hidden="true"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -932,30 +676,39 @@
                      		</c:forEach>
                      	</c:otherwise>
                      </c:choose>
-                        
                         </div>
                     </div>
 
                     <nav class="custome-pagination">
                         <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="javascript:void(0)" tabindex="-1" aria-disabled="true">
+                            <li class="page-item paging-left-arrow">
+                                <button class="page-link" tabindex="-1" aria-disabled="true" onclick="return beforePaging();">
                                     <i class="fa-solid fa-angles-left"></i>
-                                </a>
+                                </button>
                             </li>
-                            <li class="page-item active">
-                                <a class="page-link" href="javascript:void(0)">1</a>
-                            </li>
-                            <li class="page-item" aria-current="page">
-                                <a class="page-link" href="javascript:void(0)">2</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="javascript:void(0)">3</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="javascript:void(0)">
+                            <div class="pagingBtnDiv">
+                            <c:set var="val" value="${param.val }" />
+                            <c:choose>
+                            <c:when test="${paging.totalPagingBlockCnt > paging.endNumOfCurrentPagingBlock }">
+                            	<c:forEach var="i" begin="${paging.startNumOfCurrentPagingBlock}" end="${paging.endNumOfCurrentPagingBlock }" step="1">
+                            		<li class="page-item active">
+                              	  		<button class="page-link page-${i}">${i}</button>
+                           			</li>
+                            </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                            	<c:forEach var="i" begin="${paging.startNumOfCurrentPagingBlock}" end="${paging.totalPagingBlockCnt }" step="1">
+		                            <li class="page-item active">
+		                                <button class="page-link plink${i}" >${i}</button>
+		                            </li>
+	                            </c:forEach>
+                            </c:otherwise>
+                            </c:choose>
+                            </div>
+                            <li class="page-item paging-right-arrow">
+                                <button class="page-link" onclick="return afterPaging();">
                                     <i class="fa-solid fa-angles-right"></i>
-                                </a>
+                                </button>
                             </li>
                         </ul>
                     </nav>

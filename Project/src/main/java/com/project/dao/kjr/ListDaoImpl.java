@@ -1,9 +1,11 @@
 package com.project.dao.kjr;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -14,6 +16,7 @@ import com.project.vodto.PagingInfo;
 import com.project.vodto.ProductCategory;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
+import com.project.vodto.kjy.SearchVO;
 
 @Repository
 public class ListDaoImpl implements ListDao {
@@ -95,12 +98,87 @@ public class ListDaoImpl implements ListDao {
 	}
 
 	@Override
-	public List<Products> selectProductsSearching(String val) throws Exception {
+	public List<Products> selectProductsSearching(String val, String sort, PagingInfo paging) throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
 		String value = "%" + val + "%";
+		params.put("value", value);
+		params.put("startRowIndex", paging.getStartRowIndex());
+		params.put("endRowIndex", paging.getViewProductPerPage());
+		switch (sort) {
+		case "aToz":
+			params.put("sort", "p.product_name");
+			break;
+		case "low":
+			params.put("sort", "p.selling_price");
+			break;
+		case "high":
+			params.put("sort", "p.selling_price desc");
+			break;
+		case "pop":
+			params.put("sort", "p.product_name");
+			break;
+
+		default:
+			break;
+		}
 		
-		List<Products> searchedProducts = ses.selectList(ns+".selectProductsSearching", value);
+		List<Products> searchedProducts = ses.selectList(ns+".selectProductsSearching", params);
 		System.out.println("검색된 상품 : " +searchedProducts);
-		return searchedProducts;
+		return searchedProducts; 
 	}
+
+	@Override
+	public List<SearchVO> selectProductsCategoryBySearch(String val) throws Exception {
+		String value = "%" + val + "%";
+		List<SearchVO> search = ses.selectList(ns+".selectSearchProductsCategories", value);
+		return search;
+	}
+
+	@Override
+	public List<String> selectProductKeyBySearch(String val) throws Exception {
+		
+		return ses.selectList(ns+".selectSearchPrductsKey", val);
+	}
+
+	@Override
+	public List<Products> selectProductsWithFilter(String val, List<String> checkedList,  List<String> checkedLang, String sort, PagingInfo paging) throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("val", val);
+		params.put("checkedList", checkedList);
+		params.put("checkedLang", checkedLang);
+		params.put("startRowIndex", paging.getStartRowIndex());
+		params.put("endRowIndex", paging.getViewProductPerPage());
+		switch (sort) {
+		case "aToz":
+			params.put("sort", "p.product_name");
+			break;
+		case "low":
+			params.put("sort", "p.selling_price");
+			break;
+		case "high":
+			params.put("sort", "p.selling_price desc");
+			break;
+		case "pop":
+			params.put("sort", "p.product_name");
+			break;
+
+		default:
+			break;
+		}
+		
+		List<Products> lst = ses.selectList(ns+".selectProductsSearchingWithFilter", params);
+		return lst;
+	}
+
+	@Override
+	public int selectSearchProductCount(String val,List<String> checkedList, List<String> checkedLang) throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("val", val);
+		params.put("checkedList", checkedList);
+		params.put("checkedLang", checkedLang);
+		return ses.selectOne(ns+".selectSearchProductCount", params);
+	}
+
+	
 
 }

@@ -22,7 +22,7 @@ public class PagingInfo {
 	
 	//-------------------------------------------------------------------------------------
 	// PageNation(페이징 블럭 처리)를 위해 필요한 멤버들
-	private int pageCntPerBlock; // 한 개 블럭에 보여줄 페이지 번호의 갯수
+	private int pageCntPerBlock; // 한 페이지에 보여줄 블럭의 갯수
 	private int totalPagingBlockCnt; // 전체 페이징 블럭의 갯수
 	private int pageBlockOfCurrentPage; // 현재 페이지가 속한 페이징 블럭 번호
 	private int startNumOfCurrentPagingBlock; // 현재 페이징 블럭에서의 출력 시작 페이지 번호

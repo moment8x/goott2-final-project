@@ -3,8 +3,10 @@ package com.project.service.kjy;
 import java.util.List;
 import java.util.Map;
 
+import com.project.vodto.PagingInfo;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
+import com.project.vodto.kjy.SearchVO;
 
 public interface ListService {
 	// 리스트 페이지 장르 목록 가져오기
@@ -18,5 +20,11 @@ public interface ListService {
 	// 상품 하나의 정보를 id로 가져오기
 	public Products getProductById(String id) throws Exception;
 	// 검색하기
-	public List<Products> searchProducts(String val) throws Exception;
+	public Map<String, Object> searchProducts(String val, String sort, int page) throws Exception;
+	// 검색한 상품의 카테고리와 개수 가져오기
+	public List<SearchVO> searchProductsCateogries(String val) throws Exception;
+	// 검색한 상품의 언어 정보 가져오기
+	public List<Integer> searchProductslang(String val) throws Exception;
+	// 검색한 상품 가져오기 (필터가 있을 때)
+	public Map<String, Object> searchProductsWithFilter(String val, List<String> checkedList, List<String> checkedLang, String sort, int page) throws Exception;
 }
