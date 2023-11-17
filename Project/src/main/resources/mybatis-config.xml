@@ -16,10 +16,23 @@
 		<typeAlias type="com.project.vodto.kkb.MemberRecentPost" alias="MemberRecentPost" />
 		<typeAlias type="com.project.vodto.kkb.MemberRecentInquiry" alias="MemberRecentInquiry" />
 		<typeAlias type="com.project.vodto.kkb.MemberParam" alias="MemberParam" />
+		<typeAlias type="com.project.vodto.kkb.MemberUpdateCond" alias="MemberUpdateCond" />
 		<typeAlias type="com.project.vodto.kkb.OrderNoResponse" alias="OrderNoResponse" />
+		<typeAlias type="com.project.vodto.kkb.OrderCondition" alias="OrderCondition" />
 		<typeAlias type="com.project.vodto.kkb.OrderProductResponse" alias="OrderProductResponse" />
 		<typeAlias type="com.project.vodto.kkb.PostResponse" alias="PostResponse" />
 		<typeAlias type="com.project.vodto.kkb.PostCondition" alias="PostCondition" />
+		<typeAlias type="com.project.vodto.kkb.InquiryResponse" alias="InquiryResponse" />
+		<typeAlias type="com.project.vodto.kkb.InquiryCondition" alias="InquiryCondition" />
+		<typeAlias type="com.project.vodto.kkb.CouponInfoResponse" alias="CouponInfoResponse" />
+		<typeAlias type="com.project.vodto.kkb.CouponListResponse" alias="CouponListResponse" />
+		<typeAlias type="com.project.vodto.kkb.PointInfoResponse" alias="PointInfoResponse" />
+		<typeAlias type="com.project.vodto.kkb.RewardInfoResponse" alias="RewardInfoResponse" />
+		<typeAlias type="com.project.vodto.kkb.PointListResponse" alias="PointListResponse" />
+		<typeAlias type="com.project.vodto.kkb.RewardListResponse" alias="RewardListResponse" />
+		<typeAlias type="com.project.vodto.kkb.ShoppingCartResponse" alias="ShoppingCartResponse" />
+		<typeAlias type="com.project.vodto.kkb.AppliedCategory" alias="AppliedCategory" />
+		<typeAlias type="com.project.vodto.kkb.CouponAppliedCategory" alias="CouponAppliedCategory" />
 		<typeAlias type="com.project.vodto.Product" alias="product" />
 		<typeAlias type="com.project.vodto.Board" alias="Board" />
 	</typeAliases>

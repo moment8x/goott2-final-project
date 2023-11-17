@@ -24,49 +24,41 @@ public class AdminMemberDAOImpl implements AdminMemberDAO {
 
 	@Override
 	public int countAll() throws Exception {
-		
 		return ses.selectOne(ns + ".selectAllMemberCount");
 	}
 	
 	@Override
 	public List<MemberResponse> findByInfo(MemberCondition memberCond) throws Exception {
-		
 		return ses.selectList(ns + ".selectMemberInfo", memberCond);
 	}
 
 	@Override
 	public MemberBasicInfo findBasicInfoById(String memberId) throws Exception {
-		
 		return ses.selectOne(ns + ".selectBasicInfo", memberId);
 	}
 
 	@Override
 	public List<MemberRecentOrder> findRecentOrderById(String memberId) throws Exception {
-		
 		return ses.selectList(ns + ".selectRecentOrder", memberId);
 	}
 
 	@Override
 	public List<MemberRecentPost> findRecentPostById(String memberId) throws Exception {
-		
 		return ses.selectList(ns + ".selectRecentPost", memberId);
 	}
 
 	@Override
 	public List<MemberRecentInquiry> findRecentInquiryById(String memberId) throws Exception {
-		
 		return ses.selectList(ns + ".selectRecentInquiry", memberId);
 	}
 
 	@Override
 	public MemberParam findDetailInfoById(String memberId) throws Exception {
-		
 		return ses.selectOne(ns + ".selectMemberDetailInfo", memberId);
 	}
 
 	@Override
 	public int changeMemberDetailInfo(MemberParam member) throws Exception {
-		
 		return ses.update(ns + ".updateMemberDetailInfo", member);
 	}
 

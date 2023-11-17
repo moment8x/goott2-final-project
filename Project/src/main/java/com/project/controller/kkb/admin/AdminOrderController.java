@@ -21,10 +21,9 @@ public class AdminOrderController {
 	
 	private final AdminOrderService adminOrderService;
 	
-		// 전체 주문 조회
+		/* 전체 주문 조회 */
 		@PostMapping("/search")
 		public Map<String, Object> searchOrderInfo(@RequestBody OrderCondition orderCond) throws Exception {	
-			
 			return adminOrderService.getOrderInfo(orderCond);
 		}
 }
