@@ -12,6 +12,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.ShoppingCart;
+import com.project.vodto.kjs.ShowCartDTO;
 
 /**
  * @author goott1
@@ -111,5 +112,31 @@ public class ShoppingCartDAOImpl implements ShoppingCartDAO {
 		params.put("productId", productId);
 		
 		return session.delete(ns + ".deleteMemberCartItem", params);
+	}
+
+	@Override
+	public List<ShowCartDTO> getNonMemberShoppingCart(String nonMemberId) throws SQLException, NamingException {
+		System.out.println("장바구니 dao단 - 비회원 헤더 장바구니 정보 조회");
+		
+		return session.selectList(ns + ".getNonMemberShoppingCart", nonMemberId);
+	}
+
+	@Override
+	public List<ShowCartDTO> getMemberShoppingCart(String memberId) throws SQLException, NamingException {
+		System.out.println("장바구니 dao단 - 회원 헤더 장바구니 정보 조회");
+		
+		return session.selectList(ns + ".getMemberShoppingCart", memberId);
+	}
+
+	@Override
+	public int countListNon(String nonMemberId) throws SQLException, NamingException {
+		System.out.println("장바구니 dao단 - 비회원 장바구니 수량 조회");
+		return session.selectOne(ns + ".countListNon", nonMemberId);
+	}
+
+	@Override
+	public int countList(String memberId) throws SQLException, NamingException {
+		System.out.println("장바구니 dao단 - 회원 장바구니 수량 조회");
+		return session.selectOne(ns + ".countList", memberId);
 	}
 }

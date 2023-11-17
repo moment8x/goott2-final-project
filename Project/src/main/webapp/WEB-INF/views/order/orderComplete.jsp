@@ -160,7 +160,7 @@
 							<div class="order-contain">
 								<h3 class="theme-color">주문이 완료되었습니다.</h3>
 								<h2 class="text-content">주문번호
-									${requestScope.pd.non_order_no }</h2>
+									${requestScope.paymentDetail.paymentHistory.orderNo}</h2>
 
 							</div>
 						</div>
@@ -170,9 +170,7 @@
 		</div>
 	</section>
 	<!-- Breadcrumb Section End -->
-	<div>${requestScope.noh }</div>
-	<div>${requestScope.itemList }</div>
-	<div>${requestScope.pd }</div>
+	<div>${requestScope.paymentDetail.detailOrderItem }</div>
 	<!-- Cart Section Start -->
 	<section class="cart-section section-b-space">
 		<div class="container-fluid-lg">
@@ -183,7 +181,7 @@
 							<table class="table mb-0">
 								<tbody>
 
-									<c:forEach var="item" items="${requestScope.itemList }">
+									<c:forEach var="item" items="${requestScope.paymentDetail.detailOrderItem }">
 
 
 
@@ -192,13 +190,13 @@
 												<div class="product border-0">
 													<a href="product.left-sidebar.html" class="product-image">
 														<img
-														src="/resources/assets/images/vegetable/product/1.png"
+														src="${item.productImage }"
 														class="img-fluid blur-up lazyload" alt="">
 													</a>
 													<div class="product-detail">
 
 														<ul>
-															<li class="name"><div class="product_id">${item.product_id }</div></li>
+															<li class="name"><div class="product_id">${item.productName }</div></li>
 
 															<li class="text-content">Sold By: Fresho</li>
 
@@ -210,7 +208,7 @@
 
 											<td class="price">
 												<h4 class="table-title text-content">Price</h4>
-												<h6 class="theme-color">${item.product_price}</h6>
+												<h6 class="theme-color">${item.productPrice}</h6>
 											</td>
 
 											<td class="quantity">
@@ -314,7 +312,7 @@
 								<ul class="summery-contain">
 									<li>
 										<h4>주문금액</h4>
-										<h4 class="price">${requestScope.pd.total_amount }원</h4>
+										<h4 class="price">${requestScope.paymentDetail.paymentHistory.totalAmount }원</h4>
 									</li>
 
 									<li>
@@ -325,8 +323,8 @@
 									<li>
 										<h4>결제수단</h4>
 										<h4 class="price text-danger">
-											${requestScope.pd.payment_method }
-											<c:if test="${requestScope.pd.payment_method eq 'card' }">(${requestScope.pd.card_name })</c:if>
+											${requestScope.paymentDetail.paymentHistory.paymentMethod }
+											<c:if test="${requestScope.paymentDetail.paymentHistory.paymentMethod eq 'card' }">(${requestScope.paymentDetail.paymentHistory.cardName })</c:if>
 										</h4>
 									</li>
 								</ul>
@@ -348,14 +346,14 @@
 
 								<ul class="summery-contain pb-0 border-bottom-0">
 									<li class="d-block">
-										<h4>${requestScope.noh.shipping_address }</h4>
-										<h4 class="mt-2">${requestScope.noh.detailed_shipping_address }</h4>
+										<h4>${requestScope.paymentDetail.paymentHistory.shippingAddress }</h4>
+										<h4 class="mt-2">${requestScope.paymentDetail.paymentHistory.detailedShippingAddress }</h4>
 									</li>
 
 									<li class="pb-0">
 										<h4>받는 사람 :</h4>
-										<h4>${requestScope.noh.recipient_name }
-											(${requestScope.noh.recipient_phone_number })</h4>
+										<h4>${requestScope.paymentDetail.paymentHistory.recipientName }
+											(${requestScope.paymentDetail.paymentHistory.recipientPhoneNumber })</h4>
 								</ul>
 								<!--  <h4 class="price theme-color">
                                             <a href="order-tracking.html" class="text-danger">Track Order</a>

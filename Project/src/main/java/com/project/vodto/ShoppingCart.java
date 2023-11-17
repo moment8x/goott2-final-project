@@ -14,7 +14,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ShoppingCart {
-	private int no;
+	private int shoppingCartSeq;
 	private String nonMemberId;
 	private String memberId;
 	private String productId;

@@ -19,7 +19,7 @@ public class Member {
 	private String name;
 	private String phoneNumber; //전화번호
 	private String cellPhoneNumber; // 핸드폰번호
-	private Timestamp registertaionDate;
+	private Timestamp registrationDate;
 	private char gender;
 	private String dateOfBirth;
 	private String zipCode;
@@ -36,10 +36,10 @@ public class Member {
 	private String remember;
 	private Timestamp lastLoginDate;
 	private String refundBank;
+	private String accountHolder; //예금주
 	private String refundAccount;
 	private String dormantAccout; //휴면계정
 	private String memberToken;
 	private String permission; //권한 등급
 	private String withdraw; //탈퇴여부
-	private String accountHolder;
 }

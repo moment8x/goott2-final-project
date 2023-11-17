@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -347,6 +348,254 @@
 	}
 	
 	//배송주소록 추가
+	function addShippingAddress(addrSeq) {
+		let zipCode = $('#addZipNo').val()
+		let address = $('#addAddr').val()
+		let detailAddress = $('#addAddrDetail').val()
+		let recipient = $('#recipient').val()
+		let recipientContact = $('#recipientContact').val()
+		
+		$.ajax({
+			url : '/user/addShippingAddress', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				addrSeq,
+				zipCode,
+				address,
+				detailAddress,
+				recipient,
+				recipientContact
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data == true){
+					$('#addZipNo').val('')
+					$('#addAddr').val('')
+					$('#addAddrDetail').val('')
+					$('#recipient').val('')
+					$('#recipientContact').val('')
+					
+					location.reload()
+				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//배송주소록 수정
+	function shippingAddrModify(addrSeq) {
+		let zipCode = $('#shippingZipNoModify').val()
+		let address = $('#shippingAddrModify').val()
+		let detailAddress = $('#shippingDetailAddrModify').val()
+		let recipient = $('#recipientName').val()
+		let recipientContact = $('#editRecipientContact').val()
+		
+		$.ajax({
+			url : '/user/shippingAddrModify', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				zipCode,
+				address,
+				detailAddress,
+				recipient,
+				recipientContact,
+				addrSeq
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+					location.reload()
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//수정할 주소록 가져오기
+	function editShippingAddr(addrSeq) {
+		$.ajax({
+			url : '/user/myPage/modifyShippingAddr', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				"addrSeq" : addrSeq
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				outputShippingAddr(data);
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	function outputShippingAddr(addr) {
+		let output = `<button type="button" class="btn theme-bg-color btn-md text-white"
+			onclick="goPopup();">주소 찾기</button>`
+		output += `<div class="col-xxl-6">`
+		output += `<div class="form-floating theme-form-floating">`
+		output += `<input type="text" class="form-control" id="shippingZipNoModify"
+			name="zipCode" value="\${addr.zipCode}" readonly />`
+		output += `<label for="shippingZipNoModify">우편번호</label>`	
+		output += `</div>`
+		output += `</div>`
+
+		output += `<div class="col-xxl-6">`
+		output += `<div class="form-floating theme-form-floating">`
+		output += `<input class="form-control" type="text"
+			value="\${addr.address}" name="address"
+			id="shippingAddrModify" readonly />`
+		output += `<label for="shippingAddrModify">주소</label>`
+		output += `</div>`
+		output += `</div>`
+
+		output += `<div class="col-xxl-12">`
+		output += `<div class="form-floating theme-form-floating">`
+		output += `<input type="text" class="form-control"
+			id="shippingDetailAddrModify"
+			value="\${addr.detailAddress}" />`
+		output += `<label for="shippingDetailAddrModify">상세주소</label>`
+		output += `</div>`
+		output += `</div>`
+			
+		output += `<div class="col-xxl-6">`
+		output += `<div class="form-floating theme-form-floating">`
+		output += `<input type="text" class="form-control" id="recipientName"
+			name="recipient" placeholder="받는사람"
+			value="\${addr.recipient} " />`
+		output += `<label for="recipientName">받는사람</label>`
+		output += `</div>`
+		output += `</div>`
+
+		output += `<div class="col-xxl-6">`
+		output += `<div class="form-floating theme-form-floating">`
+		output += `<input type="text" class="form-control"
+				id="editRecipientContact" placeholder="받는사람 연락처"
+				value="\${addr.recipientContact}" />`
+		output += `<label for="editRecipientContact">받는사람 연락처</label>`
+		output += `<p>- 포함해서 입력해주세요.</p>`
+		output += `</div>`
+		output += `</div>`
+		
+		let outputFooter = `<button type="button" data-bs-dismiss="modal"
+			class="btn theme-bg-color btn-md fw-bold text-light"
+			onclick="shippingAddrModify(\${addr.addrSeq});">
+			변경</button>`
+		outputFooter += `<button type="button" class="btn btn-animation btn-md fw-bold"
+			data-bs-dismiss="modal">닫기</button>`	
+
+		$('.row.g-4.editAddr').html(output);
+		$('.modal-footer.editAddrFooter').html(outputFooter);
+	}
+	
+	function delShippingAddr(addrSeq){
+		$.ajax({
+			url : '/user/deleteShippingAddr', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				addrSeq
+			},
+			async : false,
+			success : function(data) {
+				console.log(data);
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	function setBasicAddr(addrSeq) {
+		$.ajax({
+			url : '/user/setBasicAddr', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				addrSeq
+			},
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data == "success"){
+					alert("기본배송지로 설정되었습니다.")
+					location.reload()
+				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//전화번호 유효성 검사
+	function duplicatePhoneNumber() {
+		let newPhoneNumber = $('#newUserPhonNumber').val();
+		let regPhone = /^\d{2,3}-\d{3,4}-\d{4}$/;
+		
+		$.ajax({
+			url : '/user/duplicatePhoneNumber', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				newPhoneNumber
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data){ //중복
+					$('#newUserPhonNumber').val('');
+					printMsg("newUserPhonNumber", "newUserPhonNumber", "중복된 전화번호 입니다.", true)
+					$('.trueMsg').hide();
+				}else if(!regPhone.test(newPhoneNumber)){
+					$('#newUserPhonNumber').val('');
+					printMsg("newUserPhonNumber", "newUserPhonNumber", "전화번호 형식에 맞지 않습니다.", true)
+					$('.trueMsg').hide();
+				}else if(data == false && regPhone.test(newPhoneNumber)){
+					printMsg("", "newUserPhonNumber", "", false)
+					$('#successPhoneNumber').show();			
+				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//휴대폰번호 유효성 검사
+	function duplicateCellPhone() {
+		let newCellPhone = $('#newCellPhoneNumber').val();
+		let regCellPhone = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
+		
+		$.ajax({
+			url : '/user/duplicateCellPhone', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				newCellPhone
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data){//휴대폰번호 중복
+					$('#newCellPhoneNumber').val('');		
+					$('.trueMsg').hide();
+					printMsg("newCellPhoneNumber", "newCellPhoneNumber", "중복된 휴대폰번호 입니다.", true)
+				}else if(!regCellPhone.test(newCellPhone)){ //정규식에 맞지않음
+					$('#newCellPhoneNumber').val('');		
+					$('.trueMsg').hide();
+					printMsg("newCellPhoneNumber", "newCellPhoneNumber", "휴대폰번호 형식에 맞지 않습니다.", true)
+				}else if(data == false && regCellPhone.test(newCellPhone)){
+					printMsg("", "newCellPhoneNumber", "", false)
+					$('#successCellPhoneNumber').show();
+				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	//배송주소록 추가
 	function addShippingAddress() {
 		let zipCode = $('#addZipNo').val()
 		let address = $('#addAddr').val()
@@ -454,13 +703,41 @@
 .theme-form-floating
 .editCellPhoneNumber, .form-floating
 .theme-form-floating
-.pwd {
+.pwd, #orderStatus {
 	display: flex;
 }
 
 #authenticationMsg {
 	font-size: 18px;
 }
+.container-fluid-lg.recentOrderHistoy{
+	padding-left: 0px;
+}
+.btn.btn-sm.add-button.w-100.basicAddrBtn{
+	background-color: #E0EFEC;
+}
+.col-xxl-9.recentOrder{
+	margin-top: 0px;
+}
+#deliveryStatus{
+	gap:15px;
+}
+
+#deliveryStatus Button{
+	width: 90px;
+	height: 30px;
+}
+#orderStatus{
+	gap : 7px;
+}
+#orderStatus Button{
+	width: 80px;
+	height: 30px;
+}
+.orderDetailClick{
+	font-size: 24px;
+}
+
 </style>
 </head>
 
@@ -618,9 +895,9 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="pills-profile-tab"
-									data-bs-toggle="pill" data-bs-target="#pills-profile"
-									type="button" role="tab" aria-controls="pills-profile"
+								<button class="nav-link" id="pills-review-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-review"
+									type="button" role="tab" aria-controls="pills-review"
 									aria-selected="false">
 									<i data-feather="clipboard"></i>작성한 리뷰
 								</button>
@@ -667,7 +944,7 @@
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>포인트</h5>
-														<h3>3658</h3>
+														<h3>${userInfo.totalPoints }점</h3>
 													</div>
 												</div>
 											</div>
@@ -680,7 +957,7 @@
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>적립금</h5>
-														<h3>254</h3>
+														<h3>${userInfo.totalRewards }원</h3>
 													</div>
 												</div>
 											</div>
@@ -693,7 +970,7 @@
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>쿠폰</h5>
-														<h3>32158</h3>
+														<h3>${userInfo.couponCount }개</h3>
 													</div>
 												</div>
 											</div>
@@ -705,9 +982,9 @@
 									</div>
 
 									<section class="cart-section section-b-space">
-										<div class="container-fluid-lg">
+										<div class="container-fluid-lg recentOrderHistoy">
 											<div class="row g-sm-5 g-3">
-												<div class="col-xxl-9">
+												<div class="col-xxl-9 recentOrder">
 													<div class="cart-table">
 														<div class="table-responsive-xl">
 															<table class="table">
@@ -1306,21 +1583,30 @@
 											</button>
 										</div>
 									</div>
-									<div class="order-contain">
+									<div class="order-contain orderHistory">
 										<div class="order-box dashboard-bg-box">
 
-											${orderList }
-
+										<c:forEach var="order" items="${orderList }">
 											<div class="product-order-detail">
-												<c:forEach var="order" items="${orderList }">
-													<a href="#" class="order-image"> <img
-														src="${order.productImage }" class="blur-up lazyload"
-														alt="${order.productName }" id="productImg" />
-													</a>
+												<c:choose>
+													<c:when test="${order.productImage != '' }">
+														<a href="#" class="order-image"> <img
+															src="${order.productImage }" class="blur-up lazyload"
+															alt="${order.productName }" id="productImg" />
+														</a>
+													</c:when>
+													<c:otherwise>
+														<a href="#" class="order-image"> <img
+															src="/resources/assets/images/noimage.jpg" class="blur-up lazyload"
+															alt="noImg" id="productImg" />
+														</a>
+													</c:otherwise>
+												</c:choose>
 
 													<div class="order-wrap">
-														<h3>${order.orderNo }</h3>
-														<p class="text-content">${order.orderTime }</p>
+														<a class="orderDetailClick" href="orderDetail?no=${order.orderNo }">주문번호 : ${order.orderNo }</a>
+														<p class="text-content"><fmt:formatDate value="${order.orderTime }" type="date" /></p>
+														
 														<a href="#">
 															<h3>${order.productName }</h3>
 														</a>
@@ -1328,29 +1614,88 @@
 															<li>
 																<div class="size-box">
 																	<h6 class="text-content">총 수량 :</h6>
-																	<h5>${order.totalOrderCnt }</h5>
-																</div>
-															</li>
-
-
-
-															<li>
-																<div class="size-box">
-																	<h6 class="text-content">총 결제금액 :</h6>
-																	<h5>${order.actualPaymentAmount }</h5>
+																	<h5>${order.totalOrderCnt }권</h5>
 																</div>
 															</li>
 
 															<li>
 																<div class="size-box">
-																	<h6 class="text-content">Quantity :</h6>
-																	<h5>250 G</h5>
+																	<h6 class="text-content">결제금액 :</h6>
+																	<h5><fmt:formatNumber value="${order.actualPaymentAmount}" type="NUMBER" />원</h5>
+																	
+																</div>
+															</li>
+
+															<li>
+																<div class="size-box">
+																	<h6 class="text-content">배송상태 :</h6>
+																	<h5>${order.deliveryStatus }</h5>
+																</div>
+															</li>
+															
+															<li>
+																<div class="size-box">
+																	<div id="orderStatus">
+																		<c:choose>
+																			<c:when test="${order.deliveryStatus eq '출고전' }">
+																				<button
+																					class="btn theme-bg-color text-white m-0"
+																					type="button" id="button-addon1">
+																					<span>취소</span>
+																				</button>	
+																			</c:when>
+																			
+																			<c:when test="${order.deliveryStatus eq '입금전' }">
+																				<button
+																					class="btn theme-bg-color text-white m-0"
+																					type="button" id="button-addon1">
+																					<span>취소</span>
+																				</button>	
+																			</c:when>
+																			
+																			<c:when test="${order.deliveryStatus eq '출고완료' }">
+																				<button
+																					class="btn theme-bg-color text-white m-0"
+																					type="button" id="button-addon1">
+																					<span>배송조회</span>
+																				</button>	
+																				<div>${order.invoiceNumber }</div>
+																			</c:when>
+																			
+																			<c:when test="${order.deliveryStatus eq '배송중' }">
+																				<button
+																					class="btn theme-bg-color text-white m-0"
+																					type="button" id="button-addon1">
+																					<span>배송조회</span>
+																				</button>	
+																				<div>${order.invoiceNumber }</div>
+																			</c:when>
+																			
+																			<c:when test="${order.deliveryStatus eq '취소' }">
+																				<div>취소</div>	
+																				<div>${order.invoiceNumber }</div>
+																			</c:when>
+																			
+																			<c:otherwise>
+																				<button
+																					class="btn theme-bg-color text-white m-0"
+																					type="button" id="button-addon1">
+																					<span>교환</span>
+																				</button>	
+																				<button
+																					class="btn theme-bg-color text-white m-0"
+																					type="button" id="button-addon1">
+																					<span>반품</span>
+																				</button>
+																			</c:otherwise>
+																	</c:choose>
+																	</div>
 																</div>
 															</li>
 														</ul>
 													</div>
-												</c:forEach>
 											</div>
+												</c:forEach>
 										</div>
 									</div>
 								</div>
@@ -1681,6 +2026,7 @@
 									<div class="title title-flex">
 										<div>
 											<h2>배송주소록</h2>
+
 											<span class="title-leaf"> <svg
 													class="icon-width bg-gray">
                             <use
@@ -1702,13 +2048,11 @@
 
 									<div class="row g-sm-4 g-3">
 										<c:forEach var="addr" items="${userAddrList }">
+										
 											<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
+
 												<div class="address-box">
 													<div>
-														<div class="form-check">
-															<input class="form-check-input" type="radio" name="jack"
-																id="flexRadioDefault1" />
-														</div>
 
 														<c:if test="${fn:contains(addr.basicAddr,'Y')}">
 															<div class="label">
@@ -1721,7 +2065,11 @@
 															<table class="table">
 																<tbody>
 																	<tr>
-																		<td colspan="2">${userInfo.name}</td>
+																		<td colspan="2">${addr.recipient}</td>
+																	</tr>
+
+																	<tr>
+																		<td colspan="2">${addr.recipientContact}</td>
 																	</tr>
 
 																	<tr>
@@ -1744,14 +2092,23 @@
 															</table>
 														</div>
 													</div>
-
+														
+													<c:if test="${fn:contains(addr.basicAddr,'N')}">
+														<button
+															class="btn btn-sm add-button w-100 basicAddrBtn"
+															onclick="setBasicAddr(${addr.addrSeq});">
+															<i data-feather=check class="me-2"></i> 기본배송지로 설정
+														</button>
+													</c:if>
 													<div class="button-group">
 														<button class="btn btn-sm add-button w-100"
-															data-bs-toggle="modal" data-bs-target="#editProfile">
+															data-bs-toggle="modal" data-bs-target='#editProfile'
+															onclick="editShippingAddr(${addr.addrSeq});">
 															<i data-feather="edit"></i> Edit
 														</button>
 														<button class="btn btn-sm add-button w-100"
-															data-bs-toggle="modal" data-bs-target="#removeProfile">
+														data-bs-toggle="modal" data-bs-target="#removeProfile"
+															onclick="delShippingAddr(${addr.addrSeq});">
 															<i data-feather="trash-2"></i> Remove
 														</button>
 													</div>
@@ -2054,6 +2411,17 @@
 				</div>
 
 				<div class="modal-body">
+					<div class="form-floating mb-4 theme-form-floating">
+						<input type="text" class="form-control" id="recipient"
+							name="recipient" placeholder="받는사람" /><label for="recipient">받는사람</label>
+					</div>
+
+					<div class="form-floating mb-4 theme-form-floating">
+						<input type="text" class="form-control" id="recipientContact"
+							name="recipientContact" placeholder="받는사람 연락처" /><label
+							for="recipientContact">받는사람 연락처</label>
+						<p>- 포함해서 입력해주세요.</p>
+					</div>
 
 					<div>
 						<button type="button" class="btn theme-bg-color btn-md text-white"
@@ -2062,12 +2430,14 @@
 
 					<div class="form-floating mb-4 theme-form-floating">
 						<input type="text" class="form-control addZipNo" id="addZipNo"
-							name="zipCode" placeholder="우편번호" readonly />
+							name="zipCode" placeholder="우편번호" readonly /><label
+							for="addZipNo">우편번호</label>
 					</div>
 
 					<div class="form-floating mb-4 theme-form-floating">
 						<input type="text" class="form-control addAddr" id="addAddr"
-							name="address" placeholder="주소" readonly />
+							name="address" placeholder="주소" readonly /><label
+							for="addAddr">주소</label>
 					</div>
 
 					<div class="form-floating mb-4 theme-form-floating">
@@ -2165,76 +2535,30 @@
 	<!-- Location Modal End -->
 
 	<!-- Edit Profile Start -->
-	<c:forEach var="addr" items="${userAddrList }">
-	<div class="modal fade theme-modal" id="editProfile" tabindex="-1"
+
+	<div class="modal fade theme-modal" id='editProfile' tabindex="-1"
 		aria-labelledby="exampleModalLabel2" aria-hidden="true">
 		<div
 			class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen-sm-down">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title" id="exampleModalLabel2">배송지 수정</h5>
+					<div>${memberShippingAddr}</div>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
 				<div class="modal-body">
-					<div class="row g-4">
-						<div class="col-xxl-12">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="recipientName"
-										value="${userInfo.name }" /> <label for="recipientName">이름</label>
-									
-								</div>
-							</form>
-						</div>
-
-						<button type="button" class="btn theme-bg-color btn-md text-white"
-							onclick="goPopup();">주소 찾기</button>
-						<div class="col-xxl-6">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="shippingZipNoModify" name="zipCode"
-										value="${addr.zipCode }" readonly/> <label for="shippingZipNoModify">우편번호</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-xxl-6">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input class="form-control" type="text" value="${addr.address }"
-										name="address" id="shippingAddrModify" maxlength="10"
-										oninput="javascript: if (this.value.length > this.maxLength) this.value =
-                                            this.value.slice(0, this.maxLength);" readonly/>
-									<label for="shippingAddrModify">주소</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-12">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="shippingDetailAddrModify"
-										value="${addr.detailAddress }" /> <label
-										for="shippingDetailAddrModify">상세주소</label>
-								</div>
-							</form>
-						</div>
+					<div class="row g-4 editAddr">
 					</div>
 				</div>
-				<div class="modal-footer">
-					<button type="button" data-bs-dismiss="modal"
-						class="btn theme-bg-color btn-md fw-bold text-light" onclick="shippingAddrModify();">
-						변경</button>
-					<button type="button" class="btn btn-animation btn-md fw-bold"
-						data-bs-dismiss="modal">닫기</button>
+				<div class="modal-footer editAddrFooter">
+					
 				</div>
 			</div>
 		</div>
 	</div>
-	</c:forEach>
 	<!-- Edit Profile End -->
 
 	<!-- Edit Card Start -->
@@ -2305,25 +2629,19 @@
 			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
 			<div class="modal-content">
 				<div class="modal-header d-block text-center">
-					<h5 class="modal-title w-100" id="exampleModalLabel22">Are You
-						Sure ?</h5>
+					<h5 class="modal-title w-100" id="exampleModalLabel22">삭제하시겠습니까?</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<i class="fa-solid fa-xmark"></i>
 					</button>
-				</div>
-				<div class="modal-body">
-					<div class="remove-box">
-						<p>The permission for the use/group, preview is inherited from
-							the object, object will create a new permission for this object</p>
-					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-animation btn-md fw-bold"
 						data-bs-dismiss="modal">No</button>
 					<button type="button"
 						class="btn theme-bg-color btn-md fw-bold text-light"
-						data-bs-target="#removeAddress" data-bs-toggle="modal">
+						data-bs-target="#removeAddress" data-bs-toggle="modal"
+						>
 						Yes</button>
 				</div>
 			</div>
@@ -2336,20 +2654,16 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title text-center" id="exampleModalLabel12">
-						Done!</h5>
+					삭제되었습니다.</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
-				<div class="modal-body">
-					<div class="remove-box text-center">
-						<h4 class="text-content">It's Removed.</h4>
-					</div>
-				</div>
 				<div class="modal-footer pt-0">
 					<button type="button"
 						class="btn theme-bg-color btn-md fw-bold text-light"
+						onclick="location.reload();"
 						data-bs-dismiss="modal">Close</button>
 				</div>
 			</div>

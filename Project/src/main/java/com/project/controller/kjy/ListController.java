@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.project.service.kjy.ListService;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.Product;
@@ -47,10 +48,13 @@ public class ListController {
 	public String goCategory(Model model, @PathVariable String lang) {
 		// 리스트 카테고리 가져오기 + 현재 페이지 정보
 		try {
-			List<ProductCategories> lst = lService.getProductCategory(lang);
+			List<ProductCategories> lst = lService.getProductCategory(lang+"/");
 			ProductCategories pd = lService.getCategoryInfo(lang);
+			System.out.println("pd"+pd +"lst"+lst);
+			List<Products> bestSellers = lService.getProductsBsetSeller(lang);
 			model.addAttribute("categories", lst);
 			model.addAttribute("nowCategory", pd);
+			model.addAttribute("bestSellers", bestSellers);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -61,7 +65,7 @@ public class ListController {
 	}
 	
 	@RequestMapping("/categoryList/{lang}/{key}")
-	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page, @PathVariable(name="lang") String lang, HttpServletRequest request) {
+	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page,@RequestParam(value="active", defaultValue = "grid-btn d-xxl-inline-block d-none") String active, @PathVariable(name="lang") String lang, HttpServletRequest request) {
 		this.page = page;
 		String categoryKey = lang + "/" + key; 
 		
@@ -74,6 +78,7 @@ public class ListController {
 			model.addAttribute("nowCategory", nowCategory);
 			model.addAttribute("key", categoryKey);
 			model.addAttribute("page", page);
+			model.addAttribute("active", active);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -124,10 +129,9 @@ public class ListController {
 	}
 	@RequestMapping("/isLogin")
 	public ResponseEntity<Map<String, String>> checkLogin(HttpServletRequest request){
-		System.out.println("!!!!!!!!!!!!");
 		ResponseEntity<Map<String, String>> data = null;
 		Map<String, String> loginMap = new HashMap<String, String>();
-		if(request.getSession().getAttribute("loginMe") != null) {
+		if(request.getSession().getAttribute("loginMemeber") != null) {
 			loginMap.put("isLogin", "loginOK");
 			data = new ResponseEntity<Map<String,String>>(loginMap, HttpStatus.OK);
 		} else {
@@ -135,5 +139,36 @@ public class ListController {
 			data = new ResponseEntity<Map<String,String>>(loginMap, HttpStatus.OK);
 		}
 		return data;
+	}
+	
+	@RequestMapping(value = "/float", method = RequestMethod.POST)
+	public ResponseEntity<Products> getProduct(@RequestParam("id") String id){
+		ResponseEntity<Products> res = null;
+		try {
+			Products products = lService.getProductById(id);
+			res = new ResponseEntity<Products>(products, HttpStatus.OK);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			res = new ResponseEntity<Products>(HttpStatus.CONFLICT);
+			e.printStackTrace();
+		}
+		return res;
+		
+	}
+	
+	@RequestMapping("/searchPage")
+	public Model goSearching(@RequestParam(value="val", defaultValue = "notSearch") String val, Model model) {
+		if("notSearch".equals(val)) {
+			model.addAttribute("products", val);
+		} else {
+			try {
+				List<Products> lst = lService.searchProducts(val);
+				model.addAttribute("products", lst);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return model;
 	}
 }

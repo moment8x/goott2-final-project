@@ -6,19 +6,7 @@
 <meta charset="UTF-8">
 <title>Dear Books</title>
 <script type="text/javascript">
-	function delUser() {
-		$.ajax({
-			url : '/user/withdrawal', // 데이터를 수신받을 서버 주소
-			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-			async : false,
-			success : function(data) {
-				console.log(data);
-			},
-			error : function() {
-			}
-		});
-				location.href="/";
-	}
+	
 </script>
 <style type="text/css">
  .deer{
@@ -134,16 +122,16 @@
                                     <li>
                                         <div class="delivery-box">
                                             <div class="delivery-icon">
-                                                <img src="/resources/assets/svg/3/delivery.svg" class="blur-up lazyload" alt="">
+                                                <img src="/resources/assets/svg/3/leaf.svg" class="blur-up lazyload" alt="">
                                             </div>
 
                                             <div class="delivery-detail">
-                                                <h5 class="text"><a href="#">주문내역 확인하러 가기</a></h5>
+                                                <h5 class="text"><a href="myPage">마이페이지로</a></h5>
                                             </div>
                                         </div>
                                     </li>
 
-                                    <li>
+                                <!--     <li>
                                         <div class="delivery-box">
                                             <div class="delivery-icon">
                                                 <img src="/resources/assets/svg/3/leaf.svg" class="blur-up lazyload" alt="">
@@ -153,7 +141,7 @@
                                                 <h5 class="text"><a href="#">포인트/적립금/쿠폰 확인하러 가기</a></h5>
                                             </div>
                                         </div>
-                                    </li>
+                                    </li> -->
 
                                     <li>
                                         <div class="delivery-box">
@@ -169,7 +157,7 @@
                                     
                                     <li>
                                     	<button class="btn btn-animation ms-xxl-auto mt-xxl-0 mt-3 btn-md fw-bold withdrawalBtn" 
-                                    		onclick="delUser();">
+                                    		onclick="location.href='pwdCheck';">
 			                              탈퇴
 			                            </button>
                                     </li>

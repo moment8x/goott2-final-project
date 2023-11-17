@@ -1,40 +1,33 @@
 package com.project.controller.kjy;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.security.SecureRandom;
-import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-
 import com.project.service.kjy.LoginService;
 import com.project.vodto.kjy.LoginDTO;
 import com.project.vodto.kjy.Memberkjy;
@@ -47,11 +40,41 @@ public class LoginController {
 	@Inject
 	private LoginService loginService;
 	
-//	@Inject
-//	private BCryptPasswordEncoder passwordEncoder;
+//	private BCryptPasswordEncoder passenc;
+	
+	private String BeforeUri = null;
 	
 	@RequestMapping("/")
-	public String goLogin(HttpServletRequest request, HttpServletResponse response) {
+	public String goLogin(HttpServletRequest request) {
+		// 이전 경로 설정
+		this.BeforeUri = request.getHeader("referer");
+		
+		// 자동로그인 여부 체크후 적용
+		Cookie[] cookies = request.getCookies();
+		String value = "";
+		if(cookies != null) {
+			for(Cookie cookie : cookies) {
+				if("remCo".equals(cookie.getName())) {
+					value = cookie.getValue();
+					String member_id = value.split("/a@")[0];
+					String key = value.split("/a@")[1];
+					try {
+						Memberkjy loginMember = loginService.getRememberCheck(member_id, key);
+						if(loginMember != null) {
+							request.getSession().setAttribute("loginMember", loginMember);
+						}
+						System.out.println("자동로그인!!");
+						return "redirect:"+this.BeforeUri;
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+			
+			
+		}
+		
 		
 		return "/login/login";
 	}
@@ -63,15 +86,12 @@ public class LoginController {
 			Memberkjy loginMember = loginService.getLogin(loginDTO);
 			if(loginMember != null) {
 					request.getSession().setAttribute("loginMember", loginMember);
-					if(loginDTO.getRemember() != null) {
-						Cookie cookie = new Cookie("al", loginMember.getMember_id());
-						cookie.setMaxAge(60 * 60 * 24* 7);
-						cookie.setPath("/");
-						response.addCookie(cookie);
-					}
-				model.addObject("loginMember", loginMember);
 				model.addObject("status", "로그인 성공");
-				model.setViewName("/index");
+				if(BeforeUri != null) {
+					model.setViewName("redirect:"+BeforeUri);
+				} else {
+					model.setViewName("/login/login");
+				}
 			} else {
 				model.addObject("status", "로그인 실패");
 				model.setViewName("/login/login");
@@ -97,8 +117,28 @@ public class LoginController {
 	}
 	
 	@RequestMapping("/logout")
-	public void goLogOut() {
+	public String goLogOut(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession ses = request.getSession();
+		ses.invalidate();
 		
+		Cookie[] cookies = request.getCookies();
+		if(cookies != null) {
+			for(Cookie cookie : cookies) {
+				if("remCo".equals(cookie.getName())) {
+					cookie.setMaxAge(0);
+					cookie.setPath("/");
+					response.addCookie(cookie);
+				}
+			}
+		}
+		
+		
+		System.out.println("로그아웃 됨!");
+		if(BeforeUri != null) {
+		return "redirect:"+this.BeforeUri;
+		} else {
+			return "/index";
+		}
 	}
 	@RequestMapping("/naverLogin")
 	public String naverLogin(HttpServletRequest request) throws UnsupportedEncodingException {
@@ -116,7 +156,7 @@ public class LoginController {
 		return "redirect:" + apiURL;
 	}
 	@RequestMapping("/naverLoginCallBack")
-	public String naverLoginCallBack(HttpServletRequest request) {
+	public ModelAndView naverLoginCallBack(HttpServletRequest request, ModelAndView model) {
 	    String clientId = "QvibsLi5PSZRGzsKS_Zp";
 	    String clientSecret = "o6h8h8IDEQ";
 	    String code = request.getParameter("code");
@@ -124,7 +164,8 @@ public class LoginController {
 
 	    if (state == null || !state.equals(request.getSession().getAttribute("state"))) {
 	        // 상태(state) 값 검증에 실패한 경우, 예외 처리 또는 로깅
-	        return "error"; // 예시로 "error" 페이지를 리턴
+	    	model.setViewName("error");
+	        return model; // 예시로 "error" 페이지를 리턴
 	    }
 
 	    String redirectURI = "http://localhost:8081/login/naverLoginCallBack";
@@ -152,7 +193,7 @@ public class LoginController {
 	            res.append(inputLine);
 	        }
 	        br.close();
-	        System.out.println("무" + res.toString());
+	        System.out.println("토큰가져오기" + res.toString());
 
 	        if (responseCode == 200) {
 	            ObjectMapper objectMapper = new ObjectMapper();
@@ -170,7 +211,7 @@ public class LoginController {
 	                int userInfoResponseCode = userInfoCon.getResponseCode();
 
 	                if (userInfoResponseCode == 200) {
-	                    BufferedReader userInfoReader = new BufferedReader(new InputStreamReader(userInfoCon.getInputStream()));
+	                    BufferedReader userInfoReader = new BufferedReader(new InputStreamReader(userInfoCon.getInputStream(), "UTF-8"));
 	                    StringBuilder userInfoResponse = new StringBuilder();
 	                    String userInfoInputLine;
 	                    while ((userInfoInputLine = userInfoReader.readLine()) != null) {
@@ -178,12 +219,32 @@ public class LoginController {
 	                    }
 	                    userInfoReader.close();
 	                    
+	                    JsonNode userInfoJson = objectMapper.readTree(userInfoResponse.toString());
+	                    String naverId = userInfoJson.get("response").get("id").asText();
+//	                    String naverUserInfo = userInfoJson.get("response").asText();
+	                    JsonNode jsonUserInfo = userInfoJson.get("response");
+	                    
 	                    System.out.println("user : " + userInfoResponse.toString());
-	                    return "success"; // 사용자 정보 가져오기에 성공한 경우
+	                    
+	                    Memberkjy naverLoginUser = loginService.getMemberById(naverId);
+	         
+	                    if(naverLoginUser == null) {
+	                    	model.setViewName("/register/register");
+	                    	model.addObject("userInfo", jsonUserInfo);
+	                    	return model;
+	                    } else if(BeforeUri != null) {
+	                    	request.getSession().setAttribute("loginMember", naverLoginUser);
+	                    	model.setViewName("redirect:" + BeforeUri);
+	                    } else {
+	                    	model.setViewName("/index");
+	                    }
+	                    
+	                    return model; // 사용자 정보 가져오기에 성공한 경우
 	                } else {
 	                    // 사용자 정보 가져오기에 실패한 경우, 오류 처리 로직 추가
 	                    System.out.println("Error getting user info");
-	                    return "error";
+	                    model.setViewName("error");
+	                    return model;
 	                }
 	            } else {
 	                // 액세스 토큰이 유효하지 않은 경우, 리프레시 토큰을 사용하여 갱신
@@ -207,23 +268,49 @@ public class LoginController {
 	                            userInfoResponse.append(userInfoInputLine);
 	                        }
 	                        userInfoReader.close();
-	                        return "success"; // 사용자 정보 가져오기에 성공한 경우
+	                        
+	                        JsonNode userInfoJson = objectMapper.readTree(userInfoResponse.toString());
+		                    String naverId = userInfoJson.get("response").get("id").asText();
+		                    String naverUserInfo = userInfoJson.get("response").asText();
+		                    
+		                    System.out.println("user : " + userInfoResponse.toString());
+		                    
+		                    Memberkjy naverLoginUser = loginService.getMemberById(naverId);
+		                    
+		                    if(naverLoginUser == null) {
+		                    	model.setViewName("/register/register");
+		                    	model.addObject("userInfo", naverUserInfo);
+		                    	return model;
+		                    } else {
+		                    	request.getSession().setAttribute("loginMember", naverLoginUser);
+		                    	if(BeforeUri != null) {
+			                    	model.setViewName("redirect:" + BeforeUri);
+			                    } else {
+			                    	model.setViewName("/index");
+			                    }
+		                    } 
+		                    
+		                    return model; // 사용자 정보 가져오기에 성공한 경우
+	                                  
 	                    } else {
 	                        // 사용자 정보 가져오기에 실패한 경우, 오류 처리 로직 추가
 	                        System.out.println("Error getting user info");
-	                        return "error";
+	                        model.setViewName("error");
+	                        return model;
 	                    }
 	                } else {
 	                    // 액세스 토큰 갱신이 실패한 경우
 	                    System.out.println("Error refreshing access token");
-	                    return "error";
+	                    model.setViewName("error");
+	                    return model;
 	                }
 	            }
 	        }
 	    } catch (Exception e) {
 	        // 예외 로깅
 	        e.printStackTrace();
-	        return "error"; // 또는 다른 오류 처리 로직 추가
+	        model.setViewName("error");
+	        return model; // 또는 다른 오류 처리 로직 추가
 	    }
 
 	    return null;
@@ -254,7 +341,6 @@ public class LoginController {
 		        }
 		        br.close();
 		        
-		        System.out.println("야" + res.toString());
 		        if (responseCode == 200) {
 		            // 토큰이 유효함
 		            return true;
@@ -288,9 +374,202 @@ public class LoginController {
         while ((inputLine = br.readLine()) != null) {
             res.append(inputLine);
         }
-        br.close();
+        
+        String accessToken = null;
+        if (responseCode == 200) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(res.toString());
+            accessToken = jsonNode.get("access_token").asText();
+        }
+            br.close();
+            
         System.out.println("호"+res.toString());
    
-		return null;
+		return accessToken;
+	}
+	
+	@RequestMapping("/kakaoLogin")
+	public void kakaoLogin(HttpServletRequest request, ModelAndView model) {
+		System.out.println("와! 카카오!");
+		String code = request.getParameter("code");
+		System.out.println("인가코드 : "+code);
+	
+		try {
+			URL getToken = new URL("https://kauth.kakao.com/oauth/token");
+			HttpURLConnection urlCon = (HttpURLConnection)getToken.openConnection();
+			urlCon.setRequestMethod("POST");
+			urlCon.setRequestProperty("Content-type","application/x-www-form-urlencoded;charset=utf-8");
+			urlCon.setDoOutput(true);
+			
+			String prop = "grant_type=authorization_code&client_id=ea14e924ac0db2a6536242752c1b5ae1"
+					+"&redirect_uri=http://localhost:8081/login/kakaoLogin"+"&code="+code+"&client_secret=gx1gQFu0lkWKOB3bhtm3K9WonXTrY1OB";
+			DataOutputStream dos = new DataOutputStream(urlCon.getOutputStream());
+			dos.writeBytes(prop);
+			dos.flush();
+			dos.close();
+			
+			int responseCode = urlCon.getResponseCode();
+			
+			System.out.println(urlCon.getInputStream());
+			 if (responseCode == 200) {
+		            // HTTP 응답 처리 및 토큰 추출
+		            BufferedReader in = new BufferedReader(new InputStreamReader(urlCon.getInputStream()));
+		            String inputLine;
+		            StringBuilder response = new StringBuilder();
+		            while ((inputLine = in.readLine()) != null) {
+		                response.append(inputLine);
+		            }
+		            in.close();
+		            
+		            // 응답에서 토큰 정보 추출
+		            System.out.println("res : "+ response.toString());
+		            JsonNode jsonMapper = new ObjectMapper().readTree(response.toString());
+		            String access_token = jsonMapper.get("access_token").asText();
+		            String refresh_token = jsonMapper.get("refresh_token").asText();
+		            
+		            if(isAccessTokenRight(access_token)) { // 유효기간 검사
+		            	//지나지 않았다면
+		            	URL getInfoUrl = new URL("https://kapi.kakao.com/v2/user/me");
+		            	HttpURLConnection getInfoUrlCon = (HttpURLConnection) getInfoUrl.openConnection();
+		            	getInfoUrlCon.setRequestMethod("GET");
+		            	getInfoUrlCon.setRequestProperty("Authorization", "Bearer " + access_token);
+		            	getInfoUrlCon.setRequestProperty("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+		            	
+		            	int getInfoResponseCode = getInfoUrlCon.getResponseCode();
+
+		                if (getInfoResponseCode == 200) {
+		                    BufferedReader getInfoReader = new BufferedReader(new InputStreamReader(getInfoUrlCon.getInputStream(), "UTF-8"));
+		                    StringBuilder getInfoResponse = new StringBuilder();
+		                    String getInfoInputLine;
+		                    while ((getInfoInputLine = getInfoReader.readLine()) != null) {
+		                    getInfoResponse.append(getInfoInputLine);
+		                    }
+		                    getInfoReader.close();
+		                    
+		                    System.out.println("카카오로그인 유저 정보다람쥐썬더 " + getInfoResponse.toString());
+		                }      
+		            } else {
+		            	Map<String, String> tokenMap = refreshKakaoToken(access_token, refresh_token);
+		            	access_token = tokenMap.get("access_token");
+		            	refresh_token = tokenMap.get("refresh_token");
+		            	
+		            	URL getInfoUrl = new URL("https://kapi.kakao.com/v2/user/me");
+		            	HttpURLConnection getInfoUrlCon = (HttpURLConnection) getInfoUrl.openConnection();
+		            	getInfoUrlCon.setRequestMethod("GET");
+		            	getInfoUrlCon.setRequestProperty("Authorization", "Bearer " + access_token);
+		            	getInfoUrlCon.setRequestProperty("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+		            	
+		            	int getInfoResponseCode = getInfoUrlCon.getResponseCode();
+
+		                if (getInfoResponseCode == 200) {
+		                    BufferedReader getInfoReader = new BufferedReader(new InputStreamReader(getInfoUrlCon.getInputStream(), "UTF-8"));
+		                    StringBuilder getInfoResponse = new StringBuilder();
+		                    String getInfoInputLine;
+		                    while ((getInfoInputLine = getInfoReader.readLine()) != null) {
+		                    getInfoResponse.append(getInfoInputLine);
+		                    }
+		                    getInfoReader.close();
+		                    
+		                    System.out.println("카카오로그인 유저 정보다람쥐썬더 " + getInfoResponse.toString());
+		                }
+		            }
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private Map<String, String> refreshKakaoToken(String access_token, String refresh_token) {
+		// 토큰 갱신
+		Map<String, String> tokenMap = null;
+		try {
+			URL url = new URL("https://kauth.kakao.com/oauth/token");
+			HttpURLConnection rfCon = (HttpURLConnection) url.openConnection();
+			rfCon.setRequestMethod("POST");
+			rfCon.setRequestProperty("Content-type","application/x-www-form-urlencoded;charset=utf-8");
+			rfCon.setDoOutput(true);
+			
+			String prop = "grant_type=refresh_token&client_id=ea14e924ac0db2a6536242752c1b5ae1"
+					+"&refresh_token="+refresh_token+"&client_secret=gx1gQFu0lkWKOB3bhtm3K9WonXTrY1OB";
+			DataOutputStream dos = new DataOutputStream(rfCon.getOutputStream());
+			dos.writeBytes(prop);
+			dos.flush();
+			dos.close();
+
+			int responseCode = rfCon.getResponseCode();
+			BufferedReader in = null;
+			if (responseCode == 200) { // 정상 호출
+	            
+	            in = new BufferedReader(new InputStreamReader(rfCon.getInputStream()));
+	            String inputLine;
+	            StringBuilder response = new StringBuilder();
+	            while ((inputLine = in.readLine()) != null) {
+	                response.append(inputLine);
+	            }
+	            in.close();
+	            
+	            // 응답에서 토큰 정보 추출
+	            System.out.println("res : "+ response.toString());
+	            JsonNode jsonMapper = new ObjectMapper().readTree(response.toString());
+	            String access_token_new = jsonMapper.get("access_token").asText();
+	            String refresh_token_new = jsonMapper.get("refresh_token").asText();
+	            tokenMap = new HashMap<String, String>();
+	            tokenMap.put("aceess_token", access_token_new);
+	            tokenMap.put("refresh_token_new", refresh_token_new);
+	            
+	            
+	        } else {  // 에러 발생
+	        	in = new BufferedReader(new InputStreamReader(rfCon.getErrorStream()));
+	        }
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return tokenMap;
+	}
+
+	private boolean isAccessTokenRight(String access_token) {
+		boolean result = false;
+		try {
+			URL url = new URL("https://kapi.kakao.com/v1/user/access_token_info");
+			HttpURLConnection acCon = (HttpURLConnection) url.openConnection();
+			acCon.setRequestMethod("GET");
+			acCon.setRequestProperty("Authorization","Bearer "+access_token);
+			int responseCode = acCon.getResponseCode();
+			
+			BufferedReader br = new BufferedReader(new InputStreamReader(acCon.getInputStream()));
+			if (responseCode == 200) { // 정상 호출
+			result = true;
+	            br = new BufferedReader(new InputStreamReader(acCon.getInputStream()));
+	        } else if(responseCode == 401) { // 유효기간 만료
+	        	result = false;
+			}else {  // 에러 발생
+	            br = new BufferedReader(new InputStreamReader(acCon.getErrorStream()));
+	        }
+	        String inputLine;
+	        StringBuilder res = new StringBuilder();
+	        while ((inputLine = br.readLine()) != null) {
+	            res.append(inputLine);
+	        }
+	        br.close();
+	        
+	        System.out.println("액세스 유효 "+res.toString());
+	        
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	@RequestMapping("/login/forgot")
+	public Model forgot(@RequestParam("status") String status, Model model) {
+		model.addAttribute("status", status);
+		
+		return model;
 	}
 }
