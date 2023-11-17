@@ -43,10 +43,13 @@ public class LoginDaoImpl implements LoginDao {
 	@Override
 	public Memberkjy selectRememberCheck(String memberId, String key) throws Exception {
 		Map<String, Object> params = new HashMap<String, Object>();
+		System.out.println("id : " + memberId + ", " + "key : " + key);
 		params.put("memberId", memberId);
 		params.put("key", key);
+		Memberkjy m = ses.selectOne(ns+".rememberCheck", params);
+		System.out.println("member : " + m);
 		
-		return ses.selectOne(ns+".rememberCheck", params);
+		return m;
 	}
 
 	@Override

@@ -32,6 +32,7 @@
 
 		$('#payModalBtn').on("click", function() {
 			let pId = $(this).attr("value");
+			console.log("pid" + pId)
 			$.ajax({
 				url : '/list/isLogin',
 				type : 'GET',
@@ -71,10 +72,10 @@
 	 
 	function payLink(data, pId) {
 		if(data.isLogin == "loginOK"){
-			$('#MemberLoginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=Y");
+			$('#MemberLoginPay').attr("href","/order/requestOrder?productId="+pId+"&isLogin=Y");
 		} else {
 			$('#loginPay').attr("href","/login/");
-			$('#noLoginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=N");
+			$('#noLoginPay').attr("href","/order/requestOrder?productISd="+pId+"&isLogin=N");
 		}
 	}
 
@@ -411,7 +412,7 @@
 							 -->
 							 <c:choose>
 							 	<c:when test="${sessionScope.loginMember != null }">
-							 		<a href="/order/requestOrder?product_id="+pId+"&isLogin=Y" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+							 		<a href="" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
 							 	</c:when>
 							 	<c:otherwise>
 							 		<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>

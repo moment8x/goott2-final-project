@@ -16,6 +16,42 @@
 </script>
 <title>Insert title here</title>
 <script>
+		let regTypeId = /^(?=.*[A-Za-z]+)(?=.*\d+)[A-Za-z0-9]{4,13}$/;
+		let regTypePd = /^(?=.*[a-zA-Z]+)(?=.*[!@#$%^*+=-])(?=.*[0-9]+).{8,15}$/;
+		let resultId = false;
+		let resultPd = false;
+	$(function() {
+		
+		$('.log-in-form input[type=text]').on("blur", function() {
+			if(regTypeId.test($(this).val())){
+				$(".idError").html("");
+				resultId = true;
+			} else {
+    			$(".idError").html("아이디는 영문과 숫자가 반드시 포함된 4~13글자여야 합니다.");
+    			resultId = false;
+    		}
+		});
+		
+		$('.log-in-form input[type=password]').on("blur", function() {
+			if(regTypePd.test($(this).val())){
+				$(".pdError").html("");
+				resultPd = true;
+			} else {
+    			$(".pdError").html("올바른 비밀번호가 아닙니다.");
+    			resultPd = false;
+    		}
+		});
+	});
+
+	function allRight() {
+		
+		if(resultId == true && resultPd == true){
+			return true;
+		}
+		window.alert("놉");
+		return false;
+	}
+	
   function loginWithKakao() {
     Kakao.Auth.authorize({
       redirectUri: 'http://localhost:8081/login/kakaoLogin',
@@ -57,6 +93,9 @@
 	}
 	#naver_id_login img{
 		width: 50%
+	}
+	.idError, .pdError{
+		color: red;
 	}
 </style>
 <!-- Callback 처리 -->
@@ -149,14 +188,14 @@
                         </div>
 
                         <div class="input-box">
-                            <form class="row g-4" action="/login/" method="post">
+                            <form class="row g-4" action="/login/" method="post" onsubmit="return allRight();">
                                 <div class="col-12">
                                     <div class="form-floating theme-form-floating log-in-form">
-                                        <input type="text" class="form-control" id="text" name="username" placeholder="">
-                                        <label for="text">아이디를 입력해 주세요</label>
+                                        <input type="text" class="form-control" id="username" name="username" placeholder="">
+                                        <label for="username">아이디를 입력해 주세요</label>
                                     </div>
                                 </div>
-
+                                <div class="idError"></div>
                                 <div class="col-12">
                                     <div class="form-floating theme-form-floating log-in-form">
                                         <input type="password" class="form-control" id="password"
@@ -164,7 +203,7 @@
                                         <label for="password">비밀번호를 입력해 주세요</label>
                                     </div>
                                 </div>
-
+                                <div class="pdError"></div>
                                 <div class="col-12">
                                     <div class="forgot-box">
                                         <div class="form-check ps-0 m-0 remember-box">
@@ -177,7 +216,7 @@
                                 </div>
 
                                 <div class="col-12">
-                                    <button class="btn btn-animation w-100 justify-content-center" type="submit">로그인</button>
+                                    <button class="btn btn-animation w-100 justify-content-center" type="submit" >로그인</button>
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                 </div>
                             </form>

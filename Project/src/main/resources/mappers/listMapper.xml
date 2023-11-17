@@ -67,7 +67,56 @@
   	</select>
   	
   	<select id="selectProductsSearching" resultMap="productsResultMap">
-  		select p.*, (SELECT i.product_image FROM product_images i WHERE i.product_id = p.product_id LIMIT 1) AS product_image from products p where p.product_name like #{value}
+  		select p.*, (SELECT i.product_image FROM product_images i WHERE i.product_id = p.product_id LIMIT 1) AS product_image from products p where p.product_name like #{value} order by ${sort} limit #{startRowIndex}, #{endRowIndex}
   	</select>
-  
+ 
+ 	<resultMap type="com.project.vodto.kjy.SearchVO" id="searchVo">
+ 		<result property="category_name" column="category_name"/>
+ 		<result property="category_key" column="category_key"/>
+ 		<result property="category_count" column="category_count"/>
+ 	</resultMap>
+ 
+  	<select id="selectSearchProductsCategories" resultMap="searchVo">
+  		SELECT (SELECT c.category_name FROM product_categories c WHERE c.category_key = p.category_key) AS category_name, (select c.category_key from product_categories c where c.category_key = p.category_key) as category_key , COUNT(*) AS category_count FROM products p WHERE p.product_name LIKE #{value} group by category_name order by category_count desc
+  	</select>
+  	
+  	<select id="selectSearchPrductsKey" resultType="String">
+  		select category_key from products where product_name like CONCAT("%", #{val} ,"%")
+  	</select>
+  	
+  	<select id="selectProductsSearchingWithFilter" resultMap="productsResultMap">
+  		select p.*, (SELECT i.product_image FROM product_images i WHERE i.product_id = p.product_id LIMIT 1) AS product_image from products p where p.product_name like CONCAT("%", #{val}, "%") 
+  			<if test="checkedList  != null and checkedList.size() > 0">
+  			and p.category_key in
+  				<foreach item="checked" collection="checkedList" separator=","  open="(" close=")">
+		  			#{checked}
+		  		</foreach>
+  			</if>
+  			<if test="checkedLang != null and checkedLang.size() > 0">
+  				and (
+  				<foreach item="lang" collection="checkedLang" separator="or">
+  					p.category_key like CONCAT(#{lang}, "%")
+  				</foreach>
+  				)
+  			</if>
+  			order by ${sort} limit #{startRowIndex}, #{endRowIndex}
+  	</select>
+  	
+  	<select id="selectSearchProductCount" resultType="int">
+  		select count(*) from products where product_name like CONCAT("%", #{val}, "%")
+  		<if test="checkedList  != null and checkedList.size() > 0">
+  			and category_key in
+  				<foreach item="checked" collection="checkedList" separator=","  open="(" close=")">
+		  			#{checked}
+		  		</foreach>
+  			</if>
+  			<if test="checkedLang != null and checkedLang.size() > 0">
+  				and (
+  				<foreach item="lang" collection="checkedLang" separator="or">
+  					category_key like CONCAT(#{lang}, "%")
+  				</foreach>
+  				)
+  			</if>
+  	</select>
+  	
   </mapper>

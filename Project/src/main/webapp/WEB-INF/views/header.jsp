@@ -38,11 +38,26 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     <link rel="stylesheet" type="text/css" href="/resources/assets/css/bulk-style.css">
     <!-- Template css -->
     <link id="color-link" rel="stylesheet" type="text/css" href="/resources/assets/css/style.css">
+    <script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
     
     <script>
+    $(function() {
+    	$("#searching-var").on("keyup", function(e) {
+			if(e.keyCode == "13"){
+				let val = $(this).val();
+		    	let encodedVal = encodeURIComponent(val);
+		    	let url = "/list/searchPage?val=" + encodedVal;
+		    	window.location.href=url;
+			}
+		})
+	})
+    
+    
     function searching() {
     	let val = $("#searching-var").val();
-    	let url = "/list/searchPage?val=" + val;
+    	let encodedVal = encodeURIComponent(val);
+    	let url = "/list/searchPage?val=" + encodedVal;
     	window.location.href=url;
 	}
     </script>

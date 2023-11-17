@@ -33,6 +33,7 @@ import com.project.vodto.Product;
 import com.project.vodto.kjy.Memberkjy;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
+import com.project.vodto.kjy.SearchVO;
 
 @Controller
 @RequestMapping("/list/*")
@@ -87,7 +88,7 @@ public class ListController {
 		// 카테고리 목록 가져오기
 		try {
 			List<ProductCategories> lstPC= lService.getProductCategory(categoryKey);
-			if (lstPC != null) {
+			if (lstPC != null) { 
 				model.addAttribute("productCategory", lstPC);
 			}
 		} catch (Exception e) {
@@ -98,7 +99,8 @@ public class ListController {
 		// 상품 가져오기
 		try {
 			Map<String, Object> map = lService.getProductForList(categoryKey, page, sortBy);
-			List<Product> lst = (List<Product>)map.get("list_product");
+			List<Products> lst = (List<Products>)map.get("list_product");
+			System.out.println("리스트는"+lst);
 			PagingInfo paging = (PagingInfo)map.get("paging_info");
 			model.addAttribute("products", lst);
 			model.addAttribute("paging_info", paging);
@@ -131,7 +133,7 @@ public class ListController {
 	public ResponseEntity<Map<String, String>> checkLogin(HttpServletRequest request){
 		ResponseEntity<Map<String, String>> data = null;
 		Map<String, String> loginMap = new HashMap<String, String>();
-		if(request.getSession().getAttribute("loginMe") != null) {
+		if(request.getSession().getAttribute("loginMember") != null) {
 			loginMap.put("isLogin", "loginOK");
 			data = new ResponseEntity<Map<String,String>>(loginMap, HttpStatus.OK);
 		} else {
@@ -157,18 +159,51 @@ public class ListController {
 	}
 	
 	@RequestMapping("/searchPage")
-	public Model goSearching(@RequestParam(value="val", defaultValue = "notSearch") String val, Model model) {
+	public Model goSearching(@RequestParam(value="val", defaultValue = "notSearch") String val,
+			@RequestParam(value="page", defaultValue = "1") int page, 
+			@RequestParam(value="sort", defaultValue = "aToz") String sort, Model model) {
 		if("notSearch".equals(val)) {
 			model.addAttribute("products", val);
 		} else {
 			try {
-				List<Products> lst = lService.searchProducts(val);
+				// 검색에 해당하는 상품 가져오기
+				Map<String, Object> map = lService.searchProducts(val, sort, page);
+				// 검색에 해당하는 카테고리 정보 가져오기
+				List<SearchVO> listCategoryies = lService.searchProductsCateogries(val);
+				// 검색에 해당하는 언어 정보 가져오기
+				List<Integer> listLangInt = lService.searchProductslang(val);
+				List<Products> lst = (List<Products>) map.get("pList");
+				PagingInfo paging = (PagingInfo) map.get("paging");
 				model.addAttribute("products", lst);
+				model.addAttribute("categories", listCategoryies);
+				model.addAttribute("lang", listLangInt);
+				model.addAttribute("paging", paging);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		return model;
+	}
+	
+	@RequestMapping(value="/searchPageWithFilter", method = RequestMethod.POST)
+	public ResponseEntity<Map<String, Object>> productListWithFilter(@RequestParam(value ="val", defaultValue = "notSearch") String val,
+			@RequestParam(value = "checkedList[]", defaultValue = "") List<String> checkedList,
+			@RequestParam(value = "checkedLang[]", defaultValue = "") List<String> checkedLang,
+			@RequestParam(value = "sort", defaultValue = "aToz") String sort,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			Model model) {
+		ResponseEntity<Map<String, Object>> mapJson = null;
+		try {
+			Map<String, Object> map = lService.searchProductsWithFilter(val, checkedList, checkedLang, sort, page);
+			mapJson = new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mapJson = new ResponseEntity<Map<String, Object>>(HttpStatus.CONFLICT);
+		}
+		
+		
+		return mapJson;
 	}
 }
