@@ -19,11 +19,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
-    <link
+    <link 
         href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
         rel="stylesheet">
-        
-        
         
     <!-- bootstrap css -->
     <link id="rtl-link" rel="stylesheet" type="text/css" href="/resources/assets/css/vendors/bootstrap.css">
@@ -41,8 +39,13 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
     
+    <!-- latest jquery -->
+    <script src="/resources/assets/js/jquery-3.6.0.min.js"></script>
+    
     <script>
     $(function() {
+    	showCart();
+    	
     	$("#searching-var").on("keyup", function(e) {
 			if(e.keyCode == "13"){
 				let val = $(this).val();
@@ -74,12 +77,91 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 				dataType: "json",
 				async: false,
 				success: function (data) {
-					console.log(data);
-					//showCart();
+					console.log("data", data);
+					if (data.status === "success") {
+						newCart(data.cartItems);
+					}
 				}, error: function (data) {
 					console.log(data);
 				}
 			});
+		}
+		
+		function showCart() {
+			let output = "";
+			let output2 = "";
+			let output3 = "";
+			//let output3 = '<i data-feather="shopping-cart"></i>';
+			
+			output += `<c:if test='${cartItems != "none"}'>`;
+			
+			output += `<c:forEach var="item" items="${cartItems}">`;
+			output += `<li class="product-box-contain">`;
+			output += `<div class="drop-cart">`;
+    		output += `<a href="#" class="drop-image">`;
+    		output += `<img src="${item.productImage}" class="blur-up lazyload" alt=""></a>`;
+    		output += `<div class="drop-contain">`;
+    		output += `<a href="#">`;
+    		output += `<h5>${item.productName}</h5></a>`;
+    		output += `<h6><span>1 x</span> ${item.sellingPrice}원</h6>`;
+    		output += `<button class="close-button close_button" onclick="delCart('${item.productId}');">`;
+    		output += `<i class="fa-solid fa-xmark"></i></button></div></div></li>`;
+    		output += `</c:forEach></c:if>`;
+    		output += `<c:if test='${cartItems == "none"}'>`;
+    		output += `등록된 상품이 없습니다.</c:if>`;
+    		
+    		output2 += `<h5>Total :</h5>`;
+    		output2 += `<c:if test='${cartItems != "none"}'>`;
+    		output2 += `<c:set var="total" value="0" />`;
+            output2 += `<c:forEach var="item" items="${cartItems}" varStatus="status">`;
+            output2 += `<c:set var="total" value="${total + item.sellingPrice}" />`;
+            output2 += `</c:forEach>`;
+            output2 += `<c:out value="${total }"/>원</c:if>`;
+            output2 += `<c:if test='${cartItems == "none"}'>--</c:if>`;
+            
+            output3 += `<c:if test='${cartItems != "none"}'>`;
+            output3 += `<span class="position-absolute top-0 start-100 translate-middle badge">${cartItems.size()}`;
+            output3 += `<span class="visually-hidden">unread messages</span></span></c:if>`;
+            
+			$('.cart-list').html(output);
+			$('.price-box').html(output2);
+			$('.red-icon').html(output3);
+		}
+		
+		function newCart(items) {
+			let output = "";
+			let output2 = '<h5>Total :</h5>';
+			let output3 = '';
+			
+			if (items !== "none") {
+				let total = 0;
+				items.forEach(function (item) {
+					output += `<li class="product-box-contain">`;
+					output += `<div class="drop-cart">`;
+		    		output += `<a href="#" class="drop-image">`;
+		    		output += '<img src=\"' + item.productImage + '\" class="blur-up lazyload" alt=""></a>';
+		    		output += `<div class="drop-contain">`;
+		    		output += `<a href="#">`;
+		    		output += '<h5>' + item.productName + '</h5></a>';
+		    		output += '<h6><span>1 x</span>' + item.sellingPrice + '원</h6>';
+		    		output += '<button class="close-button close_button"';
+		    		output += 'onclick=\"delCart(\'' + item.productId + '\');\">';
+		    		output += `<i class="fa-solid fa-xmark"></i></button></div></div></li>`;
+		    		
+		            total += item.sellingPrice;
+				});
+				output2 += total + '원';
+				output3 += '<span class="position-absolute top-0 start-100 translate-middle badge">';
+				output3 += items.length + '<span class="visually-hidden">unread messages</span></span>';
+			} else {
+				output += '등록된 상품이 없습니다.';
+	            output2 += '--';
+	            // output3에 빨간거 없애기!
+			}
+			
+			$('.cart-list').html(output);
+			$('.price-box').html(output2);
+			$('.red-icon').html(output3);
 		}
 	</script>
 	
@@ -261,50 +343,17 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                     <li class="right-side">
                                         <div class="onhover-dropdown header-badge">
                                             <button type="button" class="btn p-0 position-relative header-wishlist">
-                                                <i data-feather="shopping-cart"></i>
-                                                <span class="position-absolute top-0 start-100 translate-middle badge">${cartItems.size()}
-                                                    <span class="visually-hidden">unread messages</span>
-                                                </span>
+                                            	<i data-feather="shopping-cart"></i>
+                                            	<div class="red-icon"></div>
                                             </button>
 
                                             <div class="onhover-div">
                                                 <ul class="cart-list">
-                                                	<c:choose>
-                                                		<c:when test="${cartItems.size() > 0}">
-                                                			<c:forEach var="item" items="${cartItems}">
-                                                				<li class="product-box-contain">
-                                                				<div class="drop-cart">
-                                                				<a href="#" class="drop-image">
-                                                				<img src="${item.productImage}" class="blur-up lazyload" alt=""></a>
-                                                				<div class="drop-contain">
-                                                				<a href="#">
-                                                				<h5>${item.productName}</h5></a>
-                                                				<h6><span>1 x</span> ${item.sellingPrice}원</h6>
-                                                				<button class="close-button close_button" onclick="delCart('${item.productId}');">
-                                                				<i class="fa-solid fa-xmark"></i></button></div></div></li>
-                                                			</c:forEach>
-                                                		</c:when>
-                                                		<c:otherwise>
-                                                			등록된 상품이 없습니다.
-                                                		</c:otherwise>
-                                                	</c:choose>
+                                                	
                                                 </ul>
 
                                                 <div class="price-box">
-                                                    <h5>Total :</h5>
-                                                    <c:choose>
-                                                    	<c:when test="${cartItems.size() > 0}">
-                                                    		<c:set var="total" value="0" />
-                                                    		<c:forEach var="item" items="${cartItems}" varStatus="status">
-                                                    			<c:set var="total" value="${total + item.sellingPrice}" />
-                                                    			 <!-- <div id="sellingPrice${status.index }" style="display: none">${item.sellingPrice }</div>  -->
-                                                    		</c:forEach>
-                                                    		<c:out value="${total }"/>원
-                                                    	</c:when>
-                                                    	<c:otherwise>
-                                                    		--
-                                                    	</c:otherwise>
-                                                    </c:choose>
+                                                    
                                                 </div>
 
                                                 <div class="button-group">
@@ -749,8 +798,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     
     <!-- Header End -->
     
-	<!-- latest jquery -->
-    <script src="/resources/assets/js/jquery-3.6.0.min.js"></script>
+	
     
     <!-- jquery ui-->
     <script src="/resources/assets/js/jquery-ui.min.js"></script>

@@ -14,13 +14,6 @@ import org.springframework.stereotype.Repository;
 import com.project.vodto.ShoppingCart;
 import com.project.vodto.kjs.ShowCartDTO;
 
-/**
- * @author goott1
- * @packageName : com.project.dao.kjs.shoppingCart
- * @fileName : ShoppingCartDAOImpl.java
- * @date : 2023. 10. 13.
- * @description :
- */
 @Repository
 public class ShoppingCartDAOImpl implements ShoppingCartDAO {
 	@Inject
@@ -28,52 +21,18 @@ public class ShoppingCartDAOImpl implements ShoppingCartDAO {
 	
 	private String ns = "com.project.mappers.shoppingCartMapper";
 	
-	/**
-	 * @MethodName : selectShoppingCartNon
-	 * @author : goott1
-	 * @param nonMemberId
-	 * @return
-	 * @throws SQLException
-	 * @throws NamingException
-	 * @returnValue : 
-	 * @description : 장바구니 dao단 - 비회원 장바구니 정보 조회
-	 * @date : 2023. 10. 13.
-	 */
 	@Override
 	public List<ShoppingCart> selectShoppingCartNon(String nonMemberId) throws SQLException, NamingException {
 		System.out.println("장바구니 dao단 - 비회원 장바구니 정보 조회");
 		return session.selectList(ns + ".selectNonMemberShoppingCart", nonMemberId);
 	}
 
-	/**
-	 * @MethodName : selectShoppingCart
-	 * @author : goott1
-	 * @param memberId
-	 * @return
-	 * @throws SQLException
-	 * @throws NamingException
-	 * @returnValue : 
-	 * @description : 장바구니 dao단 - 회원 장바구니 정보 조회`
-	 * @date : 2023. 10. 13.
-	 */
 	@Override
 	public List<ShoppingCart> selectShoppingCart(String memberId) throws SQLException, NamingException {
 		System.out.println("장바구니 dao단 - 회원 장바구니 정보 조회");
 		return session.selectList(ns + ".selectMemberShoppingCart", memberId);
 	}
 
-	/**
-	 * @MethodName : deleteItem
-	 * @author : goott1
-	 * @param nonMemberId
-	 * @param productId
-	 * @return
-	 * @throws SQLException
-	 * @throws NamingException
-	 * @returnValue : 
-	 * @description : 장바구니 dao단 - 비회원 장바구니 아이템 단일 삭제
-	 * @date : 2023. 10. 13.
-	 */
 	@Override
 	public int deleteItemNon(String nonMemberId, String productId) throws SQLException, NamingException {
 		System.out.println("장바구니 dao단 - 비회원 장바구니 아이템 단일 삭제");
@@ -85,21 +44,23 @@ public class ShoppingCartDAOImpl implements ShoppingCartDAO {
 	}
 
 	@Override
-	public int insertShoppingCartNon(String nonMemberId, String productId) throws SQLException, NamingException {
+	public int insertShoppingCartNon(String nonMemberId, String productId, int quantity) throws SQLException, NamingException {
 		System.out.println("장바구니 dao단 - 비회원 장바구니 아이템 추가");
-		Map<String, String> params = new HashMap<String, String>();
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("nonMemberId", nonMemberId);
 		params.put("productId", productId);
+		params.put("quantity", quantity);
 		
 		return session.insert(ns + ".insertShoppingCartNon", params);
 	}
 
 	@Override
-	public int insertShoppingCart(String memberId, String productId) throws SQLException, NamingException {
+	public int insertShoppingCart(String memberId, String productId, int quantity) throws SQLException, NamingException {
 		System.out.println("장바구니 dao단 - 회원 장바구니 아이템 추가");
-		Map<String, String> params = new HashMap<String, String>();
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("memberId", memberId);
 		params.put("productId", productId);
+		params.put("quantity", quantity);
 		
 		return session.insert(ns + ".insertShoppingCart", params);
 	}
@@ -138,5 +99,27 @@ public class ShoppingCartDAOImpl implements ShoppingCartDAO {
 	public int countList(String memberId) throws SQLException, NamingException {
 		System.out.println("장바구니 dao단 - 회원 장바구니 수량 조회");
 		return session.selectOne(ns + ".countList", memberId);
+	}
+
+	@Override
+	public int updateQTY(String memberId, String productId, int quantity) throws SQLException, NamingException {
+		System.out.println("======= 장바구니 DAO단 - 회원 상품 수량 변경 =======");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("productId", productId);
+		params.put("quantity", quantity);
+		
+		return session.update(ns + ".updateQTY", params);
+	}
+
+	@Override
+	public int updateQTYNon(String nonMemberId, String productId, int quantity) throws SQLException, NamingException {
+		System.out.println("======= 장바구니 DAO단 - 비회원 상품 수량 변경 =======");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("nonMemberId", nonMemberId);
+		params.put("productId", productId);
+		params.put("quantity", quantity);
+		
+		return session.update(ns + ".updateQTYNon", params);
 	}
 }

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.project.service.ksh.payment.OrderService;
 import com.project.vodto.CouponInfos;
 import com.project.vodto.DetailOrderItem;
-import com.project.vodto.Member;
 import com.project.vodto.NonOrderHistory;
 import com.project.vodto.OrderHistory;
 import com.project.vodto.Product;

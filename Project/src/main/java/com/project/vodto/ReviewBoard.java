@@ -13,12 +13,15 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ShoppingCart {
-	private int shoppingCartSeq;
-	private String nonMemberId;
-	private String memberId;
+public class ReviewBoard {
+	private int postNo;
+	private String author;
+	private Timestamp createdDate;
+	private String content;
+	private int ref;
+	private int step;
+	private int ref_order;
+	private int likes;
+	private int rating;
 	private String productId;
-	private int memberCheck;
-	private Timestamp registrationDate;
-	private int quantity;
 }

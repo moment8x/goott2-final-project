@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.project.dao.kjs.upload.UploadDAO;
 import com.project.dao.member.MemberDAO;
+import com.project.etc.kjs.ImgMimeType;
 import com.project.service.member.MemberService;
 import com.project.vodto.Board;
 import com.project.vodto.CouponLog;
@@ -361,8 +362,10 @@ public class MemberServiceImpl implements MemberService {
 		String newFileName = "";
 		// 회원 가입 - 프로필 사진 저장
 		if (file != null) {
-			uDao.insertUploadFile(file);
-			newFileName = file.getNewFileName();
+			if (ImgMimeType.contentTypeIsImage(file.getExtension())) {
+				uDao.insertUploadImage(file);
+				newFileName = file.getNewFileName();
+			}
 		};
 		// 회원 가입 - 회원 가입
 		if (mDao.insertMember(member) == 1) {
