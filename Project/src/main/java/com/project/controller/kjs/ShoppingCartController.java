@@ -192,9 +192,9 @@ public class ShoppingCartController {
 	}
 	
 	// item 추가
-	@RequestMapping("insert")
+	@RequestMapping(value="insert", method=RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> addProduct(HttpServletRequest request, 
-			@RequestParam("product_id") String productId, @RequestParam("quantity") int quantity) {
+			@RequestParam("productId") String productId, @RequestParam("quantity") int quantity) {
 		System.out.println("======= 장바구니 컨트롤러 - 아이템 추가 =======");
 		ResponseEntity<Map<String, Object>> result = null;
 		Map<String,Object> map = new HashMap<String, Object>();

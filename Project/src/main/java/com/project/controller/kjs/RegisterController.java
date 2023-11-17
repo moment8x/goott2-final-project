@@ -83,7 +83,11 @@ public class RegisterController {
 			System.out.println("zipCode : " + member.getZipCode());
 			System.out.println("address : " + member.getAddress());
 			System.out.println("detailAddress : " + member.getDetailedAddress());
-			mService.insertMember(member, fileList.get(0));
+			if (fileList.size() > 0) {
+				mService.insertMember(member, fileList.get(0));
+			} else {
+				mService.insertMember(member, null);
+			}
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
 		}
