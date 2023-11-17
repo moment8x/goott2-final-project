@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.project.service.ksh.payment.OrderService;
 import com.project.vodto.CouponInfos;
 import com.project.vodto.DetailOrderItem;
-import com.project.vodto.Member;
 import com.project.vodto.NonOrderHistory;
 import com.project.vodto.OrderHistory;
 import com.project.vodto.OrderInfo;
@@ -28,6 +27,7 @@ import com.project.vodto.OrderInfo2;
 import com.project.vodto.PaymentDTO;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.kjy.Memberkjy;
 
 @Controller
 @RequestMapping(value = "/order/*")
@@ -97,7 +97,7 @@ public class OrderController {
 		if(orderId.contains("O")) {
 			// 쿠폰, 포인트, 적립금, 배송 주소록 
 			HttpSession session = request.getSession();
-			Member member = (Member) session.getAttribute("loginMember");
+			Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 			try {
 				List<ShippingAddress> shippingAddr = os.getShippingAddress(member.getMemberId());
 //				List<ShippingAddress> otherAddr = new ArrayList<ShippingAddress>();

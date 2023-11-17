@@ -17,9 +17,11 @@ public interface ShoppingCartService {
 	// 선택된 장바구니 아이템 삭제
 	boolean dellteItems(String memberId, boolean loginCheck, List<String> items) throws SQLException, NamingException;
 	// 장바구니 추가
-	boolean insertItem(String memberId, boolean loginCheck, String productId) throws SQLException, NamingException;
+	boolean insertItem(String memberId, boolean loginCheck, String productId, int quantity) throws SQLException, NamingException;
 	// 헤더 장바구니 정보 조회
 	List<ShowCartDTO> getCartList(String memberId, boolean loginCheck) throws SQLException, NamingException;
 	// 장바구니 수량 조회
 	int countList(String memberId, boolean loginCheck) throws SQLException, NamingException;
+	// 장바구니 수량 변경
+	int updateQTY(String memberId, boolean loginCheck, String productId, int quantity) throws SQLException, NamingException;
 }

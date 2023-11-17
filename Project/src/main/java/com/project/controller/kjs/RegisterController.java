@@ -3,6 +3,7 @@ package com.project.controller.kjs;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -36,7 +37,7 @@ public class RegisterController {
 	private UploadFileService ufService;
 	
 //	private UploadFile file = new UploadFile();
-	private UploadFiles file = null;
+	private List<UploadFiles> fileList = null;
 	
 	@RequestMapping("register")
 	public ModelAndView moveRegister() {
@@ -82,7 +83,7 @@ public class RegisterController {
 			System.out.println("zipCode : " + member.getZipCode());
 			System.out.println("address : " + member.getAddress());
 			System.out.println("detailAddress : " + member.getDetailedAddress());
-			mService.insertMember(member, file);
+			mService.insertMember(member, fileList.get(0));
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
 		}
@@ -99,21 +100,21 @@ public class RegisterController {
 		
 		try {
 			// 2. 파일 업로드
-			if (file != null) {
+			if (fileList.get(0) != null) {
 				// 기존 파일 삭제. 단, DB에 저장된 파일일 경우 삭제X
-				if (!ufService.isExist(file)) {
-					ufService.deleteFile(file, realPath);
+				if (!ufService.isExist(fileList.get(0))) {
+					ufService.deleteFile(fileList.get(0), realPath);
 				}
 			}
 			// 새 파일 업로드.
-			file = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(), 
-					uploadFile.getContentType(), uploadFile.getBytes(), realPath);
+			fileList = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(), 
+					uploadFile.getContentType(), uploadFile.getBytes(), realPath, fileList);
 		} catch (IOException | SQLException | NamingException e) {
 			e.printStackTrace();
 		}
 		
 		System.out.println("======= 회원가입 컨트롤러 끝 =======");
-		return file;
+		return fileList.get(0);
 	}
 	
 	@RequestMapping("refreshFile")
@@ -122,8 +123,9 @@ public class RegisterController {
 		
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
 		
-		if (file != null) {
-			ufService.deleteFile(file, realPath);
+		if (fileList.size() > 0) {
+			ufService.deleteFile(fileList.get(0), realPath);
+			fileList.clear();
 		}
 		
 		System.out.println("======= 회원가입 컨트롤러 끝 =======");

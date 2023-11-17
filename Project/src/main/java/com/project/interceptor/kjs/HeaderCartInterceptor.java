@@ -2,7 +2,6 @@ package com.project.interceptor.kjs;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.servlet.http.Cookie;
@@ -16,8 +15,6 @@ import org.springframework.web.util.WebUtils;
 
 import com.project.service.kjs.member.non.NonMemberService;
 import com.project.service.kjs.shoppingcart.ShoppingCartService;
-import com.project.vodto.Member;
-import com.project.vodto.ShoppingCart;
 import com.project.vodto.kjs.ShowCartDTO;
 import com.project.vodto.kjy.Memberkjy;
 
@@ -38,10 +35,8 @@ public class HeaderCartInterceptor extends HandlerInterceptorAdapter {
 			// 로그인 상태가 아닐 시
 			// 비회원 쿠키가 있는지 확인
 			Cookie cookie = WebUtils.getCookie(request, "nom");
-			System.out.println("비회원cookie null check : " + cookie);
 			if (cookie == null) {
 				// 비회원 쿠키가 없다면 비회원 쿠키 저장
-				System.out.println("비회원 쿠키 저장");
 				String sessionValue = session.getId();	// 세션ID
 				Timestamp sessionLimit = new Timestamp(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));	// DB에 저장할 값
 				
@@ -50,7 +45,6 @@ public class HeaderCartInterceptor extends HandlerInterceptorAdapter {
 				cookie.setPath("/");	// 쿠키가 적용될 경로 지정
 				// 비회원 쿠키를 DB에 저장
 				if (nmsService.saveNonMemberId(sessionValue, sessionLimit)) {
-					System.out.println("비회원 쿠키 DB에 저장");
 					response.addCookie(cookie);	// response로 클라이언트에 보내서 쿠키 저장
 				}
 			}
@@ -84,9 +78,11 @@ public class HeaderCartInterceptor extends HandlerInterceptorAdapter {
 				items = scService.getCartList(cookie.getValue(), false);
 			}
 		}
-		System.out.println("items : " + items);
+		
 		if (items != null) {
 			session.setAttribute("cartItems", items);
+		} else {
+			session.setAttribute("cartItems", "none");
 		}
 		
 		System.out.println("HeaderCartInterceptor - postHandle 끝");

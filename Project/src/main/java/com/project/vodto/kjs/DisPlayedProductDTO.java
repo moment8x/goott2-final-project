@@ -38,4 +38,5 @@ public class DisPlayedProductDTO {
 	private int bestSellerStatus;
 	private String categoryKey;
 	private int currentQuantity;
+	private int quantity;
 }
