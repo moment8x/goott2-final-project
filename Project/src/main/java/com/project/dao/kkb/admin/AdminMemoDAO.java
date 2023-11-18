@@ -3,10 +3,14 @@ package com.project.dao.kkb.admin;
 import java.util.List;
 
 import com.project.vodto.kkb.MemoCondition;
-import com.project.vodto.kkb.MemoResponse;
+import com.project.vodto.kkb.MemoInfoCondition;
+import com.project.vodto.kkb.MemoListResponse;
 
 public interface AdminMemoDAO {
 
 	/* 회원 메모 조회 */
-	List<MemoResponse> findMemoById(MemoCondition memoCond) throws Exception;
+	List<MemoListResponse> findMemoById(MemoInfoCondition memoInfoCond) throws Exception;
+	
+	/* 회원 메모 작성 */
+	void saveMemberMemo(MemoCondition memoCond) throws Exception;
 }

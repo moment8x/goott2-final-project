@@ -6,7 +6,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.kkb.MemoCondition;
-import com.project.vodto.kkb.MemoResponse;
+import com.project.vodto.kkb.MemoInfoCondition;
+import com.project.vodto.kkb.MemoListResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,8 +19,13 @@ public class AdminMemoDAOImpl implements AdminMemoDAO {
 	private final SqlSession ses;
 	
 	@Override
-	public List<MemoResponse> findMemoById(MemoCondition memoCond) throws Exception {
-		return ses.selectList(ns + ".selectMemoInfo", memoCond);
+	public List<MemoListResponse> findMemoById(MemoInfoCondition memoInfoCond) throws Exception {
+		return ses.selectList(ns + ".selectMemoInfo", memoInfoCond);
+	}
+
+	@Override
+	public void saveMemberMemo(MemoCondition memoCond) throws Exception {
+		ses.insert(ns + ".insertMemberMemo", memoCond);
 	}
 
 }

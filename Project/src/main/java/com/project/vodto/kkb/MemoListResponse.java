@@ -9,7 +9,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class MemoResponse {
+public class MemoListResponse {
 	private int no;
 	private Timestamp createdDate;
 	private String adminId;
