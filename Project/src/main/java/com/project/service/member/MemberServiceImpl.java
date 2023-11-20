@@ -169,7 +169,7 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public int getOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException {
+	public int getOrderProductCount(String orderNo) throws SQLException, NamingException {
 		
 		
 		return mDao.selectOrderProductCount(orderNo);
@@ -261,6 +261,7 @@ public class MemberServiceImpl implements MemberService {
 		result.put("detailOrderInfo", mDao.selectDetailOrderInfo(memberId, orderNo));
 		result.put("couponsHistory", mDao.getCouponsHistory(memberId, orderNo));
 		result.put("bankTransfer", mDao.getBankTransfer(orderNo));
+		result.put("orderQty", mDao.selectOrderProductCount(orderNo));
 		
 		return result;
 	}

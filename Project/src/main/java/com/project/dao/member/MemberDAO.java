@@ -34,7 +34,7 @@ public interface MemberDAO {
 	List<MyPageOrderList> selectOrderHistory (String memberId, PagingInfo pi) throws SQLException, NamingException;
 	
 	// 주문건당 상품 총 갯수 가져오기
-	int selectOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException;
+	int selectOrderProductCount(String orderNo) throws SQLException, NamingException;
 	
 	//이메일 중복검사
 	Member duplicateUserEmail(String tmpEmail) throws SQLException, NamingException;

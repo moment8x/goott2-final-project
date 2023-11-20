@@ -60,7 +60,7 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public int selectOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException {
+	public int selectOrderProductCount(String orderNo) throws SQLException, NamingException {
 
 		return ses.selectOne(ns + ".getProductCount", orderNo);
 	}

@@ -87,7 +87,33 @@ $(function () {
 	let icOrderTime = $('.infoContent.detailOrderOrderTime').text().substring(0,21)
 	$('.infoContent.detailOrderOrderTime').text(icOrderTime)
 
-})
+	$('.form-control.cancelQty').change(function () {
+		  let totalQty = calculateTotalQuantity();
+		  console.log('총 수량:', totalQty);
+		  
+		  $('#totalCancelQty').text("총 수량 : " + totalQty);
+		  
+		  let point = ${detailOrder.usedPoints}
+		  let orderQty = ${orderQty}
+		  console.log("총 주문 갯수 " + orderQty)
+		  let refundPoint = point / orderQty
+		  console.log(refundPoint)
+		  $('.refundPoint').text(Math.floor(refundPoint)) 
+		});
+
+		
+	})
+
+	function calculateTotalQuantity() {
+		let totalQuantity = 0;
+
+		$('.form-control.cancelQty').each(function() {
+		let quantity = parseFloat($(this).val()) || 0; 
+		totalQuantity += quantity;
+		});
+
+		 return totalQuantity;
+	}
 
 
 //배송주소록 수정
@@ -151,6 +177,15 @@ function editBasicShippingAddress() {
 				}
 			});
 }
+
+//주문한 상품 전체선택
+function selectAll(selectAll) {
+	let allCheck = document.getElementsByName("order")
+	allCheck.forEach((order) => {
+		order.checked = selectAll.checked;
+		})
+}
+
 
 </script>
 <style type="text/css">
@@ -238,6 +273,20 @@ function editBasicShippingAddress() {
 	display: flex;
 	gap: 5px;
 }
+
+#cancelOrderImg{
+	width: 80px;
+}
+#cancelQty{
+	width: 50px;
+	height: 20px;
+}
+#totalCancelQty{
+	font-size: 16px;
+	text-align: center;
+	margin: 5px;
+}
+
 </style>
 </head>
 
@@ -294,15 +343,17 @@ function editBasicShippingAddress() {
 
 													<c:choose>
 														<c:when test="${order.productImage != '' }">
-															<a href="/detail/${order.productId }" class="product-image">
-																<img src="${order.productImage }"
+															<a href="/detail/${order.productId }"
+																class="product-image"> <img
+																src="${order.productImage }"
 																class="img-fluid blur-up lazyload"
 																alt="${order.productName }">
 															</a>
 														</c:when>
 														<c:otherwise>
-															<a href="/detail/${order.productId }" class="product-image">
-																<img src="/resources/assets/images/noimage.jpg"
+															<a href="/detail/${order.productId }"
+																class="product-image"> <img
+																src="/resources/assets/images/noimage.jpg"
 																class="img-fluid blur-up lazyload"
 																alt="${order.productName }">
 															</a>
@@ -339,7 +390,7 @@ function editBasicShippingAddress() {
 											</td>
 
 											<td class="name">
-												<h4 class="table-title text-content">수량</h4> 
+												<h4 class="table-title text-content">수량</h4>
 
 												<h4 class="text-title">${order.productQuantity }</h4>
 
@@ -354,6 +405,7 @@ function editBasicShippingAddress() {
 													<td class="name productStatusBtn">
 														<button
 															class="btn theme-bg-color text-white m-0 productStatusBtn"
+															data-bs-toggle="modal" data-bs-target="#cancel-order"
 															type="button" id="button-addon1">
 															<span>취소</span>
 														</button>
@@ -391,7 +443,8 @@ function editBasicShippingAddress() {
 														<h5>${order.productStatus }</h5>
 													</td>
 													<td class="completeBtn">
-														<button class="btn theme-bg-color text-white m-0" onclick="location.href='/detail/${order.productId }';"
+														<button class="btn theme-bg-color text-white m-0"
+															onclick="location.href='/detail/${order.productId }';"
 															type="button" id="button-addon1">
 															<span>리뷰작성</span>
 														</button>
@@ -409,9 +462,6 @@ function editBasicShippingAddress() {
 										</tr>
 									</tbody>
 								</table>
-								<c:if test="${order.productQuantity > 1}">
-									<div>더보기</div>
-								</c:if>
 							</c:forEach>
 
 							<div class="col-xxl-3 col-lg-4 orderInfo">
@@ -527,18 +577,21 @@ function editBasicShippingAddress() {
 													</li>
 												</c:if>
 												<li class="pb-0">
+												<c:if test="${not empty couponHistory}">
 													<h4 class="infoTitle">사용한 쿠폰 :</h4> <c:forEach
 														var="coupons" items="${couponHistory }">
 														<div class="couponsHistory">
 															<h4 class="infoContent">${coupons.couponName }</h4>
 
-															<c:set var="discountAmount" value="${coupons.discountAmount * 0.01}" />
-															
+															<c:set var="discountAmount"
+																value="${coupons.discountAmount * 0.01}" />
+
 															<c:if test="${fn:contains(coupons.discountMethod,'P')}">
 																<h4 class="infoContent">${coupons.discountAmount }%</h4>
 																<h4 class="infoContent">
 																	<fmt:formatNumber
-																		value="${detailOrder.totalAmount*discountAmount }" type="NUMBER" />
+																		value="${detailOrder.totalAmount*discountAmount }"
+																		type="NUMBER" />
 																	원
 																</h4>
 															</c:if>
@@ -553,6 +606,7 @@ function editBasicShippingAddress() {
 
 														</div>
 													</c:forEach>
+													</c:if>
 												</li>
 
 											</ul>
@@ -567,7 +621,7 @@ function editBasicShippingAddress() {
 													</h4>
 												</li>
 											</ul>
-										
+
 											<c:choose>
 												<c:when test="${detailOrder.paymentMethod eq 'bkt' }">
 													<ul class="summery-contain pb-0 border-bottom-0">
@@ -598,7 +652,7 @@ function editBasicShippingAddress() {
 															<h4 class="infoContent">${bankTransfer.payerName }</h4>
 														</li>
 
-												<!-- 	<c:if test="${bankTransfer.paymentTime != null }">
+														<!-- 	<c:if test="${bankTransfer.paymentTime != null }">
 															<li class="pb-0">
 																<h4 class="infoTitle detailOrderOrderTime">입금 시간 :</h4>
 																<h4 class="infoContent">
@@ -653,7 +707,7 @@ function editBasicShippingAddress() {
 										</div>
 									</div>
 
-								<!--  <div class="col-lg-12 col-sm-6 orderInfo">
+									<!--  <div class="col-lg-12 col-sm-6 orderInfo">
 										<div class="summery-box">
 											<div class="summery-header d-block">
 												<h3>포인트 / 적립금</h3>
@@ -821,6 +875,185 @@ function editBasicShippingAddress() {
 						data-bs-dismiss="modal">닫기</button>
 					<button type="button" class="btn theme-bg-color btn-md text-white"
 						onclick="editBasicShippingAddress();" data-bs-dismiss="modal">변경</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Add address modal box end -->
+
+	<!-- Add address modal box start -->
+	<div class="modal fade theme-modal" id="cancel-order" tabindex="-1"
+		aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div
+			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">취소</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa-solid fa-xmark"></i>
+					</button>
+				</div>
+
+				<div class="modal-body">
+					<input class="checkbox_animated check-box" type="checkbox"
+						name="order" id="selectAllOrder" onclick="selectAll(this)" /> <label
+						class="form-check-label" for="selectAllOrder"><span>전체선택</span></label>
+					<c:forEach var="order" items="${detailOrderInfo }">
+						<table class="table mb-0 productInfo">
+							<c:if
+								test="${order.productStatus == '출고전' || order.productStatus == '입금전'}">
+								<tbody>
+									<tr>
+										<td class="product-detail">
+											<div class="product border-0">
+												<c:choose>
+													<c:when test="${order.productImage != '' }">
+														<input class="checkbox_animated check-box" type="checkbox"
+															name="order" id="selectOrderCancel" />
+														<a href="/detail/${order.productId }"
+															class="product-image"> <img
+															src="${order.productImage }" id="cancelOrderImg"
+															class="img-fluid blur-up lazyload"
+															alt="${order.productName }">
+														</a>
+													</c:when>
+													<c:otherwise>
+														<input class="checkbox_animated check-box" type="checkbox"
+															name="order" id="selectOrderCancel" />
+														<a href="/detail/${order.productId }"
+															class="product-image"> <img
+															src="/resources/assets/images/noimage.jpg"
+															class="img-fluid blur-up lazyload"
+															alt="${order.productName }">
+														</a>
+													</c:otherwise>
+												</c:choose>
+												<c:set var="productNameLength"
+													value="${fn:length(order.productName)}" />
+												<c:choose>
+													<c:when test="${productNameLength <= 5}">
+														<td class="name">
+															<h4 class="table-title text-content">상품이름</h4> <a
+															href="/detail/${order.productId }" id="productName">${order.productName }</a>
+														</td>
+													</c:when>
+													<c:otherwise>
+														<td class="name">
+															<h4 class="table-title text-content">상품이름</h4> <a
+															href="/detail/${order.productId }" id="productName">${fn:substring(order.productName, 0, 5)}...</a>
+														</td>
+													</c:otherwise>
+												</c:choose>
+											</div>
+
+										</td>
+
+										<td class="price">
+											<h4 class="table-title text-content">상품금액</h4>
+											<h6 class="theme-color productPrice">
+												<fmt:formatNumber value="${order.productPrice }"
+													type="NUMBER" />
+												원
+											</h6>
+										</td>
+
+										<td class="name">
+											<h4 class="table-title text-content">수량</h4>
+											<input type="text" class="form-control cancelQty" id="cancelQty" value="0"/>
+
+										</td>
+
+										<td class="name">
+											<h4 class="table-title text-content">상품상태</h4>
+											<h5>${order.productStatus }</h5>
+										</td>
+
+									</tr>
+								</tbody>
+							</c:if>
+						</table>
+					</c:forEach>
+					<div id="totalCancelQty"></div>
+					<div class="form-floating mb-4 theme-form-floating">
+						<input type="text" class="form-control" id="cancelReason"
+							placeholder="취소 사유" /><label for="cancelReason">취소 사유</label>
+					</div>
+
+					<ul class="summery-contain pb-0 border-bottom-0">
+
+						<li class="pb-0">
+							<h4>결제금액 </h4>
+							<span>
+								<fmt:formatNumber value="${detailOrder.actualPaymentAmount }"
+									type="NUMBER" />
+								원
+							</span>
+						</li>
+
+						<c:if test="${detailOrder.usedPoints != 0 }">
+							<li class="pb-0">
+								<h4>환불 예정 포인트 </h4>
+								<span class="refundPoint">
+									<fmt:formatNumber value="${detailOrder.usedPoints }"
+										type="NUMBER" />
+									점
+								</span>
+							</li>
+						</c:if>
+
+						<c:if test="${detailOrder.usedReward != 0 }">
+							<li class="pb-0">
+								<h4>환불 예정 적립금 </h4>
+								<span>
+									<fmt:formatNumber value="${detailOrder.usedReward }"
+										type="NUMBER" />
+									원
+								</span>
+							</li>
+						</c:if>
+						<li class="pb-0">
+							<c:if test="${not empty couponHistory}">
+							<h4>환불 예정 쿠폰 </h4> 
+							<c:forEach var="coupons"
+								items="${couponHistory }">
+								<div class="couponsHistory">
+									<span>${coupons.couponName }</span>
+
+									<c:set var="discountAmount"
+										value="${coupons.discountAmount * 0.01}" />
+
+									
+									<c:if test="${fn:contains(coupons.discountMethod,'P')}">
+										<span>${coupons.discountAmount }%</span>
+										<span>
+											<fmt:formatNumber
+												value="${detailOrder.totalAmount*discountAmount }"
+												type="NUMBER" />
+											원
+										</span>
+									</c:if>
+
+									<c:if test="${fn:contains(coupons.discountMethod,'D')}">
+										<span>
+											<fmt:formatNumber value="${coupons.discountAmount }"
+												type="NUMBER" />
+											원
+										</span>
+									</c:if>
+
+								</div>
+							</c:forEach>
+						</c:if>
+						</li>
+
+					</ul>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-md"
+						data-bs-dismiss="modal">닫기</button>
+					<button type="button" class="btn theme-bg-color btn-md text-white"
+						onclick="orderCancel();" data-bs-dismiss="modal">취소</button>
 				</div>
 			</div>
 		</div>

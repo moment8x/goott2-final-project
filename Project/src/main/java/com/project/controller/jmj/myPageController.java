@@ -236,7 +236,7 @@ public class myPageController {
 			System.out.println("addrSeq null");
 			result = new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
-		return null;
+		return result;
 	}
 
 	@RequestMapping("jusoPopup")
@@ -489,10 +489,13 @@ public class myPageController {
 			List<CouponHistory> couponHistory = (List<CouponHistory>) map.get("couponsHistory");
 			// 무통장 결제내역
 			GetBankTransfer bankTransfer = (GetBankTransfer) map.get("bankTransfer");
+			
+			int orderQty = (int)map.get("orderQty");			
 
 			model.addAttribute("detailOrder", detailOrderInfo);
 			model.addAttribute("couponHistory", couponHistory);
 			model.addAttribute("bankTransfer", bankTransfer);
+			model.addAttribute("orderQty", orderQty);
 
 			// 배송주소록
 			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);

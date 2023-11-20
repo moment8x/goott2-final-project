@@ -48,7 +48,7 @@ public interface MemberService {
 	Map<String, Object> getOrderHistory(String memberId, int pageNo) throws SQLException, NamingException;
 	
 	//주문건당 총 상품 갯수 가져오기
-	int getOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException;
+	int getOrderProductCount(String orderNo) throws SQLException, NamingException;
 	
 	// 이메일 중복검사
 	Member duplicateUserEmail(String email) throws SQLException, NamingException;

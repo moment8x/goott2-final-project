@@ -552,11 +552,6 @@ function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAdd
 			async : false,
 			success : function(data) {
 				console.log(data);
-				//$('#addrRecipient').text(data.recipient)
-				//$('#addrRecipientContact').text(data.recipientContact)
-				//$('#addrZipCode').text(data.zipCode)
-				//$('#addrAddress').text(data.address)
-				//$('#addrDetailAddress').text(data.detailAddress)
 				location.reload()
 			},
 			error : function() {
@@ -1971,58 +1966,25 @@ function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAdd
 																</div>
 															</li>
 
-															<!-- <li>
+															<li>
 																<div class="size-box">
 																	<div id="orderStatus">
-																		<c:choose>
-																			<c:when test="${order.deliveryStatus eq '출고전' }">
-																				<button class="btn theme-bg-color text-white m-0"
-																					type="button" id="button-addon1">
-																					<span>취소</span>
-																				</button>
-																			</c:when>
 
-																			<c:when test="${order.deliveryStatus eq '입금전' }">
-																				<button class="btn theme-bg-color text-white m-0"
-																					type="button" id="button-addon1">
-																					<span>취소</span>
-																				</button>
-																			</c:when>
-
-																			<c:when test="${order.deliveryStatus eq '출고완료' }">
+																			<c:if test="${order.deliveryStatus eq '배송중' }">
 																				<button class="btn theme-bg-color text-white m-0"
 																					type="button" id="button-addon1">
 																					<span>배송조회</span>
 																				</button>
 																				<div>${order.invoiceNumber }</div>
-																			</c:when>
-
-																			<c:when test="${order.deliveryStatus eq '배송중' }">
-																				<button class="btn theme-bg-color text-white m-0"
-																					type="button" id="button-addon1">
-																					<span>배송조회</span>
-																				</button>
-																				<div>${order.invoiceNumber }</div>
-																			</c:when>
-
-																			<c:when test="${order.deliveryStatus eq '취소' }">
-																				<div>취소</div>
-																			</c:when>
-
-																			<c:otherwise>
-																				<button class="btn theme-bg-color text-white m-0"
-																					type="button" id="button-addon1">
-																					<span>교환</span>
-																				</button>
-																				<button class="btn theme-bg-color text-white m-0"
-																					type="button" id="button-addon1">
-																					<span>반품</span>
-																				</button>
-																			</c:otherwise>
-																		</c:choose>
+																			</c:if>
+																			
+																			<c:if test="${order.deliveryStatus eq '배송완료' }">
+																				<div>배송완료</div>
+																			</c:if>
+																		
 																	</div>
 																</div>
-															</li> -->
+															</li> 
 														</ul>
 													</div>
 												</div>
