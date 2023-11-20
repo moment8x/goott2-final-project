@@ -3,7 +3,6 @@ package com.project.controller.kkb.admin;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +22,6 @@ import com.project.service.kkb.admin.AdminOrderService;
 import com.project.service.kkb.admin.AdminPointService;
 import com.project.service.kkb.admin.AdminRewardService;
 import com.project.service.kkb.admin.AdminShoppingCartService;
-import com.project.vodto.kjy.Memberkjy;
 import com.project.vodto.kkb.InquiryCondition;
 import com.project.vodto.kkb.MemberCondition;
 import com.project.vodto.kkb.MemberParam;

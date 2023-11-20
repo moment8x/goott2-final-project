@@ -32,6 +32,6 @@
 	
 	<insert id="insertMemberMemo">
 		INSERT INTO admin_memo(member_id, admin_id, content, important) 
-		values(#{memberId},#{adminId},#{content},#{important}) 
+		VALUES(#{memberId},#{adminId},#{content},#{important}) 
 	</insert>
 </mapper>

@@ -7,6 +7,7 @@
 	<select id="selectOrderProductInfo" resultType="OrderProductResponse">
 		SELECT 	 h.order_time,
 				 p.payment_time,
+				 p.order_no,
 		         d.product_order_no,
 		         m.name,
 		         h.member_id,
