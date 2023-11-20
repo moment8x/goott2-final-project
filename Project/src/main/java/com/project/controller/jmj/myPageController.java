@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.catalina.filters.ExpiresFilter.XHttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
@@ -83,12 +85,10 @@ public class myPageController {
 	    }
 
 	@RequestMapping(value = "myPage")
-	public void myPage(Model model, HttpServletRequest request) {
+	public void myPage(Model model, HttpServletRequest request, @RequestParam(value = "pageNo", defaultValue = "1")int pageNo) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
-		
-		int pageNo=1;
 		
 		System.out.println("@@@@@@@@@@@@@페이지번호 : " + pageNo);
 		try {
@@ -124,9 +124,9 @@ public class myPageController {
 	}
 
 	@RequestMapping(value = "myPage", method = RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> myPagePost(Model model,
+	public ResponseEntity<Map<String, Object>> myPagePost(Model model, @RequestParam(value = "pageNo", defaultValue = "1")int pageNo,
 			HttpServletRequest request) {
-		int pageNo = 1;
+	
 		System.out.println("@@@@@@@@@@@@마이페이지 포스트" + pageNo);
 
 		HttpSession session = request.getSession();
@@ -204,7 +204,6 @@ public class myPageController {
 
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@로그인멤버: " + member.toString());
 
 		String memberId = member.getMemberId();
 
@@ -490,8 +489,13 @@ public class myPageController {
 			// 무통장 결제내역
 			GetBankTransfer bankTransfer = (GetBankTransfer) map.get("bankTransfer");
 			
+			//총 주문 수량
 			int orderQty = (int)map.get("orderQty");			
-
+			
+			// 회원정보
+			Member userInfo = mService.getMyInfo(memberId);
+			
+			model.addAttribute("userInfo", userInfo);
 			model.addAttribute("detailOrder", detailOrderInfo);
 			model.addAttribute("couponHistory", couponHistory);
 			model.addAttribute("bankTransfer", bankTransfer);
@@ -505,6 +509,36 @@ public class myPageController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	@RequestMapping(value = "orderDetailWithJson", method = RequestMethod.POST)
+	public ResponseEntity<List<DetailOrder>> orderDetailFromJson(@RequestParam("no") String orderNo, 
+			@RequestParam ("detailedOrderId") int detailedOrderId, HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
+		HttpHeaders header = new HttpHeaders();
+		header.add("Content-Type", "application/json; charset=UTF-8");
+		
+		ResponseEntity<List<DetailOrder>> result = null;
+
+			System.out.println("@@@@@@@@@@@@@@@@@@@주문상세 제이슨 응답" + detailedOrderId + "번 주문을 취소하자");
+		
+		
+		// 주문상품 상세정보
+		List<DetailOrder> detailOrder;
+		try {
+			detailOrder = mService.getDetailOrderInfo(memberId, orderNo);
+//			model.addAttribute("productOrderList", detailOrder);
+			result = new ResponseEntity<List<DetailOrder>>(detailOrder, header, HttpStatus.OK);
+		} catch (SQLException | NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			 result = new ResponseEntity<>(null, header, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		return result;
 	}
 
 	@RequestMapping(value = "orderDetail", method = RequestMethod.POST)

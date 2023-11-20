@@ -779,45 +779,6 @@ function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAdd
 			output += `<h5>\${e.deliveryStatus }</h5>`
 			output += `</div>`
 			output += `</li>`
-		//	output += `<li>`
-		//	output += `<div class="size-box">`
-		//	output += `<div id="orderStatus">`
-		//	if(e.deliveryStatus == '출고전'){
-		//		output += `button class="btn theme-bg-color text-white m-0" type="button" id="button-addon1">`	
-		//		output += `<span>취소</span>`
-		//		output += `</button>`
-		//	}else if(e.deliveryStatus == '입금전'){
-		//		output += `<button class="btn theme-bg-color text-white m-0"
-		//			type="button" id="button-addon1">`
-		//		output += `<span>취소</span>`
-		//		output += `</button>`
-		//	}else if(e.deliveryStatus == '출고완료'){
-		//		output += `<button class="btn theme-bg-color text-white m-0"
-		//			type="button" id="button-addon1">`
-		//		output += `<span>배송조회</span>`
-		//			output += `</button>`
-		//		output += `<div>${order.invoiceNumber }</div>`
-		//	}else if(e.deliveryStatus == '배송중'){
-		///		output += `<button class="btn theme-bg-color text-white m-0"
-		//			type="button" id="button-addon1">`
-		//		output += `<span>배송조회</span>`
-		//			output += `</button>`
-		//		output += `<div>${order.invoiceNumber }</div>`
-		//	}else if(e.deliveryStatus == '취소'){
-		//		output += `<div>취소</div>`
-		//	}else{
-		//		output += `<button class="btn theme-bg-color text-white m-0"
-		//			type="button" id="button-addon1">`
-		//		output += `<span>교환</span>`
-		//			output += `</button>`
-		//		output += `<button class="btn theme-bg-color text-white m-0"
-		//			type="button" id="button-addon1">`
-		//		output += `<span>반품</span>`
-		//			output += `</button>`
-		//	}
-		//	output += `</div>`
-		//	output += `</div>`
-		//	output += `</li>`
 			output += `</ul>`
 			output += `</div>`
 			output += `</div>`

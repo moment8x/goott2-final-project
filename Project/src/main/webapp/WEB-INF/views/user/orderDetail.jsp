@@ -88,22 +88,46 @@ $(function () {
 	$('.infoContent.detailOrderOrderTime').text(icOrderTime)
 
 	$('.form-control.cancelQty').change(function () {
-		  let totalQty = calculateTotalQuantity();
+		  let totalQty = calculateTotalQuantity(); //입력한 총 수량
 		  console.log('총 수량:', totalQty);
 		  
 		  $('#totalCancelQty').text("총 수량 : " + totalQty);
 		  
-		  let point = ${detailOrder.usedPoints}
-		  let orderQty = ${orderQty}
+		  let point = ${detailOrder.usedPoints} //결제 할 때 사용한 포인트
+		  let reward = ${detailOrder.usedReward} //결제 할 때 사용한 적립금
+		  let orderQty = ${orderQty} // 총 주문 수량
+		  let refundPoint = 0;
+		  let refundReward = 0;
+		  
 		  console.log("총 주문 갯수 " + orderQty)
-		  let refundPoint = point / orderQty
-		  console.log(refundPoint)
-		  $('.refundPoint').text(Math.floor(refundPoint)) 
+		  
+		  if(totalQty > orderQty){
+			  refundPoint = 0
+			  refundReward = 0
+		  	alert("주문 수량 보다 많이 입력 할 수 없습니다.")
+		  }else if(totalQty != orderQty){
+			  refundPoint = calculate(orderQty, totalQty, point)
+			  refundReward = calculate(orderQty, totalQty, reward)
+		  }else{
+			  refundPoint = point;
+			  refundReward = point;
+		  }  
+		  
+		  console.log("환불 포인트 : " +refundPoint)
+		  console.log("환불 적립금 : " +refundReward)
+		  
+		  $('.refundPoint').text(Math.floor(refundPoint).toLocaleString()+ "점") 
+		  $('.refundReward').text(Math.floor(refundReward).toLocaleString()+ "점") 
 		});
-
 		
 	})
-
+	
+	//환불 예정 포인트, 적립금 구하기
+	function calculate(n, k, usedAmount) { // 입력한 총 수량, 총 주문수량, 포인트, 적립금
+		return ((n - k) / n) * usedAmount
+	}
+	
+	//취소 수량 입력받아서 총 수량 구하기
 	function calculateTotalQuantity() {
 		let totalQuantity = 0;
 
@@ -185,6 +209,60 @@ function selectAll(selectAll) {
 		order.checked = selectAll.checked;
 		})
 }
+
+function showRefund() {
+	$('.editRefund').show()
+}
+
+//무통장 환불 정보 변경
+function editRefundAccount() {
+	let refundBank = $("select[name=refundBank]").val()
+	let accountHolder = $('#accountHolder').val();
+	let refundAccount = $('#refundAccount').val();
+	
+	console.log(refundBank + accountHolder + refundAccount)
+	
+	$('#changeRefundBank').text(refundBank);
+	$('#changeRefundAccount').text(refundAccount)
+	$('#changeAccountHolder').text(accountHolder)
+	
+	$('.editRefund').hide()
+}
+
+function handleCheckboxChange() {
+	let checkbox = document.getElementById("selectOrderCancel");
+	let detailedOrderId = $('input[name="order"]:checked').val()
+    // 체크박스가 체크되었는지 확인
+    if (checkbox.checked) {
+        // 체크되었을 때 실행할 동작
+        alert(detailedOrderId + "번 주문 상품")
+        fetchDetailOrders();
+    } else {
+        // 체크가 해제되었을 때 실행할 동작 (선택적)
+    }
+}
+
+function fetchDetailOrders() {
+	let orderNo = "${detailOrder.orderNo}"
+	let detailedOrderId = $('input[name="order"]:checked').val()
+	console.log(detailedOrderId)
+	 $.ajax({
+			url : '/user/orderDetailWithJson', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				detailedOrderId,
+				orderNo
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				
+			},
+			error : function() {
+			}
+		});
+}	
 
 
 </script>
@@ -274,19 +352,29 @@ function selectAll(selectAll) {
 	gap: 5px;
 }
 
-#cancelOrderImg{
+#cancelOrderImg {
 	width: 80px;
 }
-#cancelQty{
+
+#cancelQty {
 	width: 50px;
 	height: 20px;
 }
-#totalCancelQty{
+
+#totalCancelQty {
 	font-size: 16px;
 	text-align: center;
 	margin: 5px;
 }
 
+.pb-0.refundList {
+	margin-right: 10px;
+	margin-bottom: 10px;
+}
+
+.editRefund{
+	display: none;
+}
 </style>
 </head>
 
@@ -576,38 +664,37 @@ function selectAll(selectAll) {
 														</h4>
 													</li>
 												</c:if>
-												<li class="pb-0">
-												<c:if test="${not empty couponHistory}">
-													<h4 class="infoTitle">사용한 쿠폰 :</h4> <c:forEach
-														var="coupons" items="${couponHistory }">
-														<div class="couponsHistory">
-															<h4 class="infoContent">${coupons.couponName }</h4>
+												<li class="pb-0"><c:if
+														test="${not empty couponHistory}">
+														<h4 class="infoTitle">사용한 쿠폰 :</h4>
+														<c:forEach var="coupons" items="${couponHistory }">
+															<div class="couponsHistory">
+																<h4 class="infoContent">${coupons.couponName }</h4>
 
-															<c:set var="discountAmount"
-																value="${coupons.discountAmount * 0.01}" />
+																<c:set var="discountAmount"
+																	value="${coupons.discountAmount * 0.01}" />
 
-															<c:if test="${fn:contains(coupons.discountMethod,'P')}">
-																<h4 class="infoContent">${coupons.discountAmount }%</h4>
-																<h4 class="infoContent">
-																	<fmt:formatNumber
-																		value="${detailOrder.totalAmount*discountAmount }"
-																		type="NUMBER" />
-																	원
-																</h4>
-															</c:if>
+																<c:if test="${fn:contains(coupons.discountMethod,'P')}">
+																	<h4 class="infoContent">${coupons.discountAmount }%</h4>
+																	<h4 class="infoContent">
+																		<fmt:formatNumber
+																			value="${detailOrder.totalAmount*discountAmount }"
+																			type="NUMBER" />
+																		원
+																	</h4>
+																</c:if>
 
-															<c:if test="${fn:contains(coupons.discountMethod,'D')}">
-																<h4 class="infoContent">
-																	<fmt:formatNumber value="${coupons.discountAmount }"
-																		type="NUMBER" />
-																	원
-																</h4>
-															</c:if>
+																<c:if test="${fn:contains(coupons.discountMethod,'D')}">
+																	<h4 class="infoContent">
+																		<fmt:formatNumber value="${coupons.discountAmount }"
+																			type="NUMBER" />
+																		원
+																	</h4>
+																</c:if>
 
-														</div>
-													</c:forEach>
-													</c:if>
-												</li>
+															</div>
+														</c:forEach>
+													</c:if></li>
 
 											</ul>
 
@@ -652,15 +739,6 @@ function selectAll(selectAll) {
 															<h4 class="infoContent">${bankTransfer.payerName }</h4>
 														</li>
 
-														<!-- 	<c:if test="${bankTransfer.paymentTime != null }">
-															<li class="pb-0">
-																<h4 class="infoTitle detailOrderOrderTime">입금 시간 :</h4>
-																<h4 class="infoContent">
-																	<fmt:formatDate value="${bankTransfer.paymentTime }"
-																		type="date" />
-																</h4>
-															</li>
-														</c:if> -->
 													</ul>
 												</c:when>
 
@@ -695,7 +773,7 @@ function selectAll(selectAll) {
 
 														<c:if test="${detailOrder.cardNumber != null}">
 															<li class="pb-0">
-																<h4 class="infoTitle">결제 카드 번호 :</h4>
+																<h4 class="infoTitle">카드번호 :</h4>
 																<h4 class="infoContent">${detailOrder.cardNumber }</h4>
 															</li>
 														</c:if>
@@ -706,22 +784,6 @@ function selectAll(selectAll) {
 
 										</div>
 									</div>
-
-									<!--  <div class="col-lg-12 col-sm-6 orderInfo">
-										<div class="summery-box">
-											<div class="summery-header d-block">
-												<h3>포인트 / 적립금</h3>
-											</div>
-
-											<ul class="summery-contain pb-0 border-bottom-0">
-												<li class="d-block pt-0">
-													<p class="text-content">Pay on Delivery (Cash/Card).
-														Cash on delivery (COD) available. Card/Net banking
-														acceptance subject to device availability.</p>
-												</li>
-											</ul>
-										</div>
-									</div>-->
 								</div>
 							</div>
 							<div class="moveBtn">
@@ -897,7 +959,7 @@ function selectAll(selectAll) {
 
 				<div class="modal-body">
 					<input class="checkbox_animated check-box" type="checkbox"
-						name="order" id="selectAllOrder" onclick="selectAll(this)" /> <label
+						name="order" id="selectAllOrder" onclick="selectAll(this)"" /> <label
 						class="form-check-label" for="selectAllOrder"><span>전체선택</span></label>
 					<c:forEach var="order" items="${detailOrderInfo }">
 						<table class="table mb-0 productInfo">
@@ -909,8 +971,8 @@ function selectAll(selectAll) {
 											<div class="product border-0">
 												<c:choose>
 													<c:when test="${order.productImage != '' }">
-														<input class="checkbox_animated check-box" type="checkbox"
-															name="order" id="selectOrderCancel" />
+														<input class="checkbox_animated check-box" type="checkbox" value="${order.detailedOrderId }"
+															name="order" id="selectOrderCancel" onchange="handleCheckboxChange();" />
 														<a href="/detail/${order.productId }"
 															class="product-image"> <img
 															src="${order.productImage }" id="cancelOrderImg"
@@ -919,8 +981,8 @@ function selectAll(selectAll) {
 														</a>
 													</c:when>
 													<c:otherwise>
-														<input class="checkbox_animated check-box" type="checkbox"
-															name="order" id="selectOrderCancel" />
+														<input class="checkbox_animated check-box" type="checkbox" value="${order.detailedOrderId }"
+															name="order" id="selectOrderCancel" onchange="handleCheckboxChange();"/>
 														<a href="/detail/${order.productId }"
 															class="product-image"> <img
 															src="/resources/assets/images/noimage.jpg"
@@ -959,8 +1021,9 @@ function selectAll(selectAll) {
 										</td>
 
 										<td class="name">
-											<h4 class="table-title text-content">수량</h4>
-											<input type="text" class="form-control cancelQty" id="cancelQty" value="0"/>
+											<h4 class="table-title text-content">수량</h4> <input
+											type="text" class="form-control cancelQty" id="cancelQty"
+											value="0" />
 
 										</td>
 
@@ -980,72 +1043,159 @@ function selectAll(selectAll) {
 							placeholder="취소 사유" /><label for="cancelReason">취소 사유</label>
 					</div>
 
+					<c:choose>
+						<c:when test="${detailOrder.paymentMethod eq 'bkt' }">
+							<ul class="summery-contain pb-0 border-bottom-0">
+								<li class="pb-0 refundList">
+									<h4>결제수단</h4> <c:if
+										test="${detailOrder.paymentMethod eq 'bkt' }">
+										<span>무통장 입금</span>
+									</c:if>
+								</li>
+
+								<li class="pb-0 refundList">
+									<h4>환불은행</h4> <span id="changeRefundBank">${userInfo.refundBank }</span>
+								</li>
+
+								<li class="pb-0 refundList">
+									<h4>환불계좌</h4> <span id="changeRefundAccount">${userInfo.refundAccount }</span>
+								</li>
+
+								<li class="pb-0 refundList">
+									<h4>예금주</h4> <span id="changeAccountHolder">${userInfo.accountHolder }</span>
+								</li>
+								
+								<li class="pb-0 refundList">
+									<button class="btn theme-bg-color btn-md text-white" 
+									onclick="showRefund();" type="button">변경</button>
+								</li>
+
+							</ul>
+							<div class="editRefund">
+
+							<div class="col-12">
+								<div class="form-floating theme-form-floating">
+									<input type="text" class="form-control" id="accountHolder" placeholder="예금주" />
+									<label for="accountHolder">예금주</label>
+								</div>
+							</div>
+
+							<div class="col-12">
+								<div class="form-floating theme-form-floating">
+									<input type="text" class="form-control" id="refundAccount" placeholder="환불계좌" />
+									<label for="refundAccount">환불계좌</label>
+								</div>
+							</div>
+
+							<div class="col-12">
+								<div class="form-floating theme-form-floating">
+									<select class="form-select" id="floatingSelect2 newRefundBank"
+										name="refundBank" aria-label="Floating label select example">
+										<option selected>환불받으실 은행을 선택해주세요.</option>
+										<option value="KB국민은행">KB국민은행</option>
+										<option value="신한은행">신한은행</option>
+										<option value="우리은행">우리은행</option>
+										<option value="하나은행">하나은행</option>
+										<option value="SC제일은행">SC제일은행</option>
+										<option value="씨티은행">씨티은행</option>
+										<option value="NH농협은행">NH농협은행</option>
+										<option value="수협은행">수협은행</option>
+										<option value="케이뱅크">케이뱅크</option>
+										<option value="카카오뱅크">카카오뱅크</option>
+										<option value="토스뱅크">토스뱅크</option>
+										<option value="대구은행">대구은행</option>
+										<option value="BNK부산은행">BNK부산은행</option>
+										<option value="경남은행">경남은행</option>
+										<option value="광주은행">광주은행</option>
+										<option value="전북은행">전북은행</option>
+										<option value="제주은행">제주은행</option>
+										<option value="우체국">우체국</option>
+										<option value="새마을금고">새마을금고</option>
+									</select> <label for="floatingSelect">환불은행</label>
+								</div>
+							</div>
+							
+							<div class="col-12">
+								<button class="btn theme-bg-color btn-md text-white" 
+								onclick="editRefundAccount();" type="button">변경</button>
+							</div>
+							</div>
+						</c:when>
+
+						<c:otherwise>
+							<ul class="summery-contain pb-0 border-bottom-0">
+
+								<li class="pb-0 refundList">
+									<h4>결제수단</h4> <span>${detailOrder.paymentMethod}</span>
+								</li>
+
+								<c:if test="${detailOrder.cardName != null}">
+									<li class="pb-0 refundList">
+										<h4>결제카드</h4> <span>${detailOrder.cardName }</span>
+									</li>
+								</c:if>
+
+								<c:if test="${detailOrder.cardNumber != null}">
+									<li class="pb-0 refundList">
+										<h4>카드번호</h4> <span>${detailOrder.cardNumber }</span>
+									</li>
+								</c:if>
+
+							</ul>
+						</c:otherwise>
+					</c:choose>
+
 					<ul class="summery-contain pb-0 border-bottom-0">
 
-						<li class="pb-0">
-							<h4>결제금액 </h4>
-							<span>
-								<fmt:formatNumber value="${detailOrder.actualPaymentAmount }"
-									type="NUMBER" />
-								원
-							</span>
+						<li class="pb-0 refundList">
+							<h4>환불 금액</h4> <span> <fmt:formatNumber
+									value="${detailOrder.actualPaymentAmount }" type="NUMBER" /> 원
+						</span>
 						</li>
 
 						<c:if test="${detailOrder.usedPoints != 0 }">
-							<li class="pb-0">
-								<h4>환불 예정 포인트 </h4>
-								<span class="refundPoint">
-									<fmt:formatNumber value="${detailOrder.usedPoints }"
-										type="NUMBER" />
-									점
-								</span>
+							<li class="pb-0 refundList">
+								<h4>환불 포인트</h4> <span class="refundPoint"> <fmt:formatNumber
+										value="${detailOrder.usedPoints }" type="NUMBER" /> 점
+							</span>
 							</li>
 						</c:if>
 
 						<c:if test="${detailOrder.usedReward != 0 }">
-							<li class="pb-0">
-								<h4>환불 예정 적립금 </h4>
-								<span>
-									<fmt:formatNumber value="${detailOrder.usedReward }"
-										type="NUMBER" />
-									원
-								</span>
+							<li class="pb-0 refundList">
+								<h4>환불 적립금</h4> <span class="refundReward"> <fmt:formatNumber
+										value="${detailOrder.usedReward }" type="NUMBER" /> 원
+							</span>
 							</li>
 						</c:if>
-						<li class="pb-0">
-							<c:if test="${not empty couponHistory}">
-							<h4>환불 예정 쿠폰 </h4> 
-							<c:forEach var="coupons"
-								items="${couponHistory }">
-								<div class="couponsHistory">
-									<span>${coupons.couponName }</span>
+						<li class="pb-0 refundList"><c:if
+								test="${not empty couponHistory}">
+								<h4>환불 예정 쿠폰</h4>
+								<c:forEach var="coupons" items="${couponHistory }">
+									<div class="couponsHistory">
+										<span>${coupons.couponName }</span>
 
-									<c:set var="discountAmount"
-										value="${coupons.discountAmount * 0.01}" />
+										<c:set var="discountAmount"
+											value="${coupons.discountAmount * 0.01}" />
 
-									
-									<c:if test="${fn:contains(coupons.discountMethod,'P')}">
-										<span>${coupons.discountAmount }%</span>
-										<span>
-											<fmt:formatNumber
-												value="${detailOrder.totalAmount*discountAmount }"
-												type="NUMBER" />
-											원
-										</span>
-									</c:if>
 
-									<c:if test="${fn:contains(coupons.discountMethod,'D')}">
-										<span>
-											<fmt:formatNumber value="${coupons.discountAmount }"
-												type="NUMBER" />
-											원
-										</span>
-									</c:if>
+										<c:if test="${fn:contains(coupons.discountMethod,'P')}">
+											<span>${coupons.discountAmount }%</span>
+											<span> <fmt:formatNumber
+													value="${detailOrder.totalAmount*discountAmount }"
+													type="NUMBER" /> 원
+											</span>
+										</c:if>
 
-								</div>
-							</c:forEach>
-						</c:if>
-						</li>
+										<c:if test="${fn:contains(coupons.discountMethod,'D')}">
+											<span> <fmt:formatNumber
+													value="${coupons.discountAmount }" type="NUMBER" /> 원
+											</span>
+										</c:if>
+
+									</div>
+								</c:forEach>
+							</c:if></li>
 
 					</ul>
 				</div>
