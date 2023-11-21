@@ -96,7 +96,7 @@ public interface MemberService {
 	Map<String, Object> searchOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword, int pageNo) throws SQLException, NamingException;
 	
 	//취소할 주문 선택
-	DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId) throws SQLException, NamingException;
+	Map<String, Object> selectCancelOrder(String memberId, String orderNo, int detailedOrderId) throws SQLException, NamingException;
 
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------

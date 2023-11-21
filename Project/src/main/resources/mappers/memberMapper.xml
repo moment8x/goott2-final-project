@@ -142,8 +142,8 @@
         where member_id = #{memberId} and order_no = #{orderNo}
 	</update>
 
-	<select id="gerCouponsHistory" resultType="com.project.vodto.jmj.CouponHistory">
-		select c.discount_method, c.discount_amount, c.coupon_name 
+	<select id="getCouponsHistory" resultType="com.project.vodto.jmj.CouponHistory">
+		select c.discount_method, c.discount_amount, c.coupon_name, cl.expiration_date
 		from coupons c, coupon_logs cl
 		where cl.member_id = #{memberId} and cl.related_order = #{orderNo}
 		and c.coupon_number = cl.coupon_number
@@ -217,10 +217,10 @@
 		         and o.delivery_status = '배송완료'   
 	        </when>
 	        <when test="returnApply != null and returnApply.equals('반품신청')">
-		         and o.delivery_status = '반품신청'   
+		         and d.product_status = '반품신청'   
 	        </when>
 	        <when test="exchangeApply != null and exchangeApply.equals('교환신청')">
-		         and o.delivery_status = '교환신청'   
+		         and d.product_status = '교환신청'   
 	        </when>
 	        <when test="cancelList != null and cancelList.equals('취소')">
 		         and d.product_status = '취소' 
@@ -249,13 +249,14 @@
 	</select>
 	
 	<select id="selectCancelOrder" resultType="com.project.vodto.jmj.DetailOrder">
-		select d.product_price,d.product_quantity, d.product_status, prod.product_id, d.detailed_order_id,
+		select d.product_price,d.product_quantity, d.product_status, prod.product_id, d.detailed_order_id, pay.payment_method,
 		(SELECT p.product_image FROM product_images p WHERE p.product_id = prod.product_id limit 1) AS product_image, prod.product_name, d.product_invoice_number
-	    from detailed_order_items d, products prod, order_history o, (SELECT * FROM product_images GROUP BY product_id) p
+	    from detailed_order_items d, products prod, order_history o, (SELECT * FROM product_images GROUP BY product_id) p, payments pay
 	    where member_id = #{memberId} and d.order_no = #{orderNo} and d.detailed_order_id = #{detailedOrderId}
         and prod.product_id = d.product_id
         and d.order_no = o.order_no
         and prod.product_id = p.product_id
+        and o.order_no = pay.order_no
 	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">

@@ -11,13 +11,10 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-public class CancelDetailOrder {
-
-	private int amount; //금액
-	private String productId;
-	private int detailedOrderId;
+public class CancelDTO {
 	private String reason;
-	private String processingStatus; //처리여부
-	private String refundStatus; //환불여부
-	
+	private int amount;
+	private int refundPointUsed;
+	private int refundRewardUsed;
+	private int totalRefundAmount;
 }

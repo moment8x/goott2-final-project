@@ -32,6 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.CancelDTO;
 import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
@@ -512,7 +513,7 @@ public class myPageController {
 	}
 	
 	@RequestMapping(value = "orderDetailWithJson", method = RequestMethod.POST)
-	public ResponseEntity<DetailOrder> orderDetailFromJson(@RequestParam("orderNo") String orderNo, @RequestParam("detailedOrderId") int detailedOrderId,
+	public ResponseEntity<Map<String, Object>> orderDetailFromJson(@RequestParam("orderNo") String orderNo, @RequestParam("detailedOrderId") int detailedOrderId,
 			 HttpServletRequest request, Model model) {
 		System.out.println("orderDetailWitlhJson Controller");
 		HttpSession session = request.getSession();
@@ -522,17 +523,14 @@ public class myPageController {
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
 		
-		ResponseEntity<DetailOrder> result = null;
-
-		System.out.println("@@@@@@@@@@@@@@@@@@@주문상세 제이슨 응답" + detailedOrderId + "번 주문을 취소하자");
+		ResponseEntity<Map<String, Object>> result = null;
 		
-		// 주문상품 상세정보
-		DetailOrder cancelDetailOrder;
 		try {
-			
-			cancelDetailOrder = mService.selectCancelOrder(memberId, orderNo, detailedOrderId);
-//			model.addAttribute("cancelDetailOrder", cancelDetailOrder);
-			result = new ResponseEntity<DetailOrder>(cancelDetailOrder, header, HttpStatus.OK);
+			// 주문상품 상세정보, 쿠폰사용내역
+			Map<String, Object> map = mService.selectCancelOrder(memberId, orderNo, detailedOrderId);
+
+
+			result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -590,17 +588,15 @@ public class myPageController {
 
 	@RequestMapping(value = "searchOrderStatus", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> searchOrderStatus(@ModelAttribute GetOrderStatusSearchKeyword keyword,
-			HttpServletRequest request, @RequestParam(value = "pageNo", defaultValue = "1") int pageNo, Model model) {
+		HttpServletRequest request, @RequestParam(value = "pageNo", defaultValue = "1") int pageNo, Model model) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
-
+System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@키워드" + keyword.toString());
 		ResponseEntity<Map<String, Object>> result = null;
 
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
-
-		System.out.println("@@@@@@@@@@@@@@키워드@@@@@@@@@@@@@@@" + keyword.toString());
 
 		try {
 			Map<String, Object> map = mService.searchOrderStatus(memberId, keyword, pageNo);
@@ -609,7 +605,6 @@ public class myPageController {
 
 			model.addAttribute("page", page);
 
-			System.out.println("@@@@@@@@@@@@@@@@@@키워드 페이징" + page.toString());
 			if (sos != null) {
 				result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);
 			} else {
@@ -620,5 +615,14 @@ public class myPageController {
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	@RequestMapping("cancelOrder")
+	public void cancelOrder(@ModelAttribute CancelDTO tmpCancel, HttpServletRequest request) {
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@취소");
+
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
 	}
 }

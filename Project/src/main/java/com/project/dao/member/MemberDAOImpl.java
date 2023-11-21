@@ -289,7 +289,7 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("memberId", memberId);
 		params.put("orderNo", orderNo);
 		
-		return ses.selectList(ns + ".gerCouponsHistory", params);
+		return ses.selectList(ns + ".getCouponsHistory", params);
 	}
 	
 	@Override

@@ -22,4 +22,5 @@ public class DetailOrder {
 	private String productInvoiceNumber;
 	private String productId;
 	private int detailedOrderId;
+	private String paymentMethod;
 }

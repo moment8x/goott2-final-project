@@ -342,10 +342,13 @@ public class MemberServiceImpl implements MemberService {
 	}
 	
 	@Override
-	public DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId)
+	public Map<String, Object> selectCancelOrder(String memberId, String orderNo, int detailedOrderId)
 			throws SQLException, NamingException {
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("couponsHistory", mDao.getCouponsHistory(memberId, orderNo));
+		result.put("selectCancelOrder", mDao.selectCancelOrder(memberId, orderNo, detailedOrderId));
 		
-		return mDao.selectCancelOrder(memberId, orderNo, detailedOrderId);
+		return result;
 	}
 
 	// --------------------------------------- 장민정 끝 ----------------------------------------
