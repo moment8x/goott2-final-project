@@ -293,9 +293,11 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	
 	@Override
-	public GetBankTransfer getBankTransfer(String orderNo) throws SQLException, NamingException {
-		
-		return ses.selectOne(ns + ".getBankTransfer", orderNo);
+	public GetBankTransfer getBankTransfer(String orderNo, String memberId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		return ses.selectOne(ns + ".getBankTransfer", params);
 	}
 	
 	@Override
@@ -347,6 +349,16 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectOne(ns + ".getOrderStatusCnt", params);
 	}
+	
+	@Override
+	public DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		params.put("detailedOrderId", detailedOrderId);
+		return ses.selectOne(ns + ".selectCancelOrder", params);
+	}
 
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
@@ -390,6 +402,8 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".updateProfile", params);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+	
 
 	
 

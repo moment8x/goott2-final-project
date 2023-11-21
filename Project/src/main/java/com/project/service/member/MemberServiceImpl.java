@@ -260,7 +260,7 @@ public class MemberServiceImpl implements MemberService {
 		
 		result.put("detailOrderInfo", mDao.selectDetailOrderInfo(memberId, orderNo));
 		result.put("couponsHistory", mDao.getCouponsHistory(memberId, orderNo));
-		result.put("bankTransfer", mDao.getBankTransfer(orderNo));
+		result.put("bankTransfer", mDao.getBankTransfer(orderNo, memberId));
 		result.put("orderQty", mDao.selectOrderProductCount(orderNo));
 		
 		return result;
@@ -340,6 +340,14 @@ public class MemberServiceImpl implements MemberService {
 						
 		return result;
 	}
+	
+	@Override
+	public DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId)
+			throws SQLException, NamingException {
+		
+		return mDao.selectCancelOrder(memberId, orderNo, detailedOrderId);
+	}
+
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
 	@Override
@@ -396,6 +404,7 @@ public class MemberServiceImpl implements MemberService {
 		System.out.println("======= 멤버(로그인) 서비스단 끝 =======");
 		return result;
 	}
+
 
 
 

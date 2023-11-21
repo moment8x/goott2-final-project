@@ -512,8 +512,9 @@ public class myPageController {
 	}
 	
 	@RequestMapping(value = "orderDetailWithJson", method = RequestMethod.POST)
-	public ResponseEntity<List<DetailOrder>> orderDetailFromJson(@RequestParam("no") String orderNo, 
-			@RequestParam ("detailedOrderId") int detailedOrderId, HttpServletRequest request, Model model) {
+	public ResponseEntity<DetailOrder> orderDetailFromJson(@RequestParam("orderNo") String orderNo, @RequestParam("detailedOrderId") int detailedOrderId,
+			 HttpServletRequest request, Model model) {
+		System.out.println("orderDetailWitlhJson Controller");
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
@@ -521,21 +522,20 @@ public class myPageController {
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
 		
-		ResponseEntity<List<DetailOrder>> result = null;
+		ResponseEntity<DetailOrder> result = null;
 
-			System.out.println("@@@@@@@@@@@@@@@@@@@주문상세 제이슨 응답" + detailedOrderId + "번 주문을 취소하자");
-		
+		System.out.println("@@@@@@@@@@@@@@@@@@@주문상세 제이슨 응답" + detailedOrderId + "번 주문을 취소하자");
 		
 		// 주문상품 상세정보
-		List<DetailOrder> detailOrder;
+		DetailOrder cancelDetailOrder;
 		try {
-			detailOrder = mService.getDetailOrderInfo(memberId, orderNo);
-//			model.addAttribute("productOrderList", detailOrder);
-			result = new ResponseEntity<List<DetailOrder>>(detailOrder, header, HttpStatus.OK);
+			
+			cancelDetailOrder = mService.selectCancelOrder(memberId, orderNo, detailedOrderId);
+//			model.addAttribute("cancelDetailOrder", cancelDetailOrder);
+			result = new ResponseEntity<DetailOrder>(cancelDetailOrder, header, HttpStatus.OK);
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			 result = new ResponseEntity<>(null, header, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		return result;

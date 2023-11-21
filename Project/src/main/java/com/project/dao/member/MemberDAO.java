@@ -109,7 +109,7 @@ public interface MemberDAO {
 	List<CouponHistory> getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException;
 	
 	// 무통장 주문 내역 가져오기
-	GetBankTransfer getBankTransfer(String orderNo) throws SQLException, NamingException;
+	GetBankTransfer getBankTransfer(String orderNo, String memberId) throws SQLException, NamingException;
 	
 	//주문상태별 조회
 	List<MyPageOrderList> selectOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword, PagingInfo pi) throws SQLException, NamingException;
@@ -119,6 +119,9 @@ public interface MemberDAO {
 	
 	//주문상태별로 주문갯수
 	int getTotalOrderStatusCnt(String memberId, GetOrderStatusSearchKeyword keyword) throws SQLException, NamingException;
+	
+	//취소할 주문 가져오기
+	DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -130,6 +133,7 @@ public interface MemberDAO {
 	// 프로필사진 업데이트
 	int updateProfile(String memberId, String newFileName) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+	
 	
 	
 	

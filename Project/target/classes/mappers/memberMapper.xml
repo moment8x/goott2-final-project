@@ -150,9 +150,10 @@
 	</select>
 	
 	<select id="getBankTransfer" resultType="com.project.vodto.jmj.GetBankTransfer">
-		select bank_name, payer_name, deposited_account, payment_time
-		from bank_transfers 
-		where order_no = #{orderNo}
+		select b.bank_name, b.payer_name, b.deposited_account, b.payment_time, b.amount_to_pay
+		from bank_transfers b, order_history o
+		where b.order_no =#{orderNo} and o.member_id = #{memberId}
+        and b.order_no = o.order_no
 	</select>
 	
 	<select id="searchOrderStatus" resultType="com.project.vodto.jmj.MyPageOrderList">
@@ -245,6 +246,16 @@
 	
 	<select id="getTotalOrderCnt" resultType="int">
 		select count(order_no) from order_history where member_id = #{memberId}
+	</select>
+	
+	<select id="selectCancelOrder" resultType="com.project.vodto.jmj.DetailOrder">
+		select d.product_price,d.product_quantity, d.product_status, prod.product_id, d.detailed_order_id,
+		(SELECT p.product_image FROM product_images p WHERE p.product_id = prod.product_id limit 1) AS product_image, prod.product_name, d.product_invoice_number
+	    from detailed_order_items d, products prod, order_history o, (SELECT * FROM product_images GROUP BY product_id) p
+	    where member_id = #{memberId} and d.order_no = #{orderNo} and d.detailed_order_id = #{detailedOrderId}
+        and prod.product_id = d.product_id
+        and d.order_no = o.order_no
+        and prod.product_id = p.product_id
 	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">

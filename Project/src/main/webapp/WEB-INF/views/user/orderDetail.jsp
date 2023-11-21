@@ -102,6 +102,7 @@ $(function () {
 		  console.log("총 주문 갯수 " + orderQty)
 		  
 		  if(totalQty > orderQty){
+			  totalQty = 0
 			  refundPoint = 0
 			  refundReward = 0
 		  	alert("주문 수량 보다 많이 입력 할 수 없습니다.")
@@ -118,9 +119,68 @@ $(function () {
 		  
 		  $('.refundPoint').text(Math.floor(refundPoint).toLocaleString()+ "점") 
 		  $('.refundReward').text(Math.floor(refundReward).toLocaleString()+ "점") 
+	
 		});
+	
 		
 	})
+	
+	function orderCancel() {
+		
+		}
+	
+	
+	function selectOrderCancel() {
+	  $("input[name='order']:checked").each(function () {
+	    let detailedOrderId = $(this).val();
+	    let orderNo = '${detailOrder.orderNo}';
+	
+	    alert(detailedOrderId + "번 주문 상품");
+	
+	    $.ajax({
+	      url: "/user/orderDetailWithJson", // 데이터를 수신받을 서버 주소
+	      type: "post", // 통신방식(GET, POST, PUT, DELETE)
+	      data: {
+	    	  detailedOrderId, 
+	    	  orderNo,
+	      },
+	      dataType: "json",
+	      async: false,
+	      success: function (data) {
+	        console.log(data);
+	        let productPrice = data.productPrice;
+	        let totalQty = calculateTotalQuantity();
+	        let orderQty = ${orderQty}
+	        let refundAmount = $('.refundAmount').text().replace("원", "").replace(",", "")
+			let bktRefundAmount = $('.bktRefundAmount').text().replace("원", "").replace(",", "")
+			let point = ${detailOrder.usedPoints} //결제 할 때 사용한 포인트
+		 	let reward = ${detailOrder.usedReward}
+			
+			 if(totalQty != orderQty){
+				 refundPoint = calculate(orderQty, totalQty, point)
+				 refundReward = calculate(orderQty, totalQty, reward)
+				 refundAmount -= productPrice
+				 bktRefundAmount -= productPrice
+				 $('.refundAmount').text(refundAmount.toLocaleString()+ "원")
+				 $('.bktRefundAmount').text(bktRefundAmount.toLocaleString()+ "원")
+				 console.log("환불포인트 : "+refundPoint + "환불 적립금 : " + refundReward)	 
+			  }else{
+				  refundAmount = refundAmount - refundPoint - refundReward
+				  bktRefundAmount = bktRefundAmount - refundPoint - refundReward
+				  $('.refundAmount').text(refundAmount.toLocaleString()+ "원")
+				  $('.bktRefundAmount').text(bktRefundAmount.toLocaleString()+ "원")
+			  }
+			 console.log("!!!!!!!!!!")
+			 
+	        
+	      },
+	      error: function (error) {
+	    	  console.log(error);
+	      },
+	    });
+	  });
+	}
+
 	
 	//환불 예정 포인트, 적립금 구하기
 	function calculate(n, k, usedAmount) { // 입력한 총 수량, 총 주문수량, 포인트, 적립금
@@ -203,12 +263,15 @@ function editBasicShippingAddress() {
 }
 
 //주문한 상품 전체선택
-function selectAll(selectAll) {
-	let allCheck = document.getElementsByName("order")
-	allCheck.forEach((order) => {
-		order.checked = selectAll.checked;
-		})
+function selectAll() {
+	if($("#selectAllOrder").is(':checked')) {
+		$("input[name=order]").prop("checked", true);
+	} else {
+		$("input[name=order]").prop("checked", false);
+	}
 }
+
+
 
 function showRefund() {
 	$('.editRefund').show()
@@ -229,28 +292,16 @@ function editRefundAccount() {
 	$('.editRefund').hide()
 }
 
-function handleCheckboxChange() {
-	let checkbox = document.getElementById("selectOrderCancel");
-	let detailedOrderId = $('input[name="order"]:checked').val()
-    // 체크박스가 체크되었는지 확인
-    if (checkbox.checked) {
-        // 체크되었을 때 실행할 동작
-        alert(detailedOrderId + "번 주문 상품")
-        fetchDetailOrders();
-    } else {
-        // 체크가 해제되었을 때 실행할 동작 (선택적)
-    }
-}
 
 function fetchDetailOrders() {
 	let orderNo = "${detailOrder.orderNo}"
-	let detailedOrderId = $('input[name="order"]:checked').val()
-	console.log(detailedOrderId)
+	//let detailedOrderId = $('input[name="order"]:checked').val()
+	//console.log(detailedOrderId)
 	 $.ajax({
 			url : '/user/orderDetailWithJson', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
-				detailedOrderId,
+			//	detailedOrderId,
 				orderNo
 			},
 			dataType : 'json',
@@ -372,7 +423,7 @@ function fetchDetailOrders() {
 	margin-bottom: 10px;
 }
 
-.editRefund{
+.editRefund {
 	display: none;
 }
 </style>
@@ -701,11 +752,22 @@ function fetchDetailOrders() {
 											<ul class="summery-total">
 												<li class="list-total border-top-0 pt-2">
 													<h4 class="fw-bold">결제금액</h4>
-													<h4 class="fw-bold">
+													<c:choose>
+													<c:when test="${detailOrder.paymentMethod eq 'bkt' }">
+														<h4 class="fw-bold">
 														<fmt:formatNumber
-															value="${detailOrder.actualPaymentAmount }" type="NUMBER" />
+															value="${bankTransfer.amountToPay }" type="NUMBER" />
 														원
 													</h4>
+													</c:when>
+													<c:otherwise>
+														<h4 class="fw-bold">
+															<fmt:formatNumber
+																value="${detailOrder.actualPaymentAmount }" type="NUMBER" />
+															원
+														</h4>
+													</c:otherwise>
+													</c:choose>
 												</li>
 											</ul>
 
@@ -959,7 +1021,7 @@ function fetchDetailOrders() {
 
 				<div class="modal-body">
 					<input class="checkbox_animated check-box" type="checkbox"
-						name="order" id="selectAllOrder" onclick="selectAll(this)"" /> <label
+						name="order" id="selectAllOrder" onclick="selectAll();" onchange="selectOrderCancel();" /> <label
 						class="form-check-label" for="selectAllOrder"><span>전체선택</span></label>
 					<c:forEach var="order" items="${detailOrderInfo }">
 						<table class="table mb-0 productInfo">
@@ -971,8 +1033,11 @@ function fetchDetailOrders() {
 											<div class="product border-0">
 												<c:choose>
 													<c:when test="${order.productImage != '' }">
-														<input class="checkbox_animated check-box" type="checkbox" value="${order.detailedOrderId }"
-															name="order" id="selectOrderCancel" onchange="handleCheckboxChange();" />
+														<input
+															class="checkbox_animated check-box selectOrderCancel"
+															type="checkbox" value="${order.detailedOrderId }"
+															onchange="selectOrderCancel();" name="order"
+															id="selectOrderCancel" />
 														<a href="/detail/${order.productId }"
 															class="product-image"> <img
 															src="${order.productImage }" id="cancelOrderImg"
@@ -981,8 +1046,11 @@ function fetchDetailOrders() {
 														</a>
 													</c:when>
 													<c:otherwise>
-														<input class="checkbox_animated check-box" type="checkbox" value="${order.detailedOrderId }"
-															name="order" id="selectOrderCancel" onchange="handleCheckboxChange();"/>
+														<input
+															class="checkbox_animated check-box selectOrderCancel"
+															type="checkbox" value="${order.detailedOrderId }"
+															onchange="selectOrderCancel();" name="order"
+															id="selectOrderCancelWithNoImg" />
 														<a href="/detail/${order.productId }"
 															class="product-image"> <img
 															src="/resources/assets/images/noimage.jpg"
@@ -1064,61 +1132,61 @@ function fetchDetailOrders() {
 								<li class="pb-0 refundList">
 									<h4>예금주</h4> <span id="changeAccountHolder">${userInfo.accountHolder }</span>
 								</li>
-								
+
 								<li class="pb-0 refundList">
-									<button class="btn theme-bg-color btn-md text-white" 
-									onclick="showRefund();" type="button">변경</button>
+									<button class="btn theme-bg-color btn-md text-white"
+										onclick="showRefund();" type="button">변경</button>
 								</li>
 
 							</ul>
 							<div class="editRefund">
 
-							<div class="col-12">
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="accountHolder" placeholder="예금주" />
-									<label for="accountHolder">예금주</label>
+								<div class="col-12">
+									<div class="form-floating theme-form-floating">
+										<input type="text" class="form-control" id="accountHolder"
+											placeholder="예금주" /> <label for="accountHolder">예금주</label>
+									</div>
 								</div>
-							</div>
 
-							<div class="col-12">
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="refundAccount" placeholder="환불계좌" />
-									<label for="refundAccount">환불계좌</label>
+								<div class="col-12">
+									<div class="form-floating theme-form-floating">
+										<input type="text" class="form-control" id="refundAccount"
+											placeholder="환불계좌" /> <label for="refundAccount">환불계좌</label>
+									</div>
 								</div>
-							</div>
 
-							<div class="col-12">
-								<div class="form-floating theme-form-floating">
-									<select class="form-select" id="floatingSelect2 newRefundBank"
-										name="refundBank" aria-label="Floating label select example">
-										<option selected>환불받으실 은행을 선택해주세요.</option>
-										<option value="KB국민은행">KB국민은행</option>
-										<option value="신한은행">신한은행</option>
-										<option value="우리은행">우리은행</option>
-										<option value="하나은행">하나은행</option>
-										<option value="SC제일은행">SC제일은행</option>
-										<option value="씨티은행">씨티은행</option>
-										<option value="NH농협은행">NH농협은행</option>
-										<option value="수협은행">수협은행</option>
-										<option value="케이뱅크">케이뱅크</option>
-										<option value="카카오뱅크">카카오뱅크</option>
-										<option value="토스뱅크">토스뱅크</option>
-										<option value="대구은행">대구은행</option>
-										<option value="BNK부산은행">BNK부산은행</option>
-										<option value="경남은행">경남은행</option>
-										<option value="광주은행">광주은행</option>
-										<option value="전북은행">전북은행</option>
-										<option value="제주은행">제주은행</option>
-										<option value="우체국">우체국</option>
-										<option value="새마을금고">새마을금고</option>
-									</select> <label for="floatingSelect">환불은행</label>
+								<div class="col-12">
+									<div class="form-floating theme-form-floating">
+										<select class="form-select" id="floatingSelect2 newRefundBank"
+											name="refundBank" aria-label="Floating label select example">
+											<option selected>환불받으실 은행을 선택해주세요.</option>
+											<option value="KB국민은행">KB국민은행</option>
+											<option value="신한은행">신한은행</option>
+											<option value="우리은행">우리은행</option>
+											<option value="하나은행">하나은행</option>
+											<option value="SC제일은행">SC제일은행</option>
+											<option value="씨티은행">씨티은행</option>
+											<option value="NH농협은행">NH농협은행</option>
+											<option value="수협은행">수협은행</option>
+											<option value="케이뱅크">케이뱅크</option>
+											<option value="카카오뱅크">카카오뱅크</option>
+											<option value="토스뱅크">토스뱅크</option>
+											<option value="대구은행">대구은행</option>
+											<option value="BNK부산은행">BNK부산은행</option>
+											<option value="경남은행">경남은행</option>
+											<option value="광주은행">광주은행</option>
+											<option value="전북은행">전북은행</option>
+											<option value="제주은행">제주은행</option>
+											<option value="우체국">우체국</option>
+											<option value="새마을금고">새마을금고</option>
+										</select> <label for="floatingSelect">환불은행</label>
+									</div>
 								</div>
-							</div>
-							
-							<div class="col-12">
-								<button class="btn theme-bg-color btn-md text-white" 
-								onclick="editRefundAccount();" type="button">변경</button>
-							</div>
+
+								<div class="col-12">
+									<button class="btn theme-bg-color btn-md text-white"
+										onclick="editRefundAccount();" type="button">변경</button>
+								</div>
 							</div>
 						</c:when>
 
@@ -1146,11 +1214,21 @@ function fetchDetailOrders() {
 					</c:choose>
 
 					<ul class="summery-contain pb-0 border-bottom-0">
-
+						
 						<li class="pb-0 refundList">
-							<h4>환불 금액</h4> <span> <fmt:formatNumber
+							<h4>환불 금액</h4> 
+						<c:choose>
+						<c:when test="${detailOrder.paymentMethod eq 'bkt' }">
+							<span class="bktRefundAmount"> <fmt:formatNumber
+									value="${bankTransfer.amountToPay }" type="NUMBER" /> 원
+						</span>
+						</c:when>
+						<c:otherwise>
+							<span class="refundAmount"> <fmt:formatNumber
 									value="${detailOrder.actualPaymentAmount }" type="NUMBER" /> 원
 						</span>
+						</c:otherwise>
+						</c:choose>
 						</li>
 
 						<c:if test="${detailOrder.usedPoints != 0 }">

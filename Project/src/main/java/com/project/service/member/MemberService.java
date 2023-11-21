@@ -94,6 +94,9 @@ public interface MemberService {
 	
 	//주문내역 상태별 검색
 	Map<String, Object> searchOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword, int pageNo) throws SQLException, NamingException;
+	
+	//취소할 주문 선택
+	DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId) throws SQLException, NamingException;
 
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
@@ -104,6 +107,7 @@ public interface MemberService {
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
+	
 	
 	
 	
