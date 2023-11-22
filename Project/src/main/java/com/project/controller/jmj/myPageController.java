@@ -468,7 +468,6 @@ public class myPageController {
 
 	@RequestMapping("orderDetail")
 	public void orderDetail(@RequestParam("no") String orderNo, HttpServletRequest request, Model model) {
-		System.out.println("주문상세페이지입니당.");
 
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
@@ -515,7 +514,6 @@ public class myPageController {
 	@RequestMapping(value = "orderDetailWithJson", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> orderDetailFromJson(@RequestParam("orderNo") String orderNo, @RequestParam("detailedOrderId") int detailedOrderId,
 			 HttpServletRequest request, Model model) {
-		System.out.println("orderDetailWitlhJson Controller");
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
@@ -618,11 +616,13 @@ System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@키워드" + keyword.toString());
 	}
 	
 	@RequestMapping("cancelOrder")
-	public void cancelOrder(@ModelAttribute CancelDTO tmpCancel, HttpServletRequest request) {
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@취소");
-
+	public void cancelOrder(@ModelAttribute CancelDTO tmpCancel, HttpServletRequest request, CancelDTO cd) {
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@취소 " + cd.toString());
+		
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
+		
+		mService.cancelOrder(tmpCancel, memberId);
 	}
 }

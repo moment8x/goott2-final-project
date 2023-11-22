@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import com.project.vodto.Member;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.CancelDTO;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
@@ -312,6 +313,8 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("cancelList", keyword.getCancelList());
 		params.put("exchangeList", keyword.getExchangeList());
 		params.put("returnList", keyword.getReturnList());
+		params.put("exchangeApply", keyword.getExchangeApply());
+		params.put("returnApply", keyword.getReturnApply());
 		
 		params.put("sevenDaysAgo", keyword.getSevenDaysAgo());
 		params.put("fifteenDaysAgo", keyword.getFifteenDaysAgo());
@@ -359,6 +362,61 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("detailedOrderId", detailedOrderId);
 		return ses.selectOne(ns + ".selectCancelOrder", params);
 	}
+	
+	@Override
+	public int insertCancelOrder(String productId, String reason, int detailedOrderId, String paymentMethod)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("productId", productId);
+		params.put("reason", reason);
+		params.put("detailedOrderId", detailedOrderId);
+		params.put("paymentMethod", paymentMethod);
+		
+		return ses.insert(ns + ".insertCancelOrder", params);
+	}
+
+	@Override
+	public int updateDetailProductStatus(int detailedOrderId) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".updateDetailProductStatus", detailedOrderId);
+	}
+
+	@Override
+	public int updateRefundAccount(String memberId, CancelDTO tmpCancel) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("refundBank", tmpCancel.getRefundBank());
+		params.put("refundAccount", tmpCancel.getRefundAccount());
+		params.put("accountHolder", tmpCancel.getAccountHolder());
+		
+		return ses.update(ns + ".updateRefundAccount", tmpCancel);
+	}
+
+	@Override
+	public int insertRefund(String productId, CancelDTO tmpCancel, String paymentMethod)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("productId", productId);
+		params.put("amount", tmpCancel.getAmount());
+		params.put("refundRewardUsed", tmpCancel.getRefundRewardUsed());
+		params.put("refundPointUsed", tmpCancel.getRefundPointUsed());
+		params.put("totalRefundAmount", tmpCancel.getTotalRefundAmount());
+		params.put("paymentMethod", paymentMethod);
+		
+		return ses.insert(ns + ".insertRefund", params);
+	}
+	
+	@Override
+	public int insertRewardLog(String memberId, CancelDTO tmpCancel, int addReward)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("refundRewardUsed", tmpCancel.getRefundRewardUsed());
+		params.put("orderNo", tmpCancel.getOrderNo());
+		params.put("balance", addReward);
+		
+		return ses.insert(ns + ".insertRewardLog", tmpCancel);
+	}
 
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
@@ -403,11 +461,13 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
 
-	
 
-	
 
-	
+
+
+
+
+
 
 
 	

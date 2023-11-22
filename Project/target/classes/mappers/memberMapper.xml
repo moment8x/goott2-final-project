@@ -97,7 +97,7 @@
 	</update>
 	
 	<select id="getDetailOrder" resultType="com.project.vodto.jmj.DetailOrder"> 
-		select d.product_price,d.product_quantity, d.product_status, prod.product_id, d.detailed_order_id,
+		select d.product_price,d.product_quantity, d.product_status, prod.product_id, d.detailed_order_id, o.delivery_status,
 		(SELECT p.product_image FROM product_images p WHERE p.product_id = prod.product_id limit 1) AS product_image, prod.product_name, d.product_invoice_number
 	    from detailed_order_items d, products prod, order_history o, (SELECT * FROM product_images GROUP BY product_id) p
 	    where member_id = #{memberId} and d.order_no = #{orderNo}
@@ -173,6 +173,12 @@
 	        </when>
 	        <when test="deliveryCompleted != null and deliveryCompleted.equals('배송완료')">
 		         and o.delivery_status = '배송완료'   
+	        </when>
+	         <when test="returnApply != null and returnApply.equals('반품신청')">
+		         and d.product_status = '반품신청'   
+	        </when>
+	        <when test="exchangeApply != null and exchangeApply.equals('교환신청')">
+		         and d.product_status = '교환신청'   
 	        </when>
 	        <when test="cancelList != null and cancelList.equals('취소')">
 		         and d.product_status = '취소' 
@@ -258,6 +264,44 @@
         and prod.product_id = p.product_id
         and o.order_no = pay.order_no
 	</select>
+	
+	<insert id="insertCancelOrder">
+		insert into cacellations(product_id, reason, processing_status, refund_status, detailed_order_id) 
+		<choose>
+			<when test="paymentMethod != null and paymentMethod.equals('bkt')">			
+				values (#{productId},#{reason},'취소완료','Y',#{detailedOrderId})
+			</when>
+			<otherwise>
+				values (#{productId},#{reason},'취소완료','N',#{detailedOrderId})
+			</otherwise>
+		</choose>
+	</insert>
+	
+	<update id="updateDetailProductStatus">
+		update detailed_order_items set product_status = '취소' where d.detailed_order_id = #{detailedOrderId}
+	</update>
+	
+	<update id="updateRefundAccount">
+		update member set refund_bank = #{refundBank}, refund_account = #{refundAccount}, account_holder = #{accountHolder} where member_id = #{memberId}
+	</update>
+	
+	<insert id="insertRefund">
+		<choose>
+			<when test="paymentMethod != null and paymentMethod.equals('bkt')">
+				insert into refunds(product_id, total_refund_amount, refund_reward_used, refund_point_used, actual_refund_amount)
+				values (#{productId},#{amount},#{refundRewardUsed},#{refundPointUsed}, #{totalRefundAmount})
+			</when>
+			<otherwise>
+				insert into refunds(product_id, total_refund_amount, refund_reward_used, refund_point_used)
+				values (#{productId},#{amount},#{refundRewardUsed},#{refundPointUsed})
+			</otherwise>
+		</choose>
+	</insert>
+	
+	<insert id="insertRewardLog">
+		insert into reward_logs(member_id, reason, reward, related_order, balance) 
+		values(#{memberId},'주문취소',#{refundRewardUsed},#{orderNo},#{balance})
+	</insert>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">
 		SELECT member_id FROM member WHERE member_id = #{memberId}  

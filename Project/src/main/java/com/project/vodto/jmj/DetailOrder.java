@@ -23,4 +23,5 @@ public class DetailOrder {
 	private String productId;
 	private int detailedOrderId;
 	private String paymentMethod;
+	private String deliveryStatus;
 }

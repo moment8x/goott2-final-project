@@ -23,6 +23,7 @@ import com.project.vodto.OrderHistory;
 import com.project.vodto.PointLog;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.CancelDTO;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
@@ -350,6 +351,38 @@ public class MemberServiceImpl implements MemberService {
 		
 		return result;
 	}
+	
+	@Override
+	public boolean cancelOrder(CancelDTO tmpCancel, String memberId) throws SQLException, NamingException {
+		Map<String, Object> order = selectCancelOrder(memberId, tmpCancel.getOrderNo(), tmpCancel.getDetailedOrderId());
+		DetailOrder detailOrder = (DetailOrder)order.get("selectCancelOrder");
+		Member member = mDao.selectMyInfo(memberId);
+
+	//		-- 취소 인서트(무통장이라면)
+		if(mDao.insertCancelOrder(detailOrder.getProductId(), tmpCancel.getReason(), tmpCancel.getDetailedOrderId(), detailOrder.getPaymentMethod()) != 0) {
+	//		-- 디테일 프로덕트상태 업데이트
+			mDao.updateDetailProductStatus(tmpCancel.getDetailedOrderId());
+			//환불정보를 변경했다면
+			mDao.updateRefundAccount(memberId, tmpCancel);
+			
+		}
+//		-- 환불 인서트(무통장이라면)
+		mDao.insertRefund(detailOrder.getProductId(), tmpCancel, detailOrder.getPaymentMethod());
+//		-- if(환불 적립금이 있다면)
+//			-- 적립금 로그 인서트
+		int addReward = member.getTotalRewards() + tmpCancel.getRefundRewardUsed();
+		mDao.insertRewardLog(memberId, tmpCancel, addReward);
+//			-- 멤버 총 적립금 업데이트 여기서부터~~~~~~~~~~~~~~~~~
+		mDao.updateMemberReward(tmpCancel.getRefundRewardUsed());
+//		-- if(환불 포인트가 있다면)
+//			-- 포인트 로그 인서트
+//			-- 멤버 총 포인트 업데이트
+//		-- if(환불 쿠폰이 있다면)
+//			-- 쿠폰로그 사용일 null로 업데이트
+//			-- 멤버 총 쿠폰갯수 업데이트
+		return false;
+	}
+
 
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
@@ -407,6 +440,7 @@ public class MemberServiceImpl implements MemberService {
 		System.out.println("======= 멤버(로그인) 서비스단 끝 =======");
 		return result;
 	}
+
 
 
 

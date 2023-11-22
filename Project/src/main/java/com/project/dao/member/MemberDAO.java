@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.project.vodto.Member;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.CancelDTO;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
@@ -122,6 +123,21 @@ public interface MemberDAO {
 	
 	//취소할 주문 가져오기
 	DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId) throws SQLException, NamingException;
+	
+	//취소테이블 인서트
+	int insertCancelOrder(String productId, String reason, int detailedOrderId, String paymentMethod) throws SQLException, NamingException;
+	
+	//취소할경우 디테일 상품상태 업데이트
+	int updateDetailProductStatus(int detailedOrderId) throws SQLException, NamingException;
+	
+	//환불계좌 업데이트
+	int updateRefundAccount(String memberId, CancelDTO tmpCancel) throws SQLException, NamingException;
+	
+	//환불테이블 인서트
+	int insertRefund(String productId, CancelDTO tmpCancel, String paymentMethod) throws SQLException, NamingException;
+	
+	//취소시 사용한 적립금이 있다면 적립금 로그 인서트
+	int insertRewardLog(String memberId, CancelDTO tmpCancel, int addReward) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -133,6 +149,14 @@ public interface MemberDAO {
 	// 프로필사진 업데이트
 	int updateProfile(String memberId, String newFileName) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+
+
+	
+
+	
+
+	
+
 	
 	
 	
