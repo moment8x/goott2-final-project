@@ -125,7 +125,7 @@ public interface MemberDAO {
 	DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId) throws SQLException, NamingException;
 	
 	//취소테이블 인서트
-	int insertCancelOrder(String productId, String reason, int detailedOrderId, String paymentMethod) throws SQLException, NamingException;
+	int insertCancelOrder(String productId, String reason,int amount, int detailedOrderId, String paymentMethod) throws SQLException, NamingException;
 	
 	//취소할경우 디테일 상품상태 업데이트
 	int updateDetailProductStatus(int detailedOrderId) throws SQLException, NamingException;
@@ -137,7 +137,32 @@ public interface MemberDAO {
 	int insertRefund(String productId, CancelDTO tmpCancel, String paymentMethod) throws SQLException, NamingException;
 	
 	//취소시 사용한 적립금이 있다면 적립금 로그 인서트
-	int insertRewardLog(String memberId, CancelDTO tmpCancel, int addReward) throws SQLException, NamingException;
+	int insertRewardLog(String memberId, CancelDTO tmpCancel, int totalReward) throws SQLException, NamingException;
+	
+	//멤버 적립금 업데이트
+	int updateMemberReward(int addReward, String memberId) throws SQLException, NamingException;
+	
+	//환불 포인트가 있다면 포인트로그 인서트
+	int insertPointLog(String memberId, int refundPointUsed, String orderNo, int totalPoint) throws SQLException, NamingException;
+	
+	//적립금로그 balance가져오기
+	int selectRewardBalance(String memberId) throws SQLException, NamingException;
+	
+	//포인트로그 balance가져오기
+	int selectPointBalance(String memberId) throws SQLException, NamingException;
+	
+	//멤버 포인트 업데이트
+	int updateMemberPoint(int addPoint, String memberId) throws SQLException, NamingException;
+	
+	//환불 쿠폰이 있다면 쿠폰로그 업데이트
+	int updateCouponLog(int couponLogsSeq) throws SQLException, NamingException;
+	
+	//해당 주문의 사용쿠폰 갯수 가져오기
+	int selectCouponCnt(String memberId, String orderNo) throws SQLException, NamingException;
+	
+	//환불 쿠폰이 있다면 쿠폰갯수 업데이트
+	int updateMemeberTotalCoupon(int totalCouponCnt, String memberId) throws SQLException, NamingException;
+	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -149,14 +174,6 @@ public interface MemberDAO {
 	// 프로필사진 업데이트
 	int updateProfile(String memberId, String newFileName) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
-
-
-	
-
-	
-
-	
-
 	
 	
 	

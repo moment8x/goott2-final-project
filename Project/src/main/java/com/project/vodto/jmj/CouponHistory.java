@@ -24,6 +24,7 @@ public class CouponHistory {
 	private Timestamp obtainedDate; //얻은 날짜
 	private Timestamp usedDate;
 	private Timestamp expirationDate; //만료일
+	private int couponLogsSeq;
 	
 	//coupon_categories
 	private String categoryKey; //적용가능한 상품 카테고리 키

@@ -143,7 +143,7 @@
 	</update>
 
 	<select id="getCouponsHistory" resultType="com.project.vodto.jmj.CouponHistory">
-		select c.discount_method, c.discount_amount, c.coupon_name, cl.expiration_date
+		select c.discount_method, c.discount_amount, c.coupon_name, cl.expiration_date, cl.coupon_logs_seq
 		from coupons c, coupon_logs cl
 		where cl.member_id = #{memberId} and cl.related_order = #{orderNo}
 		and c.coupon_number = cl.coupon_number
@@ -266,19 +266,22 @@
 	</select>
 	
 	<insert id="insertCancelOrder">
-		insert into cacellations(product_id, reason, processing_status, refund_status, detailed_order_id) 
+	<selectKey order="BEFORE" keyProperty="no" resultType="int">
+		SELECT max(refunds_id) from refunds
+	</selectKey>
+		insert into cancellations(product_id, reason, amount, processing_status, refund_status, detailed_order_id, refunds_id) 
 		<choose>
 			<when test="paymentMethod != null and paymentMethod.equals('bkt')">			
-				values (#{productId},#{reason},'취소완료','Y',#{detailedOrderId})
+				values (#{productId},#{reason}, #{amount},'취소완료','Y',#{detailedOrderId}, #{no})
 			</when>
 			<otherwise>
-				values (#{productId},#{reason},'취소완료','N',#{detailedOrderId})
+				values (#{productId},#{reason}, #{amount},'취소완료','N',#{detailedOrderId}, #{no})
 			</otherwise>
 		</choose>
 	</insert>
 	
 	<update id="updateDetailProductStatus">
-		update detailed_order_items set product_status = '취소' where d.detailed_order_id = #{detailedOrderId}
+		update detailed_order_items set product_status = '취소' where detailed_order_id = #{detailedOrderId}
 	</update>
 	
 	<update id="updateRefundAccount">
@@ -302,6 +305,40 @@
 		insert into reward_logs(member_id, reason, reward, related_order, balance) 
 		values(#{memberId},'주문취소',#{refundRewardUsed},#{orderNo},#{balance})
 	</insert>
+	
+	<update id="updateMemberReward">
+		update member set total_rewards = #{totalRewards} where member_id = #{memberId}
+	</update>
+	
+	<insert id="insertPointLog">
+		insert into point_logs(member_id, reason, point, related_order, balance) 
+		values (#{memberId}, '취소', #{point}, #{orderNo}, #{balance})
+	</insert>
+	
+	<select id="selectPointBalance" resultType="int">
+		 SELECT balance FROM point_logs WHERE member_id = #{memberId} ORDER BY point_logs_seq DESC LIMIT 1
+	</select>
+	
+	<select id="selectRewardBalance" resultType="int">
+	 	SELECT balance FROM reward_logs WHERE member_id = #{memberId} ORDER BY reward_logs_seq DESC LIMIT 1
+	</select>
+	
+	<update id="updateMemberPoint">
+		update member set total_points = #{totalCouponCnt} where member_id = #{memberId}
+	</update>
+	
+	<update id="updateCouponLog">
+		update coupon_logs set used_date = null, related_order = null where coupon_logs_seq = #{couponLogsSeq}
+	</update>
+	
+	<select id="selectCouponCnt" resultType="int">
+		select count(related_order) from coupon_logs where member_id = #{memberId} and related_order = #{orderNo}
+	</select>
+	
+	<update id="updateMemeberTotalCoupon">
+		update member set coupon_count = coupon_count + #{couponCnt} where member_id = #{memberId}
+	</update>
+	
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">
 		SELECT member_id FROM member WHERE member_id = #{memberId}  
@@ -332,6 +369,7 @@
 		UPDATE member SET profile_image = #{ufSeq} where member_id = #{memberId}
 	</update>
 	
+
 	
 	<!-- =========================== 김진솔 끝 =========================== -->
 </mapper>

@@ -18,6 +18,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.filters.ExpiresFilter.XHttpServletResponse;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -615,14 +616,25 @@ System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@키워드" + keyword.toString());
 		return result;
 	}
 	
-	@RequestMapping("cancelOrder")
-	public void cancelOrder(@ModelAttribute CancelDTO tmpCancel, HttpServletRequest request, CancelDTO cd) {
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@취소 " + cd.toString());
+	@RequestMapping(value = "cancelOrder", method = RequestMethod.POST)
+	public ResponseEntity<String> cancelOrder(@ModelAttribute CancelDTO tmpCancel, HttpServletRequest request) {
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@취소 " + tmpCancel.toString());
 		
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
 		
-		mService.cancelOrder(tmpCancel, memberId);
+		ResponseEntity<String> result = null;
+		
+		try {
+			 if(mService.cancelOrder(tmpCancel, memberId)) {
+				 result = new ResponseEntity<String>("success", HttpStatus.OK);				 
+			 }
+
+		} catch (SQLException | NamingException e) {
+			e.printStackTrace();
+			result = new ResponseEntity<String>("fail", HttpStatus.CONFLICT);
+		}
+		return result;
 	}
 }

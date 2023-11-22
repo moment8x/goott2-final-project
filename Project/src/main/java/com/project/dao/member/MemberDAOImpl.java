@@ -364,11 +364,12 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	
 	@Override
-	public int insertCancelOrder(String productId, String reason, int detailedOrderId, String paymentMethod)
+	public int insertCancelOrder(String productId, String reason, int amount, int detailedOrderId, String paymentMethod)
 			throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("productId", productId);
 		params.put("reason", reason);
+		params.put("amount", amount);
 		params.put("detailedOrderId", detailedOrderId);
 		params.put("paymentMethod", paymentMethod);
 		
@@ -389,7 +390,7 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("refundAccount", tmpCancel.getRefundAccount());
 		params.put("accountHolder", tmpCancel.getAccountHolder());
 		
-		return ses.update(ns + ".updateRefundAccount", tmpCancel);
+		return ses.update(ns + ".updateRefundAccount", params);
 	}
 
 	@Override
@@ -407,15 +408,81 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	
 	@Override
-	public int insertRewardLog(String memberId, CancelDTO tmpCancel, int addReward)
+	public int insertRewardLog(String memberId, CancelDTO tmpCancel, int totalReward)
 			throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("memberId", memberId);
 		params.put("refundRewardUsed", tmpCancel.getRefundRewardUsed());
 		params.put("orderNo", tmpCancel.getOrderNo());
-		params.put("balance", addReward);
+		params.put("balance", totalReward);
 		
-		return ses.insert(ns + ".insertRewardLog", tmpCancel);
+		return ses.insert(ns + ".insertRewardLog", params);
+	}
+	
+	@Override
+	public int updateMemberReward(int addReward, String memberId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("totalRewards", addReward);
+		
+		return ses.update(ns + ".updateMemberReward", params);
+	}
+	
+	@Override
+	public int insertPointLog(String memberId, int refundPointUsed, String orderNo, int totalPoint)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("point", refundPointUsed);
+		params.put("orderNo", orderNo);
+		params.put("balance", totalPoint);
+		
+		return ses.insert(ns + ".insertPointLog", params);
+	}
+	
+	@Override
+	public int selectRewardBalance(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".selectRewardBalance", memberId);
+	}
+
+	@Override
+	public int selectPointBalance(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".selectPointBalance", memberId);
+	}
+
+	@Override
+	public int updateMemberPoint(int addPoint, String memberId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("totalCouponCnt", addPoint);
+		
+		return ses.update(ns + ".updateMemberPoint", params);
+	}
+
+	@Override
+	public int updateCouponLog(int couponLogsSeq) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".updateCouponLog", couponLogsSeq);
+	}
+
+	@Override
+	public int selectCouponCnt(String memberId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.selectOne(ns + ".selectCouponCnt", params);
+	}
+
+	@Override
+	public int updateMemeberTotalCoupon(int couponCnt, String memberId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("couponCnt", couponCnt);
+		
+		return ses.update(ns + ".updateMemeberTotalCoupon", params);
 	}
 
 
@@ -461,14 +528,4 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
 
-
-
-
-
-
-
-
-
-
-	
 }

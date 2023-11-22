@@ -92,15 +92,15 @@ $(function () {
 //취소 버튼을 누르면
 function orderCancel(){
 	$("input[name='order']:checked").each(function () {
-		let detailedOrderId = $(this).val();
+		let detailedOrderId = Number($(this).val());
 		let reason = $('#cancelReason').val()
-		let amount = $('#refundAmount').text().replace(",", "").replace("원", "")
-		let refundPointUsed = $('#refundPoint').text().replace(",", "").replace("점", "")
-		let refundRewardUsed = $('#refundReward').text().replace(",", "").replace("원", "")
+		let amount = Number($('#refundAmount').text().replace(",", "").replace("원", ""))
+		let refundPointUsed = Number($('#refundPoint').text().replace(",", "").replace("점", ""))
+		let refundRewardUsed = Number($('#refundReward').text().replace(",", "").replace("원", ""))
 		let totalRefundAmount = Number(amount) + Number(refundPointUsed) + Number(refundRewardUsed)
 		let orderNo = '${detailOrder.orderNo}';
 		let refundBank = $('#changeRefundBank').text();
-		let refundAccount = $('#RefundAccount').text();
+		let refundAccount = $('#changeRefundAccount').text();
 		let accountHolder = $('#changeAccountHolder').text();
 		
 		console.log("환불포인트" + refundPointUsed)
@@ -111,7 +111,7 @@ function orderCancel(){
 	
 		$.ajax({
 			url : '/user/cancelOrder', // 데이터를 수신받을 서버 주소
-			type : 'get', // 통신방식(GET, POST, PUT, DELETE)
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
 				reason,
 				amount,
@@ -119,15 +119,22 @@ function orderCancel(){
 				refundRewardUsed,
 				totalRefundAmount,
 				detailedOrderId,
-				orderNo
+				orderNo,
+				refundBank,
+				refundAccount,
+				accountHolder
 			},
-			dataType : 'json',
+			dataType : 'text',
 			async : false,
 			success : function(data) {
 				console.log(data);
+				if(data == 'success'){
+					location.reload()
+				}
 				
 			},
-			error : function() {
+			error : function(error) {
+				console.log(error)
 			}
 		});
 	})
