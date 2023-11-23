@@ -1,4 +1,6 @@
-package com.project.vodto.kkb;
+package com.project.service.kkb.admin;
+
+import com.project.vodto.kkb.OrderProductResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

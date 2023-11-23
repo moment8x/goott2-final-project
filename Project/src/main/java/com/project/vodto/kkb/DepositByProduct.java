@@ -3,7 +3,7 @@ package com.project.vodto.kkb;
 import java.sql.Timestamp;
 import java.util.List;
 
-import com.project.service.kkb.admin.OrderProduct;
+import com.project.service.kkb.admin.DepositProduct;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,15 +12,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class OrderByProduct {
+public class DepositByProduct {
 	private Timestamp orderTime;
-	private Timestamp paymentTime;
 	private String orderNo;
 	private String name;
 	private String memberId;
-	private int actualPaymentAmount;
-	private String paymentMethod;
-	private String paymentStatus;
+	private int depositAmount;
+	private String bankName;
 	private String deliveryMessage;
-	private List<OrderProduct> orders;
+	private List<DepositProduct> orders;
 }

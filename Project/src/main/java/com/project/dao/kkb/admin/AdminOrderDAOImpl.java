@@ -5,6 +5,9 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.project.vodto.kkb.DepositCondition;
+import com.project.vodto.kkb.DepositNoResponse;
+import com.project.vodto.kkb.DepositProductResponse;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
@@ -19,13 +22,23 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	private final SqlSession ses;
 
 	@Override
-	public List<OrderNoResponse> findOrderByInfo(OrderCondition order) throws Exception {
-		return ses.selectList(ns + ".selectOrderNoInfo", order);
+	public List<OrderNoResponse> findOrderByInfo(OrderCondition orderCond) throws Exception {
+		return ses.selectList(ns + ".selectOrderNoInfo", orderCond);
 	}
 
 	@Override
-	public List<OrderProductResponse> findProductByInfo(OrderCondition order) throws Exception {
-		return ses.selectList(ns + ".selectOrderProductInfo", order);
+	public List<OrderProductResponse> findProductByInfo(OrderCondition orderCond) throws Exception {
+		return ses.selectList(ns + ".selectOrderProductInfo", orderCond);
+	}
+
+	@Override
+	public List<DepositNoResponse> findDepositByInfo(DepositCondition depositCond) throws Exception {
+		return ses.selectList(ns + ".selectDepositNoInfo", depositCond);
+	}
+
+	@Override
+	public List<DepositProductResponse> findDepositProductByInfo(DepositCondition depositCond) throws Exception {
+		return ses.selectList(ns + ".selectDepositProductInfo", depositCond);
 	}
 
 }
