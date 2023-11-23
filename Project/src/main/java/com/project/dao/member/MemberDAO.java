@@ -7,6 +7,7 @@ import javax.naming.NamingException;
 
 import org.springframework.stereotype.Repository;
 
+import com.project.vodto.BankTransfer;
 import com.project.vodto.Member;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
@@ -163,6 +164,9 @@ public interface MemberDAO {
 	//환불 쿠폰이 있다면 쿠폰갯수 업데이트
 	int updateMemeberTotalCoupon(int totalCouponCnt, String memberId) throws SQLException, NamingException;
 	
+	//해당유저의 무통장주문내역 가져오기
+	List<GetBankTransfer> selectBankTransfers(String memberId) throws SQLException, NamingException;
+	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -174,7 +178,7 @@ public interface MemberDAO {
 	// 프로필사진 업데이트
 	int updateProfile(String memberId, String newFileName) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
-	
+
 	
 	
 	

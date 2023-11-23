@@ -125,7 +125,7 @@
 	</update>
 	
 	<select id="getCurOrderHistory" resultType="com.project.vodto.jmj.MyPageOrderList">
-		SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, d.product_id,
+		SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, d.product_id, pay.payment_method,
       pay.actual_payment_amount, p.product_image, prod.product_name, sum(d.product_quantity) as totalOrderCnt
       FROM products prod, detailed_order_items d, order_history o, payments pay, (SELECT * FROM product_images GROUP BY product_id) p
         where member_id = #{memberId} and o.order_time between (NOW() - INTERVAL 7 day) and now() 
@@ -338,6 +338,13 @@
 	<update id="updateMemeberTotalCoupon">
 		update member set coupon_count = coupon_count + #{couponCnt} where member_id = #{memberId}
 	</update>
+	
+	<select id="selectBankTransfers" resultType="com.project.vodto.jmj.GetBankTransfer">
+		select b.bank_name, b.payer_name, b.deposited_account, b.payment_time, b.amount_to_pay
+		from bank_transfers b, order_history o
+		where  o.member_id = #{memberId}
+        and b.order_no = o.order_no;
+	</select>
 	
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">

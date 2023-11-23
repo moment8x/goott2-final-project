@@ -1348,10 +1348,23 @@ function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAdd
 																				<div class="product border-0">
 																					<div class="product-detail">
 																						<ul>
-																							<li class="name">총 금액 : <fmt:formatNumber
-																									value="${curOrder.actualPaymentAmount}"
-																									type="NUMBER" />원
+																						
+																						<c:forEach var="bankTransfers" items="${bankTransfers }">
+																						<c:choose>
+																							<c:when test="${curOrder.paymentMethod eq 'bkt'}">
+																								<li class="name">총 금액 : <fmt:formatNumber
+																									value="${bankTransfers.amountToPay }"
+																					 				type="NUMBER" />원
 																							</li>
+																							</c:when>
+																							<c:otherwise>
+																								<li class="name">총 금액 : <fmt:formatNumber
+																										value="${curOrder.actualPaymentAmount }"
+																										type="NUMBER" />원
+																								</li>
+																							</c:otherwise>
+																						</c:choose>
+																						</c:forEach>
 																						</ul>
 																						<ul>
 																							<li class="name">총 권수 :

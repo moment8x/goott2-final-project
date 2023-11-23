@@ -28,6 +28,7 @@ import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
@@ -134,10 +135,13 @@ public class MemberServiceImpl implements MemberService {
 		PagingInfo pi = pagination(pageNo, memberId);
 
 		List<MyPageOrderList> lst = mDao.selectOrderHistory(memberId, pi);
+		List<GetBankTransfer> bankTransfer = mDao.selectBankTransfers(memberId);
 
 		Map<String, Object> result = new HashMap<String, Object>();
+		
 		result.put("orderHistory", lst);
 		result.put("pagination", pi);
+		result.put("bankTransfer", bankTransfer);
 
 		return result;
 	}

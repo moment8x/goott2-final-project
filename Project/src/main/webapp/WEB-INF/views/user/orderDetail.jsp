@@ -1547,7 +1547,7 @@ function editRefundAccount() {
 					<ul class="summery-contain pb-0 border-bottom-0">
 
 						<li class="pb-0 refundList">
-							<h4>취소 금액</h4> <span id="refundAmount"></span>
+							<h4>환불 금액</h4> <span id="refundAmount"> 원 </span>
 
 						</li>
 

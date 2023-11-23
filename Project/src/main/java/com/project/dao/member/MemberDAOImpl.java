@@ -11,6 +11,7 @@ import javax.naming.NamingException;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.project.vodto.BankTransfer;
 import com.project.vodto.Member;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
@@ -485,6 +486,11 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.update(ns + ".updateMemeberTotalCoupon", params);
 	}
 
+	@Override
+	public List<GetBankTransfer> selectBankTransfers(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".selectBankTransfers", memberId);
+	}
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
@@ -527,5 +533,7 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".updateProfile", params);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+
 
 }

@@ -117,6 +117,10 @@ public class myPageController {
 			// 배송주소록
 			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
 			model.addAttribute("userAddrList", userAddrList);
+			
+			//무통장 주문 내역
+			List<GetBankTransfer> bankTransfers = (List<GetBankTransfer>)map.get("bankTransfer");
+			model.addAttribute("bankTransfers", bankTransfers);
 
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
