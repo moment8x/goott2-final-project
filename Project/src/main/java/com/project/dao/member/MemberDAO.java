@@ -126,7 +126,7 @@ public interface MemberDAO {
 	DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId) throws SQLException, NamingException;
 	
 	//취소테이블 인서트
-	int insertCancelOrder(String productId, String reason,int amount, int detailedOrderId, String paymentMethod) throws SQLException, NamingException;
+	int insertCancelOrder(String productId, String reason,int totalRefundAmount, int detailedOrderId, String paymentMethod) throws SQLException, NamingException;
 	
 	//취소할경우 디테일 상품상태 업데이트
 	int updateDetailProductStatus(int detailedOrderId) throws SQLException, NamingException;
@@ -135,7 +135,7 @@ public interface MemberDAO {
 	int updateRefundAccount(String memberId, CancelDTO tmpCancel) throws SQLException, NamingException;
 	
 	//환불테이블 인서트
-	int insertRefund(String productId, CancelDTO tmpCancel, String paymentMethod) throws SQLException, NamingException;
+	int insertRefund(String productId, CancelDTO tmpCancel, String paymentMethod, int amountAfterDiscount, int amountBeforeDiscount) throws SQLException, NamingException;
 	
 	//취소시 사용한 적립금이 있다면 적립금 로그 인서트
 	int insertRewardLog(String memberId, CancelDTO tmpCancel, int totalReward) throws SQLException, NamingException;
@@ -167,6 +167,9 @@ public interface MemberDAO {
 	//해당유저의 무통장주문내역 가져오기
 	List<GetBankTransfer> selectBankTransfers(String memberId) throws SQLException, NamingException;
 	
+	//모든 상품의 상태가 취소라면 주문내역 배송상태 업데이트
+	int updatedeliveryStatus(String memberId, String orderNo) throws SQLException, NamingException;
+	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -178,6 +181,7 @@ public interface MemberDAO {
 	// 프로필사진 업데이트
 	int updateProfile(String memberId, String newFileName) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+
 
 	
 	

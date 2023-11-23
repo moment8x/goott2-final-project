@@ -72,13 +72,21 @@ function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
 		buldMnnm, buldSlno, mtYn, lnbrMnnm, lnbrSlno, emdNo) {
 	// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
 
-	//회원정보 수정 주소찾기
+	//배송지 변경 주소찾기
 	let newZipNo = document.querySelector("#editZipNo")
 		newZipNo.value = zipNo;
 	let newAddr = document.querySelector("#editAddr")
 		newAddr.value = roadAddrPart1;
 	let newAddrDetail = document.querySelector("#editAddrDetail")
 		newAddrDetail.value = addrDetail
+		
+	//반품 회수지 변경 주소찾기
+	let returnZipNo = document.querySelector("#returnZipNo")
+		returnZipNo.value = zipNo;
+	let returnAddr = document.querySelector("#returnAddr")
+		returnAddr.value = roadAddrPart1;
+	let returnDetailAddr = document.querySelector("#returnDetailAddr")
+		returnDetailAddr.value = addrDetail 
 }
 $(function () {
 	let orderTime = $('.detailOrderOrderTime').text().substring(0,21)
@@ -86,28 +94,91 @@ $(function () {
 	
 	let icOrderTime = $('.infoContent.detailOrderOrderTime').text().substring(0,21)
 	$('.infoContent.detailOrderOrderTime').text(icOrderTime)
+	
 
+
+})
+
+//반품 접수 버튼 누르면
+function applyReturn() {
+	$("input[name='order']:checked").each(function () { 
+	let refundBank = $('#returnBank').text();
+	let refundAccount = $('#returnAccount').text();
+	let accountHolder = $('#returnHolder').text();
+	let zipNo = $('#returnZipNo').val();
+	let addr = $('#returnAddr').val()
+	let detailAddr = $('#returnDetailAddr').val()
+	let returnReason = $('#returnReason').val()
+	let detailedOrderId = Number($(this).val());
+	let orderNo = '${detailOrder.orderNo}';
+
+	$.ajax({
+		url : '/user/returnOrder', // 데이터를 수신받을 서버 주소
+		type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+		data : {
+			refundBank,
+			refundAccount,
+			accountHolder,
+			zipNo,
+			addr,
+			detailAddr,
+			returnReason,
+			detailedOrderId,
+			orderNo
+		},
+		dataType : '',
+		async : false,
+		success : function(data) {
+			console.log(data);
+			
+			
+		},
+		error : function(error) {
+			console.log(error)
+		}
+	});
 	})
+}
 
 //취소 버튼을 누르면
 function orderCancel(){
+	let result = false;
+	let cancelReason = $('#cancelReason').val();
+        if (cancelReason.trim() === '') {
+            alert('사유를 입력해주세요.');
+            return result
+        } 
 	$("input[name='order']:checked").each(function () {
+		let cancelReason = $('#cancelReason').val();
+		let totalQty = calculateTotalQuantity()
+		let orderQty = ${orderQty}
+		let point = ${detailOrder.usedPoints} //결제 할 때 사용한 포인트
+		let reward = ${detailOrder.usedReward}
+		
 		let detailedOrderId = Number($(this).val());
 		let reason = $('#cancelReason').val()
 		let amount = Number($('#refundAmount').text().replace(",", "").replace("원", ""))
-		let refundPointUsed = Number($('#refundPoint').text().replace(",", "").replace("점", ""))
-		let refundRewardUsed = Number($('#refundReward').text().replace(",", "").replace("원", ""))
-		let totalRefundAmount = Number(amount) + Number(refundPointUsed) + Number(refundRewardUsed)
+		let refundPointUsed = 0
+		let refundRewardUsed = 0
 		let orderNo = '${detailOrder.orderNo}';
 		let refundBank = $('#changeRefundBank').text();
 		let refundAccount = $('#changeRefundAccount').text();
 		let accountHolder = $('#changeAccountHolder').text();
 		
+		if(totalQty != orderQty){
+			refundPointUsed = calculate(orderQty, totalQty, point)
+			refundRewardUsed = calculate(orderQty, totalQty, reward)
+		}else if(totalQty == orderQty){
+			refundPointUsed = Math.floor(point / orderQty)
+			refundRewardUsed = Math.floor(reward / orderQty)
+		}
+		let totalRefundAmount = Number(amount) + Number(refundPointUsed) + Number(refundRewardUsed)
+		
 		console.log("환불포인트" + refundPointUsed)
 		console.log("환불 적립금" + refundRewardUsed)
 		console.log("환불금액 " + amount)
 		console.log("총 환불금액" + totalRefundAmount)
-		console.log("디테일번호" + detailedOrderId)
+		console.log("디테일번호" + detailedOrderId)	
 	
 		$.ajax({
 			url : '/user/cancelOrder', // 데이터를 수신받을 서버 주소
@@ -122,13 +193,16 @@ function orderCancel(){
 				orderNo,
 				refundBank,
 				refundAccount,
-				accountHolder
+				accountHolder,
+				orderQty,
+				totalQty
 			},
 			dataType : 'text',
 			async : false,
 			success : function(data) {
 				console.log(data);
 				if(data == 'success'){
+					result = true;
 					location.reload()
 				}
 				
@@ -138,10 +212,13 @@ function orderCancel(){
 			}
 		});
 	})
+	return result
 }
-	
+
 	//취소창에서 상품 선택하고 수량 입력하면 환불 계산
 	function selectOrderCancel() {
+	let bktRefundAmount = 0
+  	let refundAmount = 0	
 	  $("input[name='order']:checked").each(function () {
 	    let detailedOrderId = $(this).val();
 	    let orderNo = '${detailOrder.orderNo}';
@@ -160,8 +237,7 @@ function orderCancel(){
 	        $('.form-control.cancelQty').change(function () {
 	  		  let totalQty = calculateTotalQuantity(); //입력한 총 수량
 	  		  console.log('총 수량:', totalQty);
-	  		  
-	  		  $('#totalCancelQty').text("총 수량 : " + totalQty);
+	  		  $('.totalCancelQty').text("총 수량 : " + totalQty)
 	  		  
 	  		  let point = ${detailOrder.usedPoints} //결제 할 때 사용한 포인트
 	  		  let reward = ${detailOrder.usedReward} //결제 할 때 사용한 적립금
@@ -171,13 +247,11 @@ function orderCancel(){
 			  let bktAmount = ${bankTransfer.amountToPay }
 	  		  let refundPoint = 0;
 	  		  let refundReward = 0;
-	  		  let bktRefundAmount = 0
-	  		  let refundAmount = 0
+	  		 
 	  		  let today = new Date()
 	  		  let couponWithP = $('.infoContent.usedCouponWithP').text().replace(",", "").replace("원", "")
-	  		  let couponWithD = $('.infoContent.usedCouponWithD').text().replace(",", "").replace("원", "")
 	  		  let refudnCouponWithP = 0
-	  		  let refundCouponWithD = 0
+	  		  let products = data.selectCancelOrder;
 	  		  
 	  		  console.log("총 주문 갯수 " + orderQty)
 	  		  
@@ -190,24 +264,29 @@ function orderCancel(){
 	  			  refundPoint = calculate(orderQty, totalQty, point)
 	  			  refundReward = calculate(orderQty, totalQty, reward)
 	  			  refudnCouponWithP = calculate(orderQty, totalQty, couponWithP)
-	  			  refundCouponWithD = calculate(orderQty, totalQty, couponWithD)
-	  			 // bktRefundAmount += productPrice - refundPoint - refundReward
-	  			  //refundAmount += productPrice - refundPoint - refundReward
 	  			  
 	  			  if(data.couponsHistory.length == 0){
-	  				bktRefundAmount += productPrice - refundPoint - refundReward
-		  			refundAmount += productPrice - refundPoint - refundReward
+	  					if(data.selectCancelOrder.paymentMethod == 'bkt' && data.selectCancelOrder.productStatus == '배송완료'){
+			  				bktRefundAmount += productPrice - refundPoint - refundReward
+	  					}else{
+				  			refundAmount += productPrice - refundPoint - refundReward	  						
+	  					}
+		  			console.log(bktRefundAmount)
+		  			console.log(refundAmount)
+	  				
 	  			  }else if(data.couponsHistory.length != 0 && data.couponsHistory.expirationDate < today ){
-	  				bktRefundAmount += productPrice - refundPoint - refundReward
-		  			refundAmount += productPrice - refundPoint - refundReward
-	  			  }else if(data.couponsHistory.length != 0 && data.couponsHistory.discountMethod == 'P'){
-	  				bktRefundAmount += productPrice - refundPoint - refundReward - refudnCouponWithP
-		  			refundAmount += productPrice - refundPoint - refundReward - refudnCouponWithP
-	  			  }else if(data.couponsHistory.length != 0 && data.couponsHistory.discountMethod == 'D'){
-	  				bktRefundAmount += productPrice - refundPoint - refundReward - refundCouponWithD
-		  			refundAmount += productPrice - refundPoint - refundReward - refundCouponWithD
+	  				if(data.selectCancelOrder.paymentMethod == 'bkt' && data.selectCancelOrder.productStatus == '배송완료'){
+		  				bktRefundAmount += productPrice - refundPoint - refundReward
+  					}else{
+			  			refundAmount += productPrice - refundPoint - refundReward	  						
+  					}
+	  			  }else if(data.couponsHistory.length != 0){
+	  				if(data.selectCancelOrder.paymentMethod == 'bkt' && data.selectCancelOrder.productStatus == '배송완료'){
+	  					bktRefundAmount += productPrice - refundPoint - refundReward - refudnCouponWithP
+	  				}else{
+		  				refundAmount += productPrice - refundPoint - refundReward - refudnCouponWithP
+	  				}
 	  			  }
-	  			  
 	  		  }else{
 	  			  refundPoint = point;
 	  			  refundReward = reward;
@@ -222,6 +301,11 @@ function orderCancel(){
 	  		  $('#refundReward').text(Math.floor(refundReward).toLocaleString()+ "원") 
 	  		  $('#refundAmount').text(refundAmount.toLocaleString()+ "원")
 			  $('#refundAmount').text(bktRefundAmount.toLocaleString()+ "원")
+			  
+	  		  $('#returnRefundPoint').text(Math.floor(refundPoint).toLocaleString()+ "점") 
+	  		  $('#returnRefundReward').text(Math.floor(refundReward).toLocaleString()+ "원") 
+	  		  $('#returnRefundAmount').text(refundAmount.toLocaleString()+ "원")
+			  $('#returnRefundAmount').text(bktRefundAmount.toLocaleString()+ "원")
 	  		});
 	        
 	      },
@@ -235,7 +319,7 @@ function orderCancel(){
 
 	
 	//환불 예정 포인트, 적립금 구하기
-	function calculate(n, k, usedAmount) { // 입력한 총 수량, 총 주문수량, 포인트, 적립금
+	function calculate(n, k, usedAmount) { // 총 주문 수량, 입력한 총 수량, 포인트, 적립금
 		return ((n - k) / n) * usedAmount
 	}
 	
@@ -314,9 +398,17 @@ function editBasicShippingAddress() {
 			});
 }
 
-//주문한 상품 전체선택
+//취소 주문한 상품 전체선택
 function selectAll() {
 	if($("#selectAllOrder").is(':checked')) {
+		$("input[name=order]").prop("checked", true);
+	} else {
+		$("input[name=order]").prop("checked", false);
+	}
+}
+
+function selectAllReturn() {
+	if($("#selectAllReturnOrder").is(':checked')) {
 		$("input[name=order]").prop("checked", true);
 	} else {
 		$("input[name=order]").prop("checked", false);
@@ -329,7 +421,7 @@ function showRefund() {
 	$('.editRefund').show()
 }
 
-//무통장 환불 정보 변경
+//취소 무통장 환불 정보 변경
 function editRefundAccount() {
 	let refundBank = $("select[name=refundBank]").val()
 	let accountHolder = $('#accountHolder').val();
@@ -340,6 +432,21 @@ function editRefundAccount() {
 	$('#changeRefundBank').text(refundBank);
 	$('#changeRefundAccount').text(refundAccount)
 	$('#changeAccountHolder').text(accountHolder)
+	
+	$('.editRefund').hide()
+}
+
+//반품 무통장 환불 정보 변경
+function editRturnAccount() {
+	let refundBank = $("select[name=selectReturnBank]").val()
+	let accountHolder = $('#changeReturnAccountHolder').val();
+	let refundAccount = $('#changeReturnAccount').val();
+	
+	console.log(refundBank + accountHolder + refundAccount)
+	
+	$('#returnBank').text(refundBank);
+	$('#returnAccount').text(refundAccount)
+	$('#returnHolder').text(accountHolder)
 	
 	$('.editRefund').hide()
 }
@@ -440,7 +547,7 @@ function editRefundAccount() {
 	height: 20px;
 }
 
-#totalCancelQty {
+.totalCancelQty {
 	font-size: 16px;
 	text-align: center;
 	margin: 5px;
@@ -465,6 +572,10 @@ function editRefundAccount() {
 </head>
 
 <body>
+	
+	<c:if test="${sessionScope.loginMember == null }">
+		<c:redirect url="login"/>
+	</c:if>
 
 	<!-- Header Start -->
 	<jsp:include page="../header.jsp"></jsp:include>
@@ -673,7 +784,7 @@ function editRefundAccount() {
 													<h4 class="infoContent">${detailOrder.detailedShippingAddress }</h4>
 												</li>
 												<c:choose>
-													<c:when test="${detailOrder.deliveryMessage == null }">
+													<c:when test="${detailOrder.deliveryMessage == '' }">
 														<li class="pb-0">
 															<h4 class="infoTitle">배송메세지 :</h4>
 															<h4 class="infoContent">없음</h4>
@@ -764,23 +875,15 @@ function editRefundAccount() {
 																<c:set var="discountAmount"
 																	value="${coupons.discountAmount * 0.01}" />
 
-																<c:if test="${fn:contains(coupons.discountMethod,'P')}">
-																	<h4 class="infoContent">${coupons.discountAmount }%</h4>
-																	<h4 class="infoContent usedCouponWithP">
-																		<fmt:formatNumber
-																			value="${detailOrder.totalAmount*discountAmount }"
-																			type="NUMBER" />
-																		원
-																	</h4>
-																</c:if>
 
-																<c:if test="${fn:contains(coupons.discountMethod,'D')}">
-																	<h4 class="infoContent usedCouponWithD">
-																		<fmt:formatNumber value="${coupons.discountAmount }"
-																			type="NUMBER" />
-																		원
-																	</h4>
-																</c:if>
+																<h4 class="infoContent">${coupons.discountAmount }%</h4>
+																<h4 class="infoContent usedCouponWithP">
+																	<fmt:formatNumber
+																		value="${detailOrder.totalAmount*discountAmount }"
+																		type="NUMBER" />
+																	원
+																</h4>
+
 
 															</div>
 														</c:forEach>
@@ -1122,7 +1225,7 @@ function editRefundAccount() {
 
 										<td class="price">
 											<h4 class="table-title text-content">상품금액</h4>
-											<h6 class="theme-color productPrice">
+											<h6 class="theme-color refundProductPrice">
 												<fmt:formatNumber value="${order.productPrice }"
 													type="NUMBER" />
 												원
@@ -1146,7 +1249,7 @@ function editRefundAccount() {
 							</c:if>
 						</table>
 					</c:forEach>
-					<div id="totalCancelQty"></div>
+					<div class="totalCancelQty"></div>
 					<div class="form-floating mb-4 theme-form-floating">
 						<input type="text" class="form-control" id="cancelReason"
 							name="reason" placeholder="취소 사유" /><label for="cancelReason">취소
@@ -1174,7 +1277,7 @@ function editRefundAccount() {
 								<li class="pb-0 refundList">
 									<h4>예금주</h4> <span id="changeAccountHolder">${userInfo.accountHolder }</span>
 								</li>
-							
+
 								<li class="pb-0 refundList">
 									<button class="btn theme-bg-color btn-md text-white"
 										onclick="showRefund();" type="button">변경</button>
@@ -1278,18 +1381,7 @@ function editRefundAccount() {
 								<h4>환불 예정 쿠폰</h4>
 								<c:forEach var="coupons" items="${couponHistory }">
 									<div class="couponsHistory">
-										<span>${coupons.couponName }</span>
-
-										<c:if test="${fn:contains(coupons.discountMethod,'P')}">
-											<span>${coupons.discountAmount }%</span>
-										</c:if>
-
-										<c:if test="${fn:contains(coupons.discountMethod,'D')}">
-											<span> <fmt:formatNumber
-													value="${coupons.discountAmount }" type="NUMBER" /> 원
-											</span>
-										</c:if>
-
+										<span>${coupons.couponName }</span> <span>${coupons.discountAmount }%</span>
 									</div>
 								</c:forEach>
 							</c:if></li>
@@ -1300,7 +1392,7 @@ function editRefundAccount() {
 					<button type="button" class="btn btn-secondary btn-md"
 						data-bs-dismiss="modal">닫기</button>
 					<button type="button" class="btn theme-bg-color btn-md text-white"
-						onclick="orderCancel();" data-bs-dismiss="modal">취소</button>
+						onclick="return orderCancel();" data-bs-dismiss="modal">취소</button>
 				</div>
 			</div>
 		</div>
@@ -1324,9 +1416,9 @@ function editRefundAccount() {
 
 				<div class="modal-body">
 					<input class="checkbox_animated check-box" type="checkbox"
-						name="order" id="selectAllOrder" onclick="selectAll();"
+						name="order" id="selectAllReturnOrder" onclick="selectAllReturn();"
 						onchange="selectOrderCancel();" /> <label
-						class="form-check-label" for="selectAllOrder"><span>전체선택</span></label>
+						class="form-check-label" for="selectAllReturnOrder"><span>전체선택</span></label>
 					<c:forEach var="order" items="${detailOrderInfo }">
 						<table class="table mb-0 productInfo">
 							<c:if test="${order.productStatus == '배송완료'}">
@@ -1408,12 +1500,50 @@ function editRefundAccount() {
 							</c:if>
 						</table>
 					</c:forEach>
-					<div id="totalCancelQty"></div>
+					<div class="totalCancelQty"></div>
 					<div class="form-floating mb-4 theme-form-floating">
-						<input type="text" class="form-control" id="cancelReason"
-							name="reason" placeholder="취소 사유" /><label for="cancelReason">반품
-							사유</label>
+						반품 사유<input type="text" class="form-control" id="returnReason"
+							value="상품 하자" name="reason" readonly="readonly" />
+						<div class="deliverMsg">
+							<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>
+							상품에 하자가 있는 경우에만 반품이 가능합니다.
+						</div>
 					</div>
+
+					<h4>회수장소</h4>
+					<ul class="summery-contain pb-0 border-bottom-0">
+						<li class="pb-0 refundList">
+							<input type="text"
+							class="form-control" value="${detailOrder.zipCode }"
+							id="returnZipNo" name="zipCode" readonly/>
+
+						</li>
+
+						<li class="pb-0 refundList">
+							<input type="text" class="form-control"
+							value="${detailOrder.shippingAddress }" id="returnAddr"
+							name="shippingAddress" readonly />
+						</li>
+
+						<li class="pb-0 refundList">
+							<input type="text" class="form-control"
+							value="${detailOrder.detailedShippingAddress }" id="returnDetailAddr"
+							name="detailedShippingAddress" />
+						</li>
+
+						<li class="pb-0 refundList"><input type="text"
+							class="form-control" value="${detailOrder.deliveryMessage }"
+							id="returnMsg" name="deliveryMessage" placeholder="메세지" /></li>
+
+						<li class="pb-0 refundList">
+							<button
+								class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
+								onclick="goPopup();">
+								<i data-feather="edit" class="me-2"></i> 배송지 변경
+							</button>
+						</li>
+					</ul>
+
 
 					<c:choose>
 						<c:when test="${detailOrder.paymentMethod eq 'bkt' }">
@@ -1426,15 +1556,15 @@ function editRefundAccount() {
 								</li>
 
 								<li class="pb-0 refundList">
-									<h4>환불은행</h4> <span id="changeRefundBank">${userInfo.refundBank }</span>
+									<h4>환불은행</h4> <span id="returnBank">${userInfo.refundBank }</span>
 								</li>
 
 								<li class="pb-0 refundList">
-									<h4>환불계좌</h4> <span id="changeRefundAccount">${userInfo.refundAccount }</span>
+									<h4>환불계좌</h4> <span id="returnAccount">${userInfo.refundAccount }</span>
 								</li>
 
 								<li class="pb-0 refundList">
-									<h4>예금주</h4> <span id="changeAccountHolder">${userInfo.accountHolder }</span>
+									<h4>예금주</h4> <span id="returnHolder">${userInfo.accountHolder }</span>
 								</li>
 
 								<li class="pb-0 refundList">
@@ -1443,54 +1573,28 @@ function editRefundAccount() {
 								</li>
 
 							</ul>
-							
-							<div>회수장소</div>
-							<ul class="summery-contain pb-0 border-bottom-0">
-								<li class="pb-0 refundList">
-									<h4>우편번호</h4> <c:if
-										test="${detailOrder.paymentMethod eq 'bkt' }">
-										<span>무통장 입금</span>
-									</c:if>
-								</li>
 
-								<li class="pb-0 refundList">
-									<h4>주소</h4> <span id="changeRefundBank">${userInfo.refundBank }</span>
-								</li>
-
-								<li class="pb-0 refundList">
-									<h4>상세주소</h4> <span id="changeRefundAccount">${userInfo.refundAccount }</span>
-								</li>
-
-								<li class="pb-0 refundList">
-									<button
-										class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
-										data-bs-toggle="modal" data-bs-target="#change-address">
-										<i data-feather="edit" class="me-2"></i> 배송지 변경
-									</button>
-								</li>
-
-							</ul>
 							<div class="editRefund">
 
 								<div class="col-12">
 									<div class="form-floating theme-form-floating">
-										<input type="text" class="form-control" id="accountHolder"
-											placeholder="예금주" /> <label for="accountHolder">예금주</label>
+										<input type="text" class="form-control" id="changeReturnAccountHolder"
+											placeholder="예금주" /> <label for="changeReturnAccountHolder">예금주</label>
 									</div>
 								</div>
 
 								<div class="col-12">
 									<div class="form-floating theme-form-floating">
-										<input type="text" class="form-control" id="refundAccount"
-											placeholder="환불계좌" /> <label for="refundAccount">환불계좌</label>
+										<input type="text" class="form-control" id="changeReturnAccount"
+											placeholder="환불계좌" /> <label for="changeReturnAccount">환불계좌</label>
 									</div>
 								</div>
 
 								<div class="col-12">
 									<div class="form-floating theme-form-floating">
-										<select class="form-select" id="floatingSelect2 newRefundBank"
-											name="refundBank" aria-label="Floating label select example">
-											<option selected>환불받으실 은행을 선택해주세요.</option>
+										<select class="form-select" id="floatingSelect2"
+											name="selectReturnBank" aria-label="Floating label select example">
+											<option>환불받으실 은행을 선택해주세요.</option>
 											<option value="KB국민은행">KB국민은행</option>
 											<option value="신한은행">신한은행</option>
 											<option value="우리은행">우리은행</option>
@@ -1516,7 +1620,7 @@ function editRefundAccount() {
 
 								<div class="col-12">
 									<button class="btn theme-bg-color btn-md text-white"
-										onclick="editRefundAccount();" type="button">변경</button>
+										onclick="editRturnAccount();" type="button">변경</button>
 								</div>
 							</div>
 						</c:when>
@@ -1547,19 +1651,19 @@ function editRefundAccount() {
 					<ul class="summery-contain pb-0 border-bottom-0">
 
 						<li class="pb-0 refundList">
-							<h4>환불 금액</h4> <span id="refundAmount"> 원 </span>
+							<h4>환불 금액</h4> <span id="returnRefundAmount"> 원 </span>
 
 						</li>
 
 						<c:if test="${detailOrder.usedPoints != 0 }">
 							<li class="pb-0 refundList">
-								<h4>환불 포인트</h4> <span id="refundPoint"> </span>
+								<h4>환불 포인트</h4> <span id="returnRefundPoint"> </span>
 							</li>
 						</c:if>
 
 						<c:if test="${detailOrder.usedReward != 0 }">
 							<li class="pb-0 refundList">
-								<h4>환불 적립금</h4> <span id="refundReward"> </span>
+								<h4>환불 적립금</h4> <span id="returnRefundReward"> </span>
 							</li>
 						</c:if>
 						<li class="pb-0 refundList"><c:if
@@ -1567,18 +1671,7 @@ function editRefundAccount() {
 								<h4>환불 예정 쿠폰</h4>
 								<c:forEach var="coupons" items="${couponHistory }">
 									<div class="couponsHistory">
-										<span>${coupons.couponName }</span>
-
-										<c:if test="${fn:contains(coupons.discountMethod,'P')}">
-											<span>${coupons.discountAmount }%</span>
-										</c:if>
-
-										<c:if test="${fn:contains(coupons.discountMethod,'D')}">
-											<span> <fmt:formatNumber
-													value="${coupons.discountAmount }" type="NUMBER" /> 원
-											</span>
-										</c:if>
-
+										<span>${coupons.couponName }</span> <span>${coupons.discountAmount }%</span>
 									</div>
 								</c:forEach>
 							</c:if></li>
@@ -1589,7 +1682,7 @@ function editRefundAccount() {
 					<button type="button" class="btn btn-secondary btn-md"
 						data-bs-dismiss="modal">닫기</button>
 					<button type="button" class="btn theme-bg-color btn-md text-white"
-						onclick="orderCancel();" data-bs-dismiss="modal">취소</button>
+						onclick="applyReturn();">접수</button>
 				</div>
 			</div>
 		</div>

@@ -367,30 +367,75 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional(rollbackFor = Exception.class)
 	public boolean cancelOrder(CancelDTO tmpCancel, String memberId) throws SQLException, NamingException {
 		boolean result = false;
+		boolean allCancel = true;
 
 		Map<String, Object> order = selectCancelOrder(memberId, tmpCancel.getOrderNo(), tmpCancel.getDetailedOrderId());
 		DetailOrder detailOrder = (DetailOrder) order.get("selectCancelOrder");
 		List<CouponHistory> coupons = (List<CouponHistory>) order.get("couponsHistory");
-
 		Member member = mDao.selectMyInfo(memberId);
+		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, tmpCancel.getOrderNo());
+		
+		int amountAfterDiscount = 0; //할인 후 금액
+		int amountBeforeDiscount = 0; //할인 전 금액
+		int productPrice = detailOrder.getProductPrice();
+		float discountAmount = 0; // 금액에 곱할 %
+		int dcAmount = 0; // 할인 전 금액에서 할인받은 금액
+		int refundCouponAmount = 0; //선택한 상품별 쿠폰 적용 금액
+		
+		System.out.println("1");
+		System.out.println(coupons.size());
+		if(coupons.size() == 0) {//쿠폰 적용 안 했다
+			amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - tmpCancel.getRefundRewardUsed();
+			amountBeforeDiscount = productPrice;
+		}else{// 쿠폰 적용 했다
+			for(CouponHistory coupon : coupons) {
+				 //if(coupon.getDiscountMethod() == 'P') {
+					 discountAmount = (float) (coupon.getDiscountAmount() * 0.01);
+					 dcAmount = (int) (tmpCancel.getTotalRefundAmount() * discountAmount);
+					 refundCouponAmount = (tmpCancel.getOrderQty() - tmpCancel.getTotalQty()) * dcAmount;
+					 amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - 
+							 				tmpCancel.getRefundRewardUsed() - refundCouponAmount;
+					 amountBeforeDiscount = productPrice;
+				 //}else {
+					 refundCouponAmount = (tmpCancel.getOrderQty() - tmpCancel.getTotalQty()) * coupon.getDiscountAmount();
+					 amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - 
+							 				tmpCancel.getRefundRewardUsed() - refundCouponAmount;
+					 amountBeforeDiscount = productPrice;
+				// }
+			}
+		}
+		System.out.println("2");
+		System.out.println("@@@@@@@@@@@@@@@@@@할인전금액" + amountBeforeDiscount);
+		System.out.println("@@@@@@@@@@@@@@@@@@할인후금액" + amountAfterDiscount);
+		System.out.println("@@@@@@@@@@@@@@@@@@상품금액금액" + productPrice);
 
-
-		//환불테이블 인서트
-		if (mDao.insertRefund(detailOrder.getProductId(), tmpCancel, detailOrder.getPaymentMethod()) > 0) {
-			System.out.println("환불 저장 완");
-			// 취소 인서트(무통장이라면)
-			if (mDao.insertCancelOrder(detailOrder.getProductId(), tmpCancel.getReason(), tmpCancel.getAmount(),
-					tmpCancel.getDetailedOrderId(), detailOrder.getPaymentMethod()) > 0) {
-				System.out.println("취소 저장 완");
+		//취소테이블 인서트
+		if (mDao.insertCancelOrder(detailOrder.getProductId(), tmpCancel.getReason(), amountBeforeDiscount,
+				tmpCancel.getDetailedOrderId(), detailOrder.getPaymentMethod()) > 0) {
+			System.out.println("취소 저장 완");
+			// //환불테이블 인서트
+			if (mDao.insertRefund(detailOrder.getProductId(), tmpCancel, detailOrder.getPaymentMethod(), 
+					amountAfterDiscount, amountBeforeDiscount) > 0) {
+				System.out.println("환불 저장 완");
 				// 디테일 프로덕트상태 업데이트
-				mDao.updateDetailProductStatus(tmpCancel.getDetailedOrderId());
-				System.out.println("디테일 상태 업데이트 완");
+				if(mDao.updateDetailProductStatus(tmpCancel.getDetailedOrderId()) > 0) {
+					System.out.println("디테일 상태 업데이트 완");
+					for(DetailOrder cancelDetail : detailOrders) {
+						if(!"취소".equals(cancelDetail.getProductStatus())) {
+							allCancel = false;
+							break;
+						}else {
+							mDao.updatedeliveryStatus(memberId, tmpCancel.getOrderNo());
+							System.out.println("주문내역 배송상태 변경 완");
+						}
+					}
+				}
 				// 환불계좌정보를 변경했다면
 				mDao.updateRefundAccount(memberId, tmpCancel);
 				System.out.println("환불 계좌 정보 변경 완");
 				
+				// if(환불 적립금이 있다면)
 				if (tmpCancel.getRefundRewardUsed() != 0) {
-					// if(환불 적립금이 있다면)
 					// 적립금 로그 인서트
 					int totalReward = mDao.selectRewardBalance(memberId) + tmpCancel.getRefundRewardUsed();
 					if(mDao.insertRewardLog(memberId, tmpCancel, totalReward) > 0) {

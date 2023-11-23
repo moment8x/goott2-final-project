@@ -15,7 +15,7 @@ import lombok.ToString;
 @ToString
 public class CouponHistory {
 	//coupons
-	private char discountMethod; //할인방법
+//	private char discountMethod; //할인방법
 	private int discountAmount; // 할인금액(%)
 	private int termOfValidity; // 사용기한
 	private String couponName;

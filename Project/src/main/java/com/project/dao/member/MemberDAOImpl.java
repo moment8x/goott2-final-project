@@ -365,12 +365,12 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	
 	@Override
-	public int insertCancelOrder(String productId, String reason, int amount, int detailedOrderId, String paymentMethod)
+	public int insertCancelOrder(String productId, String reason, int amountBeforeDiscount, int detailedOrderId, String paymentMethod)
 			throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("productId", productId);
 		params.put("reason", reason);
-		params.put("amount", amount);
+		params.put("amount", amountBeforeDiscount);
 		params.put("detailedOrderId", detailedOrderId);
 		params.put("paymentMethod", paymentMethod);
 		
@@ -395,14 +395,14 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public int insertRefund(String productId, CancelDTO tmpCancel, String paymentMethod)
+	public int insertRefund(String productId, CancelDTO tmpCancel, String paymentMethod, int amountAfterDiscount, int amountBeforeDiscount)
 			throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("productId", productId);
-		params.put("amount", tmpCancel.getAmount());
+		params.put("amount", amountAfterDiscount);
 		params.put("refundRewardUsed", tmpCancel.getRefundRewardUsed());
 		params.put("refundPointUsed", tmpCancel.getRefundPointUsed());
-		params.put("totalRefundAmount", tmpCancel.getTotalRefundAmount());
+		params.put("totalRefundAmount", amountBeforeDiscount);
 		params.put("paymentMethod", paymentMethod);
 		
 		return ses.insert(ns + ".insertRefund", params);
@@ -491,6 +491,15 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectList(ns + ".selectBankTransfers", memberId);
 	}
+	
+	@Override
+	public int updatedeliveryStatus(String memberId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.update(ns + ".updatedeliveryStatus", params);
+	}
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
@@ -533,6 +542,8 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".updateProfile", params);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+
 
 
 

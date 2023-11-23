@@ -13,13 +13,15 @@ import lombok.ToString;
 @ToString
 public class CancelDTO {
 	private String reason;
-	private int amount; //총 환불액(금액+포인트+적립금+쿠폰)
+	private int amount; //할인 후 금액
 	private int refundPointUsed; //환불 포인트
 	private int refundRewardUsed; // 환불 적립금
-	private int totalRefundAmount; //실제 환불금액(현금)
+	private int totalRefundAmount; //할인 전 금액
 	private int detailedOrderId;
 	private String orderNo;
 	private String refundBank;
 	private String refundAccount;
 	private String accountHolder;
+	private int totalQty; //취소할 총 수량
+	private int orderQty; //해당 주문건의 총 수량
 }
