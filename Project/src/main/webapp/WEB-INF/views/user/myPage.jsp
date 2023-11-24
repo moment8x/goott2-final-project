@@ -462,6 +462,7 @@
 	//	if($('#choiceBasicAddr').is(':checked')){
 	//		basicAddr = 'Y'
 	//	}
+		console.log("추가 확인1");
 		$.ajax({
 			url : '/user/addShippingAddress', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
@@ -475,6 +476,7 @@
 			dataType : 'json',
 			async : false,
 			success : function(data) {
+				console.log("추가 확인2");
 				console.log(data);
 				if(data == true){		
 					alert("배송지 추가가 완료되었습니다.")
@@ -493,7 +495,7 @@
 		let detailAddress = $('#shippingDetailAddrModify').val()
 		let recipient = $('#recipientName').val()
 		let recipientContact = $('#editRecipientContact').val()
-		
+		console.log("수정 확인1");
 		$.ajax({
 			url : '/user/shippingAddrModify', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
@@ -536,6 +538,7 @@
 	}
 	
 	function outputShippingAddr(addr) {
+		console.log("id", "${sessionScope.loginMember}");
 		let output = `<button type="button" class="btn theme-bg-color btn-md text-white"
 			onclick="goPopup();">주소 찾기</button>`
 		output += `<div class="col-xxl-6">`

@@ -16477,7 +16477,7 @@ header .offcanvas-backdrop {
   right: 0;
 }
 .product-box .product-image img {
-  width: 100%;
+  width: 150%;
   height: 140px;
   -o-object-fit: contain;
   object-fit: contain;

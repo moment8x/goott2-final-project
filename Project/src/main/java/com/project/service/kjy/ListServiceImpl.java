@@ -15,6 +15,7 @@ import com.project.vodto.PagingInfo;
 import com.project.vodto.Product;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
+import com.project.vodto.kjy.ProductsForList;
 import com.project.vodto.kjy.SearchVO;
 
 @Service
@@ -49,7 +50,6 @@ public class ListServiceImpl implements ListService {
 			lst = lDao.selectProductForListSortByPrice(categoryKey, pagingInfo, sortBy);
 			break;
 		}
-		System.out.println("lst : " + lst);
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("list_product", lst);
 		map.put("paging_info", pagingInfo);
@@ -153,6 +153,30 @@ public class ListServiceImpl implements ListService {
 		PagingInfo pagingInfo = new PagingInfo(ProductCounts, 10, page, 10);
 		System.out.println(pagingInfo.getStartRowIndex() + "start");
 		return pagingInfo;
+	}
+
+	@Override
+	public Map<String, Object> indexSlideList() throws Exception {
+		Map<String, Object> map = new HashMap<String, Object>();
+		// 베스트 셀러
+		List<Products> bestSellerList = lDao.selectBsetSeller(null);
+		// 최신 도서 (화제의 신상)
+		List<ProductsForList> newList = lDao.selectNewProducts();
+		// 많이 팔린 순
+		List<ProductsForList> sellingList = lDao.selectProductOrderBySellings();
+		// 장바구니에 많은 순
+		List<ProductsForList> cartList = lDao.selectProductOrderByCart();
+		// 찜에 많은 순 (많이 보는 상품) -- 폐기 예정
+		
+		// 평점 높은 순
+		List<ProductsForList> ratingList = lDao.selectProductOrderByRating();
+		
+		map.put("bestSellerList", bestSellerList);
+		map.put("newList", newList);
+		map.put("sellingList", sellingList);
+		map.put("cartList", cartList);
+		map.put("ratingList", ratingList);
+		return map;
 	}
 
 }

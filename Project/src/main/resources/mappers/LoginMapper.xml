@@ -31,4 +31,8 @@
     	<select id="selectMemberById" resultMap="memberLoginResultMap">
     		select * from member where member_id = #{id}
     	</select>
+    	<!-- 이름과 이메일로 계정 조회 -->
+    	<select id="selectMemberByNameAndEmail" resultMap="memberLoginResultMap">
+    		select member_id,name,email from member where name = #{userName} and email = #{email}
+    	</select>
   	</mapper>

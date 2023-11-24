@@ -16,7 +16,7 @@
 </script>
 <title>Insert title here</title>
 <script>
-		let regTypeId = /^(?=.*[A-Za-z]+)(?=.*\d+)[A-Za-z0-9]{4,13}$/;
+		let regTypeId = /^(?=.*[A-Za-z]+)[A-Za-z0-9]{4,13}$/;
 		let regTypePd = /^(?=.*[a-zA-Z]+)(?=.*[!@#$%^*+=-])(?=.*[0-9]+).{8,15}$/;
 		let resultId = false;
 		let resultPd = false;
@@ -27,12 +27,12 @@
 				$(".idError").html("");
 				resultId = true;
 			} else {
-    			$(".idError").html("아이디는 영문과 숫자가 반드시 포함된 4~13글자여야 합니다.");
+    			$(".idError").html("아이디는 영문이 포함된 4~13글자여야 합니다.");
     			resultId = false;
     		}
 		});
 		
-		$('.log-in-form input[type=password]').on("blur", function() {
+		$('.log-in-form input[type=password]').on("blur keyup", function() {
 			if(regTypePd.test($(this).val())){
 				$(".pdError").html("");
 				resultPd = true;
@@ -268,8 +268,8 @@
 
       <!-- Modal body -->
       <div class="modal-body" style="align-items: center; text-align: center;">
-      <a href="/login/forgot?status=id"><button type="button" class="btn btn-outline-primary">아이디 찾기</button></a>
-       <a href="/login/forgot?status=password"><button type="button" class="btn btn-outline-success">비밀번호 찾기</button></a>
+      <a href="/login/forgot?statusValue=id"><button type="button" class="btn btn-outline-primary">아이디 찾기</button></a>
+       <a href="/login/forgot?statusValue=password"><button type="button" class="btn btn-outline-success">비밀번호 찾기</button></a>
       </div>
 
       <!-- Modal footer -->
