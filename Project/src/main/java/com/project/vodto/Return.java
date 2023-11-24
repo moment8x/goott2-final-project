@@ -14,11 +14,11 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Return {
-	private int return_no;
-	private String product_id;
+	private int returnNo;
+	private String productId;
 	private String reason;
-	private String processing_status;
-	private Timestamp request_time;
-	private Timestamp completion_time;
-	private int refund_status;
+	private String processingStatus;
+	private Timestamp requestTime;
+	private Timestamp completionTime;
+	private int refundStatus;
 }

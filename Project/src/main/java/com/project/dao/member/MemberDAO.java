@@ -20,6 +20,7 @@ import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
+import com.project.vodto.jmj.ReturnOrder;
 
 @Repository
 public interface MemberDAO {
@@ -170,6 +171,21 @@ public interface MemberDAO {
 	//모든 상품의 상태가 취소라면 주문내역 배송상태 업데이트
 	int updatedeliveryStatus(String memberId, String orderNo) throws SQLException, NamingException;
 	
+	//반품 인서트
+	int insertReturn(String productId, ReturnOrder ro) throws SQLException, NamingException;
+	
+	//반품 회수지 인서트
+	int insertReturnShippingAddress(ReturnOrder ro) throws SQLException, NamingException;
+	
+	//반품 환불계좌 변경
+	int updateRefundAccount(String memberId, ReturnOrder ro) throws SQLException, NamingException;
+	
+	//반품시 디테일 상태 변경
+	int updateDetailProductStatusWithReturn(int detailedOrderId) throws SQLException, NamingException;
+
+	//모든 디테일 상태가 반품신청이라면 주문내역 배송상태 변경
+	int updatedeliveryStatusWithReturn(String memberId, String orderNo) throws SQLException, NamingException;
+	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -181,12 +197,6 @@ public interface MemberDAO {
 	// 프로필사진 업데이트
 	int updateProfile(String memberId, String newFileName) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
-
-
-	
-	
-	
 	
 
-	
 }

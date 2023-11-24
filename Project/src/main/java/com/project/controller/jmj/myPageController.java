@@ -609,9 +609,24 @@ System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@키워드" + keyword.toString());
 	}
 	
 	@RequestMapping(value = "returnOrder", method = RequestMethod.POST)
-	public ResponseEntity<String> returnOrder(@ModelAttribute ReturnOrder ro) {
-		System.out.println("반품버튼 눌렀다.");
+	public ResponseEntity<String> returnOrder(@ModelAttribute ReturnOrder ro, HttpServletRequest request) {
+		System.out.println("반품버튼 눌렀다." + ro.toString());
 		
-		return null;
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
+		ResponseEntity<String> result = null;
+		
+		try {
+			if(mService.returnOrder(ro, memberId)){
+				 result = new ResponseEntity<String>("success", HttpStatus.OK);	
+			}
+		} catch (SQLException | NamingException e) {
+			e.printStackTrace();
+			result = new ResponseEntity<String>("fail", HttpStatus.CONFLICT);
+		}
+		
+		return result;
 	}
 }

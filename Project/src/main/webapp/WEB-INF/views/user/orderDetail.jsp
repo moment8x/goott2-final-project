@@ -87,6 +87,25 @@ function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
 		returnAddr.value = roadAddrPart1;
 	let returnDetailAddr = document.querySelector("#returnDetailAddr")
 		returnDetailAddr.value = addrDetail 
+		
+	let collectZipNo = document.querySelector("#collectZipNo");
+	let collectAddr = document.querySelector("#collectAddr");
+	let collecDetailAddr = document.querySelector("#collecDetailAddr");
+
+	let exchangeZipNo = document.querySelector("#exchangeZipNo");
+	let exchangeAddr = document.querySelector("#exchangeAddr");
+	let exchangeDetailAddr = document.querySelector("#exchangeDetailAddr");
+
+	// 교환 회수지 변경 주소찾기
+	collectZipNo.value = zipNo;
+	collectAddr.value = roadAddrPart1;
+	collecDetailAddr.value = addrDetail;
+
+	// 교환받을 주소 변경 주소찾기
+	exchangeZipNo.value = zipNo;
+	exchangeAddr.value = roadAddrPart1;
+	exchangeDetailAddr.value = addrDetail;
+
 }
 $(function () {
 	let orderTime = $('.detailOrderOrderTime').text().substring(0,21)
@@ -130,8 +149,9 @@ function applyReturn() {
 		async : false,
 		success : function(data) {
 			console.log(data);
-			
-			
+			if(data == 'success'){
+				location.reload()
+			}
 		},
 		error : function(error) {
 			console.log(error)
@@ -139,6 +159,7 @@ function applyReturn() {
 	});
 	})
 }
+
 
 //취소 버튼을 누르면
 function orderCancel(){
@@ -205,7 +226,6 @@ function orderCancel(){
 					result = true;
 					location.reload()
 				}
-				
 			},
 			error : function(error) {
 				console.log(error)
@@ -217,8 +237,8 @@ function orderCancel(){
 
 	//취소창에서 상품 선택하고 수량 입력하면 환불 계산
 	function selectOrderCancel() {
-	let bktRefundAmount = 0
-  	let refundAmount = 0	
+		let bktRefundAmount = 0
+	  	let refundAmount = 0	
 	  $("input[name='order']:checked").each(function () {
 	    let detailedOrderId = $(this).val();
 	    let orderNo = '${detailOrder.orderNo}';
@@ -266,7 +286,7 @@ function orderCancel(){
 	  			  refudnCouponWithP = calculate(orderQty, totalQty, couponWithP)
 	  			  
 	  			  if(data.couponsHistory.length == 0){
-	  					if(data.selectCancelOrder.paymentMethod == 'bkt' && data.selectCancelOrder.productStatus == '배송완료'){
+	  					if(data.selectCancelOrder.paymentMethod == 'bkt'){
 			  				bktRefundAmount += productPrice - refundPoint - refundReward
 	  					}else{
 				  			refundAmount += productPrice - refundPoint - refundReward	  						
@@ -275,17 +295,18 @@ function orderCancel(){
 		  			console.log(refundAmount)
 	  				
 	  			  }else if(data.couponsHistory.length != 0 && data.couponsHistory.expirationDate < today ){
-	  				if(data.selectCancelOrder.paymentMethod == 'bkt' && data.selectCancelOrder.productStatus == '배송완료'){
+	  				if(data.selectCancelOrder.paymentMethod == 'bkt'){
 		  				bktRefundAmount += productPrice - refundPoint - refundReward
   					}else{
 			  			refundAmount += productPrice - refundPoint - refundReward	  						
   					}
 	  			  }else if(data.couponsHistory.length != 0){
-	  				if(data.selectCancelOrder.paymentMethod == 'bkt' && data.selectCancelOrder.productStatus == '배송완료'){
+	  				if(data.selectCancelOrder.paymentMethod == 'bkt'){
 	  					bktRefundAmount += productPrice - refundPoint - refundReward - refudnCouponWithP
 	  				}else{
 		  				refundAmount += productPrice - refundPoint - refundReward - refudnCouponWithP
 	  				}
+	  				console.log("쿠폰할인금액 : " + refudnCouponWithP)
 	  			  }
 	  		  }else{
 	  			  refundPoint = point;
@@ -572,10 +593,6 @@ function editRturnAccount() {
 </head>
 
 <body>
-	
-	<c:if test="${sessionScope.loginMember == null }">
-		<c:redirect url="login"/>
-	</c:if>
 
 	<!-- Header Start -->
 	<jsp:include page="../header.jsp"></jsp:include>
@@ -721,6 +738,24 @@ function editRturnAccount() {
 														<div>취소</div>
 													</td>
 												</c:when>
+												<c:when test="${order.productStatus eq '반품신청' }">
+													<td class="name">
+														<h4 class="table-title text-content">상품상태</h4>
+														<h5>${order.productStatus }</h5>
+													</td>
+													<td>
+														<div>반품신청</div>
+													</td>
+												</c:when>
+												<c:when test="${order.productStatus eq '교환신청' }">
+													<td class="name">
+														<h4 class="table-title text-content">상품상태</h4>
+														<h5>${order.productStatus }</h5>
+													</td>
+													<td>
+														<div>교환신청</div>
+													</td>
+												</c:when>
 
 												<c:otherwise>
 													<td class="name">
@@ -759,7 +794,13 @@ function editRturnAccount() {
 												<h3>배송정보</h3>
 												<h5 class="ms-auto theme-color"></h5>
 											</div>
-
+											
+											<c:choose>
+												<c:when test="">
+													<c:otherwise>
+													</c:otherwise>
+												</c:when>
+											</c:choose>
 											<ul class="summery-contain pb-0 border-bottom-0">
 												<li class="pb-0">
 													<h4 class="infoTitle">받는사람 :</h4>
@@ -1397,9 +1438,9 @@ function editRturnAccount() {
 			</div>
 		</div>
 	</div>
-	<!-- Add address modal box end -->
+	<!-- 주문 취소 modal box end -->
 
-	<!-- 주문 반품 modal box start -->
+	<!-- 반품 modal box start -->
 	<div class="modal fade theme-modal" id="return-order" tabindex="-1"
 		aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div
@@ -1510,7 +1551,7 @@ function editRturnAccount() {
 						</div>
 					</div>
 
-					<h4>회수장소</h4>
+					<h4>회수 주소</h4>
 					<ul class="summery-contain pb-0 border-bottom-0">
 						<li class="pb-0 refundList">
 							<input type="text"
@@ -1682,12 +1723,205 @@ function editRturnAccount() {
 					<button type="button" class="btn btn-secondary btn-md"
 						data-bs-dismiss="modal">닫기</button>
 					<button type="button" class="btn theme-bg-color btn-md text-white"
-						onclick="applyReturn();">접수</button>
+						onclick="applyReturn();">신청</button>
 				</div>
 			</div>
 		</div>
 	</div>
-	<!-- Add address modal box end -->
+	<!--  반품 modal box end -->
+	
+		<!-- 교환 modal box start -->
+	<div class="modal fade theme-modal" id="exchange-order" tabindex="-1"
+		aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div
+			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">반품</h5>
+
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa-solid fa-xmark"></i>
+					</button>
+				</div>
+
+				<div class="modal-body">
+					<input class="checkbox_animated check-box" type="checkbox"
+						name="order" id="selectAllReturnOrder" onclick="selectAllReturn();"
+						onchange="selectOrderCancel();" /> <label
+						class="form-check-label" for="selectAllReturnOrder"><span>전체선택</span></label>
+					<c:forEach var="order" items="${detailOrderInfo }">
+						<table class="table mb-0 productInfo">
+							<c:if test="${order.productStatus == '배송완료'}">
+								<tbody>
+									<tr>
+										<td class="product-detail">
+											<div class="product border-0">
+												<c:choose>
+													<c:when test="${order.productImage != '' }">
+														<input
+															class="checkbox_animated check-box selectOrderCancel"
+															type="checkbox" value="${order.detailedOrderId }"
+															onchange="selectOrderCancel();" name="order"
+															id="selectOrderCancel" />
+														<a href="/detail/${order.productId }"
+															class="product-image"> <img
+															src="${order.productImage }" id="cancelOrderImg"
+															class="img-fluid blur-up lazyload"
+															alt="${order.productName }">
+														</a>
+													</c:when>
+													<c:otherwise>
+														<input
+															class="checkbox_animated check-box selectOrderCancel"
+															type="checkbox" value="${order.detailedOrderId }"
+															onchange="selectOrderCancel();" name="order"
+															id="selectOrderCancelWithNoImg" />
+														<a href="/detail/${order.productId }"
+															class="product-image"> <img
+															src="/resources/assets/images/noimage.jpg"
+															class="img-fluid blur-up lazyload"
+															alt="${order.productName }">
+														</a>
+													</c:otherwise>
+												</c:choose>
+												<c:set var="productNameLength"
+													value="${fn:length(order.productName)}" />
+												<c:choose>
+													<c:when test="${productNameLength <= 5}">
+														<td class="name">
+															<h4 class="table-title text-content">상품이름</h4> <a
+															href="/detail/${order.productId }" id="productName">${order.productName }</a>
+														</td>
+													</c:when>
+													<c:otherwise>
+														<td class="name">
+															<h4 class="table-title text-content">상품이름</h4> <a
+															href="/detail/${order.productId }" id="productName">${fn:substring(order.productName, 0, 5)}...</a>
+														</td>
+													</c:otherwise>
+												</c:choose>
+											</div>
+
+										</td>
+
+										<td class="price">
+											<h4 class="table-title text-content">상품금액</h4>
+											<h6 class="theme-color productPrice">
+												<fmt:formatNumber value="${order.productPrice }"
+													type="NUMBER" />
+												원
+											</h6>
+										</td>
+
+										<td class="name">
+											<h4 class="table-title text-content">수량</h4> <input
+											type="text" class="form-control cancelQty" id="cancelQty"
+											value="0" />
+
+										</td>
+
+										<td class="name">
+											<h4 class="table-title text-content">상품상태</h4>
+											<h5>${order.productStatus }</h5>
+										</td>
+
+									</tr>
+								</tbody>
+							</c:if>
+						</table>
+					</c:forEach>
+					<div class="totalCancelQty"></div>
+					<div class="form-floating mb-4 theme-form-floating">
+						교환 사유<input type="text" class="form-control" id="exchangeReason"
+							value="상품 하자" name="reason" readonly="readonly" />
+						<div class="deliverMsg">
+							<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>
+							상품에 하자가 있는 경우에만 교환이 가능합니다.
+						</div>
+					</div>
+
+					<h4>회수 주소</h4>
+					<ul class="summery-contain pb-0 border-bottom-0">
+						<li class="pb-0 refundList">
+							<input type="text"
+							class="form-control" value="${detailOrder.zipCode }"
+							id="collectZipNo" name="zipCode" readonly/>
+
+						</li>
+
+						<li class="pb-0 refundList">
+							<input type="text" class="form-control"
+							value="${detailOrder.shippingAddress }" id="collectAddr"
+							name="shippingAddress" readonly />
+						</li>
+
+						<li class="pb-0 refundList">
+							<input type="text" class="form-control"
+							value="${detailOrder.detailedShippingAddress }" id="collecDetailAddr"
+							name="detailedShippingAddress" />
+						</li>
+
+						<li class="pb-0 refundList"><input type="text"
+							class="form-control" value="${detailOrder.deliveryMessage }"
+							id="collecMsg" name="deliveryMessage" placeholder="메세지" /></li>
+
+						<li class="pb-0 refundList">
+							<button
+								class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
+								onclick="goPopup();">
+								<i data-feather="edit" class="me-2"></i> 배송지 변경
+							</button>
+						</li>
+					</ul>
+					
+					<h4>교환 받을 주소</h4>
+					<ul class="summery-contain pb-0 border-bottom-0">
+						<li class="pb-0 refundList">
+							<input type="text"
+							class="form-control" value="${detailOrder.zipCode }"
+							id="exchangeZipNo" name="exchangeZipNo" readonly/>
+
+						</li>
+
+						<li class="pb-0 refundList">
+							<input type="text" class="form-control"
+							value="${detailOrder.shippingAddress }" id="exchangeAddr"
+							name="exchangeAddr" readonly />
+						</li>
+
+						<li class="pb-0 refundList">
+							<input type="text" class="form-control"
+							value="${detailOrder.detailedShippingAddress }" id="exchangeDetailAddr"
+							name="exchangeDetailAddr" />
+						</li>
+
+						<li class="pb-0 refundList"><input type="text"
+							class="form-control" value="${detailOrder.deliveryMessage }"
+							id="exchangeMsg" name="exchangeMsg" placeholder="메세지" /></li>
+
+						<li class="pb-0 refundList">
+							<button
+								class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
+								onclick="goPopup();">
+								<i data-feather="edit" class="me-2"></i> 배송지 변경
+							</button>
+						</li>
+					</ul>
+
+
+					
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-md"
+						data-bs-dismiss="modal">닫기</button>
+					<button type="button" class="btn theme-bg-color btn-md text-white"
+						onclick="applyExchange();">신청</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--  교환 modal box end -->
 
 	<!-- Deal Box Modal Start -->
 	<div class="modal fade theme-modal deal-modal" id="deal-box"

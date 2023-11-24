@@ -6,7 +6,7 @@
 <mapper namespace="com.project.mappers.memberMapper">
 	<select id="getOrderList"
 		resultType="com.project.vodto.jmj.MyPageOrderList">
-	SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, d.product_id,
+	SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, d.product_id, 
       pay.actual_payment_amount, p.product_image, prod.product_name, sum(d.product_quantity) as totalOrderCnt
       FROM products prod, detailed_order_items d, order_history o, payments pay, (SELECT * FROM product_images GROUP BY product_id) p
         where member_id = #{memberId}
@@ -18,8 +18,7 @@
 	</select>
 
 	<select id="getProductCount" resultType="int">
-		select count(*) from
-		detailed_order_items where order_no = #{orderNo}
+		select sum(product_quantity) from detailed_order_items where order_no = #{orderNo}
 	</select>
 	
 	<select id="getMemberInfo" resultType="com.project.vodto.Member">
@@ -348,6 +347,31 @@
 	
 	<update id="updatedeliveryStatus" >
 		update order_history set delivery_status = '취소' where member_id = #{memberId} and order_no = #{orderNo}
+	</update>
+	
+	<insert id="insertReturn">
+		insert into returns(product_id, reason, processing_status, detailed_order_id) 
+		values(#{productId},#{reason},'반품신청',#{detailedOrderId})
+	</insert>
+	
+	<insert id="insertReturnShippingAddress">
+		<selectKey order="BEFORE" keyProperty="no" resultType="int">
+			SELECT max(returns_id) from returns
+		</selectKey>
+		insert into return_shipping_address(returns_id, return_shipping_address_zip_no, return_shipping_address_addr,return_shipping_address_detail_addr)
+		values(#{no},#{zipNo},#{addr},#{detailAddr})
+	</insert>
+	
+	<update id="updateRefundAccountWithReturn">
+		update member set refund_bank = #{refundBank}, refund_account = #{refundAccount}, account_holder = #{accountHolder} where member_id = #{memberId}
+	</update>
+	
+	<update id="updateDetailProductStatusWithReturn">
+		update detailed_order_items set product_status = '반품신청' where detailed_order_id = #{detailedOrderId}
+	</update>
+	
+	<update id="updatedeliveryStatusWithReturn" >
+		update order_history set delivery_status = '반품신청' where member_id = #{memberId} and order_no = #{orderNo}
 	</update>
 	
 	<!-- =========================== 김진솔 =========================== -->

@@ -32,6 +32,7 @@ import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
+import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.UploadFiles;
 
 @Service
@@ -421,6 +422,7 @@ public class MemberServiceImpl implements MemberService {
 				if(mDao.updateDetailProductStatus(tmpCancel.getDetailedOrderId()) > 0) {
 					System.out.println("디테일 상태 업데이트 완");
 					for(DetailOrder cancelDetail : detailOrders) {
+						//모든 디테일 상품 상태가 취소라면 주문내역 배송상태 취소로 변경
 						if(!"취소".equals(cancelDetail.getProductStatus())) {
 							allCancel = false;
 							break;
@@ -484,6 +486,43 @@ public class MemberServiceImpl implements MemberService {
 		return result;
 	}
 
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean returnOrder(ReturnOrder ro, String memberId) throws SQLException, NamingException {
+		Map<String, Object> map = selectCancelOrder(memberId, ro.getOrderNo(), ro.getDetailedOrderId());
+		DetailOrder detailOrder = (DetailOrder)map.get("selectCancelOrder");
+		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, ro.getOrderNo());
+
+		boolean result = false;
+		boolean allApplyReturn = true;
+		
+		if(mDao.insertReturn(detailOrder.getProductId(), ro) > 0) {
+			System.out.println("반품 인서트 완");
+			if(mDao.insertReturnShippingAddress(ro) > 0) {
+				System.out.println("회수 배송지 입력 완");
+				if(mDao.updateRefundAccount(memberId, ro) > 0) {
+					System.out.println("멤버 환불정보 업데이트 완");
+					if(mDao.updateDetailProductStatusWithReturn(ro.getDetailedOrderId()) > 0) {
+						System.out.println("디테일 상품 상태 업데이트 완");
+						for(DetailOrder returnDetail : detailOrders) {
+							//모든 디테일 상품 상태가 취소라면 주문내역 배송상태 취소로 변경
+							if(!"반품신청".equals(returnDetail.getProductStatus())) {
+								allApplyReturn = false;
+								break;
+							}else {
+								mDao.updatedeliveryStatusWithReturn(memberId, ro.getOrderNo());
+								System.out.println("주문내역 배송상태 변경 완");
+							}
+						}
+					}
+				}
+			}
+			result = true;
+		}
+		
+		return result;
+	}
 	// --------------------------------------- 장민정 끝
 	// ----------------------------------------
 	// --------------------------------------- 김진솔 시작
@@ -543,6 +582,7 @@ public class MemberServiceImpl implements MemberService {
 		System.out.println("======= 멤버(로그인) 서비스단 끝 =======");
 		return result;
 	}
+
 
 	// --------------------------------------- 김진솔 끝
 	// ----------------------------------------

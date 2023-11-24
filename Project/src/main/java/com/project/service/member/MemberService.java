@@ -18,6 +18,7 @@ import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.jmj.ReturnOrder;
 
 public interface MemberService {
 	// ----------------------------------- 장민정 시작 -----------------------------------
@@ -102,7 +103,8 @@ public interface MemberService {
 	//출고전, 입금전 주문취소하기
 	boolean cancelOrder(CancelDTO tmpCancel, String memberId) throws SQLException, NamingException;
 	
-
+	//배송완료시 반품하기
+	boolean returnOrder(ReturnOrder ro, String memberId) throws SQLException, NamingException;
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -112,6 +114,7 @@ public interface MemberService {
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
+	
 	
 
 }

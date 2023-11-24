@@ -24,6 +24,7 @@ import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
+import com.project.vodto.jmj.ReturnOrder;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO {
@@ -501,6 +502,52 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.update(ns + ".updatedeliveryStatus", params);
 	}
 
+	@Override
+	public int insertReturn(String productId, ReturnOrder ro) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("productId", productId);
+		params.put("reason", ro.getReturnReason());
+		params.put("detailedOrderId", ro.getDetailedOrderId());
+		
+		return ses.insert(ns + ".insertReturn", params);
+	}
+
+	@Override
+	public int insertReturnShippingAddress(ReturnOrder ro) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("zipNo", ro.getZipNo());
+		params.put("addr", ro.getAddr());
+		params.put("detailAddr", ro.getDetailAddr());
+		
+		return ses.insert(ns + ".insertReturnShippingAddress", params);
+	}
+	
+	@Override
+	public int updateRefundAccount(String memberId, ReturnOrder ro) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("refundBank", ro.getRefundBank());
+		params.put("refundAccount", ro.getRefundAccount());
+		params.put("accountHolder", ro.getAccountHolder());
+		params.put("memberId", memberId);
+		
+		return ses.update(ns + ".updateRefundAccountWithReturn", params);
+	}
+	
+	@Override
+	public int updateDetailProductStatusWithReturn(int detailedOrderId) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".updateDetailProductStatusWithReturn", detailedOrderId);
+	}
+	
+	@Override
+	public int updatedeliveryStatusWithReturn(String memberId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.update(ns + ".updatedeliveryStatusWithReturn", params);
+	}
+
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
 	@Override
@@ -542,6 +589,9 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".updateProfile", params);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+
+
 
 
 
