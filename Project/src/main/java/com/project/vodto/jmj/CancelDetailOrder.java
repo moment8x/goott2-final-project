@@ -1,6 +1,4 @@
-package com.project.vodto;
-
-import java.sql.Timestamp;
+package com.project.vodto.jmj;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,15 +8,16 @@ import lombok.ToString;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
 @Setter
+@Getter
 @ToString
-public class Return {
-	private int returnNo;
+public class CancelDetailOrder {
+
+	private int amount; //금액
 	private String productId;
+	private int detailedOrderId;
 	private String reason;
-	private String processingStatus;
-	private Timestamp requestTime;
-	private Timestamp completionTime;
-	private int refundStatus;
+	private String processingStatus; //처리여부
+	private String refundStatus; //환불여부
+	
 }

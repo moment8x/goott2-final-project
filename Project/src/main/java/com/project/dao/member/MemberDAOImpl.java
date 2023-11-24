@@ -11,9 +11,11 @@ import javax.naming.NamingException;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.project.vodto.BankTransfer;
 import com.project.vodto.Member;
 import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.CancelDTO;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
@@ -22,6 +24,7 @@ import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
+import com.project.vodto.jmj.ReturnOrder;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO {
@@ -60,7 +63,7 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public int selectOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException {
+	public int selectOrderProductCount(String orderNo) throws SQLException, NamingException {
 
 		return ses.selectOne(ns + ".getProductCount", orderNo);
 	}
@@ -289,13 +292,15 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("memberId", memberId);
 		params.put("orderNo", orderNo);
 		
-		return ses.selectList(ns + ".gerCouponsHistory", params);
+		return ses.selectList(ns + ".getCouponsHistory", params);
 	}
 	
 	@Override
-	public GetBankTransfer getBankTransfer(String orderNo) throws SQLException, NamingException {
-		
-		return ses.selectOne(ns + ".getBankTransfer", orderNo);
+	public GetBankTransfer getBankTransfer(String orderNo, String memberId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		return ses.selectOne(ns + ".getBankTransfer", params);
 	}
 	
 	@Override
@@ -310,6 +315,8 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("cancelList", keyword.getCancelList());
 		params.put("exchangeList", keyword.getExchangeList());
 		params.put("returnList", keyword.getReturnList());
+		params.put("exchangeApply", keyword.getExchangeApply());
+		params.put("returnApply", keyword.getReturnApply());
 		
 		params.put("sevenDaysAgo", keyword.getSevenDaysAgo());
 		params.put("fifteenDaysAgo", keyword.getFifteenDaysAgo());
@@ -338,6 +345,8 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("cancelList", keyword.getCancelList());
 		params.put("exchangeList", keyword.getExchangeList());
 		params.put("returnList", keyword.getReturnList());
+		params.put("returnApply", keyword.getReturnApply());
+		params.put("exchangeApply", keyword.getExchangeApply());
 		
 		params.put("sevenDaysAgo", keyword.getSevenDaysAgo());
 		params.put("fifteenDaysAgo", keyword.getFifteenDaysAgo());
@@ -345,7 +354,199 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectOne(ns + ".getOrderStatusCnt", params);
 	}
+	
+	@Override
+	public DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		params.put("detailedOrderId", detailedOrderId);
+		return ses.selectOne(ns + ".selectCancelOrder", params);
+	}
+	
+	@Override
+	public int insertCancelOrder(String productId, String reason, int amountBeforeDiscount, int detailedOrderId, String paymentMethod)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("productId", productId);
+		params.put("reason", reason);
+		params.put("amount", amountBeforeDiscount);
+		params.put("detailedOrderId", detailedOrderId);
+		params.put("paymentMethod", paymentMethod);
+		
+		return ses.insert(ns + ".insertCancelOrder", params);
+	}
 
+	@Override
+	public int updateDetailProductStatus(int detailedOrderId) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".updateDetailProductStatus", detailedOrderId);
+	}
+
+	@Override
+	public int updateRefundAccount(String memberId, CancelDTO tmpCancel) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("refundBank", tmpCancel.getRefundBank());
+		params.put("refundAccount", tmpCancel.getRefundAccount());
+		params.put("accountHolder", tmpCancel.getAccountHolder());
+		
+		return ses.update(ns + ".updateRefundAccount", params);
+	}
+
+	@Override
+	public int insertRefund(String productId, CancelDTO tmpCancel, String paymentMethod, int amountAfterDiscount, int amountBeforeDiscount)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("productId", productId);
+		params.put("amount", amountAfterDiscount);
+		params.put("refundRewardUsed", tmpCancel.getRefundRewardUsed());
+		params.put("refundPointUsed", tmpCancel.getRefundPointUsed());
+		params.put("totalRefundAmount", amountBeforeDiscount);
+		params.put("paymentMethod", paymentMethod);
+		
+		return ses.insert(ns + ".insertRefund", params);
+	}
+	
+	@Override
+	public int insertRewardLog(String memberId, CancelDTO tmpCancel, int totalReward)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("refundRewardUsed", tmpCancel.getRefundRewardUsed());
+		params.put("orderNo", tmpCancel.getOrderNo());
+		params.put("balance", totalReward);
+		
+		return ses.insert(ns + ".insertRewardLog", params);
+	}
+	
+	@Override
+	public int updateMemberReward(int addReward, String memberId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("totalRewards", addReward);
+		
+		return ses.update(ns + ".updateMemberReward", params);
+	}
+	
+	@Override
+	public int insertPointLog(String memberId, int refundPointUsed, String orderNo, int totalPoint)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("point", refundPointUsed);
+		params.put("orderNo", orderNo);
+		params.put("balance", totalPoint);
+		
+		return ses.insert(ns + ".insertPointLog", params);
+	}
+	
+	@Override
+	public int selectRewardBalance(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".selectRewardBalance", memberId);
+	}
+
+	@Override
+	public int selectPointBalance(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".selectPointBalance", memberId);
+	}
+
+	@Override
+	public int updateMemberPoint(int addPoint, String memberId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("totalCouponCnt", addPoint);
+		
+		return ses.update(ns + ".updateMemberPoint", params);
+	}
+
+	@Override
+	public int updateCouponLog(int couponLogsSeq) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".updateCouponLog", couponLogsSeq);
+	}
+
+	@Override
+	public int selectCouponCnt(String memberId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.selectOne(ns + ".selectCouponCnt", params);
+	}
+
+	@Override
+	public int updateMemeberTotalCoupon(int couponCnt, String memberId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("couponCnt", couponCnt);
+		
+		return ses.update(ns + ".updateMemeberTotalCoupon", params);
+	}
+
+	@Override
+	public List<GetBankTransfer> selectBankTransfers(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".selectBankTransfers", memberId);
+	}
+	
+	@Override
+	public int updatedeliveryStatus(String memberId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.update(ns + ".updatedeliveryStatus", params);
+	}
+
+	@Override
+	public int insertReturn(String productId, ReturnOrder ro) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("productId", productId);
+		params.put("reason", ro.getReturnReason());
+		params.put("detailedOrderId", ro.getDetailedOrderId());
+		
+		return ses.insert(ns + ".insertReturn", params);
+	}
+
+	@Override
+	public int insertReturnShippingAddress(ReturnOrder ro) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("zipNo", ro.getZipNo());
+		params.put("addr", ro.getAddr());
+		params.put("detailAddr", ro.getDetailAddr());
+		
+		return ses.insert(ns + ".insertReturnShippingAddress", params);
+	}
+	
+	@Override
+	public int updateRefundAccount(String memberId, ReturnOrder ro) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("refundBank", ro.getRefundBank());
+		params.put("refundAccount", ro.getRefundAccount());
+		params.put("accountHolder", ro.getAccountHolder());
+		params.put("memberId", memberId);
+		
+		return ses.update(ns + ".updateRefundAccountWithReturn", params);
+	}
+	
+	@Override
+	public int updateDetailProductStatusWithReturn(int detailedOrderId) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".updateDetailProductStatusWithReturn", detailedOrderId);
+	}
+	
+	@Override
+	public int updatedeliveryStatusWithReturn(String memberId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.update(ns + ".updatedeliveryStatusWithReturn", params);
+	}
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
@@ -389,10 +590,11 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
 
-	
-
-	
 
 
-	
+
+
+
+
+
 }
