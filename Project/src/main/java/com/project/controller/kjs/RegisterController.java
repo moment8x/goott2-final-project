@@ -23,8 +23,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.project.service.kjs.upload.UploadFileService;
 import com.project.service.member.MemberService;
-import com.project.vodto.Member;
 import com.project.vodto.UploadFiles;
+import com.project.vodto.kjs.SignUpDTO;
 
 
 @Controller
@@ -41,16 +41,13 @@ public class RegisterController {
 	
 	@RequestMapping("register")
 	public ModelAndView moveRegister() {
-		System.out.println("======= 회원가입 컨트롤러 - 회원가입 페이지 이동 =======");
 		ModelAndView mav = new ModelAndView("register/register");
 		
-		System.out.println("======= 회원가입 컨트롤러 끝 =======");
 		return mav;
 	}
 	
 	@RequestMapping("checkedId")
 	public ResponseEntity<Map<String, Object>> checkedId(@RequestParam("memberId") String memberId) {
-		System.out.println("======= 회원가입 컨트롤러 - 아이디 중복 체크 =======");
 		ResponseEntity<Map<String, Object>> result = null;
 		Map<String, Object> map = new HashMap<String, Object>();
 		
@@ -70,36 +67,29 @@ public class RegisterController {
 			map.put("status", "fail");
 			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.BAD_REQUEST);
 		}
-		
-		System.out.println("======= 회원가입 컨트롤러 끝 =======");
 		return result;
 	}
 	
 	@RequestMapping(value="signUp", method=RequestMethod.POST)
-	public void signUp(Member member, Model model) {
-		System.out.println("======= 회원가입 컨트롤러 - 회원가입 =======");
+	public void signUp(SignUpDTO member, Model model) {
 		
 		try {
 			System.out.println("zipCode : " + member.getZipCode());
 			System.out.println("address : " + member.getAddress());
 			System.out.println("detailAddress : " + member.getDetailedAddress());
-			
 			if (fileList != null) {
 				mService.insertMember(member, fileList.get(0));
+				fileList.clear();
 			} else {
 				mService.insertMember(member, null);
 			}
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
 		}
-		
-		System.out.println("======= 회원가입 컨트롤러 끝 =======");
 	}
 	
 	@RequestMapping(value="uploadFile", method=RequestMethod.POST)
 	public @ResponseBody UploadFiles uploadFile(HttpServletRequest request, MultipartFile uploadFile) {
-		System.out.println("======= 회원가입 컨트롤러 - 프로필 사진 등록 =======");
-		
 		// 1. 파일이 저장될 경로 확인
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
 		
@@ -118,13 +108,11 @@ public class RegisterController {
 			e.printStackTrace();
 		}
 		
-		System.out.println("======= 회원가입 컨트롤러 끝 =======");
 		return fileList.get(0);
 	}
 	
 	@RequestMapping("refreshFile")
 	public void refreshFile(HttpServletRequest request) {
-		System.out.println("======= 회원가입 컨트롤러 - 프로필 사진 초기화 =======");
 		
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
 		
@@ -132,7 +120,5 @@ public class RegisterController {
 			ufService.deleteFile(fileList.get(0), realPath);
 			fileList.clear();
 		}
-		
-		System.out.println("======= 회원가입 컨트롤러 끝 =======");
 	}
 }

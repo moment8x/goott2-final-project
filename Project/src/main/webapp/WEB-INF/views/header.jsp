@@ -98,12 +98,12 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 			output += `<c:forEach var="item" items="${cartItems}">`;
 			output += `<li class="product-box-contain">`;
 			output += `<div class="drop-cart">`;
-    		output += `<a href="#" class="drop-image">`;
+    		output += `<a href="/detail/${item.productId}" class="drop-image">`;
     		output += `<img src="${item.productImage}" class="blur-up lazyload" alt=""></a>`;
     		output += `<div class="drop-contain">`;
     		output += `<a href="#">`;
     		output += `<h5>${item.productName}</h5></a>`;
-    		output += `<h6><span>1 x</span> ${item.sellingPrice}원</h6>`;
+    		output += `<h6><span>${item.quantity} x </span> ${item.sellingPrice}원</h6>`;
     		output += `<button class="close-button close_button" onclick="delCart('${item.productId}');">`;
     		output += `<i class="fa-solid fa-xmark"></i></button></div></div></li>`;
     		output += `</c:forEach></c:if>`;
@@ -114,7 +114,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     		output2 += `<c:if test='${cartItems != "none"}'>`;
     		output2 += `<c:set var="total" value="0" />`;
             output2 += `<c:forEach var="item" items="${cartItems}" varStatus="status">`;
-            output2 += `<c:set var="total" value="${total + item.sellingPrice}" />`;
+            output2 += `<c:set var="total" value="${total + (item.sellingPrice * item.quantity)}" />`;
             output2 += `</c:forEach>`;
             output2 += `<c:out value="${total }"/>원</c:if>`;
             output2 += `<c:if test='${cartItems == "none"}'>--</c:if>`;
@@ -342,7 +342,8 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                     </li>
                                     <li class="right-side">
                                         <div class="onhover-dropdown header-badge">
-                                            <button type="button" class="btn p-0 position-relative header-wishlist">
+                                            <button type="button" class="btn p-0 position-relative header-wishlist"
+                                            		onclick="location.href='/shoppingCart/shoppingCart'">
                                             	<i data-feather="shopping-cart"></i>
                                             	<div class="red-icon"></div>
                                             </button>

@@ -14,14 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.project.dao.kjs.upload.UploadDAO;
 import com.project.dao.member.MemberDAO;
 import com.project.etc.kjs.ImgMimeType;
-import com.project.service.member.MemberService;
 import com.project.vodto.Board;
 import com.project.vodto.CouponLog;
 import com.project.vodto.CustomerInquiry;
 import com.project.vodto.Member;
-import com.project.vodto.OrderHistory;
 import com.project.vodto.PointLog;
-import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.jmj.CancelDTO;
 import com.project.vodto.jmj.ChangeShippingAddr;
@@ -32,6 +29,8 @@ import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
+import com.project.vodto.kjs.ShippingAddrDTO;
+import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.UploadFiles;
 
@@ -529,21 +528,18 @@ public class MemberServiceImpl implements MemberService {
 	// ---------------------------------------
 	@Override
 	public boolean checkedDuplication(String memberId) throws SQLException, NamingException {
-		System.out.println("======= 멤버(회원가입, 로그인) 서비스단 - 회원 정보 조회 =======");
 		boolean result = false;
 		// 회원 정보 조회
 		if (!mDao.selectId(memberId)) {
 			result = true; // 중복된 아이디가 없을 때
 		}
 
-		System.out.println("======= 멤버(회원가입, 로그인) 서비스단 끝 =======");
 		return result;
 	}
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public boolean insertMember(Member member, UploadFiles file) throws SQLException, NamingException {
-		System.out.println("======= 멤버(회원가입) 서비스단 - 회원가입 =======");
+	public boolean insertMember(SignUpDTO member, UploadFiles file) throws SQLException, NamingException {
 		boolean result = false;
 		String newFileName = "";
 		// 회원 가입 - 프로필 사진 저장
@@ -552,24 +548,41 @@ public class MemberServiceImpl implements MemberService {
 				uDao.insertUploadImage(file);
 				newFileName = file.getNewFileName();
 			}
-		}
-		;
+		};
+		
 		// 회원 가입 - 회원 가입
 		if (mDao.insertMember(member) == 1) {
-			if (!newFileName.equals("")) {
-				// 프로필사진이 있을 시.(update)
-				mDao.updateProfile(member.getMemberId(), newFileName);
+			// 배송지 설정
+			ShippingAddrDTO shipping = new ShippingAddrDTO();
+			shipping.setMemberId(member.getMemberId());
+			shipping.setRecipient(member.getName());
+			if (member.getCellPhoneNumber() != null && member.getCellPhoneNumber().equals("")) {
+				shipping.setRecipientContact(member.getCellPhoneNumber());
+			} else {
+				shipping.setRecipientContact(member.getPhoneNumber());
 			}
-			result = true;
+			shipping.setZipCode(member.getZipCode());
+			shipping.setAddress(member.getAddress());
+			shipping.setDetailAddress(member.getDetailedAddress());
+			if (member.getBasicAddr() == null) {
+				member.setBasicAddr("N");
+			}
+			shipping.setBasicAddr(member.getBasicAddr());
+			
+			// 배송지 추가
+			if (mDao.insertShipping(shipping) == 1) {
+				if (!newFileName.equals("")) {
+					// 프로필사진이 있을 시.(update)
+					mDao.updateProfile(member.getMemberId(), newFileName);
+				}
+				result = true;
+			}
 		}
-		System.out.println("member : " + member.toString());
-		System.out.println("======= 멤버(회원가입) 서비스단 끝 =======");
 		return result;
 	}
 
 	@Override
 	public Member login(String memberId, String password) throws SQLException, NamingException {
-		System.out.println("======= 멤버(로그인) 서비스단 - 로그인 =======");
 		Member result = null;
 
 		// Pwd 확인
@@ -579,12 +592,10 @@ public class MemberServiceImpl implements MemberService {
 			System.out.println(result.toString());
 		}
 
-		System.out.println("======= 멤버(로그인) 서비스단 끝 =======");
 		return result;
 	}
 
 
-	// --------------------------------------- 김진솔 끝
-	// ----------------------------------------
+	// --------------------------------------- 김진솔 끝 ----------------------------------------
 
 }

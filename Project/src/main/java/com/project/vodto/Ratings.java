@@ -11,10 +11,10 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Rating {
-	private String product_id;
+public class Ratings {
+	private String productId;
 	private float rating;
-	private int participation_count;
-	private int highest_rating;
-	private int lowest_rating;
+	private int participationCount;
+	private int highestRating;
+	private int lowestRating;
 }

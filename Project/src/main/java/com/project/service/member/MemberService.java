@@ -18,6 +18,7 @@ import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.jmj.ReturnOrder;
 
 public interface MemberService {
@@ -110,7 +111,7 @@ public interface MemberService {
 	// 회원 아이디 중복 조회
 	boolean checkedDuplication(String memberId) throws SQLException, NamingException;
 	// 회원 가입
-	boolean insertMember(Member member, UploadFiles file) throws SQLException, NamingException;
+	boolean insertMember(SignUpDTO member, UploadFiles file) throws SQLException, NamingException;
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------

@@ -50,10 +50,22 @@
 			// 받아 온 장바구니 정보 출력
 			spreadView();
 			
-			if(isLogin != "N") {
-			isLogin = "Y";
-			}
-			console.log(isLogin);
+			// QTY 입력으로 변경 시
+			$('.qty-input').blur(function() {
+				let prod = $(this).attr("id");
+				let price = $(this).prev().val();
+				let maxium = $(this).next().val();
+				
+				if ($(this).val() > maxium) {
+					$(this).val(maxium);
+					alert("재고량(" + maxium + ")보다 높은 수를 입력하실 수 없습니다.");
+				} else {
+					digitize(prod);
+					$('#total' + prod).html("&#8361;" + addComma(price * $('#' + prod).val()));
+					
+					updateQTY(prod, $(this).val());
+				}
+			});
 		});
 		
 		// 선택된 항목 삭제.
@@ -62,7 +74,7 @@
 			$("input[name='check_item']:checked").each(function(i){   //jQuery로 for문 돌면서 check 된값 배열에 담는다
 				items.push($(this).val());
 			});
-			console.log(items);
+			
 			$.ajax({
 				url: "/shoppingCart/items",
 				type:"POST",
@@ -89,7 +101,6 @@
 				async : false,
 				success : function(data) {
 					result = data;
-					console.log("data", data);
 				}, error : function() {
 					console.log("help!me!");
 				}
@@ -143,7 +154,9 @@
 						output += `<div class="quantity-price"><div class="cart_qty"><div class="input-group">`;
 						output += `<button type="button" class="btn qty-left-minus" onclick="qtyMinus('\${item.productId}', '\${item.sellingPrice}');">`;
 						output += `<i class="fa fa-minus ms-0" aria-hidden="true"></i></button>`;
-						output += `<input class="form-control input-number qty-input quantity" id="\${item.productId}" type="text" name="quantity" value="\${qty}">`;
+						output += `<input type="hidden" value="\${item.sellingPrice}">`;
+						output += `<input class="form-control input-number qty-input quantity" id="\${item.productId}" type="text" name="quantity" value="\${item.quantity}">`;
+						output += `<input type="hidden" value="\${item.currentQuantity}">`;
 						output += `<button type="button" class="btn qty-right-plus" onclick="qtyPlus('\${item.productId}', '\${item.sellingPrice}', '\${item.currentQuantity}');">`;
 						output += `<i class="fa fa-plus ms-0" aria-hidden="true"></i></button></div></div></div></td>`;
 					} else {
@@ -191,8 +204,6 @@
 				output += `<div><button>로그인 하기</button></div>`;
 			}
 			
-			console.log(output2);
-			
 			output3 += '<li class="list-total border-top-0"><h4>Total (USD)</h4>';
 			output3 += '<h4 class="price theme-color" id="total_amount">&#8361;' + addComma(total) + '</h4></li>';
 			
@@ -204,11 +215,11 @@
 		// 결제 form 갱신
 		function buy() {
 			let output = "";
+			
 			for (let i = 0; i < buyInfo.length; i++) {
 				output += `<input type="hidden" name="productId" value="\${buyInfo[i].productId}">`;
 				output += `<input type="hidden" name="productQuantity" value="\${buyInfo[i].quantity}">`;
 				output += `<input type='hidden' name="fromCart" value="Y">`;
-				output += `<input type='hidden' name="isLogin" value="\${isLogin}">`;
 				
 				$('.move-payment').html(output);
 			}
@@ -240,6 +251,7 @@
 		}
 		
 		// QTY +
+		// #prod : input태그, price : 가격, stock : 재고량
 		function qtyPlus(prod, price, stock) {
 			if (parseInt($('#' + prod).val()) < stock) {
 				digitize(prod);
@@ -253,9 +265,6 @@
 				});
 				
 				updateQTY(prod ,$('#' + prod).val());
-				subtotal();
-				totalAmount();
-				buy();
 			}
 		}
 		// QTY -
@@ -272,15 +281,13 @@
 				});
 				
 				updateQTY(prod ,$('#' + prod).val());
-				subtotal();
-				totalAmount();
-				buy();
 			}
 		}
 		
 		// QTY값 DB에 변경
 		// (productId, qty)
 		function updateQTY(productId, quantity) {
+			console.log("여기까진 오는데;;");
 			$.ajax({
 				url: "/shoppingCart/updateQTY",
 				type: "POST",
@@ -291,7 +298,14 @@
 				dataType: "JSON",
 				async: false,
 				success: function(data) {
-					console.log(data);
+					if (data.status === "success") {
+						subtotal();
+						totalAmount();
+						buy();
+					} else if (data.status === "problem") {
+						alert("재고 이상의 수량을 입력할 수 없습니다.");
+						location.reload();
+					}
 				}, error: function(data) {
 					console.log(data);
 				}
@@ -301,7 +315,6 @@
 		// 구매액(subtotal)
 		function subtotal() {
 			let sum = 0;
-			
 			for (let i = 0; i < $('h5.subtotal').length; i++) {
 				let temp = document.getElementsByClassName('calc_total')[i].innerHTML;
 				temp = digitizeNormal(temp);
@@ -334,7 +347,6 @@
 				dataType : "json",
 				async : false,
 				success : function(data) {
-					console.log(data);
 					if (data.status == "success") {
 						spreadView();
 					}

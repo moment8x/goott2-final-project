@@ -403,8 +403,9 @@
 		</selectKey>
 		UPDATE member SET profile_image = #{ufSeq} where member_id = #{memberId}
 	</update>
-	
-
-	
+	<insert id="insertShipping">
+		INSERT INTO shipping_address(member_id, recipient, recipient_contact, zip_code, address, detail_address, basic_addr)
+		VALUES(#{memberId}, #{recipient}, #{recipientContact}, #{zipCode}, #{address}, #{detailAddress}, #{basicAddr});
+	</insert>
 	<!-- =========================== 김진솔 끝 =========================== -->
 </mapper>
