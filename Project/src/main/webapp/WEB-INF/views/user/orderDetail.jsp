@@ -56,16 +56,22 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script type="text/javascript">
+let newZipNoA = "";
+let newAddrA = "";
+let newDetailAddrA = "";
 //도로명주소API 
-function goPopup() {
+function goPopup(zipNo, addr , detailAddr) {
+	newZipNoA = zipNo;
+	newAddrA = addr;
+	newDetailAddrA = detailAddr;
 	// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
-	var pop = window.open("jusoPopup", "pop",
-			"width=570,height=420, scrollbars=yes, resizable=yes");
+	var pop = window.open("jusoPopup", "pop","width=570,height=420, scrollbars=yes, resizable=yes");
 
 	// 모바일 웹인 경우, 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrMobileLinkUrl.do)를 호출하게 됩니다.
 	//var pop = window.open("/popup/jusoPopup.jsp","pop","scrollbars=yes, resizable=yes"); 
 }
 /** API 서비스 제공항목 확대 (2017.02) **/
+ 
 function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
 		roadAddrPart2, engAddr, jibunAddr, zipNo, admCd, rnMgtSn, bdMgtSn,
 		detBdNmList, bdNm, bdKdcd, siNm, sggNm, emdNm, liNm, rn, udrtYn,
@@ -73,38 +79,12 @@ function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
 	// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
 
 	//배송지 변경 주소찾기
-	let newZipNo = document.querySelector("#editZipNo")
+	let newZipNo = document.querySelector(newZipNoA)
 		newZipNo.value = zipNo;
-	let newAddr = document.querySelector("#editAddr")
+	let newAddr = document.querySelector(newAddrA)
 		newAddr.value = roadAddrPart1;
-	let newAddrDetail = document.querySelector("#editAddrDetail")
+	let newAddrDetail = document.querySelector(newDetailAddrA)
 		newAddrDetail.value = addrDetail
-		
-	//반품 회수지 변경 주소찾기
-	let returnZipNo = document.querySelector("#returnZipNo")
-		returnZipNo.value = zipNo;
-	let returnAddr = document.querySelector("#returnAddr")
-		returnAddr.value = roadAddrPart1;
-	let returnDetailAddr = document.querySelector("#returnDetailAddr")
-		returnDetailAddr.value = addrDetail 
-		
-	let collectZipNo = document.querySelector("#collectZipNo");
-	let collectAddr = document.querySelector("#collectAddr");
-	let collecDetailAddr = document.querySelector("#collecDetailAddr");
-
-	let exchangeZipNo = document.querySelector("#exchangeZipNo");
-	let exchangeAddr = document.querySelector("#exchangeAddr");
-	let exchangeDetailAddr = document.querySelector("#exchangeDetailAddr");
-
-	// 교환 회수지 변경 주소찾기
-	collectZipNo.value = zipNo;
-	collectAddr.value = roadAddrPart1;
-	collecDetailAddr.value = addrDetail;
-
-	// 교환받을 주소 변경 주소찾기
-	exchangeZipNo.value = zipNo;
-	exchangeAddr.value = roadAddrPart1;
-	exchangeDetailAddr.value = addrDetail;
 
 }
 $(function () {
@@ -113,12 +93,59 @@ $(function () {
 	
 	let icOrderTime = $('.infoContent.detailOrderOrderTime').text().substring(0,21)
 	$('.infoContent.detailOrderOrderTime').text(icOrderTime)
-	
-
-
 })
 
-//반품 접수 버튼 누르면
+//교환 신청 버튼 누르면
+function applyExchange() {
+	$("input[name='order']:checked").each(function () {
+		//회수주소
+		let returnZipNo = $('#collectZipNo').val();
+		let returnAddr = $('#collectAddr').val()
+		let returnDetailAddr = $('#collecDetailAddr').val()
+		let returnMsg = $('#collecMsg').val()
+		
+		//교환주소
+		let exchangeZipNo = $('#exchangeZipNo').val();
+		let exchangeAddr = $('#exchangeAddr').val()
+		let exchangeDetailAddr = $('#exchangeDetailAddr').val()
+		let exchangeMsg = $('#exchangeMsg').val()
+		
+		let detailedOrderId = Number($(this).val());
+		let orderNo = '${detailOrder.orderNo}';
+		let exchangeReason = $('#exchangeReason').val()
+		
+		$.ajax({
+			url : '/user/applyExchange', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				returnZipNo,
+				returnAddr,
+				returnDetailAddr,
+				returnMsg,
+				exchangeZipNo,
+				exchangeAddr,
+				exchangeDetailAddr,
+				exchangeMsg,
+				detailedOrderId,
+				orderNo
+			},
+			dataType : '',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data == 'success'){
+					location.reload()
+				}
+			},
+			error : function(error) {
+				console.log(error)
+			}
+		});
+	})
+	
+}
+
+//반품 신청 버튼 누르면
 function applyReturn() {
 	$("input[name='order']:checked").each(function () { 
 	let refundBank = $('#returnBank').text();
@@ -130,6 +157,7 @@ function applyReturn() {
 	let returnReason = $('#returnReason').val()
 	let detailedOrderId = Number($(this).val());
 	let orderNo = '${detailOrder.orderNo}';
+	let returnMsg = $('#returnMsg').val()
 
 	$.ajax({
 		url : '/user/returnOrder', // 데이터를 수신받을 서버 주소
@@ -264,14 +292,16 @@ function orderCancel(){
 	  		  let orderQty = ${orderQty} // 총 주문 수량
 	  		  let productPrice = data.selectCancelOrder.productPrice;
 			  let amount = ${detailOrder.actualPaymentAmount }
-			  let bktAmount = ${bankTransfer.amountToPay }
+			  let bktAmount = Number(${bankTransfer.amountToPay })
 	  		  let refundPoint = 0;
 	  		  let refundReward = 0;
 	  		 
 	  		  let today = new Date()
-	  		  let couponWithP = $('.infoContent.usedCouponWithP').text().replace(",", "").replace("원", "")
+	  		  let couponWithP = $('.infoContent.usedCouponWithP').text().replace(",", "").replace("원", "").trim()
 	  		  let refudnCouponWithP = 0
 	  		  let products = data.selectCancelOrder;
+	  		  
+	  		  console.log(couponWithP)
 	  		  
 	  		  console.log("총 주문 갯수 " + orderQty)
 	  		  
@@ -285,34 +315,18 @@ function orderCancel(){
 	  			  refundReward = calculate(orderQty, totalQty, reward)
 	  			  refudnCouponWithP = calculate(orderQty, totalQty, couponWithP)
 	  			  
-	  			  if(data.couponsHistory.length == 0){
-	  					if(data.selectCancelOrder.paymentMethod == 'bkt'){
-			  				bktRefundAmount += productPrice - refundPoint - refundReward
-	  					}else{
-				  			refundAmount += productPrice - refundPoint - refundReward	  						
-	  					}
-		  			console.log(bktRefundAmount)
-		  			console.log(refundAmount)
-	  				
-	  			  }else if(data.couponsHistory.length != 0 && data.couponsHistory.expirationDate < today ){
-	  				if(data.selectCancelOrder.paymentMethod == 'bkt'){
-		  				bktRefundAmount += productPrice - refundPoint - refundReward
-  					}else{
-			  			refundAmount += productPrice - refundPoint - refundReward	  						
-  					}
-	  			  }else if(data.couponsHistory.length != 0){
-	  				if(data.selectCancelOrder.paymentMethod == 'bkt'){
-	  					bktRefundAmount += productPrice - refundPoint - refundReward - refudnCouponWithP
-	  				}else{
-		  				refundAmount += productPrice - refundPoint - refundReward - refudnCouponWithP
-	  				}
-	  				console.log("쿠폰할인금액 : " + refudnCouponWithP)
-	  			  }
-	  		  }else{
+	  			  bktRefundAmount += productPrice - refundPoint - refundReward - refudnCouponWithP
+	  			  refundAmount += productPrice - refundPoint - refundReward - refudnCouponWithP
+	  			  
+	  			console.log(bktRefundAmount)
+	  			console.log(refundAmount)
+	  		  }else if(totalQty == orderQty){
 	  			  refundPoint = point;
 	  			  refundReward = reward;
 	  			  bktRefundAmount = bktAmount
 	  			  refundAmount = amount
+	  			  console.log(amount)
+	  			  console.log(refundAmount)
 	  		  }  
 	  		  
 	  		  console.log("환불 포인트 : " +refundPoint)
@@ -325,8 +339,11 @@ function orderCancel(){
 			  
 	  		  $('#returnRefundPoint').text(Math.floor(refundPoint).toLocaleString()+ "점") 
 	  		  $('#returnRefundReward').text(Math.floor(refundReward).toLocaleString()+ "원") 
-	  		  $('#returnRefundAmount').text(refundAmount.toLocaleString()+ "원")
-			  $('#returnRefundAmount').text(bktRefundAmount.toLocaleString()+ "원")
+	  		  if(data.selectCancelOrder.paymentMethod == 'bkt'){
+				  $('#returnRefundAmount').text(bktRefundAmount.toLocaleString()+ "원")	  			  
+	  		  }else{
+		  		  $('#returnRefundAmount').text(refundAmount.toLocaleString()+ "원")	  			  
+	  		  }
 	  		});
 	        
 	      },
@@ -699,7 +716,7 @@ function editRturnAccount() {
 											</td>
 											<c:choose>
 												<c:when
-													test="${order.productStatus eq '출고전' || order.productStatus eq '입금전' }">
+													test="${order.productStatus eq '출고전' || order.productStatus eq '입금전' || order.productStatus eq '결제완료'}">
 													<td class="name">
 														<h4 class="table-title text-content">상품상태</h4>
 														<h5>${order.productStatus }</h5>
@@ -840,12 +857,12 @@ function editRturnAccount() {
 												</c:choose>
 												<li class="deliverMsg"><i
 													class="fa-solid fa-circle-exclamation"
-													style="color: #ff0059;"></i> 출고전 / 입금전 상품에 대해서만 배송지 변경이
+													style="color: #ff0059;"></i> 출고전 / 입금전 / 결제완료 상품에 대해서만 배송지 변경이
 													가능합니다.</li>
 												<c:forEach var="order" items="${detailOrderInfo }" begin="0"
 													end="0">
 													<c:if
-														test="${order.productStatus eq '출고전' || order.productStatus eq '입금전' }">
+														test="${order.productStatus eq '출고전' || order.productStatus eq '입금전' || order.productStatus eq '결제완료'}">
 														<li>
 															<button
 																class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
@@ -1085,7 +1102,7 @@ function editRturnAccount() {
 
 					<div>
 						<button type="button" class="btn theme-bg-color btn-md text-white"
-							onclick="goPopup();">주소 검색</button>
+							onclick="goPopup('#editZipNo', '#editAddr', '#editAddrDetail');">주소 검색</button>
 					</div>
 
 					<div class="form-floating mb-4 theme-form-floating">
@@ -1211,7 +1228,7 @@ function editRturnAccount() {
 					<c:forEach var="order" items="${detailOrderInfo }">
 						<table class="table mb-0 productInfo">
 							<c:if
-								test="${order.productStatus == '출고전' || order.productStatus == '입금전'}">
+								test="${order.productStatus == '출고전' || order.productStatus == '입금전' || order.productStatus == '결제완료'}">
 								<tbody>
 									<tr>
 										<td class="product-detail">
@@ -1579,7 +1596,7 @@ function editRturnAccount() {
 						<li class="pb-0 refundList">
 							<button
 								class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
-								onclick="goPopup();">
+								onclick="goPopup('#returnZipNo', '#returnAddr', '#returnDetailAddr');">
 								<i data-feather="edit" class="me-2"></i> 배송지 변경
 							</button>
 						</li>
@@ -1861,15 +1878,15 @@ function editRturnAccount() {
 							value="${detailOrder.detailedShippingAddress }" id="collecDetailAddr"
 							name="detailedShippingAddress" />
 						</li>
-
+						
 						<li class="pb-0 refundList"><input type="text"
 							class="form-control" value="${detailOrder.deliveryMessage }"
-							id="collecMsg" name="deliveryMessage" placeholder="메세지" /></li>
+							id="collecMsg" name="collecMsg" placeholder="메세지" /></li>
 
 						<li class="pb-0 refundList">
 							<button
-								class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
-								onclick="goPopup();">
+								class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3 collecBtn"
+								onclick="goPopup('#collectZipNo', '#collectAddr', '#collecDetailAddr');">
 								<i data-feather="edit" class="me-2"></i> 배송지 변경
 							</button>
 						</li>
@@ -1897,13 +1914,13 @@ function editRturnAccount() {
 						</li>
 
 						<li class="pb-0 refundList"><input type="text"
-							class="form-control" value="${detailOrder.deliveryMessage }"
+							class="form-control" value="${detailOrder.deliveryMessage}"
 							id="exchangeMsg" name="exchangeMsg" placeholder="메세지" /></li>
 
 						<li class="pb-0 refundList">
 							<button
 								class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
-								onclick="goPopup();">
+								onclick="goPopup('#exchangeZipNo', '#exchangeAddr', '#exchangeDetailAddr');">
 								<i data-feather="edit" class="me-2"></i> 배송지 변경
 							</button>
 						</li>

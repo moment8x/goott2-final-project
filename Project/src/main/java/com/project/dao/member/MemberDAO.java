@@ -20,6 +20,7 @@ import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.jmj.ReturnOrder;
+import com.project.vodto.jmj.exchangeDTO;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
 
@@ -187,6 +188,18 @@ public interface MemberDAO {
 	//모든 디테일 상태가 반품신청이라면 주문내역 배송상태 변경
 	int updatedeliveryStatusWithReturn(String memberId, String orderNo) throws SQLException, NamingException;
 	
+	//교환시 반품 테이블 인서트
+	int insertReturnWithExchange(String productId, exchangeDTO ed) throws SQLException, NamingException;
+	
+	//회수, 교환 배송지 인서트
+	int insertExchangeShippingAddress(exchangeDTO ed) throws SQLException, NamingException;
+	
+	//디테일 프로덕트 상태 업데이트
+	int updateDetailProductStatusWithExchange(int detailedOrderId) throws SQLException, NamingException;
+	
+	//모든 상태가 교환신청이라면 주문내역 상태 교환신청으로 바꾸기
+	int updateDeliveryStatusWithExchange(String memberId, String orderNo)throws SQLException, NamingException;
+	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -200,6 +213,7 @@ public interface MemberDAO {
 	// 기본 배송지 설정
 	int insertShipping(ShippingAddrDTO shipping) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+	
 	
 
 }

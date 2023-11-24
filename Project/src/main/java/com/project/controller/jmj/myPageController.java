@@ -43,6 +43,7 @@ import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.jmj.ReturnOrder;
+import com.project.vodto.jmj.exchangeDTO;
 import com.project.vodto.kjy.Memberkjy;
 
 @Controller
@@ -627,6 +628,28 @@ System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@키워드" + keyword.toString());
 			result = new ResponseEntity<String>("fail", HttpStatus.CONFLICT);
 		}
 		
+		return result;
+	}
+	
+	@RequestMapping(value = "applyExchange", method = RequestMethod.POST)
+	public ResponseEntity<String> applyExchange(@ModelAttribute exchangeDTO ed, HttpServletRequest request){
+			System.out.println("교환합니당" + ed.toString());
+			
+			HttpSession session = request.getSession();
+			Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+			String memberId = member.getMemberId();
+			
+			ResponseEntity<String> result = null;
+			
+			try {
+				if(mService.exchangeOrder(ed, memberId)) {
+					result = new ResponseEntity<String>("success", HttpStatus.OK);	
+				}
+			} catch (SQLException | NamingException e) {
+				result = new ResponseEntity<String>("fail", HttpStatus.CONFLICT);
+				e.printStackTrace();
+			}
+			
 		return result;
 	}
 }

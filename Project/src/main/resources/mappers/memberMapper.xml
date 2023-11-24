@@ -358,8 +358,8 @@
 		<selectKey order="BEFORE" keyProperty="no" resultType="int">
 			SELECT max(returns_id) from returns
 		</selectKey>
-		insert into return_shipping_address(returns_id, return_shipping_address_zip_no, return_shipping_address_addr,return_shipping_address_detail_addr)
-		values(#{no},#{zipNo},#{addr},#{detailAddr})
+		insert into return_shipping_address(returns_id, return_shipping_address_zip_no, return_shipping_address_addr,return_shipping_address_detail_addr, return_shipping_address_return_msg)
+		values(#{no},#{zipNo},#{addr},#{detailAddr}, #{returnMsg})
 	</insert>
 	
 	<update id="updateRefundAccountWithReturn">
@@ -372,6 +372,29 @@
 	
 	<update id="updatedeliveryStatusWithReturn" >
 		update order_history set delivery_status = '반품신청' where member_id = #{memberId} and order_no = #{orderNo}
+	</update>
+	
+	<insert id="insertExchange">
+		insert into returns(product_id, reason, processing_status, detailed_order_id) 
+		values(#{productId},#{reason},'교환신청',#{detailedOrderId})
+	</insert>
+	
+	<insert id="insertExchangeShippingAddress">
+		<selectKey order="BEFORE" keyProperty="no" resultType="int">
+			SELECT max(returns_id) from returns
+		</selectKey>
+		insert into return_shipping_address(returns_id, return_shipping_address_zip_no, return_shipping_address_addr,return_shipping_address_detail_addr,
+		return_shipping_address_return_msg, exchange_shipping_address_zip_no, exchange_shipping_address_addr, exchange_shipping_address_detail_addr, 
+		exchange_shipping_address_exchange_msg)
+		values(#{no},#{returnZipNo},#{returnAddr},#{returnDetailAddr},#{returnMsg},#{exchangeZipNo},#{exchangeAddr},#{exchangeDetailAddr},#{exchangeMsg})
+	</insert>
+	
+	<update id="updateDetailProductStatusWithExchange">
+		update detailed_order_items set product_status = '교환신청' where detailed_order_id = #{detailedOrderId}
+	</update>
+	
+	<update id="updateDeliveryStatusWithExchange" >
+		update order_history set delivery_status = '교환신청' where member_id = #{memberId} and order_no = #{orderNo}
 	</update>
 	
 	<!-- =========================== 김진솔 =========================== -->

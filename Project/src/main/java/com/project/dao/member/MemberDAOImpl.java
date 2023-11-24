@@ -26,6 +26,7 @@ import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.jmj.ReturnOrder;
+import com.project.vodto.jmj.exchangeDTO;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO {
@@ -519,6 +520,7 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("zipNo", ro.getZipNo());
 		params.put("addr", ro.getAddr());
 		params.put("detailAddr", ro.getDetailAddr());
+		params.put("returnMsg", ro.getReturnMsg());
 		
 		return ses.insert(ns + ".insertReturnShippingAddress", params);
 	}
@@ -548,6 +550,47 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.update(ns + ".updatedeliveryStatusWithReturn", params);
 	}
+	
+	@Override
+	public int insertReturnWithExchange(String productId, exchangeDTO ed) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("productId", productId);
+		params.put("reason", ed.getExchangeReason());
+		params.put("detailedOrderId", ed.getDetailedOrderId());
+		
+		return ses.insert(ns + ".insertExchange", params);
+	}
+
+	@Override
+	public int insertExchangeShippingAddress(exchangeDTO ed) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("returnZipNo", ed.getReturnZipNo());
+		params.put("returnAddr", ed.getReturnAddr());
+		params.put("returnDetailAddr", ed.getReturnDetailAddr());
+		params.put("returnMsg", ed.getReturnMsg());
+		params.put("exchangeZipNo", ed.getExchangeZipNo());
+		params.put("exchangeAddr", ed.getExchangeAddr());
+		params.put("exchangeDetailAddr", ed.getExchangeDetailAddr());
+		params.put("exchangeMsg", ed.getExchangeMsg());
+		
+		return ses.insert(ns + ".insertExchangeShippingAddress", params);
+	}
+
+	@Override
+	public int updateDetailProductStatusWithExchange(int detailedOrderId) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".updateDetailProductStatusWithExchange", detailedOrderId);
+	}
+
+	@Override
+	public int updateDeliveryStatusWithExchange(String memberId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.update(ns + ".updateDeliveryStatusWithExchange", params);
+	}
+
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
@@ -595,16 +638,6 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".insertShipping", shipping);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
-
-
-	
-
-	
-
-
-
-
-
 
 
 }

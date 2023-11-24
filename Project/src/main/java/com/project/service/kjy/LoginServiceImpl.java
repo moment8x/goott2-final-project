@@ -81,17 +81,15 @@ public class LoginServiceImpl implements LoginService {
 		// 먼저 db에서 해당 이메일을 쓰는 사람이 있는지 확인
 		Memberkjy findMember = loginDao.selectMemberByNameAndEmail(email, userName);
 		if(findMember != null) {
-			System.out.println("!!2222");
+
 			emailaSend(email);
 		}
 		
 	}
 	
 	public boolean emailaSend(String email) throws MessagingException{
-		System.out.println("!!333s");
 		String code = UUID.randomUUID().toString();
-		System.out.println("안녕???????");
-		System.setProperty("mail.debug", "true");
+		//System.setProperty("mail.debug", "true");
 		
 		boolean result = false;
 		
