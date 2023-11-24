@@ -1,6 +1,5 @@
 package com.project.service.kkb.admin;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +37,9 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		
 		return result;
 	}
+	
 		
-	public List<OrderByProduct> getOrderByProduct(OrderCondition orderCond) throws Exception {
+	private List<OrderByProduct> getOrderByProduct(OrderCondition orderCond) throws Exception {
 	    
 		List<OrderProductResponse> list = adminOrderRepository.findProductByInfo(orderCond);
 
@@ -84,7 +84,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		return result;
 	}
 	
-	public List<DepositByProduct> getDepositByProduct(DepositCondition depositCond) throws Exception {
+	private List<DepositByProduct> getDepositByProduct(DepositCondition depositCond) throws Exception {
 		    
 			List<DepositProductResponse> list = adminOrderRepository.findDepositProductByInfo(depositCond);
 	

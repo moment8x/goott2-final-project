@@ -29,7 +29,7 @@ public class AdminOrderController {
 		}
 		
 		/* 입금 전 관리 */
-		@PostMapping("/deposit ")
+		@PostMapping("/deposit")
 		public Map<String, Object> searchDepositInfo(@RequestBody DepositCondition depositCond) throws Exception {	
 			return adminOrderService.getDepositInfo(depositCond);
 		}
