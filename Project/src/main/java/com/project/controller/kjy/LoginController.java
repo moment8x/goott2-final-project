@@ -49,21 +49,25 @@ public class LoginController {
 	public String goLogin(HttpServletRequest request, HttpServletResponse response, Object handler) {
 		// 이전 경로 설정
 		this.beforeUri = request.getHeader("referer");
+		// 고객센터(cs) 이전 경로 설정
+		if(request.getParameter("csPath") != null && request.getParameter("csPath") != "") {
+			this.beforeUri = "http://localhost:8081/cs/" + request.getParameter("csPath");
+		}
 		System.out.println("befo : " + this.beforeUri);
-		
 		return "/login/login";
 	}
 	
-	@RequestMapping(value="/", method=RequestMethod.POST)
-	public ModelAndView loginProcess(LoginDTO loginDTO, ModelAndView model, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/", method = RequestMethod.POST)
+	public ModelAndView loginProcess(LoginDTO loginDTO, ModelAndView model, HttpServletRequest request,
+			HttpServletResponse response) {
 		System.out.println(loginDTO.toString());
 		try {
 			Memberkjy loginMember = loginService.getLogin(loginDTO);
-			if(loginMember != null) {
-					request.getSession().setAttribute("loginMember", loginMember);
+			if (loginMember != null) {
+				request.getSession().setAttribute("loginMember", loginMember);
 				model.addObject("status", "로그인 성공");
-				if(beforeUri != null) {
-					model.setViewName("redirect:"+beforeUri);
+				if (beforeUri != null) {
+					model.setViewName("redirect:" + beforeUri);
 				} else {
 					model.setViewName("/login/login");
 				}
@@ -77,7 +81,7 @@ public class LoginController {
 			model.addObject("status", "로그인 도중 에러");
 			model.setViewName("/login/login");
 		}
-		
+
 		return model;
 	}
 	

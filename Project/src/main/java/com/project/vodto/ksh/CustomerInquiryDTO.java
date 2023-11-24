@@ -1,6 +1,7 @@
-package com.project.vodto;
+package com.project.vodto.ksh;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class CustomerInquiry {
+public class CustomerInquiryDTO {
 	private int postNo;
 	private String author;
 	private Timestamp createdDate;
@@ -28,4 +29,5 @@ public class CustomerInquiry {
 	private String phoneNumber;
 	private String email;
 	private String orderNo;
+	private int uploadFilesSeq;
 }

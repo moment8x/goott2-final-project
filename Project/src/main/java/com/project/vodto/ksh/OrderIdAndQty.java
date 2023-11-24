@@ -14,7 +14,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class OrderInfo2 {
+public class OrderIdAndQty {
 	private List<String> productId;
 	private List<Integer> productQuantity;
 	
