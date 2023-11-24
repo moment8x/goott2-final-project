@@ -32,7 +32,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	public Map<String, Object> getTotalMemberCount() throws Exception {
 		int totalCount = 0;
 		if(memberCount.getCurrentCount() > 0) {
-			// TotalMemberCountEvent에 저장해둔 값 가져옴
+			/* TotalMemberCountEvent에 저장해둔 값 가져옴 */
 			System.out.println("이벤트 객체에서 전체 회원 수 조회");
 			totalCount = memberCount.getCurrentCount(); 
 		} else {
@@ -50,7 +50,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	public void updateMemberCount() throws Exception {
 		int memberCount = adminMemberRepository.countAll();	
 		System.out.println("회원 수 갱신");
-		// 이벤트 발행
+		/* 이벤트 발행 */
 		publisher.publishEvent(new TotalMemberCountEvent(memberCount));
 	}	
 	
@@ -98,7 +98,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	@Override
 	public Map<String, Object> getMemberInfo(MemberCondition memberCond ) throws Exception {
 		
-		//전화번호 "-" 제거
+		/* 전화번호 "-" 제거 */
 		memberCond.setCellPhoneNumber(memberCond.getCellPhoneNumber().replace("-", "")); 
 		memberCond.setPhoneNumber(memberCond.getPhoneNumber().replace("-", ""));
 		
@@ -106,16 +106,16 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		
 		for ( MemberResponse responseParam : responseList ) {
 			
-			//=== 값 세팅 ===//
+			/* === 값 세팅 === */
 			
-			// 성별
+			/* 성별 */
 			Character gender = responseParam.getGender().equals('M') ? '남': '여';
 			responseParam.setGender(gender);
 			
-			// 나이
+			/* 나이 */
 			responseParam.setAge(calculateAge(responseParam));
 			
-			//지역
+			/* 지역 */
 			if(responseParam.getAddress() != null) {
 				responseParam.setRegion(detectRegion(responseParam));	
 			}
@@ -167,7 +167,6 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		return age+"세";
 	}
 
-	
 //	@EventListener(ContextRefreshedEvent.class)
 //	public void updateMemberCount(ContextRefreshedEvent e) throws Exception {
 //		
@@ -181,7 +180,4 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 //		}
 //	}
 //	
-	
-
-
 }

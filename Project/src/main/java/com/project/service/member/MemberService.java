@@ -2,6 +2,7 @@ package com.project.service.member;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import javax.naming.NamingException;
 
@@ -14,6 +15,7 @@ import com.project.vodto.ShippingAddress;
 import com.project.vodto.UploadFiles;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 
 public interface MemberService {
@@ -42,8 +44,8 @@ public interface MemberService {
 
 	// 장바구니 목록 가져오기
 	
-	//주문건당 주문내역 가져오기
-	List<MyPageOrderList> getOrderHistory(String memberId) throws SQLException, NamingException;
+	//주문건당 주문내역 가져오기 + 페이징
+	Map<String, Object> getOrderHistory(String memberId, int pageNo) throws SQLException, NamingException;
 	
 	//주문건당 총 상품 갯수 가져오기
 	int getOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException;
@@ -79,13 +81,19 @@ public interface MemberService {
 	List<DetailOrder> getDetailOrderInfo(String memberId, String orderNo) throws SQLException, NamingException;
 	
 	//주문상세페이지 정보가져오기
-	DetailOrderInfo getOrderInfo(String memberId, String orderNo) throws SQLException, NamingException;
-	
-	//출고전, 입금전 배송지 변경하기
-//	int updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId) throws SQLException, NamingException;
+	Map<String, Object> getOrderInfo(String memberId, String orderNo) throws SQLException, NamingException;
 	
 	//출고전, 입금전 배송주소록에서 배송지선택해서 변경하기
 	boolean selectBasicAddr(String memberId, int addrSeq, String orderNo, String deliveryMessage) throws SQLException, NamingException;
+	
+	//최근주문내역 3개 가져오기
+	List<MyPageOrderList> getCurOrderHistory(String memberId) throws SQLException, NamingException;
+	
+	// 출고전, 입금전 배송지를 새로운 배송지로 변경
+	boolean updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId) throws SQLException, NamingException;
+	
+	//주문내역 상태별 검색
+	Map<String, Object> searchOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword, int pageNo) throws SQLException, NamingException;
 
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
@@ -96,6 +104,9 @@ public interface MemberService {
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
+	
+	
+	
 	
 	
 

@@ -20,4 +20,5 @@ public class ShoppingCart {
 	private String productId;
 	private int memberCheck;
 	private Timestamp registrationDate;
+	private int quantity;
 }

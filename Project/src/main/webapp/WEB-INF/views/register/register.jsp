@@ -178,7 +178,7 @@
     		$('#zipCode').on('change', function() {
     			if ($('#zipCode').val() !== "") {
     				isValidZipCode = true;
-    				console.log("zipCode", $('#zipCode').vla());
+    				console.log("zipCode", $('#zipCode').val());
     			} else {
     				isValidZipCode = false;
     			}
@@ -188,7 +188,7 @@
     		$('#address').on('change', function() {
     			if ($('#address').val() != "") {
     				isvalidAddress = true;
-    				console.log("address", $('#address').vla());
+    				console.log("address", $('#address').val());
     			} else {
     				isvalidAddress = false;
     			}
@@ -506,7 +506,7 @@
                                 <!-- 우편번호 -->
                                 <div class="col-12">
                                     <div class="form-floating theme-form-floating">
-                                        <input type="text" class="form-control" id="zipCode" name="zipCode" placeholder="우편번호" onclick="searchZipCode();">
+                                        <input type="text" class="form-control" id="zipCode" name="zipCode" placeholder="우편번호" onclick="searchZipCode();" readonly>
                                         <label for="zipCode">*우편번호</label>
                                     </div>
                                     <div class="validation"></div>
@@ -514,7 +514,7 @@
                                 <!-- 주소 -->
                                 <div class="col-12">
                                     <div class="form-floating theme-form-floating">
-                                        <input type="text" class="form-control" id="address" name="address" placeholder="주소">
+                                        <input type="text" class="form-control" id="address" name="address" placeholder="주소" readonly>
                                         <label for="address">*주소</label>
                                     </div>
                                     <div class="validation"></div>

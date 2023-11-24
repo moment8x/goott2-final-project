@@ -1,7 +1,5 @@
 package com.project.vodto.ksh;
 
-import java.sql.Timestamp;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +26,7 @@ public class OrderInfo {
 	private String detailedShippingAddress;
 	private String cardName;
 	private String paymentMethod;
-	
+	private int couponDiscount;
 	private int calculatedPrice;
 	private int currentQuantity;
 	private String categoryKey;

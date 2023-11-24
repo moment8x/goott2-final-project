@@ -64,36 +64,44 @@ public class OrderServiceImpl implements OrderService {
 		} else { // 카드 및 간편결제
 
 			if (od.insertNewPayment(pd) > 0) { // 결제
+				System.out.println("결제완료!" + pd.toString());
+				System.out.println(itemList.toString());
 				if (od.saveDetailItems(itemList) > 0) { // 주문 상세
 					System.out.println("주문 상세 테이블 저장");
 					if (updateDiscountMethod(pd, itemList)) {
 						result = true;
 					}
 				}
-			} 
+			}
 		}
 		return result;
 	}
 
 	@Override
-	public boolean compareAmount(PaymentDTO pd, List<DetailOrderItem> itemList, Memberkjy memberInfo) {
+	public List<DetailOrderItem> compareAmount(PaymentDTO pd, List<DetailOrderItem> itemList, Memberkjy memberInfo) {
+		
+		System.out.println("아이템리스트"+itemList.toString());
+		System.out.println("페이먼트디티오"+pd.toString());
+		
 		boolean result = false;
-
 		int realAmount = 0;
 		int totalAmount = 0;
 		int couponDiscount = 0;
 		boolean isValidPoint = false;
 		boolean isValidReward = false;
 
+		List<DetailOrderItem> renewaledList = null;
 		List<String> productId = new ArrayList<String>();
 		List<Integer> productQuantity = new ArrayList<Integer>();
-
+		
 		try {
 			for (DetailOrderItem item : itemList) {
 				productId.add(item.getProductId());
 				productQuantity.add(item.getProductQuantity());
+				item.setCouponDiscount(0);
 			}
 			List<OrderInfo> products = od.getProductInfo(productId);
+			System.out.println("도대체 어디가 문젭니까! products : " + products.toString());
 			for (OrderInfo product : products) {
 				int i = 0;
 				product.setProductQuantity(productQuantity.get(i));
@@ -113,14 +121,43 @@ public class OrderServiceImpl implements OrderService {
 
 					// 넘어온 쿠폰번호와 멤버가 가지고 있는 쿠폰번호가 일치하는지
 					if (pd.getCouponNumbers().get(i).equals(couponInfo.getCouponNumber())) {
-						for (int j = 0; j < products.size(); i++) { // 상품 종류만큼 반복
+						System.out.println("넘어온 쿠폰번호랑 멤버가 가지고 있는 쿠폰번호랑 같음!");
+						for (int j = 0; j < products.size(); j++) { // 상품 종류만큼 반복
 							// 쿠폰적용카테고리와 상품카테고리가 일치하는지
-							if (couponInfo.getCategoryKey().contains(products.get(j).getCategoryKey())) {
-								if (couponInfo.getDiscountMethod() == 'P') {
-									couponDiscount += (totalAmount * (couponInfo.getDiscountAmount() / 100));
-								} else {
-									couponDiscount += couponInfo.getDiscountAmount();
+							
+							if (couponInfo.getCategoryKey().contains(products.get(j).getCategoryKey())
+									|| couponInfo.getCategoryKey().contains("ALL")) {
+								System.out.println("ALL 카테고리 적용쿠폰이거나 쿠폰 카테고리 일치!");
+								System.out.println("couponDiscount!" + couponDiscount);
+								System.out.println("검증 다 통과한 쿠폰! : " + couponInfo.toString());
+								System.out.println(products.get(j).getCalculatedPrice());
+								if (couponInfo.getCategoryKey().contains(products.get(j).getCategoryKey())) {
+									
+									int calcAmount = (int) Math.round((products.get(j).getCalculatedPrice()
+											* (double) couponInfo.getDiscountAmount() / 100) / 10) * 10;
+									
+									// 주문 상세 상품의 쿠폰 할인 금액을 위한 코드를 짜야함
+									if(itemList.get(j).getCouponDiscount() > 0) {
+										
+										itemList.get(j).setCouponDiscount(itemList.get(j).getCouponDiscount() + calcAmount);
+										
+									} else {
+										itemList.get(j).setCouponDiscount(calcAmount);
+									}
+									
+									System.out.println(products.get(j).getProductName() + "의 쿠폰 할인 금액은 : " + itemList.get(j).getCouponDiscount());
+									
+									couponDiscount += calcAmount;//테스트땜에 주석처리함 다시 풀어야해!!!!!!!!!!!!!!!!!!!!!!!!!!!
+									//couponDiscount = 0;
 								}
+
+								// couponDiscount += (int)Math.round((totalAmount *
+								// (double)couponInfo.getDiscountAmount()/100) / 10) * 10;
+
+								// System.out.println("" + totalAmount + "," + couponInfo.getDiscountAmount() /
+								// 100 + "," + (totalAmount * (couponInfo.getDiscountAmount() / 100)));
+								// couponDiscount += (totalAmount * (couponInfo.getDiscountAmount() / 100));
+								System.out.println("couponDiscount!" + couponDiscount);
 
 							}
 						}
@@ -160,10 +197,13 @@ public class OrderServiceImpl implements OrderService {
 					if (pd.getAmountToPay() == realAmount) {
 						result = true;
 					}
+					System.out.println("무통장 내야 할 금액! : " + pd.getAmountToPay() + ", 검증 된 금액! : " + realAmount);
 				} else {
 					if (pd.getActualPaymentAmount() == realAmount) {
 						result = true;
+						
 					}
+					System.out.println("결제 한 금액! : " + pd.getActualPaymentAmount() + ", 검증 된 금액! : " + realAmount);
 				}
 			}
 
@@ -173,8 +213,11 @@ public class OrderServiceImpl implements OrderService {
 		}
 		if (result) {
 			System.out.println("결제 해야 할 금액과 실 결제 금액 일치 - 검증 완료");
+			renewaledList = itemList;
+		} else {
+			System.out.println("금액 불일치!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		}
-		return result;
+		return renewaledList;
 
 	}
 

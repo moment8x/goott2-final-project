@@ -13,7 +13,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-
 public class Products {
 	private String product_id;
 	private String product_name;

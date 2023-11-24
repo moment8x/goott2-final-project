@@ -1,7 +1,9 @@
 package com.project.service.member;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.project.dao.kjs.upload.UploadDAO;
 import com.project.dao.member.MemberDAO;
+import com.project.etc.kjs.ImgMimeType;
 import com.project.service.member.MemberService;
 import com.project.vodto.Board;
 import com.project.vodto.CouponLog;
@@ -23,7 +26,9 @@ import com.project.vodto.ShippingAddress;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
+import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.UploadFiles;
 
 @Service
@@ -121,13 +126,51 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public List<MyPageOrderList> getOrderHistory(String memberId) throws SQLException, NamingException {
+	public Map<String, Object> getOrderHistory(String memberId, int pageNo) throws SQLException, NamingException {
+		PagingInfo pi = pagination(pageNo, memberId);
 		
-		return mDao.selectOrderHistory(memberId);
+		List<MyPageOrderList> lst = mDao.selectOrderHistory(memberId, pi);
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("orderHistory", lst);
+		result.put("pagination", pi);
+		 
+		return result;
+	}
+
+	private PagingInfo pagination(int pageNo, String memberId) throws SQLException, NamingException {
+		PagingInfo result = new PagingInfo();
+		
+		//현재 페이지 번호 셋팅
+		result.setPageNo(pageNo);
+				
+		//전체 주문 갯수
+		result.setTotalPostCnt(mDao.getTotalOrderCnt(memberId));
+				
+		//총페이지 수 구하기
+		result.setTotalPageCnt(result.getTotalPostCnt(), result.getViewPostCntPerPage());
+				
+		// 보여주기 시작할 row index번호 구하기
+		result.setStartRowIndex();
+				
+		//몇개의 페이징 블럭이 나오는지
+		result.setTotalPagingBlockCnt();
+				
+		//현재 페이지가 속한 페이징 블럭 번호
+		result.setPageBlockOfCurrentPage();
+				
+		//현재 블럭의 시작 페이지 번호
+		result.setStartNumOfCurrentPagingBlock();
+				
+		//현재 블럭의 끝 페이지 번호 구하기
+		result.setEndNumOfCurrentPagingBlock();
+						
+		return result;
 	}
 
 	@Override
 	public int getOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException {
+		
 		
 		return mDao.selectOrderProductCount(orderNo);
 	}
@@ -212,9 +255,14 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public DetailOrderInfo getOrderInfo(String memberId, String orderNo) throws SQLException, NamingException {
-
-		return mDao.selectDetailOrderInfo(memberId, orderNo);
+	public Map<String, Object> getOrderInfo(String memberId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> result = new HashMap<String, Object>();
+		
+		result.put("detailOrderInfo", mDao.selectDetailOrderInfo(memberId, orderNo));
+		result.put("couponsHistory", mDao.getCouponsHistory(memberId, orderNo));
+		result.put("bankTransfer", mDao.getBankTransfer(orderNo));
+		
+		return result;
 	}
 	
 	@Override
@@ -230,7 +278,67 @@ public class MemberServiceImpl implements MemberService {
 		
 		return result;
 	}
+	
+	@Override
+	public List<MyPageOrderList> getCurOrderHistory(String memberId) throws SQLException, NamingException {
+		
+		return mDao.selectCurOrderHistory(memberId);
+	}
 
+	@Override
+	public boolean updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId)
+			throws SQLException, NamingException {
+		boolean result = false;
+		
+		if(mDao.updateDetailOrderAddr(updateDetailOrderAddr, memberId) != 0) {
+			result = true;
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public Map<String, Object> searchOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword, int pageNo)
+			throws SQLException, NamingException {
+		PagingInfo pi = orderStatusPagination(pageNo, memberId, keyword);
+		
+		List<MyPageOrderList> lst = mDao.selectOrderStatus(memberId, keyword, pi);
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("orderStatus", lst);
+		result.put("pagination", pi);
+		return result;
+	}
+	
+	private PagingInfo orderStatusPagination(int pageNo, String memberId, GetOrderStatusSearchKeyword keyword) throws SQLException, NamingException {
+		PagingInfo result = new PagingInfo();
+		
+		//현재 페이지 번호 셋팅
+		result.setPageNo(pageNo);
+				
+		//전체 주문 갯수
+		result.setTotalPostCnt(mDao.getTotalOrderStatusCnt(memberId, keyword));
+				
+		//총페이지 수 구하기
+		result.setTotalPageCnt(result.getTotalPostCnt(), result.getViewPostCntPerPage());
+				
+		// 보여주기 시작할 row index번호 구하기
+		result.setStartRowIndex();
+				
+		//몇개의 페이징 블럭이 나오는지
+		result.setTotalPagingBlockCnt();
+				
+		//현재 페이지가 속한 페이징 블럭 번호
+		result.setPageBlockOfCurrentPage();
+				
+		//현재 블럭의 시작 페이지 번호
+		result.setStartNumOfCurrentPagingBlock();
+				
+		//현재 블럭의 끝 페이지 번호 구하기
+		result.setEndNumOfCurrentPagingBlock();
+						
+		return result;
+	}
 	// --------------------------------------- 장민정 끝 ----------------------------------------
 	// --------------------------------------- 김진솔 시작 ---------------------------------------
 	@Override
@@ -254,8 +362,10 @@ public class MemberServiceImpl implements MemberService {
 		String newFileName = "";
 		// 회원 가입 - 프로필 사진 저장
 		if (file != null) {
-			uDao.insertUploadFile(file);
-			newFileName = file.getNewFileName();
+			if (ImgMimeType.contentTypeIsImage(file.getExtension())) {
+				uDao.insertUploadImage(file);
+				newFileName = file.getNewFileName();
+			}
 		};
 		// 회원 가입 - 회원 가입
 		if (mDao.insertMember(member) == 1) {
@@ -285,5 +395,9 @@ public class MemberServiceImpl implements MemberService {
 		System.out.println("======= 멤버(로그인) 서비스단 끝 =======");
 		return result;
 	}
+
+
+
 	// --------------------------------------- 김진솔 끝 ----------------------------------------
+
 }

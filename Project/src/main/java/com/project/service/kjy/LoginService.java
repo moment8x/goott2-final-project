@@ -9,4 +9,6 @@ public interface LoginService {
 	public Memberkjy getRememberCheck(String member_id, String key) throws Exception;
 	
 	public Memberkjy getMemberById(String id) throws Exception;
+	// 자동로그인 확인 키 저장
+	public boolean saveRemember(String memberId, String key) throws Exception;
 }

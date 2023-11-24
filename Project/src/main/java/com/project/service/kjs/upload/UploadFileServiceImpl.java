@@ -1,19 +1,25 @@
 package com.project.service.kjs.upload;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.naming.NamingException;
 
+import org.imgscalr.Scalr;
+import org.imgscalr.Scalr.Mode;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 
 import com.project.dao.kjs.upload.UploadDAO;
+import com.project.etc.kjs.ImgMimeType;
 import com.project.vodto.UploadFiles;
 
 @Service
@@ -23,10 +29,25 @@ public class UploadFileServiceImpl implements UploadFileService {
 	UploadDAO uDao;
 	
 	@Override
-	public UploadFiles uploadFile(String originalFileName, long size, String contentType, byte[] data,
-			String realPath) throws IOException {
+	public List<UploadFiles> uploadFile(String originalFileName, long size, String contentType, byte[] data,
+			String realPath, List<UploadFiles> fileList) throws IOException, SQLException, NamingException {
 		System.out.println("======= 업로드 서비스단 - 업로드 파일 =======");
 		
+		UploadFiles uf = null;
+		
+		// 새 파일 업로드.
+		uf = uploadNewFile(originalFileName, size, contentType, data, realPath);
+		if (uf != null) {
+			fileList.add(uf);
+		}
+		
+		System.out.println("======= 업로드 서비스단 종료 =======");
+		return fileList;
+	}
+	
+//	@Override
+	public UploadFiles uploadNewFile(String originalFileName, long size, String contentType, byte[] data,
+			String realPath) throws IOException {
 		String completePath = makeCalculatePath(realPath);	// 물리적 경로 + /년/월/일
 		System.out.println("completePath : " + completePath);
 		UploadFiles uf = new UploadFiles();
@@ -39,16 +60,30 @@ public class UploadFileServiceImpl implements UploadFileService {
 			
 			// 실제 파일을 저장시키는 문장
 			FileCopyUtils.copy(data, new File(realPath + uf.getNewFileName()));
-			System.out.println("이미지 파일 저장");
-//			if (ImgMimeType.contentTypeIsImage(contentType)) {
-//				// 이미지 파일일 경우
-//				// 스케일 다운 -> thumbnail 이름으로 파일 저장
-//				makeThumbNailImage(uf, realPath, completePath);
-//			}
+			if (ImgMimeType.contentTypeIsImage(contentType)) {
+				// 이미지 파일일 경우
+				// 스케일 다운 -> thumbnail 이름으로 파일 저장
+				makeThumbNailImage(uf, realPath, completePath);
+			}
 		}
-		
-		System.out.println("======= 업로드 서비스단 종료 =======");
 		return uf;
+	}
+	
+	private static void makeThumbNailImage(UploadFiles uf, String realPath, String completePath) throws IOException {
+		BufferedImage originImg = ImageIO.read(new File(realPath + uf.getNewFileName()));	// 원본 파일
+		
+		// 리사이징
+		BufferedImage thumbNailImg = Scalr.resize(originImg, Mode.FIT_TO_HEIGHT, 50);
+		
+		String thumbImgName = "thumb_" + uf.getNewFileName().substring(uf.getNewFileName().lastIndexOf("\\") + 1);
+		
+		File saveTarget = new File(completePath + File.separator + thumbImgName);
+
+		// 저장될 섬네일 이름, 확장자, 파일
+		if (ImageIO.write(thumbNailImg, uf.getOriginalFileName().substring(uf.getOriginalFileName().lastIndexOf(".") + 1), saveTarget)) {
+			// 썸네일 이미지를 저장에 성공 시
+			uf.setThumbnailFileName(completePath.substring(realPath.length()) + File.separator + thumbImgName);
+		}
 	}
 	
 	public static String makeCalculatePath(String realPath) {
@@ -86,27 +121,32 @@ public class UploadFileServiceImpl implements UploadFileService {
 	}
 
 	@Override
-	public void deleteFile(UploadFiles uf, String realPath) {
-		System.out.println("======= 업로드 서비스단 - 업로드 파일 삭제 =======");
-		
+	public int deleteFile(UploadFiles uf, String realPath) {
+		int result = -1;		
 		File file = new File(realPath + uf.getNewFileName());
+		System.out.println(realPath + uf.getNewFileName());
 		if (file.exists()) {
+			if (uf.getThumbnailFileName() != null || uf.getThumbnailFileName().equals("")) {
+				new File(realPath + uf.getThumbnailFileName()).delete();
+			}
 			file.delete();
+			result = 1;
+		} else {
+			result = 0;
 		}
-		
-		System.out.println("======= 업로드 서비스단 종료 =======");
+		System.out.println("result !!!!!!!!!!!!!!!!!!!!"+result);
+		return result;
 	}
 
 	@Override
 	public boolean isExist(UploadFiles uf) throws SQLException, NamingException {
-		System.out.println("======= 업로드 서비스단 - 업로드 파일 유무 조회 =======");
+		System.out.println("업로드 파일 유무 조회");
 		boolean result = false;
 		
 		if (uDao.selectUploadFile(uf) != null) {
 			result = true;
 		}
 		
-		System.out.println("======= 업로드 서비스단 종료 =======");
 		return result;
 	}
 }

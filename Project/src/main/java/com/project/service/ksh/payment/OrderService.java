@@ -22,7 +22,7 @@ public interface OrderService {
 	// 주문 상세 상품 저장
 	
 	// 결제 해야 할 금액과 실 결제 금액 일치하는지 비교
-	boolean compareAmount(PaymentDTO pd, List<DetailOrderItem> itemList, Memberkjy memberInfo) throws Exception;
+	List<DetailOrderItem> compareAmount(PaymentDTO pd, List<DetailOrderItem> itemList, Memberkjy memberInfo) throws Exception;
 	
 	// 결제 내역 저장
 	boolean savePayment(PaymentDTO pd, List<DetailOrderItem> itemList, Memberkjy memberInfo) throws Exception;

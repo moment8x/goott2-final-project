@@ -20,6 +20,7 @@ public class DetailOrderItem {
 	private int productQuantity;
 	private String productStatus;
 	private String productOrderNo;
+	private int couponDiscount;
 
 	public DetailOrderItem(String orderNo, String productId, int productQuantity) {
 		// 회원 비회원 구분 필요 (나중에 추가 지금 테스트중)

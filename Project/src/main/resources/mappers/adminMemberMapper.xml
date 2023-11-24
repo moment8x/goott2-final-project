@@ -30,7 +30,12 @@
 	</update>
 	
 	<select id="selectMemberDetailInfo" resultType="MemberParam">
-		SELECT * FROM member WHERE member_id = #{memberId}
+		SELECT  member_id, name, phone_number, cell_phone_number, registration_date, 
+				gender, date_of_birth, zip_code, address, detailed_address, email, 
+				identity_verification_status, membership_grade, profileImage, 
+				last_login_date, refund_bank, refund_account, dormant_accout, 
+				member_token, permission, withdraw, account_holder, 
+		   FROM member WHERE member_id = #{memberId}
 	</select>
 	
 	<select id="selectRecentPost" resultType="MemberRecentPost">

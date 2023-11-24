@@ -34,7 +34,9 @@
 	let products = [];
 	let couponNumbers = [];
 	let createName = "";
-	
+	let couponIndex = [];
+	let couponProduct = [];
+	let j = 0;
 	$(function() {
 		
 		
@@ -45,18 +47,35 @@
 		$("#payToAmount").text(totalAmount + shippingFee - discountAmount);
 		// discountAmount에 쿠폰도 넣어야함
 		$('#discountAmount').text(discountAmount);
-		
-		for (i=0; i<$('.categoryKeys').length; i++) {
-			productCategories.forEach(function(item){
-				if(($('#categoryKey'+i).val().indexOf(item)) != -1) {
+	
+		for (i=0; i<$('.categoryKeys').length; i++) {	// 쿠폰 갯수만큼 돌아라
+				console.log("와하하하하하하하ㅏ하하하하하하하하ㅏ하하하하하하하ㅏ하하하하하하하하하하ㅏ하하하하하핳하하하하하")
+			console.log(productCategories);
+			j=0;
+			couponProduct = [];
+			productCategories.forEach(function(item, index){	// 상품 갯수만큼 돌아라
+					couponIndex[i] = new Object();
+				if(($('#categoryKey'+i).val().indexOf(item)) != -1 || $('#categoryKey'+i).val().indexOf('ALL') != -1) {
 					// 일치하는 카테고리 존재
-					console.log($('#categoryKey'+i).val());
-					console.log(item);
-					console.log("야호");
+					console.log("쿠폰카테고리",$('#categoryKey'+i).val());
+					console.log("상품카테고리",item);
 					$('#couponSelect').attr('style', 'display:');
 					$('#couponShow').text("쿠폰 선택");
 					$('#categoryKey'+i).attr('style','display:');
+					if(($('#categoryKey'+i).val().indexOf(item)) != -1) {
+					console.log("야호");
+						couponIndex[i].no = i;
+						couponIndex[i].name = $('#categoryKey'+i).text();
+						couponIndex[i].index = [];
+						couponProduct[j] = index;
+						couponIndex[i].index = couponProduct.slice();
+						j++;
+						console.log(couponIndex);
+					}
 				} else {
+					console.log($('#categoryKey'+i).val());
+					console.log(item);
+					couponIndex[i].name = $('#categoryKey'+i).text();
 					console.log("되나?")
 				}
 			})
@@ -71,6 +90,11 @@
 				couponAmount = 0;
 				//totalAmount = Number('${requestScope.paymentInfo.totalAmount}');
 				discountCount = 0;
+				for(let i = 0; i<couponIndex.length; i++) {
+					if(couponIndex[i].no != null) {
+						$('#categoryKey'+i).css("display","");
+					}
+				}
 				calc();
 			} else {
 				if(Number($("#payToAmount").text()) == 0) {
@@ -79,22 +103,32 @@
 					return;
 				}
 				
-			let selectedIndex = $("option:selected", this).attr("id").slice(-1);
-			
+			let selectedIndex = $("option:selected", this).attr("id").slice(-1);	// ex) categoryKey0
 			if(discountCount <= couponQty-1) {
 				
-			let discountMethod = $('#discountMethod'+selectedIndex).text();
+			//let discountMethod = $('#discountMethod'+selectedIndex).text();
 			let couponDiscountAmount = Number($('#discountAmount'+selectedIndex).text());
-				if (discountMethod == "P") {
-					// 쿠폰 적용 후 가격
-					couponAmount += (totalAmount * (couponDiscountAmount/100));
+				//if (discountMethod == "P") {
+					// 그 상품에만 적용
+					console.log(couponIndex.length);
+					for(let i = 0; i<couponIndex.length; i++) {
+					console.log(couponIndex[i]);
+						if(selectedIndex == couponIndex[i].no) {
+							for(let k = 0; k < couponIndex[i].index.length; k++) {	
+							couponAmount += Math.round(((Number($('#productPrice'+couponIndex[i].index[k]).text())*Number($('#productQty'+couponIndex[i].index[k]).text())) * (couponDiscountAmount/100)) / 10) * 10;
+							console.log(couponAmount);
+							}
+							$('#categoryKey'+selectedIndex).css("display","none");
+							console.log("오잉?",'#categoryKey'+selectedIndex);
+						}
+					}
 					//couponDiscountAmount = Math.floor((totalAmount - (totalAmount * (discountAmount/100)))/10)*10;
-				} else {
+				//} else {
 					//couponDiscountAmount = totalAmount - discountAmount;
-					couponAmount += couponDiscountAmount;
-			 	}
+					//couponAmount += couponDiscountAmount;
+			 	//}
 					discountCount++;
-					calc();
+					calc(selectedIndex);
 			}
 			// $('#categoryKey'+selectedIndex).attr("style","display: none"); 
 				if(output.indexOf(selectedCoupon) == -1) {
@@ -199,7 +233,7 @@
 		        // 결제 내역 저장 ajax
 		        obj = {
 		          "paymentNumber" : rsp.imp_uid, // 결제번호
-		          "nonOrderNo" : rsp.merchant_uid, // 주문번호
+		          "orderNo" : rsp.merchant_uid, // 주문번호
 		          "paymentMethod" : rsp.pay_method, // 결제수단
 		          "totalAmount" : totalAmount, // 총 상품 금액, 수정 필요
 		          "shippingFee" : shippingFee, // 배송비
@@ -452,13 +486,14 @@
 		//}
 	//}
 	
-	function calc() {
+	function calc(index) {
 		// 쿠폰은 총 상품 가격 기준으로만 적용
 		// 할인금액은 쿠폰+포인트+적립금
 		// 토탈은 상품 가격 - 쿠폰 할인 - 포인트 - 적립금
+		
 		viewTotalAmount = Number($("#payToAmount").text());
 		discountAmount1 = couponAmount + Number($('#usingRewards').val()) + Number($('#usingPoints').val());
-		finalTotal = totalAmount - couponAmount - Number($('#usingRewards').val()) - Number($('#usingPoints').val());
+		finalTotal = totalAmount + shippingFee - couponAmount - Number($('#usingRewards').val()) - Number($('#usingPoints').val());
 		console.log(discountAmount1);
 		console.log(finalTotal);
 		if(discountAmount1 > totalAmount) {
@@ -541,8 +576,11 @@
 					alert("할인금액이 상품 금액을 넘어 포인트와 적립금을 초기화 시켰습니다.");
 				}
 			}
-			
-			finalTotal = totalAmount - couponAmount - Number($('#usingRewards').val()) - Number($('#usingPoints').val());
+			if(index != null && index != "") {
+				console.log(index);
+				
+			}
+			finalTotal = totalAmount + shippingFee - couponAmount - Number($('#usingRewards').val()) - Number($('#usingPoints').val());
 			console.log("과연?", finalTotal);
 		}
 		$('#discountAmount').text(discountAmount1);
@@ -990,8 +1028,6 @@
 																				<c:forEach var="coupon"
 																					items="${requestScope.couponInfos }"
 																					varStatus="status">
-																					<div id="discountMethod${status.index }"
-																						style="display: none">${coupon.discountMethod}</div>
 																					<div id="discountAmount${status.index }"
 																						style="display: none">${coupon.discountAmount}</div>
 
@@ -1437,7 +1473,8 @@
 											src="${info.productImage }"
 											class="img-fluid blur-up lazyloaded checkout-image" alt="">
 											<h4>
-												<span id="productName${status.index }">${info.productName }</span> X<span id="productQty${status.index }">${info.productQuantity }</span>
+												<span id="productName${status.index }">${info.productName }</span>
+												X<span id="productQty${status.index }">${info.productQuantity }</span>
 											</h4>
 											<h4 class="price">
 												<span id="productPrice${status.index }">${info.sellingPrice }</span>원
@@ -1563,10 +1600,10 @@
 							</div>
 							<!--  <button
 								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
-								type="button" onclick="cancelPayment()">취소하기</button>
+								type="button" onclick="cancelPayment()">취소하기</button>-->
 							<button type="button"
 								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
-								onclick="identify()">본인 인증</button>-->
+								onclick="identify()">본인 인증</button>
 							<button type="button"
 								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
 								onclick="packData()">테스트</button>

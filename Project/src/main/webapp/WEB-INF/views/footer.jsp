@@ -167,7 +167,7 @@
 
                     <div class="col-xl-2 col-sm-3">
                         <div class="footer-title">
-                            <h4>Help Center</h4>
+                            <h4><a href="/cs/serviceCenter">Help Center</a></h4>
                         </div>
 
                         <div class="footer-contain">

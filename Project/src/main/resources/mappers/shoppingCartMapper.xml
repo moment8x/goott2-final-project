@@ -5,10 +5,10 @@
 
 <mapper namespace="com.project.mappers.shoppingCartMapper">
 	<insert id="insertShoppingCartNon">
-		INSERT INTO shopping_cart(non_member_id, product_id, member_check) VALUES(#{nonMemberId}, #{productId}, 0)
+		INSERT INTO shopping_cart(non_member_id, product_id, member_check, quantity) VALUES(#{nonMemberId}, #{productId}, 0, #{quantity})
 	</insert>
 	<insert id="insertShoppingCart">
-		INSERT INTO shopping_cart(member_id, product_id, member_check) VALUES(#{memberId}, #{productId}, 1)
+		INSERT INTO shopping_cart(member_id, product_id, member_check, quantity) VALUES(#{memberId}, #{productId}, 1, #{quantity})
 	</insert>
 	<select id="selectNonMemberShoppingCart" resultType="com.project.vodto.ShoppingCart">
 		SELECT * FROM shopping_cart WHERE non_member_id = #{nonMemberId}
@@ -48,4 +48,10 @@
 	<select id="countList" resultType="_int">
 		SELECT count(*) FROM shopping_cart WHERE member_id = #{memberId}
 	</select>
+	<update id="updateQTY">
+		UPDATE shopping_cart SET quantity = #{quantity} WHERE member_id = #{memberId} AND product_id = #{productId}
+	</update>
+	<update id="updateQTYNon">
+		UPDATE shopping_cart SET quantity = #{quantity} WHERE non_member_id = #{nonMemberId} AND product_id = #{productId}
+	</update>
 </mapper>

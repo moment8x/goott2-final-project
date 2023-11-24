@@ -19,19 +19,18 @@ public class UploadDAOImpl implements UploadDAO {
 	String ns = "com.project.mappers.uploadFileMapper";
 	
 	@Override
-	public int insertUploadFile(UploadFiles file) throws SQLException, NamingException {
+	public int insertUploadImage(UploadFiles file) throws SQLException, NamingException {
 		System.out.println("======= 파일 업로드 DAO - insert file upload =======");
 		
-		return session.insert(ns + ".insertFile", file);
+		return session.insert(ns + ".insertImage", file);
 	}
 
 	@Override
 	public Integer selectUploadFile(UploadFiles file) throws SQLException, NamingException {
 		System.out.println("======= 파일 업로드 DAO - select file upload =======");
 		
-		file.setNewFileName(file.getNewFileName().replace("\\", "\\\\"));
+//		file.setNewFileName(file.getNewFileName().replace("\\", "/"));
 		
 		return session.selectOne(ns + ".isExist", file);
 	}
-
 }

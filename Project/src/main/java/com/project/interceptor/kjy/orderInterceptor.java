@@ -4,8 +4,11 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import com.project.vodto.kjy.Memberkjy;
 
 public class orderInterceptor extends HandlerInterceptorAdapter {
 
@@ -16,12 +19,13 @@ public class orderInterceptor extends HandlerInterceptorAdapter {
 		String orderId = "";
 		String impKey = "imp77460302";
 //		System.out.println("?????"+request.getParameter("isLogin"));
-		if (request.getParameter("isLogin") != null && request.getParameter("isLogin").equals("N") ) {
+		HttpSession session = request.getSession();
+		if (session.getAttribute("loginMember") != null) {
 			System.out.println("상희쿤");
-	         orderId = "N" + new Date().getTime();
+	         orderId = "O" + new Date().getTime();
 	         
 	      } else {
-	         orderId = "O" + new Date().getTime();
+	    	  orderId = "N" + new Date().getTime();
 	         
 	      }
 		System.out.println("야야야야야야" + orderId);

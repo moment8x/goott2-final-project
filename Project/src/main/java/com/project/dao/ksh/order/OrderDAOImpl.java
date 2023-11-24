@@ -39,12 +39,12 @@ public class OrderDAOImpl implements OrderDAO {
 
 	@Override
 	public int saveDetailItems(List<DetailOrderItem> itemList) {
-		// 테이블 바껴서 수정필요!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		int count = 0;
 		Map<String, Object> map = new HashMap<>();
 		map.put("list", itemList);
 
 		// 실행 결과 row 갯수를 리턴합니다.
+		System.out.println(itemList.toString());
 		count += ses.insert(ns + ".insertDetailOrderItem", map);
 		System.out.println(count + "개 insert 완료");
 		return count;
@@ -106,7 +106,7 @@ public class OrderDAOImpl implements OrderDAO {
 		for (CouponInfos c : couponInfos) {
 			c.setCategoryKey(ses.selectList(ns + ".getCategoryKey", c.getCouponNumber()));
 		}
-
+		System.out.println("쿠폰 카테고리 키 추가하는 다오까지 왔음" + couponInfos.toString());
 		return couponInfos;
 	}
 

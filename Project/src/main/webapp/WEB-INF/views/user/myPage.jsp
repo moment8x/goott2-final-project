@@ -210,6 +210,105 @@
 		$('#newCellPhoneNumber').blur(function() {
 			duplicateCellPhone();
 		})
+		
+		//주문 상태별 조회
+		$("select[id=orderStatusKeyword]").change(function(){
+			let beforeDeposit = null;
+			let beforeShipping = null;
+			let shipping = null;
+			let deliveryCompleted = null;
+			let cancelList = null;
+			let exchangeList = null;
+			let returnList = null;
+			let allList = null;			
+			
+			if($(this).val() == 'beforeDeposit'){
+				beforeDeposit = $("select[id=orderStatusKeyword] option:selected").text()				
+			}else if($(this).val() == 'beforeShipping'){
+				beforeShipping = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'shipping'){
+				shipping = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'deliveryCompleted'){
+				deliveryCompleted = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'cancelList'){
+				cancelList = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'exchangeList'){
+				exchangeList = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'returnList'){
+				returnList = $("select[id=orderStatusKeyword] option:selected").text()
+			}else if($(this).val() == 'allList'){
+				allList = $("select[id=orderStatusKeyword] option:selected").text()
+			}
+			
+			let orderStatusKeywordText = $("select[id=orderStatusKeyword] option:selected").text()
+
+		  	console.log(orderStatusKeywordText); 
+		  	$.ajax({
+				url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
+				type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+				data : {
+					beforeDeposit,
+					beforeShipping,
+					shipping,
+					deliveryCompleted,
+					cancelList,
+					exchangeList,
+					returnList,
+					allList
+				},
+				dataType : 'json',
+				async : false,
+				success : function(data) {
+					console.log(data);
+					if(data != null){
+						outputOrder(data.orderStatus)		
+						orderStatusPagination(data.pagination)
+					}
+				},
+				error : function() {
+				}
+			});
+		});
+		
+		//주문 기간별 조회
+		$("select[id=orderPeriod]").change(function () {
+			let sevenDaysAgo = null;
+			let fifteenDaysAgo = null;
+			let aMonthAgo = null;
+			
+			if($(this).val() == 'aMonthAgo'){
+				aMonthAgo = $("select[id=orderPeriod] option:selected").text()				
+			}else if($(this).val() == 'sevenDaysAgo'){
+				sevenDaysAgo = $("select[id=orderPeriod] option:selected").text()
+			}else if($(this).val() == 'fifteenDaysAgo'){
+				fifteenDaysAgo = $("select[id=orderPeriod] option:selected").text()
+			}
+			
+			let orderPeriodText = $("select[id=orderPeriod] option:selected").text()
+			console.log(orderPeriodText);
+			
+			$.ajax({
+				url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
+				type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+				data : {
+					sevenDaysAgo,
+					fifteenDaysAgo,
+					aMonthAgo,
+				},
+				dataType : 'json',
+				async : false,
+				success : function(data) {
+					console.log(data);
+					if(data != null){
+						outputOrder(data.orderStatus)	
+						orderStatusPagination(data.pagination) 
+					}
+				},
+				error : function() {
+				}
+			});
+		})
+		
 	})
 
 	// 유효성 검사 메세지
@@ -348,18 +447,20 @@
 	}
 	
 	//배송주소록 추가
-	function addShippingAddress(addrSeq) {
+	function addShippingAddress() {
 		let zipCode = $('#addZipNo').val()
 		let address = $('#addAddr').val()
 		let detailAddress = $('#addAddrDetail').val()
 		let recipient = $('#recipient').val()
 		let recipientContact = $('#recipientContact').val()
-		
+	//	let basicAddr = null;
+	//	if($('#choiceBasicAddr').is(':checked')){
+	//		basicAddr = 'Y'
+	//	}
 		$.ajax({
 			url : '/user/addShippingAddress', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
-				addrSeq,
 				zipCode,
 				address,
 				detailAddress,
@@ -370,13 +471,8 @@
 			async : false,
 			success : function(data) {
 				console.log(data);
-				if(data == true){
-					$('#addZipNo').val('')
-					$('#addAddr').val('')
-					$('#addAddrDetail').val('')
-					$('#recipient').val('')
-					$('#recipientContact').val('')
-					
+				if(data == true){		
+					alert("배송지 추가가 완료되었습니다.")
 					location.reload()
 				}
 			},
@@ -408,7 +504,11 @@
 			async : false,
 			success : function(data) {
 				console.log(data);
-					location.reload()
+				$('#addrRecipient').text(data.recipient)
+				$('#addrRecipientContact').text(data.recipientContact)
+				$('#addrZipCode').text(data.zipCode)
+				$('#addrAddress').text(data.address)
+				$('#addrDetailAddress').text(data.detailAddress)
 			},
 			error : function() {
 			}
@@ -509,6 +609,7 @@
 		});
 	}
 	
+	// 기본배송지 설정
 	function setBasicAddr(addrSeq) {
 		$.ajax({
 			url : '/user/setBasicAddr', // 데이터를 수신받을 서버 주소
@@ -595,73 +696,227 @@
 		});
 	}
 	
-	//배송주소록 추가
-	function addShippingAddress() {
-		let zipCode = $('#addZipNo').val()
-		let address = $('#addAddr').val()
-		let detailAddress = $('#addAddrDetail').val()
+	function outputOrder(order) {
+		let output = ''
+		$.each(order, function(i, e) {
+			output += `<div class="product-order-detail" id="productOrderDetail">`
+			output += `<a href="/detail/\${e.productId }" class="order-image">`
+			output += `<img src="\${e.productImage }" class="blur-up lazyload"
+					alt="\${e.productName }" id="productImg" />`
+			output += `</a>`
+			output += `<div class="order-wrap">`
+			output += `<div id="orderWrap">`
+			output += `<span class="orderDetailClick">주문번호 : \${e.orderNo }</span>`
+			output += `<a href="orderDetail?no=\${e.orderNo }" id="clickDetailOrder">상세보기</a>`
+			output += `</div>`	
+			let orderTime = formatDate(e.orderTime)
+			output += `<p class="text-content" id="orderTime">\${orderTime}</p>`
+			output += `<a href="/detail/\${e.productId }">`
+			output += `<h3>\${e.productName }</h3>`
+			output += `</a>`
+			output += `<ul class="product-size">`
+			output += `<li>`
+			output += `<div class="size-box">`
+			output += `<h6 class="text-content">총 수량 :</h6>`
+			output += `<h5>\${e.totalOrderCnt }권</h5>`
+			output += `</div>`
+			output += `</li>`
+			output += `<li>`
+			output += `<div class="size-box">`
+			output += `<h6 class="text-content">결제금액 :</h6>`
+			let actualPaymentAmount = Number(e.actualPaymentAmount)
+				actualPaymentAmount = actualPaymentAmount.toLocaleString()
+			output += `<h5>\${actualPaymentAmount}원</h5>`
+			output += `</div>`
+			output += `</li>`
+			output += `<li>`
+			output += `<div class="size-box">`
+			output += `<h6 class="text-content">주문상태 :</h6>`
+			output += `<h5>\${e.deliveryStatus }</h5>`
+			output += `</div>`
+			output += `</li>`
+			output += `<li>`
+			output += `<div class="size-box">`
+			output += `<div id="orderStatus">`
+			if(e.deliveryStatus == '출고전'){
+				output += `button class="btn theme-bg-color text-white m-0" type="button" id="button-addon1">`	
+				output += `<span>취소</span>`
+				output += `</button>`
+			}else if(e.deliveryStatus == '입금전'){
+				output += `<button class="btn theme-bg-color text-white m-0"
+					type="button" id="button-addon1">`
+				output += `<span>취소</span>`
+				output += `</button>`
+			}else if(e.deliveryStatus == '출고완료'){
+				output += `<button class="btn theme-bg-color text-white m-0"
+					type="button" id="button-addon1">`
+				output += `<span>배송조회</span>`
+					output += `</button>`
+				output += `<div>${order.invoiceNumber }</div>`
+			}else if(e.deliveryStatus == '배송중'){
+				output += `<button class="btn theme-bg-color text-white m-0"
+					type="button" id="button-addon1">`
+				output += `<span>배송조회</span>`
+					output += `</button>`
+				output += `<div>${order.invoiceNumber }</div>`
+			}else if(e.deliveryStatus == '취소'){
+				output += `<div>취소</div>`
+			}else{
+				output += `<button class="btn theme-bg-color text-white m-0"
+					type="button" id="button-addon1">`
+				output += `<span>교환</span>`
+					output += `</button>`
+				output += `<button class="btn theme-bg-color text-white m-0"
+					type="button" id="button-addon1">`
+				output += `<span>반품</span>`
+					output += `</button>`
+			}
+			output += `</div>`
+			output += `</div>`
+			output += `</li>`
+			output += `</ul>`
+			output += `</div>`
+			output += `</div>`
+			output += `</div>`
+		})
+		$('.order-box.dashboard-bg-box').html(output)
+	}
+	
+	//날짜포맷
+	function formatDate(date) {
+		let orderDate = new Date(date)
+		let year = orderDate.getFullYear();
+		let month = orderDate.getMonth() + 1;
+		let day = orderDate.getDate();
+		let dateStr = year+'.'+month+'.'+day;
 		
+		return dateStr
+	}
+	
+	function orderHistoryPaging(pageNo) {
 		$.ajax({
-			url : '/user/addShippingAddress', // 데이터를 수신받을 서버 주소
+			url : '/user/myPage', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
-				zipCode,
-				address,
-				detailAddress
+				"pageNo" : pageNo
 			},
 			dataType : 'json',
 			async : false,
 			success : function(data) {
 				console.log(data);
-				if(data == true){
-					$('#addZipNo').val('')
-					$('#addAddr').val('')
-					$('#addAddrDetail').val('')
-					
-					location.reload()
+				outputOrder(data.orderHistory);
+				let page = data.pagination
+				let output = `<ul class="pagination justify-content-center">`;
+				if(page.pageNo > 1){
+					output += `<li class="page-item">`
+					output += `<a class="page-link" href="javascript:void(0);" onclick="orderHistoryPaging(\${page.pageNo - 1}); return false;">`
+					output += `<i class="fa-solid fa-angles-left"></i>`
+					output += `</a>`
+					output += `</li>`			
 				}
+				
+				for (let i = page.startNumOfCurrentPagingBlock; i < page.endNumOfCurrentPagingBlock + 1 ; i++) {
+					output += `<li class="page-item">`
+					output += `<a class="page-link" href="javascript:void(0);" onclick="orderHistoryPaging(\${i}); return false;">\${i}</a> `
+					output += `</li>`
+				}
+				if(page.pageNo < page.totalPageCnt){
+					output += `<li class="page-item">`
+					output += `<a class="page-link" href="javascript:void(0);" onclick="orderHistoryPaging(\${page.pageNo + 1}); return false;">` 
+					output += `<i class="fa-solid fa-angles-right"></i>`
+					output += `</a>`
+					output += `</li>`			
+				}
+				
+				output += `</ul>`		
+				
+				$('.custome-pagination').html(output)
+				//pagination(data.pagination)
+				console.log("현재페이지 : " + pageNo)
 			},
 			error : function() {
 			}
 		});
 	}
 	
-	//배송주소록 수정
-	function shippingAddrModify() {
-		let zipCode = $('#shippingZipNoModify').val()
-		let address = $('#shippingAddrModify').val()
-		let detailAddress = $('#shippingDetailAddrModify').val()
-			
+	function orderStatusPaging(pageNo) {
 		$.ajax({
-			url : '/user/shippingAddrModify', // 데이터를 수신받을 서버 주소
+			url : '/user/searchOrderStatus', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
-				zipCode,
-				address,
-				detailAddress
+				"pageNo" : pageNo
 			},
 			dataType : 'json',
 			async : false,
 			success : function(data) {
 				console.log(data);
-				//if(data == true){
-				//	$('#addZipNo').val('')
-				//	$('#addAddr').val('')
-				//	$('#addAddrDetail').val('')
-					
-				//	location.reload()
-				//}
+				outputOrder(data.orderStatus);
+				//pagination(data.pagination)
+				let page = data.pagination
+				let output = `<ul class="pagination justify-content-center">`;
+				if(page.pageNo > 1){
+					output += `<li class="page-item">`
+					output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${page.pageNo - 1}); return false;">`
+					output += `<i class="fa-solid fa-angles-left"></i>`
+					output += `</a>`
+					output += `</li>`			
+				}
+				
+				for (let i = page.startNumOfCurrentPagingBlock; i < page.endNumOfCurrentPagingBlock + 1 ; i++) {
+					output += `<li class="page-item">`
+					output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${i}); return false;">\${i}</a> `
+					output += `</li>`
+				}
+				if(page.pageNo < page.totalPageCnt){
+					output += `<li class="page-item">`
+					output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${page.pageNo + 1}); return false;">` 
+					output += `<i class="fa-solid fa-angles-right"></i>`
+					output += `</a>`
+					output += `</li>`			
+				}
+				
+				output += `</ul>`		
+				
+				$('.custome-pagination').html(output)
+				console.log("현재페이지 : " + pageNo)
 			},
 			error : function() {
 			}
 		});
 	}
 	
-	
+	function orderStatusPagination(page) {		
+		let output = `<ul class="pagination justify-content-center">`;
+		if(page.pageNo > 1){
+			output += `<li class="page-item">`
+			output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${page.pageNo - 1}); return false;">`
+			output += `<i class="fa-solid fa-angles-left"></i>`
+			output += `</a>`
+			output += `</li>`			
+		}
+		
+		for (let i = page.startNumOfCurrentPagingBlock; i < page.endNumOfCurrentPagingBlock + 1 ; i++) {
+			output += `<li class="page-item">`
+			output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${i}); return false;">\${i}</a> `
+			output += `</li>`
+		}
+		if(page.pageNo < page.totalPageCnt){
+			output += `<li class="page-item">`
+			output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${page.pageNo + 1}); return false;">` 
+			output += `<i class="fa-solid fa-angles-right"></i>`
+			output += `</a>`
+			output += `</li>`			
+		}
+		
+		output += `</ul>`		
+		
+		$('.custome-pagination').html(output)
+	}
 </script>
 <style>
 #deliveryStatus, #successPwd, #successPhoneNumber,
-	#successCellPhoneNumber, #successEmail, #successAddr, #successRefund {
+	#successCellPhoneNumber, #successEmail, #successAddr, #successRefund,
+	#checkOrder {
 	display: flex;
 }
 
@@ -710,34 +965,73 @@
 #authenticationMsg {
 	font-size: 18px;
 }
-.container-fluid-lg.recentOrderHistoy{
+
+.container-fluid-lg.recentOrderHistoy {
 	padding-left: 0px;
 }
-.btn.btn-sm.add-button.w-100.basicAddrBtn{
+
+.btn.btn-sm.add-button.w-100.basicAddrBtn {
 	background-color: #E0EFEC;
 }
-.col-xxl-9.recentOrder{
+
+.col-xxl-9.recentOrder {
 	margin-top: 0px;
 }
-#deliveryStatus{
-	gap:15px;
+
+#deliveryStatus {
+	gap: 15px;
 }
 
-#deliveryStatus Button{
+#deliveryStatus Button {
 	width: 90px;
 	height: 30px;
 }
-#orderStatus{
-	gap : 7px;
+
+#orderStatus, #checkOrder {
+	gap: 7px;
 }
-#orderStatus Button{
+
+#orderStatus Button {
 	width: 80px;
 	height: 30px;
 }
-.orderDetailClick{
+
+.orderDetailClick {
 	font-size: 24px;
 }
 
+#curOrderNo {
+	font-size: 20px;
+}
+
+#intoDetailOrder {
+	font-size: 12px;
+	border: 2px solid #0DA487;
+	border-radius: 10px;
+	padding: 5px;
+}
+
+#clickDetailOrder {
+	width: 64px;
+	font-size: 12px;
+	border: 2px solid #0DA487;
+	border-radius: 10px;
+	padding: 5px;
+	text-align: center;
+}
+
+#orderWrap {
+	display: flex;
+	gap: 10px;
+}
+
+.cart-section.section-b-space.curOrderList {
+	padding-bottom: 0px;
+}
+
+#selectOrderStatus, #checkOrderPeriod {
+	margin-top: 30px;
+}
 </style>
 </head>
 
@@ -850,7 +1144,7 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="pills-order-tab"
+								<button class="nav-link" id="pills-order-tab" 
 									data-bs-toggle="pill" data-bs-target="#pills-order"
 									type="button" role="tab" aria-controls="pills-order"
 									aria-selected="false">
@@ -944,7 +1238,11 @@
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>포인트</h5>
-														<h3>${userInfo.totalPoints }점</h3>
+														<h3>
+															<fmt:formatNumber value="${userInfo.totalPoints }"
+																type="NUMBER" />
+															점
+														</h3>
 													</div>
 												</div>
 											</div>
@@ -957,7 +1255,11 @@
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>적립금</h5>
-														<h3>${userInfo.totalRewards }원</h3>
+														<h3>
+															<fmt:formatNumber value="${userInfo.totalRewards }"
+																type="NUMBER" />
+															원
+														</h3>
 													</div>
 												</div>
 											</div>
@@ -970,7 +1272,11 @@
 														class="blur-up lazyload" alt="" />
 													<div class="totle-detail">
 														<h5>쿠폰</h5>
-														<h3>${userInfo.couponCount }개</h3>
+														<h3>
+															<fmt:formatNumber value="${userInfo.couponCount }"
+																type="NUMBER" />
+															개
+														</h3>
 													</div>
 												</div>
 											</div>
@@ -981,122 +1287,88 @@
 										<h3>최근 주문내역</h3>
 									</div>
 
-									<section class="cart-section section-b-space">
-										<div class="container-fluid-lg recentOrderHistoy">
-											<div class="row g-sm-5 g-3">
-												<div class="col-xxl-9 recentOrder">
-													<div class="cart-table">
-														<div class="table-responsive-xl">
-															<table class="table">
-																<tbody>
-																	<tr class="product-box-contain">
-																		<td class="product-detail">
-																			<div class="product border-0">
-																				<a href="product-left-thumbnail.html"
-																					class="product-image"> <img
-																					src="/resources/assets/images/vegetable/product/1.png"
-																					class="img-fluid blur-up lazyload" alt="" />
-																				</a>
-																				<div class="product-detail">
-																					<ul>
-																						<li class="name"><a
-																							href="product-left-thumbnail.html">Bell
-																								pepper</a></li>
-
-																						<li class="text-content"><span
-																							class="text-title">Sold By:</span> Fresho</li>
-
-																						<li class="text-content"><span
-																							class="text-title">Quantity</span> - 500 g</li>
-
-																						<li>
-																							<h5 class="text-content d-inline-block">
-																								Price :</h5> <span>$35.10</span> <span
-																							class="text-content">$45.68</span>
-																						</li>
-
-																						<li>
-																							<h5 class="saving theme-color">Saving :
-																								$20.68</h5>
-																						</li>
-
-																						<li class="quantity-price-box">
-																							<div class="cart_qty">
-																								<div class="input-group">
-																									<button type="button"
-																										class="btn qty-left-minus" data-type="minus"
-																										data-field="">
-																										<i class="fa fa-minus ms-0" aria-hidden="true"></i>
-																									</button>
-																									<input
-																										class="form-control input-number qty-input"
-																										type="text" name="quantity" value="0" />
-																									<button type="button"
-																										class="btn qty-right-plus" data-type="plus"
-																										data-field="">
-																										<i class="fa fa-plus ms-0" aria-hidden="true"></i>
-																									</button>
-																								</div>
-																							</div>
-																						</li>
-
-																						<li>
-																							<h5>Total: $35.10</h5>
-																						</li>
-																					</ul>
-																				</div>
-																			</div>
-																		</td>
-
-																		<td class="price">
-																			<h4 class="table-title text-content">Price</h4>
-																			<h5>
-																				$35.10
-																				<del class="text-content">$45.68</del>
-																			</h5>
-																			<h6 class="theme-color">You Save : $20.68</h6>
-																		</td>
-
-																		<td class="quantity">
-																			<h4 class="table-title text-content">Qty</h4>
-																			<div class="quantity-price">
-																				<div class="cart_qty">
-																					<div class="input-group">
-																						<button type="button" class="btn qty-left-minus"
-																							data-type="minus" data-field="">
-																							<i class="fa fa-minus ms-0" aria-hidden="true"></i>
-																						</button>
-																						<input class="form-control input-number qty-input"
-																							type="text" name="quantity" value="0" />
-																						<button type="button" class="btn qty-right-plus"
-																							data-type="plus" data-field="">
-																							<i class="fa fa-plus ms-0" aria-hidden="true"></i>
-																						</button>
+									<c:forEach var="curOrder" items="${curOrderHistory }">
+										<span id="curOrderNo">주문번호 ${curOrder.orderNo } <a
+											href="orderDetail?no=${curOrder.orderNo }"
+											id="intoDetailOrder">상세보기</a>
+										</span>
+										<div id="orderTime">
+											<fmt:formatDate value="${curOrder.orderTime }" type="date" />
+										</div>
+										<section class="cart-section section-b-space curOrderList">
+											<div class="container-fluid-lg recentOrderHistoy">
+												<div class="row g-sm-5 g-3">
+													<div class="col-xxl-9 recentOrder">
+														<div class="cart-table">
+															<div class="table-responsive-xl">
+																<table class="table">
+																	<tbody>
+																		<tr class="product-box-contain">
+																			<td class="product-detail">
+																				<div class="product border-0">
+																					<a href="/detail/${curOrder.productId }"
+																						class="product-image"> <c:choose>
+																							<c:when test="${curOrder.productImage != '' }">
+																								<img src="${curOrder.productImage }"
+																									class="img-fluid blur-up lazyload"
+																									alt="${curOrder.productName }" />
+																							</c:when>
+																							<c:otherwise>
+																								<img src="/resources/assets/images/noimage.jpg"
+																									class="img-fluid blur-up lazyload"
+																									alt="${curOrder.productName }" />
+																							</c:otherwise>
+																						</c:choose>
+																					</a>
+																					<c:set var="productNameLength"
+																						value="${fn:length(curOrder.productName)}" />
+																					<div class="product-detail">
+																						<ul>
+																							<c:choose>
+																								<c:when test="${productNameLength <= 6}">
+																									<li class="name"><a
+																										href="/detail/${curOrder.productId }">${curOrder.productName }</a></li>
+																								</c:when>
+																								<c:otherwise>
+																									<li class="name"><a
+																										href="/detail/${curOrder.productId }">${fn:substring(curOrder.productName, 0, 6)}...</a></li>
+																								</c:otherwise>
+																							</c:choose>
+																						</ul>
 																					</div>
 																				</div>
-																			</div>
-																		</td>
+																			</td>
 
-																		<td class="subtotal">
-																			<h4 class="table-title text-content">Total</h4>
-																			<h5>$35.10</h5>
-																		</td>
-
-																		<td class="save-remove">
-																			<h4 class="table-title text-content">Action</h4> <a
-																			class="save notifi-wishlist"
-																			href="javascript:void(0)">Save for later</a> <a
-																			class="remove close_button" href="javascript:void(0)">Remove</a>
-																		</td>
-																	</tr>
-																</tbody>
-															</table>
+																			<td class="product-detail">
+																				<div class="product border-0">
+																					<div class="product-detail">
+																						<ul>
+																							<li class="name">총 금액 : <fmt:formatNumber
+																									value="${curOrder.actualPaymentAmount}"
+																									type="NUMBER" />원
+																							</li>
+																						</ul>
+																						<ul>
+																							<li class="name">총 권수 :
+																								${curOrder.totalOrderCnt}권</li>
+																						</ul>
+																						<ul>
+																							<li class="name">주문상태 :
+																								${curOrder.deliveryStatus }</li>
+																						</ul>
+																					</div>
+																				</div>
+																			</td>
+																		</tr>
+																	</tbody>
+																</table>
+															</div>
 														</div>
 													</div>
 												</div>
 											</div>
-										</div>
-									</section>
+										</section>
+									</c:forEach>
 								</div>
 							</div>
 
@@ -1554,60 +1826,71 @@
 													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                         </svg>
 										</span>
+										<div id="checkOrder">
+											<div class="col-12" id="selectOrderStatus">
+												<div class="form-floating theme-form-floating">
+													<select class="form-select" id="orderStatusKeyword"
+														aria-label="Floating label select example">
+														<option value="allList">전체</option>
+														<option value="beforeDeposit">입금전</option>
+														<option value="beforeShipping">출고전</option>
+														<option value="shipping">배송중</option>
+														<option value="deliveryCompleted">배송완료</option>
+														<option value="cancelList">취소</option>
+														<option value="exchangeList">교환</option>
+														<option value="returnList">반품</option>
+													</select> <label for="floatingSelect">주문상태별 조회</label>
+												</div>
+											</div>
 
-										<div id="deliveryStatus">
-											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn"
-												type="button" id="button-addon1">
-												<span>준비중</span> <span>0</span>
-											</button>
-											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn"
-												type="button" id="button-addon1">
-												<span>배송중</span> <span>0</span>
-											</button>
-											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn"
-												type="button" id="button-addon1">
-												<span>배송완료</span> <span>0</span>
-											</button>
-											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn"
-												type="button" id="button-addon1">
-												<span>취소</span> <span>0</span>
-											</button>
-											<button
-												class="btn theme-bg-color text-white m-0 deliveryStatusBtn"
-												type="button" id="button-addon1">
-												<span>교환/반품</span> <span>0</span>
-											</button>
+											<div class="col-12" id="checkOrderPeriod">
+												<div class="form-floating theme-form-floating">
+													<select class="form-select" id="orderPeriod"
+														aria-label="Floating label select example">
+														<option value="allList">전체</option>
+														<option value="sevenDaysAgo">일주일</option>
+														<option value="fifteenDaysAgo">15일</option>
+														<option value="aMonthAgo">1개월</option>
+													</select> <label for="floatingSelect">주문기간별 조회</label>
+												</div>
+											</div>
 										</div>
+
 									</div>
 									<div class="order-contain orderHistory">
 										<div class="order-box dashboard-bg-box">
 
-										<c:forEach var="order" items="${orderList }">
-											<div class="product-order-detail">
-												<c:choose>
-													<c:when test="${order.productImage != '' }">
-														<a href="#" class="order-image"> <img
-															src="${order.productImage }" class="blur-up lazyload"
-															alt="${order.productName }" id="productImg" />
-														</a>
-													</c:when>
-													<c:otherwise>
-														<a href="#" class="order-image"> <img
-															src="/resources/assets/images/noimage.jpg" class="blur-up lazyload"
-															alt="noImg" id="productImg" />
-														</a>
-													</c:otherwise>
-												</c:choose>
+											<c:forEach var="order" items="${orderList }">
+												<div class="product-order-detail" id="productOrderDetail">
+													<c:choose>
+														<c:when test="${order.productImage != '' }">
+															<a href="/detail/${order.productId }" class="order-image">
+																<img src="${order.productImage }"
+																class="blur-up lazyload" alt="${order.productName }"
+																id="productImg" />
+															</a>
+														</c:when>
+														<c:otherwise>
+															<a href="/detail/${order.productId }" class="order-image">
+																<img src="/resources/assets/images/noimage.jpg"
+																class="blur-up lazyload" alt="noImg" id="productImg" />
+															</a>
+														</c:otherwise>
+													</c:choose>
 
 													<div class="order-wrap">
-														<a class="orderDetailClick" href="orderDetail?no=${order.orderNo }">주문번호 : ${order.orderNo }</a>
-														<p class="text-content"><fmt:formatDate value="${order.orderTime }" type="date" /></p>
-														
-														<a href="#">
+														<div id="orderWrap">
+															<span class="orderDetailClick">주문번호 :
+																${order.orderNo }</span> <a
+																href="orderDetail?no=${order.orderNo }"
+																id="clickDetailOrder">상세보기</a>
+														</div>
+														<p class="text-content" id="orderTime">
+															<fmt:formatDate value="${order.orderTime }" type="date" />
+
+														</p>
+
+														<a href="/detail/${order.productId }">
 															<h3>${order.productName }</h3>
 														</a>
 														<ul class="product-size">
@@ -1621,84 +1904,110 @@
 															<li>
 																<div class="size-box">
 																	<h6 class="text-content">결제금액 :</h6>
-																	<h5><fmt:formatNumber value="${order.actualPaymentAmount}" type="NUMBER" />원</h5>
-																	
+																	<h5>
+																		<fmt:formatNumber value="${order.actualPaymentAmount}"
+																			type="NUMBER" />
+																		원
+																	</h5>
+
 																</div>
 															</li>
 
 															<li>
 																<div class="size-box">
-																	<h6 class="text-content">배송상태 :</h6>
+																	<h6 class="text-content">주문상태 :</h6>
 																	<h5>${order.deliveryStatus }</h5>
 																</div>
 															</li>
-															
+
 															<li>
 																<div class="size-box">
 																	<div id="orderStatus">
 																		<c:choose>
 																			<c:when test="${order.deliveryStatus eq '출고전' }">
-																				<button
-																					class="btn theme-bg-color text-white m-0"
+																				<button class="btn theme-bg-color text-white m-0"
 																					type="button" id="button-addon1">
 																					<span>취소</span>
-																				</button>	
+																				</button>
 																			</c:when>
-																			
+
 																			<c:when test="${order.deliveryStatus eq '입금전' }">
-																				<button
-																					class="btn theme-bg-color text-white m-0"
+																				<button class="btn theme-bg-color text-white m-0"
 																					type="button" id="button-addon1">
 																					<span>취소</span>
-																				</button>	
+																				</button>
 																			</c:when>
-																			
+
 																			<c:when test="${order.deliveryStatus eq '출고완료' }">
-																				<button
-																					class="btn theme-bg-color text-white m-0"
+																				<button class="btn theme-bg-color text-white m-0"
 																					type="button" id="button-addon1">
 																					<span>배송조회</span>
-																				</button>	
+																				</button>
 																				<div>${order.invoiceNumber }</div>
 																			</c:when>
-																			
+
 																			<c:when test="${order.deliveryStatus eq '배송중' }">
-																				<button
-																					class="btn theme-bg-color text-white m-0"
+																				<button class="btn theme-bg-color text-white m-0"
 																					type="button" id="button-addon1">
 																					<span>배송조회</span>
-																				</button>	
+																				</button>
 																				<div>${order.invoiceNumber }</div>
 																			</c:when>
-																			
+
 																			<c:when test="${order.deliveryStatus eq '취소' }">
-																				<div>취소</div>	
-																				<div>${order.invoiceNumber }</div>
+																				<div>취소</div>
 																			</c:when>
-																			
+
 																			<c:otherwise>
-																				<button
-																					class="btn theme-bg-color text-white m-0"
+																				<button class="btn theme-bg-color text-white m-0"
 																					type="button" id="button-addon1">
 																					<span>교환</span>
-																				</button>	
-																				<button
-																					class="btn theme-bg-color text-white m-0"
+																				</button>
+																				<button class="btn theme-bg-color text-white m-0"
 																					type="button" id="button-addon1">
 																					<span>반품</span>
 																				</button>
 																			</c:otherwise>
-																	</c:choose>
+																		</c:choose>
 																	</div>
 																</div>
 															</li>
 														</ul>
 													</div>
-											</div>
-												</c:forEach>
+												</div>
+											</c:forEach>
+
 										</div>
 									</div>
 								</div>
+
+								<nav class="custome-pagination">
+								  	<ul class="pagination justify-content-center">
+
+									<!--  	<c:if test="${page.pageNo > 1 }">
+											<li class="page-item"><a class="page-link" href="#"
+												
+												onclick="orderHistoryPaging(${page.pageNo -1}); return false;">
+													<i class="fa-solid fa-angles-left"></i>
+											</a></li>
+										</c:if>-->
+
+										<c:forEach var="i"
+											begin="${page.startNumOfCurrentPagingBlock }"
+											end="${page.endNumOfCurrentPagingBlock }">
+											<li class="page-item"><a class="page-link"
+												onclick="orderHistoryPaging(${i}); return false;" href="#">${i }</a></li>
+										</c:forEach>
+
+										<c:if test="${page.pageNo < page.totalPageCnt }">
+											<li class="page-item"><a class="page-link"
+												onclick="orderHistoryPaging(${page.pageNo +1}); return false;"
+												href="#"> <i class="fa-solid fa-angles-right"></i>
+											</a></li>
+										</c:if>
+											
+									</ul>
+								</nav>
 							</div>
 
 							<div class="tab-pane fade show" id="pills-profile"
@@ -1929,6 +2238,15 @@
 															<div class="col-12">
 																<div class="form-floating theme-form-floating">
 																	<input type="text" class="form-control"
+																		id="accountHolder" value="${userInfo.accountHolder}"
+																		placeholder="예금주" readonly /> <label
+																		for="accountHolder">예금주</label>
+																</div>
+															</div>
+
+															<div class="col-12">
+																<div class="form-floating theme-form-floating">
+																	<input type="text" class="form-control"
 																		id="refundAccount" value="${userInfo.refundAccount}"
 																		placeholder="환불계좌" readonly /> <label
 																		for="refundAccount">환불계좌</label> <i
@@ -1968,8 +2286,18 @@
 															<div class="col-12 editRefund">
 																<div class="form-floating theme-form-floating">
 																	<input type="text" class="form-control"
+																		name="accountHolder" id="editAccountHolder"
+																		value="${userInfo.accountHolder}" placeholder="예금주" />
+																	<label for="accountHolder">예금주</label>
+																</div>
+															</div>
+
+															<div class="col-12 editRefund">
+																<div class="form-floating theme-form-floating">
+																	<input type="text" class="form-control"
 																		id="newRefundAccount" name="refundAccount"
 																		placeholder="환불계좌" /> <label for="newRefundAccount">환불계좌</label>
+																	<p>14자 이내로 입력해주세요.</p>
 																	<div id="successRefund">
 																		<button class="btn theme-bg-color btn-md text-white"
 																			type="submit">변경</button>
@@ -2036,10 +2364,6 @@
 										</div>
 
 										<button
-											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3">
-											<i data-feather=check class="me-2"></i> 기본배송지로 설정
-										</button>
-										<button
 											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
 											data-bs-toggle="modal" data-bs-target="#add-address">
 											<i data-feather="plus" class="me-2"></i> 배송지 추가
@@ -2048,14 +2372,14 @@
 
 									<div class="row g-sm-4 g-3">
 										<c:forEach var="addr" items="${userAddrList }">
-										
+
 											<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
 
 												<div class="address-box">
 													<div>
 
 														<c:if test="${fn:contains(addr.basicAddr,'Y')}">
-															<div class="label">
+															<div class="label"> 
 																<label>기본배송지</label>
 															</div>
 														</c:if>
@@ -2065,37 +2389,36 @@
 															<table class="table">
 																<tbody>
 																	<tr>
-																		<td colspan="2">${addr.recipient}</td>
+																		<td colspan="2" id="addrRecipient">${addr.recipient}</td>
 																	</tr>
 
 																	<tr>
-																		<td colspan="2">${addr.recipientContact}</td>
+																		<td colspan="2" id="addrRecipientContact">${addr.recipientContact}</td>
 																	</tr>
 
 																	<tr>
 																		<td>우편번호 :</td>
 																		<td>
-																			<p>${addr.zipCode }</p>
+																			<p id="addrZipCode">${addr.zipCode }</p>
 																		</td>
 																	</tr>
 
 																	<tr>
 																		<td>주소 :</td>
-																		<td>${addr.address }</td>
+																		<td id="addrAddress">${addr.address }</td>
 																	</tr>
 
 																	<tr>
 																		<td>상세주소 :</td>
-																		<td>${addr.detailAddress }</td>
+																		<td id="addrDetailAddress">${addr.detailAddress }</td>
 																	</tr>
 																</tbody>
 															</table>
 														</div>
 													</div>
-														
+
 													<c:if test="${fn:contains(addr.basicAddr,'N')}">
-														<button
-															class="btn btn-sm add-button w-100 basicAddrBtn"
+														<button class="btn btn-sm add-button w-100 basicAddrBtn"
 															onclick="setBasicAddr(${addr.addrSeq});">
 															<i data-feather=check class="me-2"></i> 기본배송지로 설정
 														</button>
@@ -2107,7 +2430,7 @@
 															<i data-feather="edit"></i> Edit
 														</button>
 														<button class="btn btn-sm add-button w-100"
-														data-bs-toggle="modal" data-bs-target="#removeProfile"
+															data-bs-toggle="modal" data-bs-target="#removeProfile"
 															onclick="delShippingAddr(${addr.addrSeq});">
 															<i data-feather="trash-2"></i> Remove
 														</button>
@@ -2436,8 +2759,7 @@
 
 					<div class="form-floating mb-4 theme-form-floating">
 						<input type="text" class="form-control addAddr" id="addAddr"
-							name="address" placeholder="주소" readonly /><label
-							for="addAddr">주소</label>
+							name="address" placeholder="주소" readonly /><label for="addAddr">주소</label>
 					</div>
 
 					<div class="form-floating mb-4 theme-form-floating">
@@ -2446,6 +2768,10 @@
 							for="addAddrDetail">상세주소</label>
 					</div>
 
+				<!-- <input class="checkbox_animated check-box" type="checkbox"
+						id="choiceBasicAddr" name="basicAddr"/> <label
+						class="form-check-label" for="choiceBasicAddr"><span
+						id="choiceBasicAddr">기본배송지로 설정</span></label>  -->
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary btn-md"
@@ -2550,12 +2876,9 @@
 					</button>
 				</div>
 				<div class="modal-body">
-					<div class="row g-4 editAddr">
-					</div>
+					<div class="row g-4 editAddr"></div>
 				</div>
-				<div class="modal-footer editAddrFooter">
-					
-				</div>
+				<div class="modal-footer editAddrFooter"></div>
 			</div>
 		</div>
 	</div>
@@ -2640,8 +2963,7 @@
 						data-bs-dismiss="modal">No</button>
 					<button type="button"
 						class="btn theme-bg-color btn-md fw-bold text-light"
-						data-bs-target="#removeAddress" data-bs-toggle="modal"
-						>
+						data-bs-target="#removeAddress" data-bs-toggle="modal">
 						Yes</button>
 				</div>
 			</div>
@@ -2654,7 +2976,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title text-center" id="exampleModalLabel12">
-					삭제되었습니다.</h5>
+						삭제되었습니다.</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<i class="fa-solid fa-xmark"></i>
@@ -2663,8 +2985,7 @@
 				<div class="modal-footer pt-0">
 					<button type="button"
 						class="btn theme-bg-color btn-md fw-bold text-light"
-						onclick="location.reload();"
-						data-bs-dismiss="modal">Close</button>
+						onclick="location.reload();" data-bs-dismiss="modal">Close</button>
 				</div>
 			</div>
 		</div>

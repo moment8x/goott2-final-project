@@ -88,8 +88,8 @@
 				dataType : "json",
 				async : false,
 				success : function(data) {
-					console.log(data);
 					result = data;
+					console.log("data", data);
 				}, error : function() {
 					console.log("help!me!");
 				}
@@ -106,9 +106,10 @@
 			let subtotal = 0;
 			let total = 0;
 			if (data.status === "success") {
-				let items = data.items;
+				let items = data.list.items;
 				isLogin = data.isLogin;
 				$.each(items, function(i, item) {
+					let qty = data.list.list[i].quantity;
 					output += `<tr class="product-box-contain">`;
 					output += `<td class="product-detail">`;
 					output += `<div class="product border-0">`;
@@ -142,7 +143,7 @@
 						output += `<div class="quantity-price"><div class="cart_qty"><div class="input-group">`;
 						output += `<button type="button" class="btn qty-left-minus" onclick="qtyMinus('\${item.productId}', '\${item.sellingPrice}');">`;
 						output += `<i class="fa fa-minus ms-0" aria-hidden="true"></i></button>`;
-						output += `<input class="form-control input-number qty-input" id="\${item.productId}" type="text" name="quantity" value=1 onchange="renewTotal('\${item.productId}', '\${item.sellingPrice}');">`;
+						output += `<input class="form-control input-number qty-input quantity" id="\${item.productId}" type="text" name="quantity" value="\${qty}">`;
 						output += `<button type="button" class="btn qty-right-plus" onclick="qtyPlus('\${item.productId}', '\${item.sellingPrice}', '\${item.currentQuantity}');">`;
 						output += `<i class="fa fa-plus ms-0" aria-hidden="true"></i></button></div></div></div></td>`;
 					} else {
@@ -156,7 +157,7 @@
 					}
 					// 해당 아이템 최종 가격
 					output += `<td class="subtotal"><h4 class="table-title text-content">Total</h4>`;
-					output += `<h5 id="\${'total' + item.productId}" class="subtotal calc_total">&#8361;\${item.sellingPrice}</h5></td>`;
+					output += `<h5 id="\${'total' + item.productId}" class="subtotal calc_total">&#8361;\${item.sellingPrice * item.quantity}</h5></td>`;
 					// ???
 					output += `<td class="save-remove"><h4 class="table-title text-content">Action</h4>`;
 					output += `<a class="save notifi-wishlist" href="javascript:void(0)">Save for later</a>`;
@@ -166,11 +167,11 @@
 					if (item.currentQuantity > 0) {
 						buyInfo.push({
 							productId : item.productId,
-							qty : 1
+							quantity : qty
 						})
 					}
 					
-					subtotal += item.sellingPrice;
+					subtotal += item.sellingPrice * qty;
 					buy();
 				});
 				
@@ -205,12 +206,13 @@
 			let output = "";
 			for (let i = 0; i < buyInfo.length; i++) {
 				output += `<input type="hidden" name="productId" value="\${buyInfo[i].productId}">`;
-				output += `<input type="hidden" name="productQuantity" value="\${buyInfo[i].qty}">`;
+				output += `<input type="hidden" name="productQuantity" value="\${buyInfo[i].quantity}">`;
 				output += `<input type='hidden' name="fromCart" value="Y">`;
 				output += `<input type='hidden' name="isLogin" value="\${isLogin}">`;
 				
 				$('.move-payment').html(output);
 			}
+			$('.move-payment').html(output);
 		}
 		
 		// 숫자 3자리마다 콤마 찍어주기
@@ -246,10 +248,11 @@
 				
 				$.each(buyInfo, function(i, info) {
 					if (info.productId === prod) {
-						info.qty = $('#' + prod).val();
+						info.quantity = $('#' + prod).val();
 					}
 				});
 				
+				updateQTY(prod ,$('#' + prod).val());
 				subtotal();
 				totalAmount();
 				buy();
@@ -264,14 +267,35 @@
 				
 				$.each(buyInfo, function(i, info) {
 					if (info.productId === prod) {
-						info.qty = $('#' + prod).val();
+						info.quantity = $('#' + prod).val();
 					}
 				});
 				
+				updateQTY(prod ,$('#' + prod).val());
 				subtotal();
 				totalAmount();
 				buy();
 			}
+		}
+		
+		// QTY값 DB에 변경
+		// (productId, qty)
+		function updateQTY(productId, quantity) {
+			$.ajax({
+				url: "/shoppingCart/updateQTY",
+				type: "POST",
+				data: {
+					"productId" : productId,
+					"quantity" : quantity
+				},
+				dataType: "JSON",
+				async: false,
+				success: function(data) {
+					console.log(data);
+				}, error: function(data) {
+					console.log(data);
+				}
+			});
 		}
 		
 		// 구매액(subtotal)
@@ -295,12 +319,6 @@
 			
 			$('#total_amount').html("&#8361;" + addComma(subtotal + shippingPay));
 		}
-		
-		// 단일 품목 수량 합계 금액
-		/*function renewTotal(prod, price) {
-			console.log("onChange\nprod : ", prod, ", price : ", price);
-			$('#total' + prod).val() = price * $('#' + prod).val()
-		}*/
 		
 		// 단일 아이템 삭제
 		function deleteItem(elt) {

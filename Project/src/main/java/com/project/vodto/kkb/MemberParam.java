@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 public class MemberParam {
 	private String memberId;
-	private String password;
 	private String name;
 	private String phoneNumber; 
 	private String cellPhoneNumber; 
@@ -22,11 +21,7 @@ public class MemberParam {
 	private String email;
 	private char identityVerificationStatus;
 	private String membershipGrade;
-	private int totalPoints;
-	private int totalReward;
-	private int couponCount;
 	private int profileImage;
-	private String remember;
 	private Timestamp lastLoginDate;
 	private String refundBank;
 	private String refundAccount;

@@ -28,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.interceptor.kjy.RememberInterceptor;
 import com.project.service.kjy.LoginService;
 import com.project.vodto.kjy.LoginDTO;
 import com.project.vodto.kjy.Memberkjy;
@@ -42,53 +43,31 @@ public class LoginController {
 	
 //	private BCryptPasswordEncoder passenc;
 	
-	private String BeforeUri = null;
+	private String beforeUri = null;
 	
 	@RequestMapping("/")
-	public String goLogin(HttpServletRequest request) {
+	public String goLogin(HttpServletRequest request, HttpServletResponse response, Object handler) {
 		// 이전 경로 설정
-		this.BeforeUri = request.getHeader("referer");
-		
-		// 자동로그인 여부 체크후 적용
-		Cookie[] cookies = request.getCookies();
-		String value = "";
-		if(cookies != null) {
-			for(Cookie cookie : cookies) {
-				if("remCo".equals(cookie.getName())) {
-					value = cookie.getValue();
-					String member_id = value.split("/a@")[0];
-					String key = value.split("/a@")[1];
-					try {
-						Memberkjy loginMember = loginService.getRememberCheck(member_id, key);
-						if(loginMember != null) {
-							request.getSession().setAttribute("loginMember", loginMember);
-						}
-						System.out.println("자동로그인!!");
-						return "redirect:"+this.BeforeUri;
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-			
-			
+		this.beforeUri = request.getHeader("referer");
+		// 고객센터(cs) 이전 경로 설정
+		if(request.getParameter("csPath") != null && request.getParameter("csPath") != "") {
+			this.beforeUri = "http://localhost:8081/cs/" + request.getParameter("csPath");
 		}
-		
-		
+		System.out.println("befo : " + this.beforeUri);
 		return "/login/login";
 	}
 	
-	@RequestMapping(value="/", method=RequestMethod.POST)
-	public ModelAndView loginProcess(LoginDTO loginDTO, ModelAndView model, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/", method = RequestMethod.POST)
+	public ModelAndView loginProcess(LoginDTO loginDTO, ModelAndView model, HttpServletRequest request,
+			HttpServletResponse response) {
 		System.out.println(loginDTO.toString());
 		try {
 			Memberkjy loginMember = loginService.getLogin(loginDTO);
-			if(loginMember != null) {
-					request.getSession().setAttribute("loginMember", loginMember);
+			if (loginMember != null) {
+				request.getSession().setAttribute("loginMember", loginMember);
 				model.addObject("status", "로그인 성공");
-				if(BeforeUri != null) {
-					model.setViewName("redirect:"+BeforeUri);
+				if (beforeUri != null) {
+					model.setViewName("redirect:" + beforeUri);
 				} else {
 					model.setViewName("/login/login");
 				}
@@ -102,7 +81,7 @@ public class LoginController {
 			model.addObject("status", "로그인 도중 에러");
 			model.setViewName("/login/login");
 		}
-		
+
 		return model;
 	}
 	
@@ -134,8 +113,8 @@ public class LoginController {
 		
 		
 		System.out.println("로그아웃 됨!");
-		if(BeforeUri != null) {
-		return "redirect:"+this.BeforeUri;
+		if(beforeUri != null) {
+		return "redirect:"+this.beforeUri;
 		} else {
 			return "/index";
 		}
@@ -232,9 +211,9 @@ public class LoginController {
 	                    	model.setViewName("/register/register");
 	                    	model.addObject("userInfo", jsonUserInfo);
 	                    	return model;
-	                    } else if(BeforeUri != null) {
+	                    } else if(beforeUri != null) {
 	                    	request.getSession().setAttribute("loginMember", naverLoginUser);
-	                    	model.setViewName("redirect:" + BeforeUri);
+	                    	model.setViewName("redirect:" + beforeUri);
 	                    } else {
 	                    	model.setViewName("/index");
 	                    }
@@ -283,8 +262,8 @@ public class LoginController {
 		                    	return model;
 		                    } else {
 		                    	request.getSession().setAttribute("loginMember", naverLoginUser);
-		                    	if(BeforeUri != null) {
-			                    	model.setViewName("redirect:" + BeforeUri);
+		                    	if(beforeUri != null) {
+			                    	model.setViewName("redirect:" + beforeUri);
 			                    } else {
 			                    	model.setViewName("/index");
 			                    }
