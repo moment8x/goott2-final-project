@@ -9,8 +9,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,14 +17,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.project.service.ksh.payment.OrderService;
 import com.project.vodto.CouponInfos;
-import com.project.vodto.DetailOrderItem;
 import com.project.vodto.NonOrderHistory;
 import com.project.vodto.OrderHistory;
-import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.kjy.Memberkjy;
 import com.project.vodto.ksh.OrderInfo;
-import com.project.vodto.ksh.OrderInfo2;
+import com.project.vodto.ksh.OrderIdAndQty;
 import com.project.vodto.ksh.PaymentDTO;
 
 @Controller
@@ -49,87 +45,77 @@ public class OrderController {
 
 	// 리스트, 상세 -> 결제 페이지
 	@RequestMapping(value = "requestOrder")
-	public void requestOrder(@RequestParam("productId") String productId, @RequestParam("qty") int qty, Model model, HttpServletRequest request) {
+	public String getRequestOrder(@RequestParam("productId") String productId, @RequestParam("qty") int qty,
+			Model model, HttpServletRequest request) {
+		String path = "/order/requestOrder";
 		String orderId = (String) request.getAttribute("orderId");
-		String impKey = (String) request.getAttribute("impKey");
-		List<String> oneProductId = new ArrayList<String>();
-		oneProductId.add(productId);
-		List<OrderInfo> productInfos = new ArrayList<OrderInfo>();
-		PaymentDTO pd = new PaymentDTO();
-		try {
-			productInfos = os.getProductInfo(oneProductId);
-
-			// 재고 조회
-			if (productInfos.get(0).getCurrentQuantity() < 1) {
-				productInfos.get(0).setAdequacy("N");
-			} else {
-				productInfos.get(0).setAdequacy("Y");
-			}
-			productInfos.get(0).setProductQuantity(1);
-			productInfos.get(0).setCalculatedPrice(productInfos.get(0).getSellingPrice());
-			if (productInfos.get(0).getSellingPrice() >= 10000) {
-				pd.setShippingFee(0);
-			} else {
-
-				pd.setShippingFee(3000);
-			}
-			pd.setTotalAmount(productInfos.get(0).getSellingPrice());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		model = this.returnPath(orderId, model, new OrderIdAndQty(), request, productId, qty);
+		if (orderId.contains("N")) {
+			path = "/order/requestNonOrder";
 		}
-
-		model.addAttribute("paymentInfo", pd);
-		model.addAttribute("productInfos", productInfos);
-		model.addAttribute("orderId", orderId);
-		model.addAttribute("impKey", impKey);
+		return path;
 	}
 
 	// 장바구니 -> 결제 페이지
 	@RequestMapping(value = "requestOrder", method = RequestMethod.POST)
-	public String nonMemberOrder(Model model, OrderInfo2 items, HttpServletRequest request) {
+	public String postRequestOrder(Model model, OrderIdAndQty items, HttpServletRequest request) {
 		String path = "/order/requestOrder";
-		
 		String orderId = (String) request.getAttribute("orderId");
-		String impKey = (String) request.getAttribute("impKey");
+		model = this.returnPath(orderId, model, items, request, "", 0);
 		System.out.println(items.toString());
-		// 회원인지
-		if(orderId.contains("O")) {
-			// 쿠폰, 포인트, 적립금, 배송 주소록 
-			HttpSession session = request.getSession();
-			Memberkjy member = (Memberkjy)session.getAttribute("loginMember");
-			
-			// member 다시 조회
-			try {
-				Memberkjy memberInfo = os.getMemberInfo(member.getMemberId());
-				List<ShippingAddress> shippingAddr = os.getShippingAddress(member.getMemberId());
-//				List<ShippingAddress> otherAddr = new ArrayList<ShippingAddress>();
-				
-				
-				for(ShippingAddress saddr : shippingAddr) {
-					if(saddr.getBasicAddr() =='Y') {
-						model.addAttribute("basicAddr", saddr);
-					} 
-				}
-				model.addAttribute("member", memberInfo);
-				model.addAttribute("shippingAddr", shippingAddr);
-				System.out.println(shippingAddr.toString());
-			    // 쿠폰이 한 개라도 있으면
-				if(member.getCouponCount() > 0) {
-					List<CouponInfos> couponInfos = os.getCouponInfos(member.getMemberId());
-					model.addAttribute("couponInfos", couponInfos);
-					System.out.println(couponInfos.toString());
-					
-				} 
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else {
+		if (orderId.contains("N")) {
 			path = "/order/requestNonOrder";
 		}
 
-	
+		return path;
+	}
+
+	public Model returnPath(String orderId, Model model, OrderIdAndQty items, HttpServletRequest request, String productId,
+			int qty) {
+		String impKey = (String) request.getAttribute("impKey");
+
+		if (!productId.equals("") && qty > 0) {
+			List<String> productIds = new ArrayList<String>();
+			productIds.add(productId);
+			items.setProductId(productIds);
+			List<Integer> productQty = new ArrayList<Integer>(); 
+			productQty.add(qty);
+			items.setProductQuantity(productQty);
+		}
+
+			// 회원인지
+			if (orderId.contains("O")) {
+				// 쿠폰, 포인트, 적립금, 배송 주소록
+				HttpSession session = request.getSession();
+				Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+
+				// member 다시 조회
+				try {
+					Memberkjy memberInfo = os.getMemberInfo(member.getMemberId());
+					List<ShippingAddress> shippingAddr = os.getShippingAddress(member.getMemberId());
+//						List<ShippingAddress> otherAddr = new ArrayList<ShippingAddress>();
+
+					for (ShippingAddress saddr : shippingAddr) {
+						if (saddr.getBasicAddr() == 'Y') {
+							model.addAttribute("basicAddr", saddr);
+						}
+					}
+					model.addAttribute("member", memberInfo);
+					model.addAttribute("shippingAddr", shippingAddr);
+					System.out.println(shippingAddr.toString());
+					// 쿠폰이 한 개라도 있으면
+					if (member.getCouponCount() > 0) {
+						List<CouponInfos> couponInfos = os.getCouponInfos(member.getMemberId());
+						model.addAttribute("couponInfos", couponInfos);
+						System.out.println(couponInfos.toString());
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		
+		
 		List<String> productCategory = new ArrayList<String>();
 		List<OrderInfo> productInfos = new ArrayList<OrderInfo>();
 		PaymentDTO pd = new PaymentDTO();
@@ -145,13 +131,13 @@ public class OrderController {
 			for (OrderInfo i : productInfos) {
 				if (i.getCurrentQuantity() < items.getProductQuantity().get(index)) {
 					i.setAdequacy("N");
-					path = "/commonError";
+					//path = "/commonError";
 				} else {
 					i.setAdequacy("Y");
 				}
 				i.setProductQuantity(items.getProductQuantity().get(index));
 				i.setCalculatedPrice(i.getProductQuantity() * i.getSellingPrice());
-				
+
 				productCategory.add(i.getCategoryKey());
 				totalAmount += i.getCalculatedPrice();
 				index++;
@@ -166,18 +152,15 @@ public class OrderController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		
+
+		System.out.println(productInfos.toString());
 		model.addAttribute("productCategory", productCategory);
 		model.addAttribute("paymentInfo", pd);
 		model.addAttribute("orderId", orderId);
 		model.addAttribute("productInfos", productInfos);
 		model.addAttribute("impKey", impKey);
-		System.out.println(productInfos.toString());
-		System.out.println(path);
 
-		return path;
+		return model;
 	}
 
 	@RequestMapping(value = "nonOrderComplete", method = RequestMethod.POST)
@@ -195,23 +178,18 @@ public class OrderController {
 				Map<String, Object> paymentDetail = os.getPaymentDetail(noh);
 				System.out.println("paymentDetail 조회 - " + paymentDetail.toString());
 			}
-
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-
 		}
-		
-		
-
 	}
-	
+
 	@RequestMapping("jusoPopup")
 	public String findAddr() {
 		System.out.println("주소 검색");
 		return "/user/jusoPopup";
 	}
-	
+
 	@RequestMapping(value = "orderComplete", method = RequestMethod.POST)
 	public void orderComplete(OrderHistory oh, Model model, @RequestParam("products") List<String> productId) {
 
@@ -226,19 +204,14 @@ public class OrderController {
 			if (os.saveOrderHistory(oh)) {
 //				 결제랑 주문상세 조회
 				paymentDetail = os.getPaymentDetail(oh, productId);
-				
-
 				System.out.println("paymentDetail 조회 - " + paymentDetail.toString());
 			}
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		model.addAttribute("paymentDetail", paymentDetail);
-		
-		
 	}
 
 	@RequestMapping(value = "get/", method = RequestMethod.GET)

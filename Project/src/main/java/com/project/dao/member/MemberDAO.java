@@ -7,8 +7,10 @@ import javax.naming.NamingException;
 
 import org.springframework.stereotype.Repository;
 
+import com.project.vodto.BankTransfer;
 import com.project.vodto.Member;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.jmj.CancelDTO;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
@@ -17,6 +19,7 @@ import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
+import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
 
@@ -35,7 +38,7 @@ public interface MemberDAO {
 	List<MyPageOrderList> selectOrderHistory (String memberId, PagingInfo pi) throws SQLException, NamingException;
 	
 	// 주문건당 상품 총 갯수 가져오기
-	int selectOrderProductCount(List<Integer> orderNo) throws SQLException, NamingException;
+	int selectOrderProductCount(String orderNo) throws SQLException, NamingException;
 	
 	//이메일 중복검사
 	Member duplicateUserEmail(String tmpEmail) throws SQLException, NamingException;
@@ -110,7 +113,7 @@ public interface MemberDAO {
 	List<CouponHistory> getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException;
 	
 	// 무통장 주문 내역 가져오기
-	GetBankTransfer getBankTransfer(String orderNo) throws SQLException, NamingException;
+	GetBankTransfer getBankTransfer(String orderNo, String memberId) throws SQLException, NamingException;
 	
 	//주문상태별 조회
 	List<MyPageOrderList> selectOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword, PagingInfo pi) throws SQLException, NamingException;
@@ -120,6 +123,70 @@ public interface MemberDAO {
 	
 	//주문상태별로 주문갯수
 	int getTotalOrderStatusCnt(String memberId, GetOrderStatusSearchKeyword keyword) throws SQLException, NamingException;
+	
+	//취소할 주문 가져오기
+	DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId) throws SQLException, NamingException;
+	
+	//취소테이블 인서트
+	int insertCancelOrder(String productId, String reason,int totalRefundAmount, int detailedOrderId, String paymentMethod) throws SQLException, NamingException;
+	
+	//취소할경우 디테일 상품상태 업데이트
+	int updateDetailProductStatus(int detailedOrderId) throws SQLException, NamingException;
+	
+	//환불계좌 업데이트
+	int updateRefundAccount(String memberId, CancelDTO tmpCancel) throws SQLException, NamingException;
+	
+	//환불테이블 인서트
+	int insertRefund(String productId, CancelDTO tmpCancel, String paymentMethod, int amountAfterDiscount, int amountBeforeDiscount) throws SQLException, NamingException;
+	
+	//취소시 사용한 적립금이 있다면 적립금 로그 인서트
+	int insertRewardLog(String memberId, CancelDTO tmpCancel, int totalReward) throws SQLException, NamingException;
+	
+	//멤버 적립금 업데이트
+	int updateMemberReward(int addReward, String memberId) throws SQLException, NamingException;
+	
+	//환불 포인트가 있다면 포인트로그 인서트
+	int insertPointLog(String memberId, int refundPointUsed, String orderNo, int totalPoint) throws SQLException, NamingException;
+	
+	//적립금로그 balance가져오기
+	int selectRewardBalance(String memberId) throws SQLException, NamingException;
+	
+	//포인트로그 balance가져오기
+	int selectPointBalance(String memberId) throws SQLException, NamingException;
+	
+	//멤버 포인트 업데이트
+	int updateMemberPoint(int addPoint, String memberId) throws SQLException, NamingException;
+	
+	//환불 쿠폰이 있다면 쿠폰로그 업데이트
+	int updateCouponLog(int couponLogsSeq) throws SQLException, NamingException;
+	
+	//해당 주문의 사용쿠폰 갯수 가져오기
+	int selectCouponCnt(String memberId, String orderNo) throws SQLException, NamingException;
+	
+	//환불 쿠폰이 있다면 쿠폰갯수 업데이트
+	int updateMemeberTotalCoupon(int totalCouponCnt, String memberId) throws SQLException, NamingException;
+	
+	//해당유저의 무통장주문내역 가져오기
+	List<GetBankTransfer> selectBankTransfers(String memberId) throws SQLException, NamingException;
+	
+	//모든 상품의 상태가 취소라면 주문내역 배송상태 업데이트
+	int updatedeliveryStatus(String memberId, String orderNo) throws SQLException, NamingException;
+	
+	//반품 인서트
+	int insertReturn(String productId, ReturnOrder ro) throws SQLException, NamingException;
+	
+	//반품 회수지 인서트
+	int insertReturnShippingAddress(ReturnOrder ro) throws SQLException, NamingException;
+	
+	//반품 환불계좌 변경
+	int updateRefundAccount(String memberId, ReturnOrder ro) throws SQLException, NamingException;
+	
+	//반품시 디테일 상태 변경
+	int updateDetailProductStatusWithReturn(int detailedOrderId) throws SQLException, NamingException;
+
+	//모든 디테일 상태가 반품신청이라면 주문내역 배송상태 변경
+	int updatedeliveryStatusWithReturn(String memberId, String orderNo) throws SQLException, NamingException;
+	
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -134,9 +201,5 @@ public interface MemberDAO {
 	int insertShipping(ShippingAddrDTO shipping) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
 	
-	
-	
-	
 
-	
 }

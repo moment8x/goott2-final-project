@@ -278,8 +278,7 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.14.2</version>
 		</dependency>
-
-
+		
 		<!-- spring-security -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -308,6 +307,25 @@
 			<artifactId>spring-security-crypto</artifactId>
 			<version>4.2.3.RELEASE</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
+		<dependency>
+		    <groupId>com.sun.mail</groupId>
+		    <artifactId>javax.mail</artifactId>
+		    <version>1.5.5</version> <!-- 안정적인 버전으로 변경 -->
+		</dependency>
+		<dependency>
+		    <groupId>javax.activation</groupId>
+		    <artifactId>javax.activation-api</artifactId>
+		    <version>1.2.0</version>
+		</dependency>
+		
+
 
 	</dependencies>
 	<build>

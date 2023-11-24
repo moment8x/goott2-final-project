@@ -1,4 +1,7 @@
-package com.project.vodtokjy;
+package com.project.vodto.ksh;
+
+import java.sql.Timestamp;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,8 +14,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class LoginDTO1 {
-	private String username;
-	private String password;
-	private Boolean remember;
+public class OrderIdAndQty {
+	private List<String> productId;
+	private List<Integer> productQuantity;
+	
 }

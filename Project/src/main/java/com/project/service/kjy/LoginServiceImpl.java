@@ -1,10 +1,29 @@
 package com.project.service.kjy;
 
-import javax.inject.Inject;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
+
+import javax.inject.Inject;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
+
+import org.springframework.core.io.InputStreamSource;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.protobuf.compiler.PluginProtos.CodeGeneratorResponse.File;
 import com.project.dao.kjr.LoginDao;
 import com.project.vodto.kjy.LoginDTO;
 import com.project.vodto.kjy.Memberkjy;
@@ -13,9 +32,11 @@ import com.project.vodto.kjy.Memberkjy;
 public class LoginServiceImpl implements LoginService {
 	@Inject
 	private LoginDao loginDao;
+	@Inject
+	private JavaMailSender mailSender;
+	
 
 	@Override
-	@Transactional(rollbackFor = Exception.class)
 	public Memberkjy getLogin(LoginDTO loginDTO) throws Exception {
 		Memberkjy loginMember = loginDao.selectLogin(loginDTO);
 		if(loginMember != null) {
@@ -54,4 +75,43 @@ public class LoginServiceImpl implements LoginService {
 		
 		return result;
 	}
+	
+	public void emailAuth(String email, String userName) throws Exception {
+		System.out.println("!!111s");
+		// 먼저 db에서 해당 이메일을 쓰는 사람이 있는지 확인
+		Memberkjy findMember = loginDao.selectMemberByNameAndEmail(email, userName);
+		if(findMember != null) {
+			System.out.println("!!2222");
+			emailaSend(email);
+		}
+		
+	}
+	
+	public boolean emailaSend(String email) throws MessagingException{
+		System.out.println("!!333s");
+		String code = UUID.randomUUID().toString();
+		System.out.println("안녕???????");
+		System.setProperty("mail.debug", "true");
+		
+		boolean result = false;
+		
+		String emailTo = email;
+		String emailFrom = "game046@naver.com";
+		String subject = "DeerBooks 이메일 인증";
+		String message = "코드 " + code + " 를 이용하여 홈페이지에서 인증을 마치십시오";
+		
+		MimeMessage mimeMsg = mailSender.createMimeMessage();
+		MimeMessageHelper mimeHelper = new MimeMessageHelper(mimeMsg);
+		
+		mimeHelper.setFrom(emailFrom);
+		mimeHelper.setTo(emailTo);
+		mimeHelper.setSubject(subject);
+		mimeHelper.setText(message);
+		
+		mailSender.send(mimeMsg);
+		
+		result = true;
+		
+		return result;
+	} 
 }

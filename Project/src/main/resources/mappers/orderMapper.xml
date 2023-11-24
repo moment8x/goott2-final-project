@@ -55,12 +55,12 @@
 			<otherwise>
 				INSERT INTO detailed_order_items
 				(order_no, product_id,
-				product_price, product_quantity, product_status, product_order_no)
+				product_price, product_quantity, product_status, product_order_no, coupon_discount)
 				VALUES
 				<foreach item="item" index="index" collection="list"
 					separator=",">
 					(#{item.orderNo}, #{item.productId},
-					#{item.productPrice},#{item.productQuantity},#{item.productStatus},#{item.productOrderNo})
+					#{item.productPrice},#{item.productQuantity},#{item.productStatus},#{item.productOrderNo}, #{item.couponDiscount})
 				</foreach>
 			</otherwise>
 		</choose>
@@ -164,8 +164,7 @@
 		resultType="com.project.vodto.CouponInfos">
 		select l.member_id, l.coupon_number, l.obtained_date,
 		l.used_date,
-		l.expiration_date, c.coupon_name, c.discount_method, c.
-		discount_amount
+		l.expiration_date, c.coupon_name, c.discount_amount
 		from coupon_logs l inner join coupons c on
 		l.coupon_number =
 		c.coupon_number where member_id = #{memberId} and

@@ -1,21 +1,17 @@
-package com.project.vodto.ksh;
-
-import java.sql.Timestamp;
-import java.util.List;
+package com.project.vodto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @ToString
-public class OrderInfo2 {
-	private List<String> productId;
-	private List<Integer> productQuantity;
-	
+public class InquiryFile {
+	private int customerUfSeq;
+	private int postNo;
+	private int uploadFilesSeq;
 }

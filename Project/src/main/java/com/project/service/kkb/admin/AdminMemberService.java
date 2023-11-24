@@ -1,14 +1,9 @@
 package com.project.service.kkb.admin;
 
-import java.util.List;
 import java.util.Map;
 
-import com.project.vodto.kkb.MemberBasicInfo;
 import com.project.vodto.kkb.MemberCondition;
 import com.project.vodto.kkb.MemberParam;
-import com.project.vodto.kkb.MemberRecentInquiry;
-import com.project.vodto.kkb.MemberRecentOrder;
-import com.project.vodto.kkb.MemberRecentPost;
 
 public interface AdminMemberService {
 	

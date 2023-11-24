@@ -14,15 +14,18 @@ import lombok.ToString;
 @Setter
 @ToString
 public class CustomerInquiry {
-	private int post_no;
+	private int postNo;
 	private String author;
-	private Timestamp created_date;
+	private Timestamp createdDate;
 	private String title;
 	private String content;
-	private int file;
-	private String answer_status;
+	private String answerStatus;
 	private int ref;
 	private int step;
-	private int ref_order;
-	private Timestamp answer_date;
+	private int refOrder;
+	private Timestamp answerDate;
+	private String inquiryType;
+	private String phoneNumber;
+	private String email;
+	private String orderNo;
 }
