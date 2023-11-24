@@ -4,11 +4,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +38,7 @@ import com.project.service.kjy.ListService;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.Product;
 import com.project.vodto.kjy.Memberkjy;
+import com.project.vodto.kjy.NaverBooks;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
 import com.project.vodto.kjy.SearchVO;
@@ -56,7 +57,7 @@ public class ListController {
 	public String goCategory(Model model, @PathVariable String lang) {
 		// 리스트 카테고리 가져오기 + 현재 페이지 정보
 		try {
-			List<ProductCategories> lst = lService.getProductCategory(lang+"/");
+			List<ProductCategories> lst = lService.getProductCategory(lang);
 			ProductCategories pd = lService.getCategoryInfo(lang);
 			System.out.println("pd"+pd +"lst"+lst);
 			List<Products> bestSellers = lService.getProductsBsetSeller(lang);
@@ -72,19 +73,20 @@ public class ListController {
 		return "list/category";
 	}
 	
-	@RequestMapping("/categoryList/{lang}/{key}")
-	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page,@RequestParam(value="active", defaultValue = "grid-btn d-xxl-inline-block d-none") String active, @PathVariable(name="lang") String lang, HttpServletRequest request) {
+	@RequestMapping("/categoryList/{key}")
+	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page,@RequestParam(value="active", defaultValue = "grid-btn d-xxl-inline-block d-none") String active, HttpServletRequest request) {
 		this.page = page;
-		String categoryKey = lang + "/" + key; 
 		
+		String lang = key.substring(0, 3);
+		System.out.println("랭" + lang);
 		
 		// 상위 분류 페이지 + 현재 페이지 정보
 		try {
 			ProductCategories categoryLanguage = lService.getCategoryInfo(lang);
-			ProductCategories nowCategory = lService.getCategoryInfo(categoryKey);;
+			ProductCategories nowCategory = lService.getCategoryInfo(key);
 			model.addAttribute("categoryLang", categoryLanguage);
 			model.addAttribute("nowCategory", nowCategory);
-			model.addAttribute("key", categoryKey);
+			model.addAttribute("key", key);
 			model.addAttribute("page", page);
 			model.addAttribute("active", active);
 		} catch (Exception e1) {
@@ -94,7 +96,7 @@ public class ListController {
 		
 		// 카테고리 목록 가져오기
 		try {
-			List<ProductCategories> lstPC= lService.getProductCategory(categoryKey);
+			List<ProductCategories> lstPC= lService.getProductCategory(key);
 			if (lstPC != null) { 
 				model.addAttribute("productCategory", lstPC);
 			}
@@ -105,9 +107,8 @@ public class ListController {
 		
 		// 상품 가져오기
 		try {
-			Map<String, Object> map = lService.getProductForList(categoryKey, page, sortBy);
+			Map<String, Object> map = lService.getProductForList(key, page, sortBy);
 			List<Products> lst = (List<Products>)map.get("list_product");
-			System.out.println("리스트는"+lst);
 			PagingInfo paging = (PagingInfo)map.get("paging_info");
 			model.addAttribute("products", lst);
 			model.addAttribute("paging_info", paging);
@@ -171,7 +172,7 @@ public class ListController {
 		if("notSearch".equals(val)) {
 			model.addAttribute("products", val);
 		} else {
-			naverBookSearch(val);
+			Map<String, Object> naverMap = naverBookSearch(val);
 			try {
 				// 검색에 해당하는 상품 가져오기
 				Map<String, Object> map = lService.searchProducts(val, sort, page);
@@ -185,6 +186,7 @@ public class ListController {
 				model.addAttribute("categories", listCategoryies);
 				model.addAttribute("lang", listLangInt);
 				model.addAttribute("paging", paging);
+				model.addAllAttributes(naverMap);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -193,7 +195,7 @@ public class ListController {
 		return model;
 	}
 	
-	private void naverBookSearch(String val) {
+	private Map<String, Object> naverBookSearch(String val) {
 		String baseUrl = "https://openapi.naver.com/v1/search/book.json";
 		// 검색어
 		String query = "?query=val";
@@ -201,6 +203,8 @@ public class ListController {
 		String display = "&display=10";
 		String sort = "&sort=sim";
 		String bookUrl = baseUrl + query + display + sort;
+		List<NaverBooks> navBooksList = new ArrayList<>();
+		Map<String, Object> result = new HashMap<String, Object>();
 		try {
 			URLEncoder.encode(bookUrl, "UTF-8");
 			URL url = new URL(bookUrl);
@@ -209,6 +213,7 @@ public class ListController {
 			conn.setRequestProperty("X-Naver-Client-Id", "QvibsLi5PSZRGzsKS_Zp");
 			conn.setRequestProperty("X-Naver-Client-Secret", "o6h8h8IDEQ");
 			int responseCode = conn.getResponseCode();
+			
 			
 			if(responseCode == 200) {
 				 BufferedReader bookReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -220,14 +225,31 @@ public class ListController {
                  bookReader.close(); 
                  
                ObjectMapper objectMapper = new ObjectMapper();
-               JsonNode jsonMapper = new ObjectMapper().readTree(bookResponse.toString());
-//               objectMapper.treeToValue(jsonMapper, null);
+               JsonNode jsonMapper = objectMapper.readTree(bookResponse.toString());
+               System.out.println("네이버꺼일껄" + bookResponse.toString());
+               JsonNode jsonItems = jsonMapper.get("items");
+               String start = jsonMapper.get("start").asText();
+               String displayString = jsonMapper.get("display").asText();
+               String total = jsonMapper.get("total").asText();
+               result.put("start", start);
+               result.put("display", displayString);
+               result.put("total", total);
+              
+               
+               for(JsonNode jsonItem : jsonItems) {
+            	NaverBooks book = objectMapper.readValue(jsonItem.toString(), NaverBooks.class);
+            	navBooksList.add(book);
+               }
 			}
+			System.out.println("네이버꺼 : " + navBooksList);
+			result.put("naverList", navBooksList);
+			
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return result;
 		
 	}
 	

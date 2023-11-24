@@ -8,6 +8,7 @@ import com.project.vodto.PagingInfo;
 import com.project.vodto.ProductCategory;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
+import com.project.vodto.kjy.ProductsForList;
 import com.project.vodto.kjy.SearchVO;
 
 public interface ListDao {
@@ -29,7 +30,7 @@ public interface ListDao {
 	// 페이징을 위한 전체 상품 개수 구하기
 	public int selectProductCount(String key) throws Exception;
 	
-	// 카테고리에 맞는 베스트셀러 목록 가져오기
+	// (카테고리에 맞는) 베스트셀러 목록 가져오기 (key 가 없다면 null)
 	public List<Products> selectBsetSeller(String key) throws Exception;
 	
 	// id값으로 상품 하나의 정보 가져오기
@@ -44,4 +45,12 @@ public interface ListDao {
 	public List<Products> selectProductsWithFilter(String val, List<String> checkedList,  List<String> checkedLang, String sort, PagingInfo paging) throws Exception;
 	// 검색된 상품 총 갯수 가져오기
 	public int selectSearchProductCount(String val, List<String> checkedList, List<String> checkedLang) throws Exception;
+	// 최신 도서 가져오기
+	public List<ProductsForList> selectNewProducts() throws Exception;
+	// 많이 팔린 상품순
+	public List<ProductsForList> selectProductOrderBySellings() throws Exception;
+	// 카트에 많이 담긴 상품순
+	public List<ProductsForList> selectProductOrderByCart() throws Exception;
+	// 평점 순
+	public List<ProductsForList> selectProductOrderByRating() throws Exception;
 }

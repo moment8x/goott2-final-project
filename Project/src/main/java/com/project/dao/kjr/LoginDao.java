@@ -13,4 +13,6 @@ public interface LoginDao {
 	public Memberkjy selectRememberCheck(String member_id, String key) throws Exception;
 	
 	public Memberkjy selectMemberById(String id) throws Exception;
+	
+	public Memberkjy selectMemberByNameAndEmail(String email, String userName) throws Exception;
 }

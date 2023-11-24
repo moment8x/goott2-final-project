@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +33,7 @@ import com.project.interceptor.kjy.RememberInterceptor;
 import com.project.service.kjy.LoginService;
 import com.project.vodto.kjy.LoginDTO;
 import com.project.vodto.kjy.Memberkjy;
+import com.project.vodto.kjy.NaverRegisterInfo;
 
 
 @Controller
@@ -60,21 +62,25 @@ public class LoginController {
 		try {
 			Memberkjy loginMember = loginService.getLogin(loginDTO);
 			if(loginMember != null) {
-					request.getSession().setAttribute("loginMember", loginMember);
-				model.addObject("status", "로그인 성공");
+				request.getSession().setAttribute("loginMember", loginMember);
+				model.addObject("loginStatus", "loginOk");
 				if(beforeUri != null) {
-					model.setViewName("redirect:"+beforeUri);
+					if(!"/login/".equals(beforeUri)) {
+						model.setViewName("redirect:"+beforeUri);
+					} else {
+						model.setViewName("/index");
+					}
 				} else {
 					model.setViewName("/login/login");
 				}
 			} else {
-				model.addObject("status", "로그인 실패");
+				model.addObject("loginStatus", "loginError");
 				model.setViewName("/login/login");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			model.addObject("status", "로그인 도중 에러");
+			model.addObject("loginStatus", "loginError");
 			model.setViewName("/login/login");
 		}
 		
@@ -195,17 +201,17 @@ public class LoginController {
 	                    userInfoReader.close();
 	                    
 	                    JsonNode userInfoJson = objectMapper.readTree(userInfoResponse.toString());
-	                    String naverId = userInfoJson.get("response").get("id").asText();
-//	                    String naverUserInfo = userInfoJson.get("response").asText();
 	                    JsonNode jsonUserInfo = userInfoJson.get("response");
+	                    System.out.println("얍얍"+jsonUserInfo);
 	                    
-	                    System.out.println("user : " + userInfoResponse.toString());
+	                    NaverRegisterInfo naverInfo = objectMapper.treeToValue(jsonUserInfo, NaverRegisterInfo.class);
+	                    System.out.println("네이버 정보임 : " + naverInfo);
 	                    
-	                    Memberkjy naverLoginUser = loginService.getMemberById(naverId);
+	                    Memberkjy naverLoginUser = loginService.getMemberById(naverInfo.getId());
 	         
 	                    if(naverLoginUser == null) {
-	                    	model.setViewName("/register/register");
-	                    	model.addObject("userInfo", jsonUserInfo);
+	                    	model.setViewName("foward:/register/snsRegister");
+	                    	model.addObject("userInfo", naverInfo);
 	                    	return model;
 	                    } else if(beforeUri != null) {
 	                    	request.getSession().setAttribute("loginMember", naverLoginUser);
@@ -245,16 +251,16 @@ public class LoginController {
 	                        userInfoReader.close();
 	                        
 	                        JsonNode userInfoJson = objectMapper.readTree(userInfoResponse.toString());
-		                    String naverId = userInfoJson.get("response").get("id").asText();
-		                    String naverUserInfo = userInfoJson.get("response").asText();
+		                    JsonNode naverUserInfo = userInfoJson.get("response");
 		                    
-		                    System.out.println("user : " + userInfoResponse.toString());
+		                    NaverRegisterInfo naverInfo = objectMapper.treeToValue(naverUserInfo, NaverRegisterInfo.class);
+		                    System.out.println("네이버 정보임 : " + naverInfo);
 		                    
-		                    Memberkjy naverLoginUser = loginService.getMemberById(naverId);
+		                    Memberkjy naverLoginUser = loginService.getMemberById(naverInfo.getId());
 		                    
 		                    if(naverLoginUser == null) {
-		                    	model.setViewName("/register/register");
-		                    	model.addObject("userInfo", naverUserInfo);
+		                    	model.setViewName("forward : /register/snsRegister");
+		                    	model.addObject("userInfo", naverInfo);
 		                    	return model;
 		                    } else {
 		                    	request.getSession().setAttribute("loginMember", naverLoginUser);
@@ -541,10 +547,22 @@ public class LoginController {
 		return result;
 	}
 	
-	@RequestMapping("/login/forgot")
-	public Model forgot(@RequestParam("status") String status, Model model) {
+	@RequestMapping("/forgot")
+	public Model forgot(@RequestParam(value="statusValue",defaultValue = "id") String status, Model model) {
 		model.addAttribute("status", status);
 		
 		return model;
+	}
+	
+	
+	@RequestMapping(value="/auth", method = RequestMethod.POST)
+	public String authController(@RequestParam("userName")String userName, @RequestParam("email")String email) {
+	try {
+		loginService.emailaSend(email);
+	} catch (MessagingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+		return "/login/forgot";
 	}
 }

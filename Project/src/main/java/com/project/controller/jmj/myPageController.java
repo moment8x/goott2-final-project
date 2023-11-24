@@ -157,6 +157,7 @@ public class myPageController {
 		
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!" + member);
 		String memberId = member.getMemberId();
 		
 		Object addrSeqObj = map.get("addrSeq");

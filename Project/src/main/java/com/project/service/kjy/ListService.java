@@ -27,4 +27,6 @@ public interface ListService {
 	public List<Integer> searchProductslang(String val) throws Exception;
 	// 검색한 상품 가져오기 (필터가 있을 때)
 	public Map<String, Object> searchProductsWithFilter(String val, List<String> checkedList, List<String> checkedLang, String sort, int page) throws Exception;
+	// 베스트 셀러, 많이 구매한 상품 순, 리뷰 순, 최신 출판순
+	public Map<String, Object> indexSlideList() throws Exception;
 }

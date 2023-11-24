@@ -36,6 +36,7 @@ public class RememberInterceptor extends HandlerInterceptorAdapter {
 							Memberkjy loginMember = loginService.getRememberCheck(member_id, key);
 							System.out.println("loginMember : " + loginMember);
 							if(loginMember != null) {
+								System.out.println("1");
 								request.getSession().setAttribute("loginMember", loginMember);
 								System.out.println("자동로그인!!");
 								response.sendRedirect("/");

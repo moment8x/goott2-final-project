@@ -25,6 +25,7 @@ import com.project.service.kjs.upload.UploadFileService;
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
 import com.project.vodto.UploadFiles;
+import com.project.vodto.kjy.NaverRegisterInfo;
 
 
 @Controller
@@ -133,5 +134,13 @@ public class RegisterController {
 		}
 		
 		System.out.println("======= 회원가입 컨트롤러 끝 =======");
+	}
+	
+	@RequestMapping("snsRegister")
+	public void snsRegister(@RequestParam("uerInfo") NaverRegisterInfo naverInfo) {
+		System.out.println("================스타트=================");
+		System.out.println("왔다 감 영민♥승준 " + naverInfo);
+		
+		System.out.println("================끝났음=================");
 	}
 }
