@@ -629,7 +629,7 @@ textarea {
 	
 	<!-- Product Left Sidebar Start -->
 	<section class="product-section">
-		<div class="container-fluid-lg">
+		<div class="container-fluid-lg container-main" style="padding: 0 !important;">
 			<div class="row">
 				<div class="col-xxl-9 col-xl-8 col-lg-7 wow fadeInUp">
 					<div class="row g-4">
@@ -637,78 +637,28 @@ textarea {
 							<div class="product-left-box">
 								<div class="row g-2">
 									<div class="col-xxl-10 col-lg-12 col-md-10 order-xxl-2 order-lg-1 order-md-2">
-										<!-- 플립 카드 or 단일? 이미지 -->
-										<c:choose>
-											<c:when test="${productImages.size() > 2}">
-												<!-- 이미지 슬라이더 추가 -->
-												<div class="single-item">
-													<div class="flip-card">
-														<div class="flip-card-inner">
-															<div class="flip-card-front">
-																<div class="product-image">
-																	<img src="${productImages[0].productImage}"
-																		id="img-1"
-																		data-zoom-image="/resources/assets/images/product/category/1.jpg"
-																		class="img-fluid image_zoom_cls-0 blur-up lazyload"
-																		alt="${product.productName}">
-			      												</div>
-			      											</div>
-			      											<div class="flip-card-back">
-			      												<img src="${productImages[2].productImage}"
-			      													id="img-1"
-			      													data-zoom-image="/resources/assets/images/product/category/1.jpg"
-			      													class="img-fluid image_zoom_cls-0 blur-up lazyload"
-			      													alt="${product.productName}">
-			      											</div>
-			      										</div>
-			      									</div>
-			      									<div>
-			      										<div class="product-image">
-			      											<img src="${productImages[1].productImage}" alt="${product.productName }">
-			      										</div>
-			      									</div>
-		      									</div>
-											</c:when>
-											<c:when test="${productImages.size() == 2 }">
-												<div class="flip-card">
-													<div class="flip-card-inner">
-														<div class="flip-card-front">
+										<div class="single-item">
+											<c:choose>
+												<c:when test="${productImages.size() > 0}">
+													<!-- 이미지 슬라이더 추가 -->
+														<c:forEach var="productImage" items="${productImages }">
 															<div class="product-image">
-																<img src="${productImages[0].productImage}"
-																	id="img-1"
-																	data-zoom-image="/resources/assets/images/product/category/1.jpg"
-																	class="img-fluid image_zoom_cls-0 blur-up lazyload"
-																	alt="${product.productName}">
-		      												</div>
-		      											</div>
-		      											<div class="flip-card-back">
-		      												<img src="${productImages[1].productImage}"
-		      													id="img-1"
-		      													data-zoom-image="/resources/assets/images/product/category/1.jpg"
-		      													class="img-fluid image_zoom_cls-0 blur-up lazyload"
-		      													alt="${product.productName}">
-		      											</div>
-		      										</div>
-		      									</div>
-											</c:when>
-											<c:when test="${productImages.size() == 1 }">
-												<div class="product-image">
-													<img src="${productImages[0].productImage }" id="img-1"
-														data-zoom-image="/resources/assets/images/product/category/1.jpg"
-														class="img-fluid image_zoom_cls-0 blur-up lazyload"
-														alt="${product.productName}">
-												</div>
-											</c:when>
-											<c:otherwise>
-												<div class="product-image">
-													<img src="https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg"
-														id="img-1"
-														data-zoom-image="/resources/assets/images/product/category/1.jpg"
-														class="img-fluid image_zoom_cls-0 blur-up lazyload"
-														alt="${product.productName}">
-												</div>
-											</c:otherwise>
-										</c:choose>
+				      											<img src="${productImage.productImage}" alt="${product.productName }">
+				      										</div>
+														</c:forEach>
+												</c:when>
+												
+												<c:otherwise>
+													<div class="product-image">
+														<img src="https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg"
+															id="img-1"
+															data-zoom-image="/resources/assets/images/product/category/1.jpg"
+															class="img-fluid image_zoom_cls-0 blur-up lazyload"
+															alt="${product.productName}">
+													</div>
+												</c:otherwise>
+											</c:choose>
+		      							</div>
       								</div>
       							</div>
       						</div>
