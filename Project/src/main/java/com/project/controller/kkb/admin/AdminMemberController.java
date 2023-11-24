@@ -2,6 +2,8 @@ package com.project.controller.kkb.admin;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,12 +17,16 @@ import com.project.service.kkb.admin.AdminBoardService;
 import com.project.service.kkb.admin.AdminCouponService;
 import com.project.service.kkb.admin.AdminInquiryService;
 import com.project.service.kkb.admin.AdminMemberService;
+import com.project.service.kkb.admin.AdminMemoService;
 import com.project.service.kkb.admin.AdminOrderService;
 import com.project.service.kkb.admin.AdminPointService;
 import com.project.service.kkb.admin.AdminRewardService;
+import com.project.service.kkb.admin.AdminShoppingCartService;
 import com.project.vodto.kkb.InquiryCondition;
 import com.project.vodto.kkb.MemberCondition;
 import com.project.vodto.kkb.MemberParam;
+import com.project.vodto.kkb.MemoCondition;
+import com.project.vodto.kkb.MemoInfoCondition;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.PostCondition;
 
@@ -39,6 +45,8 @@ public class AdminMemberController {
 	private final AdminRewardService adminRewardService;
 	private final AdminPointService adminPointService;
 	private final AdminCouponService adminCouponService;
+	private final AdminShoppingCartService adminShoppingCartService;
+	private final AdminMemoService adminMemoService;
 	
 	/* 회원 수 변경 시 이벤트 발행(test) */
 	@GetMapping("/test")
@@ -65,56 +73,74 @@ public class AdminMemberController {
 	}
 	
 	/* CRM 회원 상세정보 */
-	@GetMapping("/detail/{memberId}")
+	@GetMapping("/{memberId}/detail")
 	public Map<String, Object> checkMemberDetail(@PathVariable("memberId") String memberId) throws Exception {
 		return adminMemberService.getMemberDetailInfo(memberId);
 	}
 	
 	/* CRM 회원 상세정보 수정 */
-	@PutMapping("/detail/update")
+	@PutMapping("/{memberId}/update")
 	public Map<String, Object> modifyMemberDetail(@RequestBody MemberParam member) throws Exception {
 		return adminMemberService.editMemberDetailInfo(member);
 	}
 	
 	/* CRM 전체 주문 조회 */
-	@PostMapping("/detail/search")
+	@PostMapping("/{memberId}/search")
 	public Map<String, Object> searchOrderInfo(@RequestBody OrderCondition orderCond) throws Exception {	
 		return adminOrderService.getOrderInfo(orderCond);
 	}
 	
 	/* CRM 게시물 정보 */
-	@PostMapping("/detail/board")
+	@PostMapping("/{memberId}/board")
 	public Map<String, Object> searchPostInfo(@RequestBody PostCondition postCond) throws Exception {
 		return adminBoardService.getPostInfo(postCond);
 	}
 	
 	/* CRM 1:1 문의 정보 */
-	@PostMapping("/detail/inquiry")
+	@PostMapping("/{memberId}/inquiry")
 	public Map<String, Object> searchInquiryInfo(@RequestBody InquiryCondition inquiryCond) throws Exception {
 		return adminInquiryService.getInquiryInfo(inquiryCond);
 	}
 	
 	/* CRM [적립금]/포인트/쿠폰 */
-	@GetMapping("/detail/reward/{memberId}")
+	@GetMapping("/{memberId}/reward")
 	public Map<String, Object> checkRewardInfo(@PathVariable("memberId") String memberId) throws Exception {
 		return adminRewardService.getRewardInfo(memberId);
 	}
 	
 	/* CRM 적립금/[포인트]/쿠폰 */
-	@GetMapping("/detail/point/{memberId}")
+	@GetMapping("/{memberId}/point")
 	public Map<String, Object> checkPointInfo(@PathVariable("memberId") String memberId) throws Exception {
 		return adminPointService.getPointInfo(memberId);
 	}
 	
 	/* CRM 적립금/포인트/[쿠폰] */
-	@GetMapping("/detail/coupon/{memberId}")
+	@GetMapping("/{memberId}/coupon")
 	public Map<String, Object> checkCouponInfo(@PathVariable("memberId") String memberId) throws Exception {
 		return adminCouponService.getCouponInfo(memberId);
 	}
 	
 	/* CRM 적립금/포인트/[쿠폰]  - 쿠폰 적용 카테고리*/
-	@GetMapping("/detail/category/{couponNumber}")
+	@GetMapping("/{memberId}/category/{couponNumber}")
 	public Map<String, Object> checkAppliedCategory(@PathVariable("couponNumber") String couponNumber) throws Exception {
 		return adminCouponService.getCategoryByCouponNo(couponNumber);
+	}
+	
+	/* CRM 장바구니 정보 */
+	@GetMapping("/{memberId}/cart")
+	public Map<String, Object> checkCartInfo(@PathVariable("memberId") String memberId) throws Exception {
+		return adminShoppingCartService.getCartInfoById(memberId);
+	}
+	
+	/* CRM 회원 메모 검색 */
+	@PostMapping("/{memberId}/memo")
+	public Map<String, Object> searchMemoInfo(@RequestBody MemoInfoCondition memoInfoCond) throws Exception {
+		return adminMemoService.getMemoById(memoInfoCond);
+	}
+	
+	/* CRM 회원 메모 작성 */
+	@PostMapping("/{memberId}/memo/write")
+	public void addMemberMemo(@RequestBody MemoCondition memoCond, HttpServletRequest req) throws Exception {
+		adminMemoService.addMemberMemo(memoCond, req);
 	}
 }

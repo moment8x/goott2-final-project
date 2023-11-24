@@ -111,37 +111,37 @@ public class PaymentController {
 			// member 다시 조회
 			Memberkjy memberInfo = os.getMemberInfo(member.getMemberId());
 
-			if (os.compareAmount(pd, itemList, memberInfo)) {
-
-				// 결제 테이블, 주문 상세 테이블, 무통장입금일 시 무통장입금 또한 저장
-				// 포인트, 적립금, 쿠폰, 멤버, 상품 재고 update
-				if (os.savePayment(pd, itemList, memberInfo)) {
-					result = new ResponseEntity<Map<String, Object>>(paymentDetail, HttpStatus.OK); // 아작스로 돌아가서 쓸모없음
-					paymentDetail.put("itemList", itemList);
-					paymentDetail.put("pd", pd);
-					if (pd.getPaymentNumber().contains("bkt")) {
-						MessageDTO messageDto = new MessageDTO();
-						messageDto.setTo(pd.getPhoneNumber());
-						SmsResponseDto responseDto = smsService.sendSms(messageDto);
-						System.out.println(responseDto.getStatusCode());
-
-					}
-
-				} else {
-					result = new ResponseEntity<>(HttpStatus.CONFLICT);
+			// 결제 테이블, 주문 상세 테이블, 무통장입금일 시 무통장입금 또한 저장
+			// 포인트, 적립금, 쿠폰, 멤버, 상품 재고 update
+			if (os.savePayment(pd, itemList, memberInfo)) {
+				result = new ResponseEntity<Map<String, Object>>(paymentDetail, HttpStatus.OK); // 아작스로 돌아가서 쓸모없음
+				paymentDetail.put("itemList", itemList);
+				paymentDetail.put("pd", pd);
+				if (pd.getPaymentNumber().contains("bkt")) {
+					MessageDTO messageDto = new MessageDTO();
+					messageDto.setTo(pd.getPhoneNumber());
+					SmsResponseDto responseDto = smsService.sendSms(messageDto);
+					System.out.println(responseDto.getStatusCode());
+					
 				}
-
+				
 			} else {
-				CancelData cancelData = new CancelData(pd.getImpUid(), true,
-						new BigDecimal(pd.getActualPaymentAmount()));
-				cancelData.setChecksum(new BigDecimal(pd.getActualPaymentAmount()));
-				cancelData.setReason("사후검증 실패");
-				if (api.cancelPaymentByImpUid(cancelData).getCode() == 0) {
-					System.out.println("사후검증 실패로 인한 취소 완료");
-					result = new ResponseEntity<>(HttpStatus.CONFLICT);
-				}
-				;
+				result = new ResponseEntity<>(HttpStatus.CONFLICT);
 			}
+//			if (os.compareAmount(pd, itemList, memberInfo)) {
+//
+//
+//			} else {
+//				CancelData cancelData = new CancelData(pd.getImpUid(), true,
+//						new BigDecimal(pd.getActualPaymentAmount()));
+//				cancelData.setChecksum(new BigDecimal(pd.getActualPaymentAmount()));
+//				cancelData.setReason("사후검증 실패");
+//				if (api.cancelPaymentByImpUid(cancelData).getCode() == 0) {
+//					System.out.println("사후검증 실패로 인한 취소 완료");
+//					result = new ResponseEntity<>(HttpStatus.CONFLICT);
+//				}
+//				;
+//			}
 		} catch (Exception e) {
 			result = new ResponseEntity<>(HttpStatus.CONFLICT);
 			e.printStackTrace();

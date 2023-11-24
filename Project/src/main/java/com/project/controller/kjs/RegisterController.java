@@ -83,7 +83,8 @@ public class RegisterController {
 			System.out.println("zipCode : " + member.getZipCode());
 			System.out.println("address : " + member.getAddress());
 			System.out.println("detailAddress : " + member.getDetailedAddress());
-			if (fileList.size() > 0) {
+			
+			if (fileList != null) {
 				mService.insertMember(member, fileList.get(0));
 			} else {
 				mService.insertMember(member, null);
