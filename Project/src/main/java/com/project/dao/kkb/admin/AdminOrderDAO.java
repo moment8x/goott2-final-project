@@ -8,6 +8,9 @@ import com.project.vodto.kkb.DepositProductResponse;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
+import com.project.vodto.kkb.ReadyCondition;
+import com.project.vodto.kkb.ReadyNoResponse;
+import com.project.vodto.kkb.ReadyProductResponse;
 
 public interface AdminOrderDAO {
 	
@@ -22,5 +25,11 @@ public interface AdminOrderDAO {
 
 	/* 입금 전 관리 (품목주문별) */
 	List<DepositProductResponse> findDepositProductByInfo(DepositCondition depositCond) throws Exception;
+	
+	/* 배송 준비중 관리 (주문번호별) */
+	List<ReadyNoResponse> findReadyByInfo(ReadyCondition readyCond) throws Exception;
+	
+	/* 배송 준비중 관리 (상품별) */
+	List<ReadyProductResponse> findReadyProductByInfo(ReadyCondition readyCond) throws Exception;
 	
 }

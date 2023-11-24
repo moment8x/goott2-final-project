@@ -32,6 +32,8 @@
 		<typeAlias type="com.project.vodto.kkb.CartResponse" alias="CartResponse" />
 		<typeAlias type="com.project.vodto.kkb.DepositNoResponse" alias="DepositNoResponse" />
 		<typeAlias type="com.project.vodto.kkb.DepositProductResponse" alias="DepositProductResponse" />
+		<typeAlias type="com.project.vodto.kkb.ReadyNoResponse" alias="ReadyNoResponse" />
+		<typeAlias type="com.project.vodto.kkb.ReadyProductResponse" alias="ReadyProductResponse" />
 		<typeAlias type="com.project.vodto.Product" alias="product" />
 		<typeAlias type="com.project.vodto.Board" alias="Board" />
 	</typeAliases>

@@ -11,6 +11,9 @@ import com.project.vodto.kkb.DepositProductResponse;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
+import com.project.vodto.kkb.ReadyCondition;
+import com.project.vodto.kkb.ReadyNoResponse;
+import com.project.vodto.kkb.ReadyProductResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,6 +42,16 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	@Override
 	public List<DepositProductResponse> findDepositProductByInfo(DepositCondition depositCond) throws Exception {
 		return ses.selectList(ns + ".selectDepositProductInfo", depositCond);
+	}
+
+	@Override
+	public List<ReadyNoResponse> findReadyByInfo(ReadyCondition readyCond) throws Exception {
+		return ses.selectList(ns + ".selectReadyNoInfo", readyCond);
+	}
+
+	@Override
+	public List<ReadyProductResponse> findReadyProductByInfo(ReadyCondition readyCond) throws Exception {
+		return ses.selectList(ns + ".selectReadyProductInfo", readyCond);
 	}
 
 }

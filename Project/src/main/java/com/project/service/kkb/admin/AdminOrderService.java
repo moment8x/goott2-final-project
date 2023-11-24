@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.project.vodto.kkb.DepositCondition;
 import com.project.vodto.kkb.OrderCondition;
+import com.project.vodto.kkb.ReadyCondition;
 
 public interface AdminOrderService {
 	 
@@ -12,5 +13,8 @@ public interface AdminOrderService {
 
 	/* 입금 전 관리 */
 	Map<String, Object> getDepositInfo(DepositCondition depositCond) throws Exception;
+
+	/* 배송 준비중 관리 */
+	Map<String, Object> getReadyInfo(ReadyCondition readyCond) throws Exception;
 
 }

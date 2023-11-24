@@ -16,6 +16,10 @@ import com.project.vodto.kkb.OrderByProduct;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
+import com.project.vodto.kkb.ReadyCondition;
+import com.project.vodto.kkb.ReadyInfoByProduct;
+import com.project.vodto.kkb.ReadyNoResponse;
+import com.project.vodto.kkb.ReadyProductResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +38,32 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		Map<String, Object> result = new HashMap<>();
 		result.put("orderNoList", orderList);
 		result.put("productList", productList);
+		
+		return result;
+	}
+	
+	@Override
+	public Map<String, Object> getDepositInfo(DepositCondition depositCond) throws Exception {
+		
+		List<DepositNoResponse> depositOrderList = adminOrderRepository.findDepositByInfo(depositCond);
+		List<DepositByProduct> depositProductList = getDepositByProduct(depositCond);
+	
+		Map<String, Object> result = new HashMap<>();
+		result.put("depositOrderList", depositOrderList);
+		result.put("depositProductList", depositProductList);
+		
+		return result;
+	}
+	
+	@Override
+	public Map<String, Object> getReadyInfo(ReadyCondition readyCond) throws Exception {
+		
+		List<ReadyInfoByProduct> readyOrderList = getReadyByProduct(readyCond);
+		List<ReadyProductResponse> readyProductList = adminOrderRepository.findReadyProductByInfo(readyCond);
+	
+		Map<String, Object> result = new HashMap<>();
+		result.put("readyOrderList", readyOrderList);
+		result.put("readyProductList", readyProductList);
 		
 		return result;
 	}
@@ -71,19 +101,6 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	            .collect(Collectors.toList());
 	}
 
-	@Override
-	public Map<String, Object> getDepositInfo(DepositCondition depositCond) throws Exception {
-		
-		List<DepositNoResponse> depositOrderList = adminOrderRepository.findDepositByInfo(depositCond);
-		List<DepositByProduct> depositProductList = getDepositByProduct(depositCond);
-	
-		Map<String, Object> result = new HashMap<>();
-		result.put("depositOrderList", depositOrderList);
-		result.put("depositProductList", depositProductList);
-		
-		return result;
-	}
-	
 	private List<DepositByProduct> getDepositByProduct(DepositCondition depositCond) throws Exception {
 		    
 			List<DepositProductResponse> list = adminOrderRepository.findDepositProductByInfo(depositCond);
@@ -112,6 +129,83 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		                );
 		            })
 		            .collect(Collectors.toList());
-		}
+	}
+	
+	private List<ReadyInfoByProduct> getReadyByProduct(ReadyCondition readyCond) throws Exception {
+	    
+		List<ReadyNoResponse> list = adminOrderRepository.findReadyByInfo(readyCond);
+
+	    return list.stream()
+	            .collect(Collectors.groupingBy(ReadyNoResponse::getOrderNo))
+	            .entrySet().stream()
+	            .map(order -> {
+	                String orderNo = order.getKey();
+	                List<ReadyInfoProduct> orders = order.getValue()
+	                        .stream()
+	                        .map(ReadyInfoProduct::from)
+	                        .collect(Collectors.toList());
+
+	                ReadyNoResponse info = order.getValue().get(0);
+
+	                return new ReadyInfoByProduct(
+	                        info.getOrderTime(),
+	                        info.getPaymentTime(),
+	                        orderNo,
+	                        info.getName(),
+	                        info.getMemberId(),
+	                        info.getActualPaymentAmount(),
+	                        info.getPaymentMethod(),
+	                        info.getDeliveryMessage(),
+	                        orders
+	                );
+	            })
+	            .collect(Collectors.toList());
+	}
+
+	
+	
+	
+//	private List<OrderByProduct> getOrderByProduct (OrderCondition orderCond) throws Exception {
+//		return getObjectByProduct(
+//				OrderProduct::from,
+//				OrderProductResponse::getOrderNo,
+//				() -> adminOrderRepository.findProductByInfo(orderCond));
+//	}
+//	
+//	private List<DepositByProduct> getDepositByProduct (DepositCondition depositCond) throws Exception {
+//		return getObjectByProduct(
+//				DepositProduct::from,
+//				DepositProductResponse::getOrderNo,
+//				() -> adminOrderRepository.findDepositProductByInfo(depositCond));
+//	}
+//	
+//	private <T,R> R createResult(T info, String orderNo, List<R> orders) {
+//		
+//			return new OrderByProduct();
+//		
+//	}
+//	
+//	private <T,R> List<R> getObjectByProduct(Function<T, R> toProduct,
+//			Function<T, String> toOrderNo, Supplier<List<T>> listSupplier) throws Exception{
+//		
+//		List<T> list = listSupplier.get();
+//		
+//		return list.stream()
+//	            .collect(Collectors.groupingBy(toOrderNo))
+//	            .entrySet().stream()
+//	            .map(order -> {
+//	                String orderNo = order.getKey();
+//	                
+//	                List<R> orders = order.getValue()
+//	                        .stream()
+//	                        .map(toProduct)
+//	                        .collect(Collectors.toList());
+//
+//	                T info = order.getValue().get(0);
+//
+//	                return createResult(info, orderNo, orders);
+//	            })
+//	            .collect(Collectors.toList());
+//	}
 
 }

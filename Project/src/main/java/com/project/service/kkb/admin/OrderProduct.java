@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter
 @AllArgsConstructor
 public class OrderProduct {
 	private String productOrderNo;
@@ -16,7 +15,7 @@ public class OrderProduct {
 	private int productQuantity;
 	private int productPrice;
 	private String productStatus;
-	private String invoiceNumber;
+	private String productInvoiceNumber;
 	
 	public static OrderProduct from(OrderProductResponse order) {
 		return new OrderProduct(
@@ -26,6 +25,6 @@ public class OrderProduct {
 				order.getProductQuantity(),
 				order.getProductPrice(),
 				order.getProductStatus(),
-				order.getInvoiceNumber());
+				order.getProductInvoiceNumber());
 	}
 }
