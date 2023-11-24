@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.naming.NamingException;
 
-import com.project.vodto.ShoppingCart;
 import com.project.vodto.kjs.ShowCartDTO;
 
 public interface ShoppingCartService {

@@ -21,6 +21,7 @@ public class ImgMimeType {
 	}
 	
 	public static boolean extIsImage(String ext) {
+		ext = ext.toLowerCase();
 		return imgMimeType.containsKey(ext.toLowerCase());
 	}
 	

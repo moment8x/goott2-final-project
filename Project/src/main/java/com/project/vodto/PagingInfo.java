@@ -33,7 +33,7 @@ public class PagingInfo {
 			int pageCntPerBlock) {
 		this.totalProducts = totalProducts;
 		this.viewProductPerPage = viewProductPerPage;
-		this.totalPageCnt = totalProducts / viewProductPerPage;
+		this.totalPageCnt = (int)Math.ceil(totalProducts / (float)viewProductPerPage);
 		this.pageNo = pageNo;
 		this.startRowIndex = (pageNo -1) * viewProductPerPage;
 		

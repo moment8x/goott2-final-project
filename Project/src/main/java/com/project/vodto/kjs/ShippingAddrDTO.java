@@ -11,12 +11,12 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ShowCartDTO {
+public class ShippingAddrDTO {
 	private String memberId;
-	private String productId;
-	private String nonMemberId;
-	private String productImage;
-	private String productName;
-	private int sellingPrice;
-	private int quantity;
+	private String recipient;
+	private String recipientContact;
+	private String zipCode;
+	private String address;
+	private String detailAddress;
+	private String basicAddr;
 }

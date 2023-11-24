@@ -28,7 +28,6 @@ public class HeaderCartInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		System.out.println("HeaderCartInterceptor - preHandle 시작");
 		// 로그인 상태 확인.
 		HttpSession session = request.getSession();
 		if (session.getAttribute("loginMember") == null) {
@@ -50,8 +49,6 @@ public class HeaderCartInterceptor extends HandlerInterceptorAdapter {
 			}
 		}
 		
-		System.out.println("HeaderCartInterceptor - preHandle의 끝");
-		
 		return true;
 	}
 
@@ -59,8 +56,6 @@ public class HeaderCartInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-		System.out.println("HeaderCartInterceptor - postHandle 시작");
-		
 		// header의 장바구니 관련 처리
 		List<ShowCartDTO> items = null;
 		// 장바구니 리스트 출력. 필요 내용 : (비)회원 아이디, 상품코드, 상품 이미지, 상품명, 상품 판매가
@@ -86,8 +81,6 @@ public class HeaderCartInterceptor extends HandlerInterceptorAdapter {
 		} else {
 			session.setAttribute("cartItems", "none");
 		}
-		
-		System.out.println("HeaderCartInterceptor - postHandle 끝");
 	}
 	
 }

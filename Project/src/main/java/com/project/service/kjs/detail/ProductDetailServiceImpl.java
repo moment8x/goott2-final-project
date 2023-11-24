@@ -9,7 +9,7 @@ import javax.naming.NamingException;
 import org.springframework.stereotype.Service;
 
 import com.project.dao.kjs.detail.ProductDetailDAO;
-import com.project.vodto.Product;
+import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ProductImage;
 
 @Service
@@ -19,22 +19,23 @@ public class ProductDetailServiceImpl implements ProductDetailService {
 	ProductDetailDAO pdDao;
 
 	@Override
-	public Product getProductInfo(String productId) throws SQLException, NamingException {
-		System.out.println("======= 상품 상세정보 서비스 - 상품 정보 조회 =======");
+	public DisPlayedProductDTO getProductInfo(String productId) throws SQLException, NamingException {
+		DisPlayedProductDTO result = pdDao.selectProductInfo(productId);
 		
-		Product result = pdDao.selectProductInfo(productId);
-		
-		System.out.println("======= 상품 상세정보 서비스 종료 =======");
 		return result;
 	}
 
 	@Override
 	public List<ProductImage> getProductImages(String productId) throws SQLException, NamingException {
-		System.out.println("======= 상품 상세정보 서비스 - 상품 이미지 조회 =======");
-		
 		List<ProductImage> result = pdDao.selectProductImages(productId);
 		
-		System.out.println("======= 상품 상세정보 서비스 종료 =======");
+		return result;
+	}
+
+	@Override
+	public List<String> getCategory(String categoryKey) throws SQLException, NamingException {
+		List<String> result = pdDao.selectProductCategory(categoryKey);
+		
 		return result;
 	}
 }

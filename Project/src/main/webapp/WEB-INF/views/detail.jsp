@@ -48,16 +48,102 @@
 <!-- Template css -->
 <link id="color-link" rel="stylesheet" type="text/css"
    href="/resources/assets/css/style.css">
-   
 <!-- latest jquery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 
 <script>
-	
 	$(function () {
 		$('.single-item').slick();
 		
+		$('.review-imgs').click(function (e) {
+			let output = "";
+			let index = $(this).prev().val();
+			let src = `<c:out value='${reviewList}'/>`;
+			src = src.split("ReviewBoardDTO");
+			src = src[index].split("imagesAddr=[")[1];
+			src = src.replaceAll("]", "");
+			src = src.replaceAll(")", "");
+			src = src.replaceAll("thumb_", "");
+			src = src.split(', ');
+			console.log("src", src);
+			
+			for (let i = 0; i < src.length; i++) {
+				if (src[i] !== "") {
+					output += "<div><img src='../resources/uploads" + src[i] + "'></div>";
+				}
+			}
+			
+			console.log(output);
+			
+			$('.fade-img').html(output);
+			
+			$('.fade-img').slick({
+				dots: false,
+				infinite: true,
+				speed: 500,
+				fade: true,
+				cssEase: 'linear'
+			});
+		});
+	
+		changeStar();
+		
 		// 첨부파일
+		uploadFiles();
+		
+		// 리뷰 작성하려 할 시 검증!
+		$("form").click(function(e) {
+			if (${sessionScope.loginMember == null}) {
+				if (window.confirm("회원만 리뷰 등록이 가능합니다. 로그인 페이지로 이동하시겠습니까?")) {
+					location.href="/login/";
+				} else {
+					return false;
+				}
+			} else {
+				$.ajax({
+					url : "/review/isValid",
+					type : "GET",
+					data : {
+						"productId" : "${product.productId}"
+					},
+					dataType : "json",
+					async : false,
+					success : function(data) {
+						console.log("success", data);
+					}, error : function(data) {
+						console.log("error", data);
+					}
+				});
+			}
+		});
+		
+		// 페이징
+		$('.paging-btn').click(function(e) {
+			let page = $(this).html();
+			let productId = "${product.productId}";
+			console.log("productId", productId);
+			$.ajax({
+				url: "/review/" + productId,
+				type: "GET",
+				data: {
+					"productId" : productId,
+					"page" : page
+				},
+				dataType: "JSON",
+				async: false,
+				success: function(data) {
+					console.log("success", data);
+					showReview(data);
+					changeStar();
+				}, error: function(data) {
+					console.log("err", data);
+				}
+			});
+		});
+	});
+	
+	// 첨부파일 함수
+	function uploadFiles() {
 		$(".upFileArea").on("dragenter dragover", function(e) {
 			e.preventDefault();
 		});
@@ -66,6 +152,7 @@
 			
 			console.log(e.originalEvent.dataTransfer.files);
 			
+			let key = $(this).attr("id").split("-")[0];
 			let files = e.originalEvent.dataTransfer.files;
 			for (let i = 0; i < files.length; i++) {
 				let form = new FormData();
@@ -82,7 +169,7 @@
 					success : function(data) {
 						console.log("업로드성공", data);
 						if (data != null) {
-							showUploadedFile(data);
+							showUploadedFile(key, data);
 						}
 					}, error : function(data) {
 						console.log("업로드 실패", data);
@@ -90,44 +177,252 @@
 				});
 			}
 		});
+	}
+	
+	// 업로드 파일 삭제 시 실행할 이벤트
+	function uploadFileDelete() {
+		$('.u-img').on('click', function(e) {
+			e.stopPropagation();
+			let key = $(this).parent().parent().attr("id").split("-")[0];
+			let thumbFileName = $(this).prev().attr("src").split("/resources/uploads")[1];
+			$.ajax({
+				url : "/review/deleteUploadFile",
+				type : "POST",
+				data : {
+					"thumbFileName" : thumbFileName
+				},
+				dataType : "JSON",
+				async : false,
+				success: function(data) {
+					console.log("success", data); 
+					if (data != null) {
+						showUploadedFile(key, data);
+					}
+				}, error: function(data) {
+					console.log("err", data);
+				}
+			});
+		});
+	}
+	
+	// 리뷰 수정 클릭 시 검증
+	function updateReviewCheck(index, postNo) {
+		let productId = "${product.productId}";
 		
-		// 별 변경!
+		// 해당 리뷰 수정 가능한지 확인
+		$.ajax({
+			url: "/review/update",
+			type: "GET",
+			data: {
+				"productId" : productId,
+				"postNo" : postNo
+			},
+			dataType: "JSON",
+			async: false,
+			success: function(data) {
+				console.log("success", data);
+				if (data.status === "success") {
+					// 리뷰 수정 시작
+					openReviewWriter(index, data.review);
+					uploadFiles();
+					changeStar();
+					showUploadedFile("update", data.review.images);
+				} else {
+					alert("작성자만 수정 가능합니다.");
+					return false;
+				}
+			}, error: function(data) {
+				console.log("err", data);
+			}
+		});
+	}
+	
+	// 리뷰 수정
+	function openReviewWriter(index, review) {
+		let content = review.content;
+		content = content.replaceAll("<br/>", "\n");
+		let output = "";		// 글 수정
+		let output2 = "";		// 별 수정
+		
+		output += '<div class="col-12"><textarea class="col-12">' + content + '</textarea></div>';
+		output += '<div><button onclick="updateReview(' + index + ', ' + review.postNo + ');">수정</button>';
+		output += '<button onclick="updateCancel(' + index + ', ' + review.postNo + ', \'' + review.author +  '\', \'' + review.content + '\', '+ review.rating + ');">취소</button>';
+		
+		output += '<div class="form-floating theme-form-floating">';
+		output += '<div style="color: #4a5568;">파일 업로드</div>';
+		output += '<div id="update-files" class="upFileArea">업로드 할 파일을 드래그 앤 드랍 하세요.<div id="update-uploadFiles" class="uploadFiles"></div></div></div></div>';
+		
+		output2 += '<div class="star-rating">';
+		for (let i = 1; i < 6; i++) {
+			if (i === review.rating) {
+				output2 += '<input type="radio" id="u-' + i + '-stars" name="updateRating" value=' + i + ' checked>';
+			} else {
+				output2 += '<input type="radio" id="u-' + i + '-stars" name="updateRating" value=' + i + '>';
+			}
+			if (i > review.rating) {
+				output2 += '<label for="u-' + i + '-stars" class="star" id="u-' + i + '-span"><i class="fa-regular fa-star" style="color: #f9e50b;"></i></label>'; 
+			} else {
+				output2 += '<label for="u-' + i + '-stars" class="star" id="u-' + i + '-span"><i class="fa-solid fa-star" style="color: #f9e50b;"></i></label>';
+			}
+		}
+		output2 += '</div>';
+		
+		$('#review-' + index + ' div.reply').html(output);
+		$('#review-' + index + ' div.product-rating').html(output2);
+	}
+	
+	// 리뷰 수정 완료 시
+	function updateReview(index, postNo) {
+		//let author = $('#review-' + index + ' div.name').text();
+		let rating = $('#review-' + index + ' input:radio[name="updateRating"]:checked').val();
+		let content = $('#review-' + index + ' div.reply textarea').val();
+		let productId = "${product.productId}";
+		//console.log("author", author);
+		console.log("rating", rating);
+		console.log("content", content);
+		console.log("productId", productId);
+		/*$.ajax({
+			url : "/review/update",
+			type : "POST",
+			data : {
+				"postNo" : postNo,
+				//"author" : author,
+				"rating" : rating,
+				"content" : content,
+				"productId" : productId
+			},
+			dataType : "JSON",
+			async : false,
+			success : function(data) {
+				console.log("success", data);
+			}, error : function(data) {
+				console.log("err", data);
+			}
+		});*/
+	}
+	
+	// 리뷰 수정 중 취소 시
+	function updateCancel(index, postNo, author, content, rating) {
+		let output = "";
+				
+		output += '<p>' + content;
+		
+		if ("${sessionScope.loginMember.memberId}" == author) {
+			output += '<a onclick="updateReviewCheck(' + index + ', ' + postNo + ');">수정</a>';
+			output += '<a onclick="removeReviewCheck(${index}, ' + postNo + ');" style="top:20px; color:#ff3535;">삭제</a>';
+		}
+		output += '</p>';
+		
+		let output2 = '<ul class="rating">';
+		for (let i = 1; i < 6; i++) {
+			if (i > rating) {
+				output2 += '<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>';
+			} else {
+				output2 += '<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>';
+			}
+		}
+		output2 += '</ul>';
+		
+		$('#review-' + index + ' div.reply').html(output);
+		$('#review-' + index + ' div.product-rating').html(output2);
+	}
+	
+	// 리뷰 삭제 클릭 시
+	function removeReviewCheck(index, postNo) {
+		let productId = "${product.productId}";
+		alert("아직 구현 X");
+		// 해당 리뷰 삭제 가능한지 확인
+		/*$.ajax({
+			url: "/review/update",
+			type: "GET",
+			data: {
+				"productId" : productId,
+				"postNo" : postNo
+			},
+			dataType: "JSON",
+			async: false,
+			success: function(data) {
+				console.log("success", data);
+				if (data.status === "success") {
+					// 리뷰 삭제 시작
+					
+				} else {
+					alert("작성자만 삭제 가능합니다.");
+					return false;
+				}
+			}, error: function(data) {
+				console.log("err", data);
+			}
+		});*/
+	}
+	
+	// 리뷰출력
+	function showReview(data) {
+		let reviewList = data.reviewList;
+		
+		let output = "";
+		for (let i = 0; i < reviewList.length; i++) {
+			output += '<li id="review-' + (i + 1) + '"><div class="people-box"><div><div class="people-image">';
+			// 이미지 영역
+			if (reviewList[i].imagesAddr !== null) {
+				output += '<input type="hidden" value=' + (i + 1) + '>';
+				output += '<img src="../resources/uploads' + reviewList[i].imagesAddr[0] + '"';
+				output += 'class="img-fluid blur-up lazyload review-imgs"';
+				output += 'data-bs-toggle="modal" data-bs-target="#myModal" />';
+			}
+			// 이미지 영역 종료
+			output += '</div></div>';
+			output += '<div class="people-comment">';
+			output += '<div class="name">' + reviewList[i].author + '</div>';
+			output += '<div class="date-time">';
+			output += '<h6 class="text-content">' + Date(reviewList[i].createdDate) + '</h6>';
+			output += '<div class="product-rating">';
+			output += '<ul class="rating">';
+			for (let j = 1; j < 6; j++) {
+				if (j > reviewList[i].rating) {
+					output += '<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>';
+				} else {
+					output += '<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>';
+				}
+			}
+			output += '</ul></div></div>'
+			output += '<div class="reply"><p>' + reviewList[i].content
+			if ("${sessionScope.loginMember.memberId}" === reviewList[i].author) {
+				output += '<a onclick="updateReviewCheck(' + (i + 1) + ', ' + reviewList[i].postNo + ');">수정</a>';
+				output += '<a onclick="removeReviewCheck(' + (i + 1) + ', ' + reviewList[i].postNo + ');" style="top:20px; color:#ff3535;">삭제</a>';
+			}
+			output += '</p></div></div></div></li>';
+		}
+		console.log("output", output);
+		
+		$('.review-list').html(output);
+	}
+	
+	// 별 변경!
+	function changeStar() {
 		$(".star").on("click", function(e) {
 			// 누른 별표까지 색칠, 이 후 별표는 X
+			let isUpdate = $(this).attr("id").includes('u-');
 			let selectValue = $(this).prev().val();
-			for (let i = 1; i < 6; i++) {
-				if (selectValue < $('#' + i + '-stars').val()) {
-					$('#' + i + '-span').html('<i class="fa-regular fa-star" style="color: #f9e50b;"></i>');
-				} else {
-					$('#' + i + '-span').html('<i class="fa-solid fa-star" style="color: #f9e50b;"></i>');
-				}
-			}
-		});
-		
-		// 리뷰 작성하려 할 시 검증!
-		$("form").click(function(e) {
-			if (${sessionScope.loginMember == null}) {
-				if (window.confirm("회원만 리뷰 등록이 가능합니다. 로그인 페이지로 이동하시겠습니까?")) {
-					location.href="/login/";
+			if (isUpdate) {
+				for (let i = 1; i < 6; i++) {
+					if (selectValue < $('#u-' + i + '-stars').val()) {
+						$('#u-' + i + '-span').html('<i class="fa-regular fa-star" style="color: #f9e50b;"></i>');
+					} else {
+						$('#u-' + i + '-span').html('<i class="fa-solid fa-star" style="color: #f9e50b;"></i>');
+					}
 				}
 			} else {
-				$.ajax({
-					url : "/review/isValid",
-					type : "GET",
-					data : {
-						"productId" : ${product.productId}
-					},
-					dataType : "json",
-					async : false,
-					success : function(data) {
-						console.log(data);
-					}, error : function(data) {
-						console.log(data);
+				for (let i = 1; i < 6; i++) {
+					if (selectValue < $('#' + i + '-stars').val()) {
+						$('#' + i + '-span').html('<i class="fa-regular fa-star" style="color: #f9e50b;"></i>');
+					} else {
+						$('#' + i + '-span').html('<i class="fa-solid fa-star" style="color: #f9e50b;"></i>');
 					}
-				});
+				}
 			}
 		});
-	});
+	}
 	
 	function plusQTY() {
 		$('#qty').val(parseInt($('#qty').val()) + 1);
@@ -167,22 +462,29 @@
 	}
 	
 	// 리뷰달기 버튼 클릭 시 유효성 검사
-	/*function isValid() {
-		boolean result = false;
-		
+	function isValid() {
+		let result = false;
+		if ($('#floatingTextarea2').val() !== "") {
+			result = true
+		}
 		return result;
-	}*/
+	}
 	
 	// 업로드 된 파일 표시    	
-	function showUploadedFile(json) {
-		console.log("newFileName", json);
+	function showUploadedFile(key, json) {
 		let output = "";
+		let index = 0;
 		for(let data of json){
-			let name = data.newFileName.replaceAll("\\", "/");
-			//output += "<img src='../resources/uploads" + name + "'/>";
-			output += `<img src='../resources/uploads\${name}'/>`;
+			let name = data.thumbnailFileName.replaceAll("\\", "/");
+			output += `<span><img src='../resources/uploads\${name}'/><i class="fa-solid fa-circle-xmark u-img" style="color: #fc1d1d;"></i></span>`;
+			index++;
 		}
-		$('.uploadFiles').html(output);
+		if (key === "insert") {
+			$('#insert-uploadFiles').html(output);
+		} else if (key === "update") {
+			$('#update-uploadFiles').html(output);
+		}
+		uploadFileDelete();
 	}
 	
 	// 페이지 나갈 시
@@ -250,6 +552,9 @@
 .star-rating input{
 	display: none;
 }
+textarea {
+	resize: none;
+}
 </style>
 
 
@@ -310,7 +615,9 @@
 										<i class="fa-solid fa-house"></i>
 									</a>
 								</li>
-								<li class="breadcrumb-item active">${product.productName}</li>
+								<c:forEach var="category" items="${categories }">
+									<li class="breadcrumb-item active">${category}</li>
+								</c:forEach>
 							</ol>
 						</nav>
 					</div>
@@ -411,482 +718,431 @@
       						<div class="right-box-contain">
       							<h6 class="offer-top">30% Off</h6>
       							<h2 class="name">${product.productName}</h2>
-      								<div class="price-rating">
-	      								<h3 class="theme-color price">${product.sellingPrice}원
-    	  									<del class="text-content">${product.consumerPrice}원</del>
-      										<span class="offer theme-color">(10% off)</span>
-      									</h3>
-      									<div class="product-rating custom-rate">
-      										<ul class="rating">
-      											<li><i data-feather="star" class="fill"></i></li>
-      											<li><i data-feather="star" class="fill"></i></li>
-      											<li><i data-feather="star" class="fill"></i></li>
-      											<li><i data-feather="star" class="fill"></i></li>
-      											<li><i data-feather="star"></i></li>
-      										</ul>
-      										<span class="review">23개 리뷰</span>
-      									</div>
-      								</div>
-      								
-      								<div class="procuct-contain">
-      									<p>${product.introductionIntro}</p>
-      								</div>
-                           			<div class="note-box product-packege">
-                           				<div class="cart_qty qty-box product-qty">
-                           					<div class="input-group">
-                           						<button type="button" class="qty-right-plus"
-                           							data-type="plus" data-field="" onclick="plusQTY();">
-                           							<i class="fa fa-plus" aria-hidden="true"></i>
-                           						</button>
-                           						<input class="form-control input-number qty-input"
-                           							type="text" id="qty" name="qty" value="0">
-                           						<button type="button" class="qty-left-minus"
-                           							data-type="minus" data-field="" onclick="minusQTY();">
-                           							<i class="fa fa-minus" aria-hidden="true"></i>
-                           						</button>
-                           					</div>
-                           				</div>
-                           				<button onclick="addCart();"
-                           					class="btn btn-md bg-dark cart-button text-white w-80">장바구니</button>
-                           				<button onclick="buy();"
-                           					class="btn btn-md bg-dark cart-button text-white w-80">바로구매</button>
-                           			</div>
-                           			
-                           			<div class="buy-box">
-                           				<a href="wishlist.html">
-                           					<i data-feather="heart"></i>
-                           					<span>Add To Wishlist</span>
-                           				</a>
-                           				<a href="compare.html">
-                           					<i data-feather="shuffle"></i>
-                           					<span>Add To Compare</span>
-                           				</a>
-                           			</div>
+   								<div class="price-rating">
+    								<h3 class="theme-color price">${product.sellingPrice}원
+ 	  									<del class="text-content">${product.consumerPrice}원</del>
+   										<span class="offer theme-color">(10% off)</span>
+   									</h3>
+   									<div class="product-rating custom-rate">
+   										<ul class="rating">
+   											<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+   											<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+   											<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+   											<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+   											<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+   										</ul>
+   										<span class="review">23개 리뷰</span>
+   									</div>
+   								</div>
+      							<div class="author">
+      								${product.authorTranslator}
+      							</div>
+   								<div class="procuct-contain">
+   									<p>${product.introductionIntro}</p>
+   								</div>
+                       			<div class="note-box product-packege">
+                       				<div class="cart_qty qty-box product-qty">
+                       					<div class="input-group">
+                       						<button type="button" class="qty-right-plus"
+                       							data-type="plus" data-field="" onclick="plusQTY();">
+                       							<i class="fa fa-plus" aria-hidden="true"></i>
+                       						</button>
+                       						<input class="form-control input-number qty-input"
+                       							type="text" id="qty" name="qty" value="1">
+                       						<button type="button" class="qty-left-minus"
+                       							data-type="minus" data-field="" onclick="minusQTY();">
+                       							<i class="fa fa-minus" aria-hidden="true"></i>
+                       						</button>
+                       					</div>
+                       				</div>
+                       				<button onclick="addCart();"
+                       					class="btn btn-md bg-dark cart-button text-white w-80">장바구니</button>
+                       				<button onclick="buy();"
+                       					class="btn btn-md bg-dark cart-button text-white w-80">바로구매</button>
+                       			</div>
+                           		
+                       			<div class="buy-box">
+                       				<a href="wishlist.html">
+                       					<i data-feather="heart"></i>
+                       					<span>Add To Wishlist</span>
+                       				</a>
+                       				<a href="compare.html">
+                       					<i data-feather="shuffle"></i>
+                       					<span>Add To Compare</span>
+                       				</a>
+                       			</div>
 
-                           			</div>
-                           		</div>
-                           		<div class="col-12">
-                           			<div class="product-section-box">
-                           				<ul class="nav nav-tabs custom-nav" id="myTab" role="tablist">
-                           					<li class="nav-item" role="presentation">
-                           						<button class="nav-link active" id="description-tab"
-                           							data-bs-toggle="tab" data-bs-target="#description"
-                           							type="button" role="tab" aria-controls="description"
-                           							aria-selected="true">소개정보</button>
-                           					</li>
-                           					<li class="nav-item" role="presentation">
-                           					<button class="nav-link" id="info-tab" data-bs-toggle="tab"
-                           						data-bs-target="#info" type="button" role="tab"
-                           						aria-controls="info" aria-selected="false">상품정보</button>
-                           					</li>
-                           					<li class="nav-item" role="presentation">
-                           						<button class="nav-link" id="care-tab" data-bs-toggle="tab"
-                           							data-bs-target="#care" type="button" role="tab"
-                           							aria-controls="care" aria-selected="false">교환/반품/품절안내</button>
-                           					</li>
-                           					<li class="nav-item" role="presentation">
-                           					<button class="nav-link getAllReview" id="review-tab"
-                           						data-bs-toggle="tab" data-bs-target="#review" type="button"
-                           						role="tab" aria-controls="review" aria-selected="false"
-                           						value="${product.productId}"
-                           						data-productId="${product.productId}">리뷰(총 리뷰 개수)</button>
-                           					</li>
-                           				</ul>
-                           				<div class="tab-content custom-tab" id="myTabContent">
-                           					<div class="tab-pane fade show active" id="description"
-                           						role="tabpanel" aria-labelledby="description-tab">
-                           						<div class="product-description">
-                           							<div class="nav-desh">
+                           	</div>
+                        </div>
+                        <div class="col-12">
+                           		<div class="product-section-box">
+                       				<ul class="nav nav-tabs custom-nav" id="myTab" role="tablist">
+                       					<li class="nav-item" role="presentation">
+                       						<button class="nav-link active" id="description-tab"
+                       							data-bs-toggle="tab" data-bs-target="#description"
+                       							type="button" role="tab" aria-controls="description"
+                       							aria-selected="true">소개정보</button>
+                       					</li>
+                       					<li class="nav-item" role="presentation">
+                       					<button class="nav-link" id="info-tab" data-bs-toggle="tab"
+                       						data-bs-target="#info" type="button" role="tab"
+                       						aria-controls="info" aria-selected="false">상품정보</button>
+                       					</li>
+                       					<li class="nav-item" role="presentation">
+                       						<button class="nav-link" id="care-tab" data-bs-toggle="tab"
+                       							data-bs-target="#care" type="button" role="tab"
+                       							aria-controls="care" aria-selected="false">교환/반품/품절안내</button>
+                       					</li>
+                       					<li class="nav-item" role="presentation">
+                       					<button class="nav-link getAllReview" id="review-tab"
+                       						data-bs-toggle="tab" data-bs-target="#review" type="button"
+                       						role="tab" aria-controls="review" aria-selected="false"
+                       						value="${product.productId}"
+                       						data-productId="${product.productId}">리뷰(총 리뷰 개수)</button>
+                       					</li>
+                       				</ul>
+                          			<div class="tab-content custom-tab" id="myTabContent">
+                          				<div class="tab-pane fade show active" id="description"
+                          					role="tabpanel" aria-labelledby="description-tab">
+                          					<div class="product-description">
+                          						<div class="nav-desh">
+                          							<c:choose>
+                           								<c:when test="${product.productInfoImage != ''}">
+                          									<img src="${product.productInfoImage }">
+                          								</c:when>
+                          								<c:otherwise>
+			                        						<h5>책 소개</h5>
+		                           							<p>${product.introductionDetail}</p>
+                          								</c:otherwise>
+                          							</c:choose>
+                          						</div>
+                          						<div class="nav-desh">
+                          							<div class="desh-title">
+                          								<h5>목차</h5>
+                          							</div>
+                          							<p>${product.tableOfContents }</p>
+                          						</div>
+                          						<div class="nav-desh">
+                           							<div class="desh-title">
                            								<c:choose>
-	                           								<c:when test="${product.productInfoImage != ''}">
-                           										<img src="${product.productInfoImage }">
+                           									<c:when test="${product.authorIntroduction != ''}">
+                           										<h5>저자 소개</h5>
+                           										<p>${product.authorIntroduction }</p>
                            									</c:when>
-                           									<c:otherwise>
-			                           							<h5>책 소개</h5>
-		                           								<p>${product.introductionDetail}</p>
-                           									</c:otherwise>
                            								</c:choose>
                            							</div>
-                           							<div class="nav-desh">
-                           								<div class="desh-title">
-                           									<h5>목차</h5>
-                           								</div>
-                           								<p>${product.tableOfContents }</p>
-                           							</div>
-                           						<!-- 
-                           						<div class="banner-contain nav-desh">
-	                           						<img src="/resources/assets/images/vegetable/banner/14.jpg"
-	                           							class="bg-img blur-up lazyload" alt="">
-	                           						<div class="banner-details p-center banner-b-space w-100 text-center">
-	                           							<div>
-	                           								<h6 class="ls-expanded theme-color mb-sm-3 mb-1">SUMMER</h6>
-	                           								<h2>VEGETABLE</h2>
-	                           								<p class="mx-auto mt-1">Save up to 5% OFF</p>
-	                           							</div>
-	                           						</div>
                            						</div>
-                           						 -->
-                           						<div class="nav-desh">
-	                           						<div class="desh-title">
-	                           							<c:choose>
-	                           								<c:when test="${product.authorIntroduction != ''}">
-	                           									<h5>저자 소개</h5>
-	                           									<p>${product.authorIntroduction }</p>
-	                           								</c:when>
-	                           							</c:choose>
-	                           						</div>
-	                           					</div>
-	                           				</div>
-	                           			</div>
-                           			
-	                           			<div class="tab-pane fade" id="info" role="tabpanel"
-	                           				aria-labelledby="info-tab">
-	                           				<div class="table-responsive">
-	                           					<table class="table info-table">
-	                           						<tbody>
-	                           							<tr>
-	                           								<td>ISBN</td>
-	                           								<td>${product.isbn}</td>
-	                           							</tr>
-	                           							<tr>
-	                           								<td>발행(출시)일자</td>
-	                           								<td>${product.publicationDate}</td>
-	                           							</tr>
-	                           							<tr>
-	                           								<td>쪽수</td>
-	                           								<td>${product.pageCount}</td>
-	                           							</tr>
-	                           							<tr>
-	                           								<td>크기</td>
-	                           								<td>${productSize}
-	                           									<button>판형알림</button>
-	                           								</td>
-	                           							</tr>
-	                           							<tr>
-	                           								<td>총권수</td>
-	                           								<td>${product.totalVolume}권</td>
-	                           							</tr>
-	                           							<tr>
-	                           								<td>원서명/저자명</td>
-	                           								<td>${product.originalAuthor}</td>
-	                           							</tr>
-	                           						</tbody>
-	                           					</table>
-	                           				</div>
-	                           			</div>
-	                           			
-	                           			<div class="tab-pane fade" id="care" role="tabpanel"
-	                           				aria-labelledby="care-tab">
-	                           				<div class="information-box">
-	                           					<ul>
-	                           						<li>
-	                           							<h5>반품/교환방법</h5>
-	                           							<p>마이룸 > 주문관리 > 주문/배송내역 > 주문조회 > 반품/교환 신청, [1:1 상담 >
-	                           							반품/교환/환불] 또는 고객센터 (1544-1900) * 오픈마켓, 해외배송 주문, 기프트 주문시
-	                           							[1:1 상담>반품/교환/환불] 또는 고객센터 (1544-1900)</p>
-	                           						</li>
-	                           						<li>
-	                           							<h5>반품/교환가능 기간</h5>
-	                           							<p>변심반품의 경우 수령 후 7일 이내, 상품의 결함 및 계약내용과 다를 경우 문제점 발견 후
-	                           							30일 이내</p>
-	                           						</li>
-	                           						<li>
-	                           							<h5>반품/교환비용</h5>
-	                           							<p>변심 혹은 구매착오로 인한 반품/교환은 반송료 고객 부담</p>
-	                           						</li>
-	                           						<li>
-	                           							<h5>반품/교환 불가 사유</h5>
-	                           							<p>1) 소비자의 책임 있는 사유로 상품 등이 손실 또는 훼손된 경우 (단지 확인을 위한 포장
-	                           							훼손은 제외)</p>
-	                           							<p>2) 소비자의 사용, 포장 개봉에 의해 상품 등의 가치가 현저히 감소한 경우 예) 화장품,
-	                           							식품, 가전제품(악세서리 포함) 등</p>
-	                           							<p>3) 복제가 가능한 상품 등의 포장을 훼손한 경우 예) 음반/DVD/비디오, 소프트웨어,
-	                           							만화책, 잡지, 영상 화보집</p>
-	                           							<p>4) 소비자의 요청에 따라 개별적으로 주문 제작되는 상품의 경우 ((1)해외주문도서)</p>
-	                           							<p>5) 디지털 컨텐츠인 eBook, 오디오북 등을 1회 이상 다운로드를 받았을 경우</p>
-	                           							<p>6) 시간의 경과에 의해 재판매가 곤란한 정도로 가치가 현저히 감소한 경우</p>
-	                           							<p>7) 전자상거래 등에서의 소비자보호에 관한 법률이 정하는 소비자 청약철회 제한 내용에
-	                           							해당되는 경우</p>
-	                           							<p>8) 세트상품 일부만 반품 불가 (필요시 세트상품 반품 후 낱권 재구매)</p>
-	                           						</li>
-	                           						<li>
-	                           							<h5>상품 품절</h5>
-	                           							<p>공급사(출판사) 재고 사정에 의해 품절/지연될 수 있으며, 품절 시 관련 사항에 대해서는
-	                           							이메일과 문자로 안내드리겠습니다.</p>
-	                           						</li>
-	                           						<li>
-	                           							<h5>소비자 피해보상 환불 지연에 따른 배상</h5>
-	                           							<p>1) 상품의 불량에 의한 교환, A/S, 환불, 품질보증 및 피해보상 등에 관한 사항은
-	                           							소비자분쟁 해결 기준 (공정거래위원회 고시)에 준하여 처리됨</p>
-	                           							<p>2) 대금 환불 및 환불지연에 따른 배상금 지급 조건, 절차 등은 전자상거래 등에서의 소비자
-	                           							보호에 관한 법률에 따라 처리함</p>
-	                           							<div>*상품 설명에 반품/교환 관련한 안내가 있는 경우 그 내용을 우선으로 합니다. (업체
-	                           							사정에 따라 달라질 수 있습니다.)</div>
-	                           						</li>
-	                           					</ul>
-	                           				</div>
-	                           			</div>
-	                           			<div class="tab-pane fade" id="review" role="tabpanel" aria-labelledby="review-tab">
-	                           				<div class="review-box">
-	                           					<div class="row g-4">
-	                           						<div class="col-xl-6">
-	                           							<div class="review-title">
-	                           								<h4 class="fw-500">Customer reviews</h4>
-	                           							</div>
-	                           							
-	                           							<div class="d-flex">
-	                           								<div class="product-rating">
-	                           									<ul class="rating">
-	                           										<li><i data-feather="star" class="fill"></i></li>
-	                           										<li><i data-feather="star" class="fill"></i></li>
-	                           										<li><i data-feather="star" class="fill"></i></li>
-	                           										<li><i data-feather="star"></i></li>
-	                           										<li><i data-feather="star"></i></li>
-	                           									</ul>
-	                           								</div>
-	                           								<h6 class="ms-3">4.2 Out Of 5</h6>
-	                           							</div>
-	                           							
-	                           							<div class="rating-box">
-	                           								<ul>
-	                           									<li>
-	                           										<div class="rating-list">
-	                           											<h5>5 Star</h5>
-	                           											<div class="progress">
-		                           											<div class="progress-bar" role="progressbar"
-	                           													style="width: 68%" aria-valuenow="100"
-	                           													aria-valuemin="0" aria-valuemax="100">68%</div>
-	                           											</div>
-	                           										</div>
-	                           									</li>
-	                           									<li>
-	                           										<div class="rating-list">
-	                           											<h5>4 Star</h5>
-	                           											<div class="progress">
-	                           												<div class="progress-bar" role="progressbar"
-	                           												style="width: 67%" aria-valuenow="100"
-	                           												aria-valuemin="0" aria-valuemax="100">67%</div>
-	                           											</div>
-	                           										</div>
-	                           									</li>
-	                           									<li>
-	                           										<div class="rating-list">
-	                           											<h5>3 Star</h5>
-	                           											<div class="progress">
-	                           												<div class="progress-bar" role="progressbar"
-	                           												style="width: 42%" aria-valuenow="100"
-	                           												aria-valuemin="0" aria-valuemax="100">42%</div>
-	                           											</div>
-	                           										</div>
-	                           									</li>
-	                           									<li>
-	                           										<div class="rating-list">
-	                           											<h5>2 Star</h5>
-	                           											<div class="progress">
-	                           												<div class="progress-bar" role="progressbar"
-	                           												style="width: 30%" aria-valuenow="100"
-	                           												aria-valuemin="0" aria-valuemax="100">30%</div>
-	                           											</div>
-	                           										</div>
-	                           									</li>
-	                           									<li>
-	                           										<div class="rating-list">
-	                           										<h5>1 Star</h5>
-	                           											<div class="progress">
-	                           												<div class="progress-bar" role="progressbar"
-		                           											style="width: 24%" aria-valuenow="100"
-	                           												aria-valuemin="0" aria-valuemax="100">24%</div>
-	                           											</div>
-	                           										</div>
-	                           									</li>
-	                           								</ul>
-	                           							</div>
-	                           						</div>
-	                           						
-	                           						<div class="col-xl-6">
-	                           							<div class="review-title">
-	                           								<h4 class="fw-500">Add a review</h4>
-	                           							</div>
-	                           							
-	                           							<form action="/review/saveReview" method="POST" enctype="multipart/form-data">
-	                           								<input type="hidden" name="productId" value="${product.productId }">
-		                           							<div class="row g-4">
-		                           								<!-- 평점 넣기 -->
-		                           								<div class="col-md-12">
-		                           									<div class="form-floating theme-form-floating">
-		                           										<div>평점</div>
-		                           										<div class="star-rating space-x-4 mx-auto">
-			                           										<input type="radio" id="1-stars" name="rating" value=1 />
-																			<label for="1-stars" class="star" id="1-span"><i class="fa-regular fa-star" style="color: #f9e50b;"></i></label>
-			                           										<input type="radio" id="2-stars" name="rating" value=2 />
-																			<label for="2-stars" class="star" id="2-span"><i class="fa-regular fa-star" style="color: #f9e50b;"></i></label>
-			                           										<input type="radio" id="3-stars" name="rating" value=3 />
-																			<label for="3-stars" class="star" id="3-span"><i class="fa-regular fa-star" style="color: #f9e50b;"></i></label>
-			                           										<input type="radio" id="4-stars" name="rating" value=4 />
-																			<label for="4-stars" class="star" id="4-span"><i class="fa-regular fa-star" style="color: #f9e50b;"></i></label>
-			                           										<input type="radio" id="5-stars" name="rating" value=5 />
-																			<label for="5-stars" class="star" id="5-span"><i class="fa-regular fa-star" style="color: #f9e50b;"></i></label>
-																		</div>
-		                           									</div>
-		                           								</div>
-		                           								<!-- 본문 --> 
-		                           								<div class="col-12">
-		                           									<div class="form-floating theme-form-floating">
-		                           										<textarea class="form-control"
-		                           										placeholder="Leave a comment here"
-		                           										id="floatingTextarea2" style="height: 150px; resize: none;" name="content"></textarea>
-		                           										<label for="floatingTextarea2">Write Your Comment</label>
-		                           									</div>
-		                           								</div>
-		                           								<!-- 이미지 넣기 -->
-		                           								<!-- <div class="col-md-12">
-		                           									<div class="form-floating theme-form-floating">
-		                           										<input type="url" class="form-control" id="review1" placeholder="Give your review a title">
-		                           										<label for="review1">Review Title</label>
-		                           									</div>
-		                           								</div> -->
-		                           								
-		                           								<div class="col-md-12">
-								                                    <div class="form-floating theme-form-floating">
-								                                    	<div style="color: #4a5568;">파일 업로드</div>
-								                                        <div class="upFileArea">
-															    			업로드 할 파일을 드래그 앤 드랍 하세요.
-															    		</div>
-															    		<div class="uploadFiles"></div>
-								                                    </div>
-								                                </div>
-		                           								
-		                           								<div class="col-md-12">
-		                           									<div class="form-floating theme-form-floating">
-		                           										<button class="btn" style="background-color: #198754; color: #fff;">리뷰 달기</button>
-		                           									</div>
-		                           								</div>
+                           					</div>
+                           				</div>
+                           				<div class="tab-pane fade" id="info" role="tabpanel"
+                           					aria-labelledby="info-tab">
+                           					<div class="table-responsive">
+                           						<table class="table info-table">
+                           							<tbody>
+                           								<tr>
+                           									<td>ISBN</td>
+                           									<td>${product.isbn}</td>
+                           								</tr>
+                           								<tr>
+                           									<td>발행(출시)일자</td>
+                           									<td>${product.publicationDate}</td>
+                           								</tr>
+                           								<tr>
+                           									<td>쪽수</td>
+                           									<td>${product.pageCount}</td>
+                           								</tr>
+                           								<tr>
+                           									<td>크기</td>
+                           									<td>${productSize}
+                           										<button>판형알림</button>
+                           									</td>
+                           								</tr>
+                           								<tr>
+                           									<td>총권수</td>
+                           									<td>${product.totalVolume}권</td>
+                           								</tr>
+                           								<tr>
+                           									<td>원서명/저자명</td>
+                           									<td>${product.originalAuthor}</td>
+                           								</tr>
+                           							</tbody>
+                           						</table>
+                           					</div>
+                           				</div>
+                           				
+		                           		<div class="tab-pane fade" id="care" role="tabpanel"
+		                           			aria-labelledby="care-tab">
+		                           			<div class="information-box">
+		                           				<ul>
+		                           					<li>
+		                           						<h5>반품/교환방법</h5>
+		                           						<p>마이룸 > 주문관리 > 주문/배송내역 > 주문조회 > 반품/교환 신청, [1:1 상담 >
+		                           						반품/교환/환불] 또는 고객센터 (1544-1900) * 오픈마켓, 해외배송 주문, 기프트 주문시
+		                           						[1:1 상담>반품/교환/환불] 또는 고객센터 (1544-1900)</p>
+		                           					</li>
+		                           					<li>
+		                           						<h5>반품/교환가능 기간</h5>
+		                           						<p>변심반품의 경우 수령 후 7일 이내, 상품의 결함 및 계약내용과 다를 경우 문제점 발견 후
+		                           						30일 이내</p>
+		                           					</li>
+		                           					<li>
+		                           						<h5>반품/교환비용</h5>
+		                           						<p>변심 혹은 구매착오로 인한 반품/교환은 반송료 고객 부담</p>
+		                           					</li>
+		                           					<li>
+		                           						<h5>반품/교환 불가 사유</h5>
+		                           						<p>1) 소비자의 책임 있는 사유로 상품 등이 손실 또는 훼손된 경우 (단지 확인을 위한 포장
+		                           						훼손은 제외)</p>
+		                           						<p>2) 소비자의 사용, 포장 개봉에 의해 상품 등의 가치가 현저히 감소한 경우 예) 화장품,
+		                           						식품, 가전제품(악세서리 포함) 등</p>
+		                           						<p>3) 복제가 가능한 상품 등의 포장을 훼손한 경우 예) 음반/DVD/비디오, 소프트웨어,
+		                           						만화책, 잡지, 영상 화보집</p>
+		                           						<p>4) 소비자의 요청에 따라 개별적으로 주문 제작되는 상품의 경우 ((1)해외주문도서)</p>
+		                           						<p>5) 디지털 컨텐츠인 eBook, 오디오북 등을 1회 이상 다운로드를 받았을 경우</p>
+		                           						<p>6) 시간의 경과에 의해 재판매가 곤란한 정도로 가치가 현저히 감소한 경우</p>
+		                           						<p>7) 전자상거래 등에서의 소비자보호에 관한 법률이 정하는 소비자 청약철회 제한 내용에
+		                           						해당되는 경우</p>
+		                           						<p>8) 세트상품 일부만 반품 불가 (필요시 세트상품 반품 후 낱권 재구매)</p>
+		                           					</li>
+		                           					<li>
+		                           						<h5>상품 품절</h5>
+		                           						<p>공급사(출판사) 재고 사정에 의해 품절/지연될 수 있으며, 품절 시 관련 사항에 대해서는
+		                           						이메일과 문자로 안내드리겠습니다.</p>
+		                           					</li>
+		                           					<li>
+		                           						<h5>소비자 피해보상 환불 지연에 따른 배상</h5>
+		                           						<p>1) 상품의 불량에 의한 교환, A/S, 환불, 품질보증 및 피해보상 등에 관한 사항은
+		                           						소비자분쟁 해결 기준 (공정거래위원회 고시)에 준하여 처리됨</p>
+		                           						<p>2) 대금 환불 및 환불지연에 따른 배상금 지급 조건, 절차 등은 전자상거래 등에서의 소비자
+		                           						보호에 관한 법률에 따라 처리함</p>
+		                           						<div>*상품 설명에 반품/교환 관련한 안내가 있는 경우 그 내용을 우선으로 합니다. (업체
+		                           						사정에 따라 달라질 수 있습니다.)</div>
+		                           					</li>
+		                           				</ul>
+		                           			</div>
+		                           		</div>
+		                           		<div class="tab-pane fade" id="review" role="tabpanel" aria-labelledby="review-tab">
+		                           			<div class="review-box">
+		                           				<div class="row g-4">
+		                           					<div class="col-xl-6">
+		                           						<div class="review-title">
+		                           							<h4 class="fw-500">Customer reviews</h4>
+		                           						</div>
+		                           						
+		                           						<div class="d-flex">
+		                           							<div class="product-rating">
+		                           								<ul class="rating">
+		                           									<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+		                           									<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+		                           									<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+		                           									<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+		                           									<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+		                           								</ul>
 		                           							</div>
-	                           							</form>
-	                           						</div>
-	                           						
-	                           						<div class="col-12">
-	                           							<div class="review-title">
-	                           								<h4 class="fw-500">Customer questions & answers</h4>
-	                           							</div>
-	                           							<div class="review-people">
-	                           								<ul class="review-list">
-	                           									<li>
-	                           										<div class="people-box">
-	                           											<div>
-	                           												<div class="people-image">
-	                           													<img src="/resources/assets/images/review/1.jpg"
-	                           													class="img-fluid blur-up lazyload" alt="">
-	                           												</div>
-	                           											</div>
-	                           											<div class="people-comment">
-	                           												<a class="name" href="javascript:void(0)">Tracey</a>
-	                           												<div class="date-time">
-	                           													<h6 class="text-content">14 Jan, 2022 at 12.58AM</h6>
-	                           													<div class="product-rating">
-	                           														<ul class="rating">
-		                           														<li><i data-feather="star" class="fill"></i></li>
-		                           														<li><i data-feather="star" class="fill"></i></li>
-		                           														<li><i data-feather="star" class="fill"></i></li>
-		                           														<li><i data-feather="star"></i></li>
-		                           														<li><i data-feather="star"></i></li>
-	                           														</ul>
-	                           													</div>
-	                           												</div>
-	                           												
-	                           												<div class="reply">
-	                           													<p>
-	                           													Icing cookie carrot cake chocolate cake sugar plum
-	                           													jelly-o danish. Dragée dragée shortbread tootsie
-	                           													roll croissant muffin cake I love gummi bears.
-	                           													Candy canes ice cream caramels tiramisu marshmallow
-	                           													cake shortbread candy canes cookie.
-	                           														<a href="javascript:void(0)">Reply</a>
-	                           													</p>
-	                           												</div>
-	                           											</div>
-	                           										</div>
-	                           									</li>
-	                           									<li>
-	                           										<div class="people-box">
-	                           											<div>
-	                           												<div class="people-image">
-	                           													<img src="/resources/assets/images/review/2.jpg" class="img-fluid blur-up lazyload" alt="">
-	                           												</div>
-	                           											</div>
-	                           											<div class="people-comment">
-	                           												<a class="name" href="javascript:void(0)">Olivia</a>
-	                           												<div class="date-time">
-	                           													<h6 class="text-content">01 May, 2022 at 08.31 AM</h6>
-	                           													<div class="product-rating">
-	                           														<ul class="rating">
-	                           															<li><i data-feather="star" class="fill"></i></li>
-	                           															<li><i data-feather="star" class="fill"></i></li>
-	                           															<li><i data-feather="star" class="fill"></i></li>
-	                           															<li><i data-feather="star"></i></li>
-	                           															<li><i data-feather="star"></i></li>
-	                           														</ul>
-	                           													</div>
-	                           												</div>
-	                           												
-	                           												<div class="reply">
-		                           												<p>
-		                           												Tootsie roll cake danish halvah powder Tootsie roll
-		                           												candy marshmallow cookie brownie apple pie pudding
-		                           												brownie chocolate bar. Jujubes gummi bears I love
-		                           												powder danish oat cake tart croissant.
-		                           													<a href="javascript:void(0)">Reply</a>
-		                           												</p>
-	                           												</div>
-	                           											</div>
-	                           										</div>
-	                           									</li>
-	                           									<li>
-	                           										<div class="people-box">
-	                           											<div>
-	                           												<div class="people-image">
-	                           													<img src="/resources/assets/images/review/3.jpg" class="img-fluid blur-up lazyload" alt="">
-	                           												</div>
-	                           											</div>
-	                           											
-	                           											<div class="people-comment">
-	                           											<a class="name" href="javascript:void(0)">Gabrielle</a>
-	                           											<div class="date-time">
-		                           											<h6 class="text-content">21 May, 2022 at 05.52 PM</h6>
-		                           											<div class="product-rating">
-		                           												<ul class="rating">
-		                           													<li><i data-feather="star" class="fill"></i></li>
-		                           													<li><i data-feather="star" class="fill"></i></li>
-		                           													<li><i data-feather="star" class="fill"></i></li>
-		                           													<li><i data-feather="star"></i></li>
-		                           													<li><i data-feather="star"></i></li>
-		                           												</ul>
-		                           											</div>
+		                           							<h6 class="ms-3">4.2 Out Of 5</h6>
+		                           						</div>
+		                           						
+		                           						<div class="rating-box">
+		                           							<ul>
+		                           								<li>
+		                           									<div class="rating-list">
+		                           										<h5>5 Star</h5>
+		                           										<div class="progress">
+			                          											<div class="progress-bar" role="progressbar"
+		                           												style="width: 68%" aria-valuenow="100"
+		                           												aria-valuemin="0" aria-valuemax="100">68%</div>
 		                           										</div>
-		                           										
-		                           										<div class="reply">
-			                           										<p>
-			                           											Biscuit chupa chups gummies powder I love sweet
-			                           											pudding jelly beans. Lemon drops marzipan apple pie
-			                           											gingerbread macaroon croissant cotton candy pastry
-			                           											wafer. Carrot cake halvah I love tart caramels
-			                           											pudding icing chocolate gummi bears. Gummi bears
-			                           											danish cotton candy muffin marzipan caramels
-			                           											awesome feel.
-			                           											<a href="javascript:void(0)">Reply</a>
-			                           										</p>
-			                           									</div>
+		                           									</div>
+		                           								</li>
+		                           								<li>
+		                           									<div class="rating-list">
+		                           										<h5>4 Star</h5>
+		                           										<div class="progress">
+		                           											<div class="progress-bar" role="progressbar"
+		                           											style="width: 67%" aria-valuenow="100"
+		                           											aria-valuemin="0" aria-valuemax="100">67%</div>
+		                           										</div>
+		                           									</div>
+		                           								</li>
+		                           								<li>
+		                           									<div class="rating-list">
+		                           										<h5>3 Star</h5>
+		                           										<div class="progress">
+		                           											<div class="progress-bar" role="progressbar"
+		                           											style="width: 42%" aria-valuenow="100"
+		                           											aria-valuemin="0" aria-valuemax="100">42%</div>
+		                           										</div>
+		                           									</div>
+		                           								</li>
+		                           								<li>
+		                           									<div class="rating-list">
+		                           										<h5>2 Star</h5>
+		                           										<div class="progress">
+		                           											<div class="progress-bar" role="progressbar"
+		                           											style="width: 30%" aria-valuenow="100"
+		                           											aria-valuemin="0" aria-valuemax="100">30%</div>
+		                           										</div>
+		                           									</div>
+		                           								</li>
+		                           								<li>
+		                           									<div class="rating-list">
+		                           									<h5>1 Star</h5>
+		                           										<div class="progress">
+		                           											<div class="progress-bar" role="progressbar"
+			                          											style="width: 24%" aria-valuenow="100"
+		                           											aria-valuemin="0" aria-valuemax="100">24%</div>
+		                           										</div>
+		                           									</div>
+		                           								</li>
+		                           							</ul>
+		                           						</div>
+		                           					</div>
+		                           					
+		                           					<div class="col-xl-6">
+		                           						<div class="review-title">
+		                           							<h4 class="fw-500">Add a review</h4>
+		                           						</div>
+		                           						
+		                           						<form action="/review/saveReview" method="POST" enctype="multipart/form-data" onsubmit="return isValid();">
+		                           							<input type="hidden" name="productId" value="${product.productId }">
+			                          						<div class="row g-4">
+			                          							<!-- 평점 넣기 -->
+			                          							<div class="col-md-12">
+			                          								<div class="form-floating theme-form-floating">
+			                          									<div>평점</div>
+			                          									<div class="star-rating space-x-4 mx-auto">
+					                          								<input type="radio" id="1-stars" name="rating" value=1 />
+																			<label for="1-stars" class="star" id="1-span"><i class="fa-solid fa-star" style="color: #f9e50b;"></i></label>
+					                          								<input type="radio" id="2-stars" name="rating" value=2 />
+																			<label for="2-stars" class="star" id="2-span"><i class="fa-solid fa-star" style="color: #f9e50b;"></i></label>
+					                          								<input type="radio" id="3-stars" name="rating" value=3 />
+																			<label for="3-stars" class="star" id="3-span"><i class="fa-solid fa-star" style="color: #f9e50b;"></i></label>
+					                          								<input type="radio" id="4-stars" name="rating" value=4 />
+																			<label for="4-stars" class="star" id="4-span"><i class="fa-solid fa-star" style="color: #f9e50b;"></i></label>
+					                          								<input type="radio" id="5-stars" name="rating" value=5 checked />
+																			<label for="5-stars" class="star" id="5-span"><i class="fa-solid fa-star" style="color: #f9e50b;"></i></label>
+																		</div>
+			                        								</div>
+			                        							</div>
+			                          							<!-- 본문 --> 
+			                          							<div class="col-12">
+			                          								<div class="form-floating theme-form-floating">
+				                          								<textarea class="form-control"
+					                          								placeholder="Leave a comment here"
+			                          										id="floatingTextarea2" style="height: 150px; resize: none;" name="content"></textarea>
+			                          									<label for="floatingTextarea2">Write Your Comment</label>
+			                          								</div>
+			                          							</div>
+			                          							<!-- 이미지 넣기 -->
+			                          							<!-- <div class="col-md-12">
+				                          							<div class="form-floating theme-form-floating">
+			                          									<input type="url" class="form-control" id="review1" placeholder="Give your review a title">
+			                          									<label for="review1">Review Title</label>
+			                          								</div>
+			                           							</div> -->
+			                           							
+			                           							<div class="col-md-12">
+								                                   <div class="form-floating theme-form-floating">
+								                                   	<div style="color: #4a5568;">파일 업로드</div>
+								                                       <div id="insert-files" class="upFileArea">
+														    			업로드 할 파일을 드래그 앤 드랍 하세요.
+															    		<div id="insert-uploadFiles" class="uploadFiles"></div>
+														    		</div>
+								                                   </div>
+								                               </div>
+			                           							
+			                           							<div class="col-md-12">
+			                           								<div class="form-floating theme-form-floating">
+			                           									<button class="btn" style="background-color: #198754; color: #fff;">리뷰 달기</button>
 			                           								</div>
 			                           							</div>
-			                           						</li>
-			                           					</ul>
-			                           				</div>
-			                           			</div>
+			                           						</div>
+		                           						</form>
+		                           					</div>
+		                           						
+		                           						<!-- 리뷰 글 표시 -->
+		                           						<div class="col-12">
+		                           							<div class="review-title">
+		                           								<h4 class="fw-500">상품 구매 후기</h4>
+		                           							</div>
+		                           							<div class="review-people">
+		                           								<ul class="review-list">
+		                           									<c:forEach var="review" items="${reviewList}" varStatus="status">
+		                           										<li id="review-${status.count}">
+			                           										<div class="people-box">
+			                           											<div>
+			                           												<div class="people-image">
+			                           													<!-- 이미지 영역 -->
+		                           														<c:if test="${review.imagesAddr.size() > 0 }">
+		                           															<input type="hidden" value="${status.count}">
+		                           															<img src="../resources/uploads${review.imagesAddr[0]}"
+		                           															class="img-fluid blur-up lazyload review-imgs"
+		                           															data-bs-toggle="modal" data-bs-target="#myModal" />
+		                           														</c:if>
+			                           												</div>
+			                           											</div>
+			                           											<div class="people-comment">
+			                           												<div class="name">${review.author}</div>
+			                           												<div class="date-time">
+			                           													<h6 class="text-content">${review.createdDate }</h6>
+			                           													<div class="product-rating">
+			                           														<ul class="rating">
+			                           															<c:forEach var="i" begin="1" end="5">
+			                           																<c:choose>
+			                           																	<c:when test="${i > review.rating }">
+			                           																		<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+			                           																	</c:when>
+			                           																	<c:otherwise>
+			                           																		<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+			                           																	</c:otherwise>
+			                           																</c:choose>
+			                           															</c:forEach>
+			                           														</ul>
+			                           													</div>
+			                           												</div>
+			                           												
+			                           												<div class="reply">
+			                           													<p>
+			                           														${review.content }
+			                           														<!-- <a href="javascript:void(0)">Reply</a> -->
+			                           														<c:if test="${sessionScope.loginMember.memberId == review.author}">
+				                           														<a onclick="updateReviewCheck(${status.count}, ${review.postNo});">수정</a>
+				                           														<a onclick="removeReviewCheck(${status.count}, ${review.postNo});" style="top:20px; color:#ff3535;">삭제</a>
+			                           														</c:if>
+			                           													</p>
+			                           												</div>
+			                           											</div>
+			                           										</div>
+			                           									</li>
+		                           									</c:forEach>
+				                           						</ul>
+				                           					</div>
+				                           					
+				                           					<div>
+				                           						<!-- 페이징 -->
+				                           						<c:choose>
+				                           							<c:when test="${pagingInfo.totalPagingBlockCnt > paingInfo.endNumOfCurrentPagingBlock}">
+				                           								<c:forEach var="i" begin="${pagingInfo.startNumOfCurrentPagingBlock}" end="${pagingInfo.endNumOfCurrentPagingBlock}" step="1">
+				                           									<li class="page-item active">
+				                           										<button type="button" class="btn btn-success paging-btn">${i}</button>
+				                           									</li>
+				                           								</c:forEach>
+				                           							</c:when>
+				                           							<c:otherwise>
+				                           								<c:forEach var="i" begin="${pagingInfo.startNumOfCurrentPagingBlock}" end="${pagingInfo.totalPageCnt }" step="1">
+				                           									<li class="page-item active">
+				                           										<button type="button" class="btn btn-success paging-btn">${i}</button>
+				                           									</li>
+				                           								</c:forEach>
+				                           							</c:otherwise>
+				                           						</c:choose>
+				                           					</div>
+				                           				</div>
+				                           			</div>
+				                           		</div>
 			                           		</div>
-			                           	</div>
-		                           	</div>
-		                       	</div>
-		                    </div>
+	                       				</div>
+		                    	</div>
 						</div>
 					</div>
 				</div>
@@ -905,11 +1161,11 @@
 									
 									<div class="product-rating mt-1">
 										<ul class="rating">
-											<li><i data-feather="star" class="fill"></i></li>
-											<li><i data-feather="star" class="fill"></i></li>
-											<li><i data-feather="star" class="fill"></i></li>
-											<li><i data-feather="star" class="fill"></i></li>
-											<li><i data-feather="star"></i></li>
+											<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+											<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+											<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+											<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+											<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
 										</ul>
 										<span>(36 Reviews)</span>
 									</div>
@@ -1107,11 +1363,11 @@
                                  </a>
                                  <div class="product-rating mt-2">
                                     <ul class="rating">
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
                                     </ul>
                                     <span>(5.0)</span>
                                  </div>
@@ -1133,7 +1389,7 @@
                                              <i class="fa fa-minus" aria-hidden="true"></i>
                                           </button>
                                           <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="0">
+                                             type="text" name="quantity" value="1">
                                           <button type="button" class="qty-right-plus bg-gray"
                                              data-type="plus" data-field="">
                                              <i class="fa fa-plus" aria-hidden="true"></i>
@@ -1182,11 +1438,11 @@
                                  </a>
                                  <div class="product-rating mt-2">
                                     <ul class="rating">
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
                                     </ul>
                                     <span>(4.0)</span>
                                  </div>
@@ -1208,7 +1464,7 @@
                                              <i class="fa fa-minus" aria-hidden="true"></i>
                                           </button>
                                           <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="0">
+                                             type="text" name="quantity" value="1">
                                           <button type="button" class="qty-right-plus bg-gray"
                                              data-type="plus" data-field="">
                                              <i class="fa fa-plus" aria-hidden="true"></i>
@@ -1259,11 +1515,11 @@
                                  </a>
                                  <div class="product-rating mt-2">
                                     <ul class="rating">
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star"></i></li>
-                                       <li><i data-feather="star"></i></li>
-                                       <li><i data-feather="star"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
                                     </ul>
                                     <span>(2.4)</span>
                                  </div>
@@ -1285,7 +1541,7 @@
                                              <i class="fa fa-minus" aria-hidden="true"></i>
                                           </button>
                                           <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="0">
+                                             type="text" name="quantity" value="1">
                                           <button type="button" class="qty-right-plus bg-gray"
                                              data-type="plus" data-field="">
                                              <i class="fa fa-plus" aria-hidden="true"></i>
@@ -1336,11 +1592,11 @@
                                  </a>
                                  <div class="product-rating mt-2">
                                     <ul class="rating">
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
                                     </ul>
                                     <span>(5.0)</span>
                                  </div>
@@ -1362,7 +1618,7 @@
                                              <i class="fa fa-minus" aria-hidden="true"></i>
                                           </button>
                                           <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="0">
+                                             type="text" name="quantity" value="1">
                                           <button type="button" class="qty-right-plus bg-gray"
                                              data-type="plus" data-field="">
                                              <i class="fa fa-plus" aria-hidden="true"></i>
@@ -1413,11 +1669,11 @@
                                  </a>
                                  <div class="product-rating mt-2">
                                     <ul class="rating">
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star"></i></li>
-                                       <li><i data-feather="star"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
                                     </ul>
                                     <span>(3.8)</span>
                                  </div>
@@ -1439,7 +1695,7 @@
                                              <i class="fa fa-minus" aria-hidden="true"></i>
                                           </button>
                                           <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="0">
+                                             type="text" name="quantity" value="1">
                                           <button type="button" class="qty-right-plus bg-gray"
                                              data-type="plus" data-field="">
                                              <i class="fa fa-plus" aria-hidden="true"></i>
@@ -1489,11 +1745,11 @@
                                  </a>
                                  <div class="product-rating mt-2">
                                     <ul class="rating">
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
                                     </ul>
                                     <span>(4.0)</span>
                                  </div>
@@ -1517,7 +1773,7 @@
                                              <i class="fa fa-minus" aria-hidden="true"></i>
                                           </button>
                                           <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="0">
+                                             type="text" name="quantity" value="1">
                                           <button type="button" class="qty-right-plus bg-gray"
                                              data-type="plus" data-field="">
                                              <i class="fa fa-plus" aria-hidden="true"></i>
@@ -1567,11 +1823,11 @@
                                  </a>
                                  <div class="product-rating mt-2">
                                     <ul class="rating">
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star"></i></li>
-                                       <li><i data-feather="star"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+                                       <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
                                     </ul>
                                     <span>(3.8)</span>
                                  </div>
@@ -1595,7 +1851,7 @@
                                              <i class="fa fa-minus" aria-hidden="true"></i>
                                           </button>
                                           <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="0">
+                                             type="text" name="quantity" value="1">
                                           <button type="button" class="qty-right-plus bg-gray"
                                              data-type="plus" data-field="">
                                              <i class="fa fa-plus" aria-hidden="true"></i>
@@ -1619,32 +1875,30 @@
 
    <jsp:include page="./footer.jsp"></jsp:include>
 
-   <!-- <script>
-      function getAllReview() {
-         const subcategory = $(this).data("productId");
-
-         // ajax 호출
-         $.ajax({
-            url : "/all/" + subcategory,
-            type : "GET",
-            dataType : "json",
-            success : function(data) {
-               // 응답 성공 시
-               console.log(data);
-               // data를 화면에 출력
-               $("#reviewList").html(data);
-            },
-            error : function(error) {
-               // 응답 실패 시
-               console.log(error);
-            }
-         });
-      }
-
-      $(".getAllReview").on("click", getAllReview);
-   </script> -->
-
-
+	<!-- The Modal -->
+	<div class="modal fade" id="myModal">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	
+	      <!-- Modal Header -->
+	      <div class="modal-header">
+	        <h4 class="modal-title">원본 이미지</h4>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+	      </div>
+	
+	      <!-- Modal body -->
+	      <div class="modal-body">
+	      	<div class="fade-img"></div>
+	      </div>
+	
+	      <!-- Modal footer -->
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+	      </div>
+	
+	    </div>
+	  </div>
+	</div>
   
    <!-- jquery ui-->
    <script src="/resources/assets/js/jquery-ui.min.js"></script>
@@ -1660,7 +1914,6 @@
    <!-- Slick js-->
    <script src="/resources/assets/js/slick/slick.js"></script>
    <script src="/resources/assets/js/slick/custom_slick.js"></script>
-
    <!-- Quantity js -->
    <script src="/resources/assets/js/quantity.js"></script>
    <!-- script js -->

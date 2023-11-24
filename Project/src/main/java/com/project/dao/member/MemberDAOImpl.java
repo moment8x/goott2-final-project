@@ -12,7 +12,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.Member;
-import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
@@ -22,6 +21,8 @@ import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
+import com.project.vodto.kjs.ShippingAddrDTO;
+import com.project.vodto.kjs.SignUpDTO;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO {
@@ -361,7 +362,7 @@ public class MemberDAOImpl implements MemberDAO {
 		return result;
 	}
 
-	public int insertMember(Member member) throws SQLException, NamingException {
+	public int insertMember(SignUpDTO member) throws SQLException, NamingException {
 		System.out.println("======= 회원가입 DAO - 회원 가입 =======");
 		
 		return ses.insert(ns + ".insertMember", member);
@@ -387,7 +388,13 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.insert(ns + ".updateProfile", params);
 	}
+	
+	@Override
+	public int insertShipping(ShippingAddrDTO shipping) throws SQLException, NamingException {
+		return ses.insert(ns + ".insertShipping", shipping);
+	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
 
 	
 

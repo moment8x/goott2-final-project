@@ -30,26 +30,16 @@ public class UploadFileServiceImpl implements UploadFileService {
 	
 	@Override
 	public List<UploadFiles> uploadFile(String originalFileName, long size, String contentType, byte[] data,
-			String realPath, List<UploadFiles> fileList) throws IOException, SQLException, NamingException {
-		System.out.println("======= 업로드 서비스단 - 업로드 파일 =======");
+			String realPath, List<UploadFiles> fileList) throws IOException {
 		
 		UploadFiles uf = null;
 		
-//		if (fileList.size() > 0) {
-//			// 기존 파일 삭제. 단, DB에 저장된 파일일 경우 삭제X
-//			for (UploadFiles file : fileList) {
-//				if (isExist(file)) {
-//					deleteFile(file, realPath);
-//				}
-//			}
-//		}
 		// 새 파일 업로드.
 		uf = uploadNewFile(originalFileName, size, contentType, data, realPath);
 		if (uf != null) {
 			fileList.add(uf);
 		}
 		
-		System.out.println("======= 업로드 서비스단 종료 =======");
 		return fileList;
 	}
 	
@@ -129,20 +119,43 @@ public class UploadFileServiceImpl implements UploadFileService {
 	}
 
 	@Override
-	public void deleteFile(UploadFiles uf, String realPath) {
-		System.out.println("업로드 파일 삭제");
+	public int deleteFile(UploadFiles uf, String realPath) {
+		int result = -1;
 		File file = new File(realPath + uf.getNewFileName());
 		if (file.exists()) {
-			if (uf.getNewFileName() != null || uf.getNewFileName().equals("")) {
+			if (uf.getThumbnailFileName() != null || uf.getThumbnailFileName().equals("")) {
 				new File(realPath + uf.getThumbnailFileName()).delete();
 			}
 			file.delete();
+			result = 1;
+		} else {
+			result = 0;
 		}
+		
+		return result;
+	}
+
+	@Override
+	public List<UploadFiles> deleteUploadedFile(List<UploadFiles> fileList, String realPath, String thumbFileName) throws IOException {
+		String newFileName = thumbFileName.replace("thumb_", "");
+//		String separator = File.separator;
+		newFileName = newFileName.replace("/", "\\");
+		for (int i = 0; i < fileList.size(); i++) {
+			// 1. 파일리스트에서 원하는 파일 선택
+			if (fileList.get(i).getNewFileName().equals(newFileName)) {
+				// 2. 실제 파일 삭제
+				if (deleteFile(fileList.get(i), realPath) == 1) {
+					// 3. 리스트에서 제거
+					fileList.remove(i);
+					break;
+				}
+			}
+		}
+		return fileList;
 	}
 
 	@Override
 	public boolean isExist(UploadFiles uf) throws SQLException, NamingException {
-		System.out.println("업로드 파일 유무 조회");
 		boolean result = false;
 		
 		if (uDao.selectUploadFile(uf) != null) {

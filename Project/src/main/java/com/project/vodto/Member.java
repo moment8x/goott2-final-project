@@ -27,7 +27,6 @@ public class Member {
 	private String detailedAddress;
 	private String email;
 	private char identityVerificationStatus;
-	private char reciveAdvertising;
 	private String membershipGrade;
 	private int totalPoints;
 	private int totalRewards;
@@ -36,10 +35,15 @@ public class Member {
 	private String remember;
 	private Timestamp lastLoginDate;
 	private String refundBank;
-	private String accountHolder; //예금주
 	private String refundAccount;
+	private String accountHolder; //예금주
 	private String dormantAccout; //휴면계정
 	private String memberToken;
 	private String permission; //권한 등급
 	private String withdraw; //탈퇴여부
+	private int accumulatedReward;
+	private int accumulatedUseReward;
+	private int accumulatedPoint;
+	private int accumulatedUsePoint;
+	private int accumulatedPayment;
 }

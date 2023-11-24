@@ -11,7 +11,6 @@ import javax.naming.NamingException;
 
 import org.springframework.stereotype.Service;
 
-import com.project.dao.kjs.product.ProductDAO;
 import com.project.dao.kjs.shoppingCart.ShoppingCartDAO;
 import com.project.vodto.ShoppingCart;
 import com.project.vodto.kjs.DisPlayedProductDTO;
@@ -21,15 +20,10 @@ import com.project.vodto.kjs.ShowCartDTO;
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 	@Inject
 	private ShoppingCartDAO scDao;
-	@Inject
-	private ProductDAO pDao;
 	
 	@Override
 	public Map<String, Object> getShoppingCart(String memberId, boolean loginCheck) throws SQLException, NamingException {
-		// 가져가야 할 데이터 : ShoppingCart객체 내용물! 참고로 여러 개! 리스트 필요
-		System.out.println("======= 장바구니 서비스단 - 장바구니 정보 조회 =======");
 		Map<String, Object> result = new HashMap<String, Object>();
-		
 		// 해당 (비)회원의 장바구니 물품 내역
 		List<ShoppingCart> list = null;
 		if (loginCheck) {
@@ -43,13 +37,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 		List<DisPlayedProductDTO> items = new ArrayList<DisPlayedProductDTO>();
 		// 저장
 		for (int i = 0; i < list.size(); i++) {
-			items.add(pDao.selectProduct(list.get(i).getProductId()));
+			items.add(scDao.selectProduct(list.get(i).getProductId(), memberId, loginCheck));
 		}
-		
 		result.put("list", list);
 		result.put("items", items);
-		
-		System.out.println("======= 장바구니 서비스단 끝 =======");
 		
 		return result;
 	}
@@ -70,7 +61,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 	@Override
 	public boolean deleteItem(String memberId, boolean loginCheck, String productId)
 			throws SQLException, NamingException {
-		System.out.println("======= 장바구니 서비스단 - 장바구니 단일 아이템 삭제 =======");
 		boolean result = false;
 		
 		if (loginCheck) {
@@ -86,15 +76,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 			} // else : error
 		}
 		
-		System.out.println("======= 장바구니 서비스단 끝 =======");
-		
 		return result;
 	}
 
 	@Override
 	public boolean dellteItems(String memberId, boolean loginCheck, List<String> items)
 			throws SQLException, NamingException {
-		System.out.println("======= 장바구니 서비스단 - 장바구니 선택 아이템 삭제 =======");
 		boolean result = false;
 		
 		if (loginCheck) {
@@ -110,15 +97,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 			}
 		}
 		
-		System.out.println("======= 장바구니 서비스단 끝 =======");
-		
 		return result;
 	}
 
 	@Override
 	public boolean insertItem(String memberId, boolean loginCheck, String productId, int quantity)
 			throws SQLException, NamingException {
-		System.out.println("======= 장바구니 서비스단 - 장바구니에 아이템 추가 =======");
 		boolean result = false;
 		boolean isFirst = true;
 		
@@ -154,13 +138,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 			}
 		}
 		
-		System.out.println("======= 장바구니 서비스단 끝 =======");
 		return result;
 	}
 
 	@Override
 	public List<ShowCartDTO> getCartList(String memberId, boolean loginCheck) throws SQLException, NamingException {
-		System.out.println("======= 장바구니 서비스단 - 헤더 장바구니 정보 조회 =======");
 		List<ShowCartDTO> result = null;
 		
 		if (loginCheck) {
@@ -169,13 +151,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 			result = scDao.getNonMemberShoppingCart(memberId);
 		}
 		
-		System.out.println("======= 장바구니 서비스단 끝 =======");
 		return result;
 	}
 
 	@Override
 	public int countList(String memberId, boolean loginCheck) throws SQLException, NamingException {
-		System.out.println("======= 장바구니 서비스단 - 헤더 장바구니 정보 조회 =======");
 		int result = -1;
 		
 		if (loginCheck) {
@@ -183,23 +163,28 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 		} else {
 			result = scDao.countListNon(memberId);
 		}
-		System.out.println("======= 장바구니 서비스단 끝 =======");
 		return result;
 	}
 
 	@Override
 	public int updateQTY(String memberId, boolean loginCheck, String productId, int quantity)
 			throws SQLException, NamingException {
-		System.out.println("======= 장바구니 서비스단 - 상품 수량 변경 =======");
 		int result = -1;
+		int availableStock = currentQTY(productId) + 1;
 		
-		if (loginCheck) {
-			result = scDao.updateQTY(memberId, productId, quantity);
-		} else {
-			result = scDao.updateQTYNon(memberId, productId, quantity);
+		if (availableStock > quantity) {
+			if (loginCheck) {
+				result = scDao.updateQTY(memberId, productId, quantity);
+			} else {
+				result = scDao.updateQTYNon(memberId, productId, quantity);
+			}
 		}
 		
-		System.out.println("======= 장바구니 서비스단 끝 =======");
 		return result;
+	}
+	
+	// 현 재고량 확인
+	public int currentQTY(String productId) throws SQLException, NamingException {
+		return scDao.getCurrentQTY(productId);
 	}
 }

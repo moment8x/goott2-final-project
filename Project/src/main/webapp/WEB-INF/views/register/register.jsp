@@ -27,6 +27,11 @@
     <!-- Template css -->
     <link id="color-link" rel="stylesheet" type="text/css" href="/resources/assets/css/style.css">
     
+    <!-- iamport -->
+    <script type="text/javascript"
+		src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+	
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
     <script>
     	let checkDuplication = false;
@@ -43,20 +48,8 @@
     	let isValidZipCode = false;
     	let isValidAddress = false;
     	
-    	/*const entries = performance.getEntriesByType("navigation")[0];
-    	if (entries.type === "reload") {
-    		console.log("새로고침");
-    		$.ajax({
-    			url: "refreshFile",
-    			type: "get",
-    			async: false,
-    			success: function(data) {
-    				console.log(data);
-    			}, error: function(data) {
-    				console.log(data);
-    			}
-    		});
-    	}*/
+    	let IMP = window.IMP;
+    	IMP.init("imp77460302") // 예: 'imp00000000a'
     	
     	$(function () {
     		// 아이디 유효성 검사
@@ -310,6 +303,29 @@
     		});
     	}
     	
+    	// 본인 인증
+    	function identify() {
+    		// IMP.certification(param, callback) 호출
+    		IMP.certification({ // param
+    			pg : 'MIIiasTest',//본인인증 설정이 2개이상 되어 있는 경우 필수 
+    			merchant_uid : "ORD20180131-0000011", // 주문 번호
+    			m_redirect_url : "http://localhost:8081/order/nonMemberOrder?productId=S000208719388", // 모바일환경에서 popup:false(기본값) 인 경우 필수, 예: https://www.myservice.com/payments/complete/mobile
+    			popup : false
+    			// PC환경에서는 popup 파라미터가 무시되고 항상 true 로 적용됨
+    		},
+    		function(rsp) { // callback
+    			if (rsp.success) {
+    				alert("본인인증 성공");
+    				console.log(rsp);
+    				let output = '<input type="hidden" value="Y" name="" readonly>';
+    				output += '<button type="button" class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold" disabled>본인 인증 완료</button>'
+    				document.getElementById("identify").innerHTML = output;
+   				} else {
+   					alert("본인인증에 실패하였습니다. 에러 내용: " + rsp.error_msg);
+   				}
+    		});
+    	}
+    	
     	function validCss(value) {
     		$('#' + value).parent().next().css("color", "#33cc33");
 			$('#' + value).parent().next().css("font-weight", "bold");
@@ -527,7 +543,7 @@
                                     </div>
                                     <div class="validation"></div>
                                     <div>
-                                    	<input id="baseAddr" type="checkbox" name="baseAddr" value="Y" checked/>
+                                    	<input id="baseAddr" type="checkbox" name="basicAddr" value="Y" checked/>
                                     	<label for="baseAddr">기본 배송지로 설정</label>
                                     </div>
                                 </div>
@@ -546,8 +562,8 @@
                                         <label for="profileImage">프로필 이미지</label>
                                         <div class="upFileArea">
 							    			업로드할 파일을 드래그 앤 드랍 하세요.
+								    		<div class="uploadFiles"></div>
 							    		</div>
-							    		<div class="uploadFiles"></div>
                                     </div>
                                     <div class="validation"></div>
                                 </div>
@@ -560,6 +576,14 @@
                                     </div>
                                     <div class="validation"></div>
                                 </div> -->
+                                
+                                <div class="col-12">
+                                	<div class="form-floating theme-form-floating" id="identify">
+		                                <button type="button"
+		                                	class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
+		                                	onclick="identify()">본인 인증</button>
+									</div>
+	                        	</div>
                                 
                                 <!-- 환불 은행 -->
                                 <div class="col-12">
