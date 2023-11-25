@@ -26,10 +26,5 @@ public class ReadyCondition {
 	private Date orderTimeStart;
 	private Date orderTimeEnd;
 	private Date paymentTimeStart;
-	private Date paymentTimeEnd;
-	
-	
-	
-	
-	
+	private Date paymentTimeEnd;	
 }

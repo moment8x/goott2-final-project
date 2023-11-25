@@ -4,6 +4,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.service.kkb.admin.AdminBoardService;
@@ -80,25 +83,72 @@ public class AdminMemberController {
 	
 	/* CRM 회원 상세정보 수정 */
 	@PutMapping("/{memberId}/update")
-	public Map<String, Object> modifyMemberDetail(@RequestBody MemberParam member) throws Exception {
-		return adminMemberService.editMemberDetailInfo(member);
+	public ResponseEntity<String> modifyMemberDetail(@RequestBody MemberParam member) throws Exception {
+		int result = adminMemberService.editMemberDetailInfo(member);
+		
+		if (result > 0) {
+	        return new ResponseEntity<>("Member information updated successfully", HttpStatus.CREATED);
+	    } else {
+	        return new ResponseEntity<>("Failed to update member information", HttpStatus.BAD_REQUEST);
+	    }
 	}
 	
 	/* CRM 전체 주문 조회 */
-	@PostMapping("/{memberId}/search")
-	public Map<String, Object> searchOrderInfo(@RequestBody OrderCondition orderCond) throws Exception {	
+	@GetMapping("/{memberId}/search")
+	public Map<String, Object> searchOrderInfo(
+			@RequestParam String orderNo,
+			@RequestParam String productOrderNo,
+			@RequestParam String invoiceNumber,
+			@RequestParam String name,
+			@RequestParam String memberId,
+			@RequestParam String email,
+			@RequestParam String cellPhoneNumber,
+			@RequestParam String phoneNumber,
+			@RequestParam String payerName,
+			@RequestParam String recipientName,
+			@RequestParam String recipientPhoneNumber,
+			@RequestParam String shippingAddress,
+			@RequestParam String productName,
+			@RequestParam String productId,
+			@RequestParam String categoryKey,
+			@RequestParam String orderTimeStart,
+			@RequestParam String orderTimeEnd,
+			@RequestParam String paymentTimeStart,
+			@RequestParam String paymentTimeEnd) throws Exception {	
+
+		OrderCondition orderCond = OrderCondition.create(
+				orderNo,productOrderNo, invoiceNumber, name, memberId, 
+				email, cellPhoneNumber, phoneNumber, payerName, recipientName, 
+				recipientPhoneNumber, shippingAddress, productName, productId, categoryKey, 
+				orderTimeStart, orderTimeEnd, paymentTimeStart, paymentTimeEnd);
+		
 		return adminOrderService.getOrderInfo(orderCond);
 	}
 	
-	/* CRM 게시물 정보 */
+	/* CRM 게시물 정보 */  // 수정 대기
 	@PostMapping("/{memberId}/board")
 	public Map<String, Object> searchPostInfo(@RequestBody PostCondition postCond) throws Exception {
 		return adminBoardService.getPostInfo(postCond);
 	}
 	
 	/* CRM 1:1 문의 정보 */
-	@PostMapping("/{memberId}/inquiry")
-	public Map<String, Object> searchInquiryInfo(@RequestBody InquiryCondition inquiryCond) throws Exception {
+	@GetMapping("/{memberId}/inquiry")
+	public Map<String, Object> searchInquiryInfo(
+			@RequestParam  String createdDateStart, 
+			@RequestParam  String createdDateEnd, 
+			@RequestParam  String title, 
+			@RequestParam  String email, 
+			@RequestParam  String content,
+			@RequestParam  String author, 
+			@RequestParam  String name, 
+			@RequestParam  String orderNo, 
+			@RequestParam  String answerStatus, 
+			@RequestParam  String inquiryType, 
+			@RequestParam  byte file) throws Exception {
+		
+		InquiryCondition inquiryCond = InquiryCondition.create(
+				createdDateStart, createdDateEnd, title, email, content, author, name, orderNo, answerStatus, inquiryType, file);
+		
 		return adminInquiryService.getInquiryInfo(inquiryCond);
 	}
 	
@@ -133,8 +183,17 @@ public class AdminMemberController {
 	}
 	
 	/* CRM 회원 메모 검색 */
-	@PostMapping("/{memberId}/memo")
-	public Map<String, Object> searchMemoInfo(@RequestBody MemoInfoCondition memoInfoCond) throws Exception {
+	@GetMapping("/{memberId}/memo")
+	public Map<String, Object> searchMemoInfo(
+			@RequestParam  String createdDateStart, 
+			@RequestParam  String createdDateEnd, 
+			@RequestParam  String memberId, 
+			@RequestParam  byte important, 
+			@RequestParam  String content) throws Exception {
+		
+		MemoInfoCondition memoInfoCond = MemoInfoCondition.create(
+				createdDateStart, createdDateEnd, memberId, important, content);
+		
 		return adminMemoService.getMemoById(memoInfoCond);
 	}
 	

@@ -4,6 +4,10 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.project.mappers.adminOrderMapper">
+	<insert id="updateInvoiceNumber">
+		
+	</insert>
+	
 	<select id="selectReadyProductInfo" resultType="ReadyProductResponse">
 		SELECT 	 i.product_image,
 				 p.order_no,
@@ -33,6 +37,7 @@
         ) i
 			ON pr.product_id = i.product_id
 		<where> 
+			d.product_status = '출고전' or d.product_status = '출고완료'
 			<if test='orderNo != null and !orderNo.equals("")' >
 				AND h.order_no = #{orderNo}
 			</if>
@@ -96,6 +101,8 @@
 				 p.order_no,
 		         m.name,
 		         h.member_id,
+		         d.product_status,
+		         d.product_order_no,
                  d.product_invoice_number,
 		         pr.product_name,
 		         pr.product_id,
@@ -116,6 +123,7 @@
 		LEFT JOIN bank_transfers b 
 			ON p.payment_number = b.payment_number
 		<where> 
+			d.product_status = '출고전' or d.product_status = '출고완료'
 			<if test='orderNo != null and !orderNo.equals("")' >
 				AND h.order_no = #{orderNo}
 			</if>

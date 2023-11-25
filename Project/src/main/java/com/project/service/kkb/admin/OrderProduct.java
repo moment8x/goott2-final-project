@@ -2,12 +2,9 @@ package com.project.service.kkb.admin;
 
 import com.project.vodto.kkb.OrderProductResponse;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@AllArgsConstructor
 public class OrderProduct {
 	private String productOrderNo;
 	private String productName;
@@ -16,6 +13,17 @@ public class OrderProduct {
 	private int productPrice;
 	private String productStatus;
 	private String productInvoiceNumber;
+	
+	private OrderProduct(String productOrderNo, String productName, String productId, int productQuantity,
+			int productPrice, String productStatus, String productInvoiceNumber) {
+		this.productOrderNo = productOrderNo;
+		this.productName = productName;
+		this.productId = productId;
+		this.productQuantity = productQuantity;
+		this.productPrice = productPrice;
+		this.productStatus = productStatus;
+		this.productInvoiceNumber = productInvoiceNumber;
+	}
 	
 	public static OrderProduct from(OrderProductResponse order) {
 		return new OrderProduct(

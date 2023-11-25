@@ -1,10 +1,11 @@
 package com.project.service.kkb.admin;
 
+import java.util.List;
 import java.util.Map;
 
 import com.project.vodto.kkb.DepositCondition;
+import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
-import com.project.vodto.kkb.ReadyCondition;
 
 public interface AdminOrderService {
 	 
@@ -15,6 +16,9 @@ public interface AdminOrderService {
 	Map<String, Object> getDepositInfo(DepositCondition depositCond) throws Exception;
 
 	/* 배송 준비중 관리 */
-	Map<String, Object> getReadyInfo(ReadyCondition readyCond) throws Exception;
+	Map<String, Object> getReadyInfo(OrderCondition readyCond) throws Exception;
+	
+	/* 배송 준비중 관리 (송장번호 저장) */
+	int editInvoiceNumber(List<InvoiceCondition> invoiceCondList) throws Exception;
 
 }

@@ -8,10 +8,10 @@ import org.springframework.stereotype.Repository;
 import com.project.vodto.kkb.DepositCondition;
 import com.project.vodto.kkb.DepositNoResponse;
 import com.project.vodto.kkb.DepositProductResponse;
+import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
-import com.project.vodto.kkb.ReadyCondition;
 import com.project.vodto.kkb.ReadyNoResponse;
 import com.project.vodto.kkb.ReadyProductResponse;
 
@@ -45,13 +45,18 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	}
 
 	@Override
-	public List<ReadyNoResponse> findReadyByInfo(ReadyCondition readyCond) throws Exception {
+	public List<ReadyNoResponse> findReadyByInfo(OrderCondition readyCond) throws Exception {
 		return ses.selectList(ns + ".selectReadyNoInfo", readyCond);
 	}
 
 	@Override
-	public List<ReadyProductResponse> findReadyProductByInfo(ReadyCondition readyCond) throws Exception {
+	public List<ReadyProductResponse> findReadyProductByInfo(OrderCondition readyCond) throws Exception {
 		return ses.selectList(ns + ".selectReadyProductInfo", readyCond);
+	}
+
+	@Override
+	public int changeInvoiceProduct(List<InvoiceCondition> invoiceCond) throws Exception {
+		return ses.insert(ns + ".updateInvoiceNumber", invoiceCond);
 	}
 
 }

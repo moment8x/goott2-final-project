@@ -18,6 +18,7 @@ public class ReadyInfoByProduct {
 	private String orderNo;
 	private String name;
 	private String memberId;
+	private String productStatus;
 	private int actualPaymentAmount;
 	private String paymentMethod;
 	private String deliveryMessage;

@@ -23,7 +23,7 @@ public interface AdminMemberService {
 	Map<String, Object> getMemberDetailInfo(String memberId) throws Exception;
 
 	/* CRM 회원 상세정보 수정 */
-	Map<String, Object> editMemberDetailInfo(MemberParam member) throws Exception;
+	int editMemberDetailInfo(MemberParam member) throws Exception;
 
 	
 }

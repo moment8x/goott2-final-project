@@ -6,17 +6,18 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.dao.kkb.admin.AdminOrderDAO;
 import com.project.vodto.kkb.DepositByProduct;
 import com.project.vodto.kkb.DepositCondition;
 import com.project.vodto.kkb.DepositNoResponse;
 import com.project.vodto.kkb.DepositProductResponse;
+import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderByProduct;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
-import com.project.vodto.kkb.ReadyCondition;
 import com.project.vodto.kkb.ReadyInfoByProduct;
 import com.project.vodto.kkb.ReadyNoResponse;
 import com.project.vodto.kkb.ReadyProductResponse;
@@ -28,7 +29,17 @@ import lombok.RequiredArgsConstructor;
 public class AdminOrderServiceImpl implements AdminOrderService {
 	
 	private final AdminOrderDAO adminOrderRepository;
-
+	
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int editInvoiceNumber(List<InvoiceCondition> invoiceCondList) throws Exception {
+		if(adminOrderRepository.changeInvoiceProduct(invoiceCondList) > 0) {
+			
+		}
+		
+		return 1;
+	}
+	
 	@Override
 	public Map<String, Object> getOrderInfo(OrderCondition orderCond) throws Exception {
 		
@@ -56,7 +67,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	}
 	
 	@Override
-	public Map<String, Object> getReadyInfo(ReadyCondition readyCond) throws Exception {
+	public Map<String, Object> getReadyInfo(OrderCondition readyCond) throws Exception {
 		
 		List<ReadyInfoByProduct> readyOrderList = getReadyByProduct(readyCond);
 		List<ReadyProductResponse> readyProductList = adminOrderRepository.findReadyProductByInfo(readyCond);
@@ -131,7 +142,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		            .collect(Collectors.toList());
 	}
 	
-	private List<ReadyInfoByProduct> getReadyByProduct(ReadyCondition readyCond) throws Exception {
+	private List<ReadyInfoByProduct> getReadyByProduct(OrderCondition readyCond) throws Exception {
 	    
 		List<ReadyNoResponse> list = adminOrderRepository.findReadyByInfo(readyCond);
 
@@ -153,6 +164,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	                        orderNo,
 	                        info.getName(),
 	                        info.getMemberId(),
+	                        info.getProductStatus(),
 	                        info.getActualPaymentAmount(),
 	                        info.getPaymentMethod(),
 	                        info.getDeliveryMessage(),
@@ -161,51 +173,5 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	            })
 	            .collect(Collectors.toList());
 	}
-
-	
-	
-	
-//	private List<OrderByProduct> getOrderByProduct (OrderCondition orderCond) throws Exception {
-//		return getObjectByProduct(
-//				OrderProduct::from,
-//				OrderProductResponse::getOrderNo,
-//				() -> adminOrderRepository.findProductByInfo(orderCond));
-//	}
-//	
-//	private List<DepositByProduct> getDepositByProduct (DepositCondition depositCond) throws Exception {
-//		return getObjectByProduct(
-//				DepositProduct::from,
-//				DepositProductResponse::getOrderNo,
-//				() -> adminOrderRepository.findDepositProductByInfo(depositCond));
-//	}
-//	
-//	private <T,R> R createResult(T info, String orderNo, List<R> orders) {
-//		
-//			return new OrderByProduct();
-//		
-//	}
-//	
-//	private <T,R> List<R> getObjectByProduct(Function<T, R> toProduct,
-//			Function<T, String> toOrderNo, Supplier<List<T>> listSupplier) throws Exception{
-//		
-//		List<T> list = listSupplier.get();
-//		
-//		return list.stream()
-//	            .collect(Collectors.groupingBy(toOrderNo))
-//	            .entrySet().stream()
-//	            .map(order -> {
-//	                String orderNo = order.getKey();
-//	                
-//	                List<R> orders = order.getValue()
-//	                        .stream()
-//	                        .map(toProduct)
-//	                        .collect(Collectors.toList());
-//
-//	                T info = order.getValue().get(0);
-//
-//	                return createResult(info, orderNo, orders);
-//	            })
-//	            .collect(Collectors.toList());
-//	}
 
 }

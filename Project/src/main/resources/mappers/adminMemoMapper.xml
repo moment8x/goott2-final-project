@@ -16,7 +16,7 @@
 				<where>
 					m.member_id = #{memberId} 
 					<if test='(createdDateStart != null and !createdDateStart.equals("")) and 
-		         		(createdDateEnd != null and !dcreatedDateEnd.equals(""))'>
+		         		(createdDateEnd != null and !createdDateEnd.equals(""))'>
 		         		AND m.created_date BETWEEN #{createdDateStart} AND #{createdDateEnd}
 	         		</if>
 	         		<if test='important == 0 or important == 1'>

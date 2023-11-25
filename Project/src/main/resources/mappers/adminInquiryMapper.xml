@@ -24,7 +24,7 @@
 			ON c.post_no = f.post_no
 		<where>
 			<if test='(createdDateStart != null and !createdDateStart.equals("")) and 
-	         		(createdDateEnd != null and !dcreatedDateEnd.equals(""))'>
+	         		(createdDateEnd != null and !createdDateEnd.equals(""))'>
 	         		AND c.created_date BETWEEN #{createdDateStart} AND #{createdDateEnd}
          	</if>
 			<if test='title != null and !title.equals("")' >

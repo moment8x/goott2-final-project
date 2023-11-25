@@ -12,7 +12,9 @@ public class ReadyNoResponse {
 	private Timestamp paymentTime;
 	private String orderNo;
 	private String name;
-	private String memberId;
+	private String memberId;	
+	private String productStatus;
+	private String productOrderNo;
 	private String productInvoiceNumber;
 	private String productName;
 	private String productId;

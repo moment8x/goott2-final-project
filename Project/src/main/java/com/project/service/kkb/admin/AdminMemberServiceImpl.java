@@ -55,16 +55,8 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	}	
 	
 	@Override
-	public Map<String, Object> editMemberDetailInfo(MemberParam member) throws Exception {
-		
-		int result = adminMemberRepository.changeMemberDetailInfo(member);
-		Map<String, Object> status = new HashMap<>();
-		if(result == 1) {
-			status.put("status", "success");
-		} else {
-			status.put("status", "fail");
-		}
-		return status;
+	public int editMemberDetailInfo(MemberParam member) throws Exception {		
+		return adminMemberRepository.changeMemberDetailInfo(member);
 	}
 	
 	@Override

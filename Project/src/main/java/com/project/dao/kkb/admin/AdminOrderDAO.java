@@ -5,10 +5,10 @@ import java.util.List;
 import com.project.vodto.kkb.DepositCondition;
 import com.project.vodto.kkb.DepositNoResponse;
 import com.project.vodto.kkb.DepositProductResponse;
+import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
-import com.project.vodto.kkb.ReadyCondition;
 import com.project.vodto.kkb.ReadyNoResponse;
 import com.project.vodto.kkb.ReadyProductResponse;
 
@@ -27,9 +27,12 @@ public interface AdminOrderDAO {
 	List<DepositProductResponse> findDepositProductByInfo(DepositCondition depositCond) throws Exception;
 	
 	/* 배송 준비중 관리 (주문번호별) */
-	List<ReadyNoResponse> findReadyByInfo(ReadyCondition readyCond) throws Exception;
+	List<ReadyNoResponse> findReadyByInfo(OrderCondition readyCond) throws Exception;
 	
 	/* 배송 준비중 관리 (상품별) */
-	List<ReadyProductResponse> findReadyProductByInfo(ReadyCondition readyCond) throws Exception;
+	List<ReadyProductResponse> findReadyProductByInfo(OrderCondition readyCond) throws Exception;
+
+	/* 배송 준비중 관리 (상품 송장번호 저장) */
+	int changeInvoiceProduct(List<InvoiceCondition> invoiceCond) throws Exception;
 	
 }
