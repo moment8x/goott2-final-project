@@ -83,13 +83,13 @@ public class AdminMemberController {
 	
 	/* CRM 회원 상세정보 수정 */
 	@PutMapping("/{memberId}/update")
-	public ResponseEntity<String> modifyMemberDetail(@RequestBody MemberParam member) throws Exception {
+	public ResponseEntity<String> setMemberDetail(@RequestBody MemberParam member) throws Exception {
 		int result = adminMemberService.editMemberDetailInfo(member);
 		
 		if (result > 0) {
 	        return new ResponseEntity<>("Member information updated successfully", HttpStatus.CREATED);
 	    } else {
-	        return new ResponseEntity<>("Failed to update member information", HttpStatus.BAD_REQUEST);
+	        return new ResponseEntity<>("Failed to update member information", HttpStatus.NOT_FOUND);
 	    }
 	}
 	
@@ -199,7 +199,13 @@ public class AdminMemberController {
 	
 	/* CRM 회원 메모 작성 */
 	@PostMapping("/{memberId}/memo/write")
-	public void addMemberMemo(@RequestBody MemoCondition memoCond, HttpServletRequest req) throws Exception {
-		adminMemoService.addMemberMemo(memoCond, req);
+	public ResponseEntity<String> addMemberMemo(@RequestBody MemoCondition memoCond, HttpServletRequest req) throws Exception {
+		int result = adminMemoService.addMemberMemo(memoCond, req);
+		
+		if (result > 0) {
+	        return new ResponseEntity<>("Member memo add successful", HttpStatus.CREATED);
+	    } else {
+	        return new ResponseEntity<>("Failed to add member memo", HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
 	}
 }

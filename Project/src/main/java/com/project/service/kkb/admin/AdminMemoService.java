@@ -13,5 +13,5 @@ public interface AdminMemoService {
 	Map<String, Object> getMemoById(MemoInfoCondition memoInfoCond) throws Exception;
 
 	/* 회원 메모 작성 */
-	void addMemberMemo(MemoCondition memoCond, HttpServletRequest req) throws Exception;
+	int addMemberMemo(MemoCondition memoCond, HttpServletRequest req) throws Exception;
 }

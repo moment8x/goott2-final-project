@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.project.dao.kkb.admin.AdminOrderDAO;
 import com.project.vodto.kkb.DepositByProduct;
+import com.project.vodto.kkb.DepositCancelInfoResponse;
 import com.project.vodto.kkb.DepositCondition;
 import com.project.vodto.kkb.DepositNoResponse;
 import com.project.vodto.kkb.DepositProductResponse;
@@ -30,14 +31,23 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	
 	private final AdminOrderDAO adminOrderRepository;
 	
+	/* 송장 번호 업데이트 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public int editInvoiceNumber(List<InvoiceCondition> invoiceCondList) throws Exception {
-		if(adminOrderRepository.changeInvoiceProduct(invoiceCondList) > 0) {
-			
-		}
 		
-		return 1;
+		int result = -1;
+		
+		if(invoiceCondList != null && !invoiceCondList.isEmpty()) {
+			
+			InvoiceCondition invoiceCond = invoiceCondList.get(0);
+			/* 주문 상세 상품 및 주문내역 테이블 송장 번호 업데이트 */
+			if(adminOrderRepository.changeInvoiceProduct(invoiceCondList) > 0) {
+				adminOrderRepository.changeInvoiceHistory(invoiceCond);
+				result = invoiceCondList.size();
+			}
+		}
+		return result;
 	}
 	
 	@Override
@@ -63,6 +73,39 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		result.put("depositOrderList", depositOrderList);
 		result.put("depositProductList", depositProductList);
 		
+		return result;
+	}
+
+	/* 입금전 관리 - 주문 취소 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int editDepositOrderCancel(List<String> orderNoList) throws Exception {
+		
+		int result = -1;
+		
+		if(adminOrderRepository.changeDepositOrderCancel(orderNoList) > 0 ) {
+			if(adminOrderRepository.changeDepositOrderCancelHistory(orderNoList) > 0) {
+				List<DepositCancelInfoResponse> cancelInfoList = adminOrderRepository.findDepositCancelInfo(orderNoList);
+				
+				result = adminOrderRepository.saveDepositOrderCancel(cancelInfoList);
+			}
+		}
+		return result;
+	}
+
+	/* 입금전 관리 - 입금 확인 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int editDepositConfirm(List<String> orderNoList) throws Exception {
+		
+		int result = -1;
+		/* 주문 상세 상품, 주문내역 테이블 상태 업데이트 */
+		if(adminOrderRepository.changeDepositConfirm(orderNoList) > 0 ) {
+			if(adminOrderRepository.changeDepositConfirmHistory(orderNoList) > 0) {
+				/* 주문 상세 상품 테이블에 송장 번호 입력일 업데이트 */
+				result = adminOrderRepository.changeDepositConfirmDate(orderNoList);
+			}
+		}
 		return result;
 	}
 	
@@ -173,5 +216,4 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	            })
 	            .collect(Collectors.toList());
 	}
-
 }

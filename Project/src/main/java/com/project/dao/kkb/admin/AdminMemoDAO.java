@@ -12,5 +12,5 @@ public interface AdminMemoDAO {
 	List<MemoListResponse> findMemoById(MemoInfoCondition memoInfoCond) throws Exception;
 	
 	/* 회원 메모 작성 */
-	void saveMemberMemo(MemoCondition memoCond) throws Exception;
+	int saveMemberMemo(MemoCondition memoCond) throws Exception;
 }

@@ -34,7 +34,7 @@ public class AdminMemoServiceImpl implements AdminMemoService {
 	}
 
 	@Override
-	public void addMemberMemo(MemoCondition memoCond, HttpServletRequest req) throws Exception {
+	public int addMemberMemo(MemoCondition memoCond, HttpServletRequest req) throws Exception {
 		Memberkjy member = (Memberkjy) req.getSession().getAttribute("loginMember");
 		
 		if(member.getPermission().equals("ROLE_ADMIN")) {
@@ -44,7 +44,9 @@ public class AdminMemoServiceImpl implements AdminMemoService {
 			throw new RuntimeException("권한 없음");
 		}
 		
-		adminMemoDAO.saveMemberMemo(memoCond);
+		int result = adminMemoDAO.saveMemberMemo(memoCond);
+		
+		return result;
 	}
 
 }

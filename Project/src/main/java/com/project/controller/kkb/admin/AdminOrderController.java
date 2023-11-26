@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.service.kkb.admin.AdminOrderService;
 import com.project.vodto.kkb.DepositCondition;
+import com.project.vodto.kkb.DepositConfirmRequest;
+import com.project.vodto.kkb.DepositOrderCancelRequest;
 import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
 
@@ -93,8 +94,32 @@ public class AdminOrderController {
 			return adminOrderService.getDepositInfo(depositCond);
 		}
 		
+		/* 입금 전 관리 (입금 확인 버튼)*/
+		@PutMapping("/confirm")
+		public ResponseEntity<String> setDepositConfirm(@RequestBody DepositConfirmRequest orderNoList) throws Exception {	
+			int result = adminOrderService.editDepositConfirm(orderNoList.getOrderNoList());
+			
+			if (result > 0) {
+		        return new ResponseEntity<>("Deposit confirmation update successful", HttpStatus.CREATED);
+		    } else {
+		        return new ResponseEntity<>("No orders were found to update", HttpStatus.NOT_FOUND);
+		    }
+		} 
+		
+		/* 입금 전 관리 (주문 취소 버튼)*/
+		@PutMapping("/cancel")
+		public ResponseEntity<String> setDepositOrderCancel(@RequestBody DepositOrderCancelRequest orderNoList) throws Exception {	
+			int result = adminOrderService.editDepositOrderCancel(orderNoList.getOrderNoList());
+			
+			if (result > 0) {
+		        return new ResponseEntity<>("Order cancellation update successful", HttpStatus.CREATED);
+		    } else {
+		        return new ResponseEntity<>("No orders were found to update", HttpStatus.NOT_FOUND);
+		    }
+		} 
+		
 		/* 배송 준비중 관리 */
-		@PostMapping("/ready")
+		@GetMapping("/ready")
 		public Map<String, Object> searchReadyInfo(
 				@RequestParam String orderNo,
 				@RequestParam String productOrderNo,
@@ -127,13 +152,13 @@ public class AdminOrderController {
 		
 		/* 배송 준비중 관리 (송장번호 저장)*/
 		@PutMapping("/invoice")
-		public ResponseEntity<String> modifyInvoiceNumber(@RequestBody List<InvoiceCondition> invoiceCondList) throws Exception {	
+		public ResponseEntity<String> setInvoiceNumber(@RequestBody List<InvoiceCondition> invoiceCondList) throws Exception {	
 			int result = adminOrderService.editInvoiceNumber(invoiceCondList);
 			
 			if (result > 0) {
 		        return new ResponseEntity<>("Invoice number update successful", HttpStatus.CREATED);
 		    } else {
-		        return new ResponseEntity<>("Invoice number update failed", HttpStatus.BAD_REQUEST);
+		    	return new ResponseEntity<>("No orders were found to update", HttpStatus.NOT_FOUND);
 		    }
 		}
 }

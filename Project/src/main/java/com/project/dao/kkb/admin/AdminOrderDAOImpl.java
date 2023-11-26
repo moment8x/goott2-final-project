@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.project.vodto.kkb.DepositCancelInfoResponse;
 import com.project.vodto.kkb.DepositCondition;
 import com.project.vodto.kkb.DepositNoResponse;
 import com.project.vodto.kkb.DepositProductResponse;
@@ -45,6 +46,41 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	}
 
 	@Override
+	public int changeDepositConfirm(List<String> orderNoList) throws Exception {
+		return ses.update(ns + ".updateDepositConfirmNo", orderNoList);
+	}
+
+	@Override
+	public int changeDepositConfirmDate(List<String> orderNoList) throws Exception {
+		return ses.update(ns + ".updateDepositConfirmDate", orderNoList);
+	}
+
+	@Override
+	public int changeDepositConfirmHistory(List<String> orderNoList) throws Exception {
+		return ses.update(ns + ".updateDepositConfirmHistory", orderNoList);
+	}
+
+	@Override
+	public int changeDepositOrderCancel(List<String> orderNoList) throws Exception {
+		return ses.update(ns + ".updateDepositOrderCancel", orderNoList);
+	}
+
+	@Override
+	public int changeDepositOrderCancelHistory(List<String> orderNoList) throws Exception {
+		return ses.update(ns + ".updateDepositOrderCancelHistory", orderNoList);
+	}
+
+	@Override
+	public List<DepositCancelInfoResponse> findDepositCancelInfo(List<String> orderNoList) throws Exception {
+		return ses.selectList(ns + ".selectDepositCancelInfo", orderNoList);
+	}
+	
+	@Override
+	public int saveDepositOrderCancel(List<DepositCancelInfoResponse> cancelInfoList) throws Exception {
+		return ses.insert(ns + ".insertDepositOrderCancel", cancelInfoList);
+	}
+
+	@Override
 	public List<ReadyNoResponse> findReadyByInfo(OrderCondition readyCond) throws Exception {
 		return ses.selectList(ns + ".selectReadyNoInfo", readyCond);
 	}
@@ -55,8 +91,12 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	}
 
 	@Override
-	public int changeInvoiceProduct(List<InvoiceCondition> invoiceCond) throws Exception {
-		return ses.insert(ns + ".updateInvoiceNumber", invoiceCond);
+	public int changeInvoiceProduct(List<InvoiceCondition> invoiceCondList) throws Exception {
+		return ses.update(ns + ".updateInvoiceProduct", invoiceCondList);
 	}
 
+	@Override
+	public int changeInvoiceHistory(InvoiceCondition invoiceCond) throws Exception {
+		return ses.update(ns + ".updateInvoiceHistory", invoiceCond);
+	}
 }

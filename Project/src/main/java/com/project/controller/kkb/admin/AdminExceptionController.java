@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @RestController
-public class ExceptionController {
+public class AdminExceptionController {
 	
 	@GetMapping("/api/members/{id}")
 	public MemberDto getMember(@PathVariable("id") String id) {

@@ -4,9 +4,19 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.project.mappers.adminOrderMapper">
-	<insert id="updateInvoiceNumber">
-		
-	</insert>
+	<update id="updateInvoiceProduct" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
+			UPDATE detailed_order_items 
+			SET    product_invoice_number = #{item.productInvoiceNumber} 
+			WHERE  product_order_no = #{item.productOrderNo}
+		</foreach>
+	</update>
+	
+	<update id="updateInvoiceHistory">
+		UPDATE order_history
+		SET    invoice_number = #{productInvoiceNumber}
+		WHERE  order_no = #{orderNo} AND invoice_number IS NULL 	
+	</update>
 	
 	<select id="selectReadyProductInfo" resultType="ReadyProductResponse">
 		SELECT 	 i.product_image,
@@ -181,6 +191,63 @@
 		ORDER BY h.order_time DESC, d.product_order_no DESC;
 	</select>
 	
+	<update id="updateDepositOrderCancel" parameterType="java.util.List">
+		<foreach collection="list" item="orderNo" index="index" separator=";">
+			UPDATE detailed_order_items 
+			SET    product_status = '취소' 
+			WHERE  order_no = #{orderNo}
+		</foreach>
+	</update>
+	
+	<update id="updateDepositOrderCancelHistory" parameterType="java.util.List">
+		<foreach collection="list" item="orderNo" index="index" separator=";">
+			UPDATE order_history
+			SET    delivery_status = '취소' 
+			WHERE  order_no = #{orderNo}
+		</foreach>
+	</update>
+	
+	<select id="selectDepositCancelInfo" resultType="DepositCancelInfoResponse">
+		SELECT  detailed_order_id, product_id, product_order_no 
+		FROM    detailed_order_items
+		WHERE   order_no IN
+		<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+        	#{orderNo}
+    	</foreach>
+	</select>
+	
+	<insert id="insertDepositOrderCancel" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
+			INSERT INTO cancellations(product_id, reason, amount, processing_status, 
+									  refund_status, request_time, completion_time, detailed_order_id) 
+			VALUES     (#{item.productId},'관리자',0,'취소완료','Y',NOW(),NOW(),#{item.detailedOrderId}) 
+		</foreach>
+	</insert>
+	
+	<update id="updateDepositConfirmNo" parameterType="java.util.List">
+		<foreach collection="list" item="orderNo" index="index" separator=";">
+			UPDATE detailed_order_items 
+			SET    product_status = '출고전' 
+			WHERE  order_no = #{orderNo}
+		</foreach>
+	</update>
+	
+	<update id="updateDepositConfirmDate">
+		<foreach collection="list" item="orderNo" index="index" separator=";">
+			UPDATE bank_transfers
+			SET    confirm_date = NOW()
+			WHERE  order_no = #{orderNo}	
+		</foreach>
+	</update>
+	
+	<update id="updateDepositConfirmHistory">
+		<foreach collection="list" item="orderNo" index="index" separator=";">
+			UPDATE order_history
+			SET    delivery_status = '출고전' 
+			WHERE  order_no = #{orderNo}
+		</foreach>
+	</update>
+	
 	<select id="selectDepositProductInfo" resultType="DepositProductResponse">
 		SELECT 	 h.order_time,
 				 p.order_no,
@@ -206,7 +273,9 @@
 		LEFT JOIN bank_transfers b 
 			ON p.payment_number = b.payment_number
 		<where> 
-			p.payment_method = 'bkt' AND (b.deposit_amount = 0 OR b.deposit_amount is null)
+			p.payment_method = 'bkt' 
+			AND (b.deposit_amount = 0 OR b.deposit_amount is null)
+			AND h.delivery_status = '입금전'
 			<if test='orderNo != null and !orderNo.equals("")' >
 				AND h.order_no = #{orderNo}
 			</if>
@@ -293,7 +362,9 @@
             ) product_count
 			ON h.order_no = product_count.order_no
 		<where> 
-			p.payment_method = 'bkt' AND (b.deposit_amount = 0 OR b.deposit_amount is null)
+			p.payment_method = 'bkt' 
+			AND (b.deposit_amount = 0 OR b.deposit_amount is null)
+			AND h.delivery_status = '입금전'
 			
 			<if test='orderNo != null and !orderNo.equals("")' >
 				AND h.order_no = #{orderNo}
@@ -349,8 +420,6 @@
 	         		AND confirm_date BETWEEN #{confirmDateStart} AND #{confirmDateEnd}
          	</if>
 		</where>
-		
-		
 		ORDER BY h.order_time DESC;
 	</select>
 	

@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter
-@ToString
 public class MemoInfoCondition {
 	private Date createdDateStart;
 	private Date createdDateEnd;

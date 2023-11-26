@@ -158,18 +158,4 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		
 		return age+"세";
 	}
-
-//	@EventListener(ContextRefreshedEvent.class)
-//	public void updateMemberCount(ContextRefreshedEvent e) throws Exception {
-//		
-//		// Root WebApplicationContext 초기화 시에만 체크
-//		if (e.getApplicationContext().getParent() == null) {
-//			int updateCount = adminMemberRepository.countAll();	
-//			System.out.println("context refresh");
-//			
-//			// 전체 회원 수를 조회하는 이벤트 발행
-//	        publisher.publishEvent(new TotalMemberCountEvent(updateCount));
-//		}
-//	}
-//	
 }
