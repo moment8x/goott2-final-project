@@ -69,7 +69,32 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	public int changeDepositOrderCancelHistory(List<String> orderNoList) throws Exception {
 		return ses.update(ns + ".updateDepositOrderCancelHistory", orderNoList);
 	}
+	
+	@Override
+	public int changeDepositOrderCancelPayments(List<String> orderNoList) throws Exception {
+		return ses.update(ns + ".updateDepositOrderCancelPayments", orderNoList);
+	}
+	
+	@Override
+	public int changeDepositOrderCancelCoupon(List<String> orderNoList) {
+		return ses.update(ns + ".updateDepositOrderCancelCoupon", orderNoList);
+	}
 
+	@Override
+	public int changeDepositOrderCancelReward(List<String> orderNoList) {
+		return ses.update(ns + ".updateDepositOrderCancelReward", orderNoList);
+	}
+
+	@Override
+	public int changeDepositOrderCancelPoint(List<String> orderNoList) {
+		return ses.update(ns + ".updateDepositOrderCancelPoint", orderNoList);
+	}
+
+	@Override
+	public int changeDepositOrderCancelMember(List<String> orderNoList) {
+		return ses.update(ns + ".updateDepositOrderCancelMember", orderNoList);
+	}
+	
 	@Override
 	public List<DepositCancelInfoResponse> findDepositCancelInfo(List<String> orderNoList) throws Exception {
 		return ses.selectList(ns + ".selectDepositCancelInfo", orderNoList);

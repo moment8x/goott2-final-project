@@ -102,7 +102,7 @@
 	         		AND payment_time BETWEEN #{paymentTimeStart} AND #{paymentTimeEnd}
          	</if>
 		</where>
-		ORDER BY h.order_time DESC, d.product_order_no DESC;
+		ORDER BY h.order_time DESC, d.product_order_no DESC
 	</select>
 	
 	<select id="selectReadyNoInfo" resultType="ReadyNoResponse">
@@ -188,15 +188,15 @@
 	         		AND payment_time BETWEEN #{paymentTimeStart} AND #{paymentTimeEnd}
          	</if>
 		</where>
-		ORDER BY h.order_time DESC, d.product_order_no DESC;
+		ORDER BY h.order_time DESC, d.product_order_no DESC
 	</select>
 	
 	<update id="updateDepositOrderCancel" parameterType="java.util.List">
-		<foreach collection="list" item="orderNo" index="index" separator=";">
-			UPDATE detailed_order_items 
-			SET    product_status = '취소' 
-			WHERE  order_no = #{orderNo}
-		</foreach>
+	    <foreach collection="list" item="orderNo" index="index" separator=";">
+	        UPDATE detailed_order_items 
+	        SET product_status = '취소', coupon_discount = 0
+	        WHERE order_no = #{orderNo}
+	    </foreach>
 	</update>
 	
 	<update id="updateDepositOrderCancelHistory" parameterType="java.util.List">
@@ -204,6 +204,71 @@
 			UPDATE order_history
 			SET    delivery_status = '취소' 
 			WHERE  order_no = #{orderNo}
+		</foreach>
+	</update>
+	
+	<update id="updateDepositOrderCancelPayments" parameterType="java.util.List">
+		<foreach collection="list" item="orderNo" index="index" separator=";">
+			UPDATE payments
+			SET    payment_status = '취소' 
+			WHERE  order_no = #{orderNo}
+		</foreach>
+	</update>
+	
+	<update id="updateDepositOrderCancelCoupon" parameterType="java.util.List">
+		<foreach collection="list" item="orderNo" index="index" separator=";">
+			UPDATE coupon_logs
+			SET    used_date = NULL,related_order = NULL
+			WHERE  related_order = #{orderNo}
+		</foreach>
+	</update>
+	
+	<update id="updateDepositOrderCancelReward" parameterType="java.util.List">
+		<foreach collection="list" item="orderNo" index="index" separator=";">			
+			UPDATE		 reward_logs r
+			INNER JOIN	 payments p
+			ON 			 r.related_order = p.order_no
+			INNER JOIN   member m
+			ON 			 r.member_id = m.member_id
+			SET 		 r.reason = '취소', 
+						 r.reward = p.used_reward,
+			             r.balance = total_rewards + p.used_reward
+			WHERE 		 r.related_order = #{orderNo}
+		</foreach>
+	</update>
+	
+	<update id="updateDepositOrderCancelPoint" parameterType="java.util.List">
+		<foreach collection="list" item="orderNo" index="index" separator=";">
+			UPDATE		 point_logs l
+			INNER JOIN	 payments p
+			ON 			 l.related_order = p.order_no
+			INNER JOIN   member m
+			ON 			 l.member_id = m.member_id
+			SET 		 l.reason = '취소', 
+						 l.point = p.used_points,
+			             l.balance = total_points + p.used_points
+			WHERE 		 l.related_order = #{orderNo}
+		</foreach>
+	</update>
+	
+	<update id="updateDepositOrderCancelMember" parameterType="java.util.List">
+		<foreach collection="list" item="orderNo" index="index" separator=";">
+			UPDATE		 member m
+			INNER JOIN	 order_history o
+			ON  		 m.member_id = o.member_id
+			INNER JOIN	 payments p
+			ON 			 o.order_no = p.order_no
+			LEFT JOIN    (SELECT count(detailed_order_id) count, order_no
+						  FROM   detailed_order_items
+						  WHERE  order_no = 'O1700812765494' AND 
+								(coupon_discount is not null AND coupon_discount != 0)) s
+			ON           o.order_no = s.order_no
+			SET 		 m.coupon_count = m.coupon_count + s.count,
+						 m.total_points = m.total_points + p.used_points,
+			             m.total_rewards = m.total_rewards + p.used_reward,
+			             m.accumulated_use_reward = m.accumulated_use_reward - p.used_points,
+			             m.accumulated_use_point = m.accumulated_use_point - p.used_reward
+			WHERE 		 o.order_no = #{orderNo}
 		</foreach>
 	</update>
 	
@@ -330,7 +395,7 @@
 	         		AND confirm_date BETWEEN #{confirmDateStart} AND #{confirmDateEnd}
          	</if>
 		</where>
-		ORDER BY h.order_time DESC, d.product_order_no DESC;
+		ORDER BY h.order_time DESC, d.product_order_no DESC
 	</select>
 	
 	<select id="selectDepositNoInfo" resultType="DepositNoResponse">
@@ -420,7 +485,7 @@
 	         		AND confirm_date BETWEEN #{confirmDateStart} AND #{confirmDateEnd}
          	</if>
 		</where>
-		ORDER BY h.order_time DESC;
+		ORDER BY h.order_time DESC
 	</select>
 	
 	

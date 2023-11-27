@@ -6,6 +6,7 @@
 <configuration>
 	<settings>
 		<setting name="mapUnderscoreToCamelCase" value="true" />
+		<!-- <setting name="logImpl" value="SLF4J" /> -->
 	</settings>
 
 	<typeAliases>

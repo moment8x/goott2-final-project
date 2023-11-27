@@ -27,7 +27,7 @@
 					</if>
 				</where>
 				ORDER BY m.created_date ASC) s
-		ORDER BY s.no DESC;
+		ORDER BY s.no DESC
 	</select>	
 	
 	<insert id="insertMemberMemo">

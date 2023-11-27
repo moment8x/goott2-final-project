@@ -24,8 +24,8 @@ public class AdminMemoDAOImpl implements AdminMemoDAO {
 	}
 
 	@Override
-	public void saveMemberMemo(MemoCondition memoCond) throws Exception {
-		ses.insert(ns + ".insertMemberMemo", memoCond);
+	public int saveMemberMemo(MemoCondition memoCond) throws Exception {
+		return ses.insert(ns + ".insertMemberMemo", memoCond);
 	}
 
 }

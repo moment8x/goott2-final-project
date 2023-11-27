@@ -21,6 +21,7 @@ public interface AdminOrderDAO {
 	/* 전체 주문 조회 (품목주문별) */
 	List<OrderProductResponse> findProductByInfo(OrderCondition orderCond) throws Exception;
 
+	
 	/* 입금 전 관리 (주문번호별) */
 	List<DepositNoResponse> findDepositByInfo(DepositCondition depositCond) throws Exception;
 
@@ -36,17 +37,33 @@ public interface AdminOrderDAO {
 	/* 입금 전 관리 (입금 확인 버튼 - 주문 내역 상태) */
 	int changeDepositConfirmHistory(List<String> orderNoList) throws Exception;
 	
-	/* 입금 전 관리 (주문 취소 버튼 - 주문 상세 상품 상태) */
+	/* 입금 전 관리 (주문 취소 버튼 - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
 	int changeDepositOrderCancel(List<String> orderNoList) throws Exception;
 
-	/* 입금 전 관리 (주문 취소 버튼 - 주문 내역 상태) */
+	/* 입금 전 관리 (주문 취소 버튼 - 주문 내역 테이블 update(column : delivery_status)) */
 	int changeDepositOrderCancelHistory(List<String> orderNoList) throws Exception;
+	
+	/* 입금 전 관리 (주문 취소 버튼 - 결제 테이블 update(column : payment_status)) */
+	int changeDepositOrderCancelPayments(List<String> orderNoList) throws Exception;
+	
+	/* 입금 전 관리 (주문 취소 버튼 - 쿠폰 로그 테이블 update(column : used_date, related_order)) */
+	int changeDepositOrderCancelCoupon(List<String> orderNoList) throws Exception;
+	
+	/* 입금 전 관리 (주문 취소 버튼 - 적립금 로그 테이블 update(column : reason, balance, reward)) */
+	int changeDepositOrderCancelReward(List<String> orderNoList) throws Exception;
+	
+	/* 입금 전 관리 (주문 취소 버튼 - 포인트 로그 테이블 update(column : reason, balance, point)) */
+	int changeDepositOrderCancelPoint(List<String> orderNoList) throws Exception;
+	
+	/* 입금 전 관리 (주문 취소 버튼 - ) */
+	int changeDepositOrderCancelMember(List<String> orderNoList) throws Exception;
 
 	/* 입금 전 관리 (주문 취소 버튼 - 취소용 추가 정보 조회) */
 	List<DepositCancelInfoResponse> findDepositCancelInfo(List<String> orderNoList) throws Exception;
 	
 	/* 입금 전 관리 (주문 취소 버튼 - 취소 테이블에 추가) */
 	int saveDepositOrderCancel(List<DepositCancelInfoResponse> cancelInfoList) throws Exception;
+	
 	
 	/* 배송 준비중 관리 (주문번호별) */
 	List<ReadyNoResponse> findReadyByInfo(OrderCondition readyCond) throws Exception;
@@ -59,5 +76,4 @@ public interface AdminOrderDAO {
 	
 	/* 배송 준비중 관리 (주문내역 송장번호 저장) */
 	int changeInvoiceHistory(InvoiceCondition invoiceCond) throws Exception;
-
 }

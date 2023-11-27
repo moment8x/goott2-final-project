@@ -83,13 +83,39 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		
 		int result = -1;
 		
-		if(adminOrderRepository.changeDepositOrderCancel(orderNoList) > 0 ) {
-			if(adminOrderRepository.changeDepositOrderCancelHistory(orderNoList) > 0) {
-				List<DepositCancelInfoResponse> cancelInfoList = adminOrderRepository.findDepositCancelInfo(orderNoList);
-				
-				result = adminOrderRepository.saveDepositOrderCancel(cancelInfoList);
-			}
+		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
+		if(adminOrderRepository.changeDepositOrderCancel(orderNoList) <= 0 ) {
+			return result;
 		}
+		/* 주문 내역 테이블 update(column : delivery_status) */
+		if(adminOrderRepository.changeDepositOrderCancelHistory(orderNoList) <= 0) {
+			return result;
+		}
+		/* 결제 테이블 update(column : payment_status) */
+		if(adminOrderRepository.changeDepositOrderCancelPayments(orderNoList) <= 0) {
+			return result;
+		}
+		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
+		if(adminOrderRepository.changeDepositOrderCancelCoupon(orderNoList) <= 0) {
+			return result;
+		}
+		/* 적립금 로그 테이블 update(column : reason, balance, reward) */
+		if(adminOrderRepository.changeDepositOrderCancelReward(orderNoList) <= 0) {
+			return result;
+		}
+		/* 포인트 로그 테이블 update(column : reason, balance, point) */
+		if(adminOrderRepository.changeDepositOrderCancelPoint(orderNoList) <= 0) {
+			return result;
+		}
+		/* 회원 테이블 update(column : total_points, total_rewards, coupon_count,
+		 * accumulated_reward, accumulated_use_reward, accumulated_pointm, accumulated_use_point ) */
+		if(adminOrderRepository.changeDepositOrderCancelMember(orderNoList) > 0) {
+			List<DepositCancelInfoResponse> cancelInfoList = 
+					adminOrderRepository.findDepositCancelInfo(orderNoList);
+			
+			result = adminOrderRepository.saveDepositOrderCancel(cancelInfoList);
+		}
+		
 		return result;
 	}
 
@@ -99,13 +125,17 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	public int editDepositConfirm(List<String> orderNoList) throws Exception {
 		
 		int result = -1;
+		
 		/* 주문 상세 상품, 주문내역 테이블 상태 업데이트 */
-		if(adminOrderRepository.changeDepositConfirm(orderNoList) > 0 ) {
-			if(adminOrderRepository.changeDepositConfirmHistory(orderNoList) > 0) {
-				/* 주문 상세 상품 테이블에 송장 번호 입력일 업데이트 */
-				result = adminOrderRepository.changeDepositConfirmDate(orderNoList);
-			}
+		if(adminOrderRepository.changeDepositConfirm(orderNoList) <= 0 ) {
+			return result;
 		}
+		
+		if(adminOrderRepository.changeDepositConfirmHistory(orderNoList) > 0) {
+			/* 주문 상세 상품 테이블에 송장 번호 입력일 업데이트 */
+			result = adminOrderRepository.changeDepositConfirmDate(orderNoList);
+		}
+		
 		return result;
 	}
 	

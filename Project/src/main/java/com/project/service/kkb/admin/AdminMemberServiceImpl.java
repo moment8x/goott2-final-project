@@ -30,7 +30,9 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	
 	@Override
 	public Map<String, Object> getTotalMemberCount() throws Exception {
+		
 		int totalCount = 0;
+		
 		if(memberCount.getCurrentCount() > 0) {
 			/* TotalMemberCountEvent에 저장해둔 값 가져옴 */
 			System.out.println("이벤트 객체에서 전체 회원 수 조회");
@@ -48,6 +50,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	
 	@Override
 	public void updateMemberCount() throws Exception {
+		
 		int memberCount = adminMemberRepository.countAll();	
 		System.out.println("회원 수 갱신");
 		/* 이벤트 발행 */
@@ -98,8 +101,6 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		
 		for ( MemberResponse responseParam : responseList ) {
 			
-			/* === 값 세팅 === */
-			
 			/* 성별 */
 			Character gender = responseParam.getGender().equals('M') ? '남': '여';
 			responseParam.setGender(gender);
@@ -111,7 +112,6 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 			if(responseParam.getAddress() != null) {
 				responseParam.setRegion(detectRegion(responseParam));	
 			}
-			
 		}
 	
 		Map<String, Object> result = new HashMap<>();
@@ -122,13 +122,14 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	}
 	
 	private String detectRegion(MemberResponse param) {
+		
 		List<String> regions = 
 				Arrays.asList("서울","경기","인천","강원","충남", "충청북도","충북","충청북도",
 						"대전","경북","경상북도","경남","경상남도","대구","부산","울산",
 						"전북","전라북도","전남","전라남도","광주","세종","제주");
 		
 		String region = "해외";
-		for( String value : regions ) {
+		for(String value : regions) {
 			if(param.getAddress().contains(value)) {
 				region = value.length() == 4 
 						? value.substring(0, 1) + value.substring(2, 3)

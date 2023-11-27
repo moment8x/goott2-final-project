@@ -26,7 +26,7 @@
 			  refund_bank = #{refundBank},
 			  refund_account = #{refundAccount},
 			  account_holder = #{accountHolder}
-		WHERE member_id  = #{memberId};
+		WHERE member_id  = #{memberId}
 	</update>
 	
 	<select id="selectMemberDetailInfo" resultType="MemberParam">

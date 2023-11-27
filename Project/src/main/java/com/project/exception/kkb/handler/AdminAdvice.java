@@ -14,7 +14,7 @@ public class AdminAdvice {
 	@ExceptionHandler
 	public ResponseEntity<ErrorResult> exceptionHandler(Exception e) {
 		log.error("[exceptionHandler] ex", e);
-		ErrorResult errorResult = new ErrorResult("EX", e.getMessage());
+		ErrorResult errorResult = new ErrorResult(e.getClass().getName(), e.getMessage());
 		return new ResponseEntity<ErrorResult>(errorResult, HttpStatus.BAD_REQUEST);
 	}
 	
