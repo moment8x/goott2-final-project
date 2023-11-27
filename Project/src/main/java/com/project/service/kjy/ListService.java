@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.project.vodto.PagingInfo;
+import com.project.vodto.Wishlist;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
 import com.project.vodto.kjy.SearchVO;
@@ -29,4 +30,15 @@ public interface ListService {
 	public Map<String, Object> searchProductsWithFilter(String val, List<String> checkedList, List<String> checkedLang, String sort, int page) throws Exception;
 	// 베스트 셀러, 많이 구매한 상품 순, 리뷰 순, 최신 출판순
 	public Map<String, Object> indexSlideList() throws Exception;
+	
+//--------------------------------------------------------민정---------------------------------------------------------
+	// 찜하기
+	public boolean insertlikeProduct(String memberId, String productId) throws Exception;
+
+	//찜삭제
+	public boolean deleteWishList(String memberId, String productId) throws Exception;
+	
+	//찜목록 가져오기
+	public List<Wishlist> getProductId(String memberId) throws Exception;
+//---------------------------------------------------------민정 끝------------------------------------------------------ 
 }

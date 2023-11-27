@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import com.project.vodto.BankTransfer;
 import com.project.vodto.Member;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.UploadFiles;
 import com.project.vodto.jmj.CancelDTO;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
@@ -26,6 +27,7 @@ import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.jmj.ReturnOrder;
+import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
 
 @Repository
@@ -590,6 +592,53 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.update(ns + ".updateDeliveryStatusWithExchange", params);
 	}
+	
+	@Override
+	public int insertUploadProfile(UploadFiles uf) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("extension", uf.getExtension());
+		params.put("originalFileName", uf.getOriginalFileName());
+		params.put("newFileName", uf.getNewFileName());
+		params.put("fileSize", uf.getFileSize());
+		
+		return ses.insert(ns+ ".insertUploadProfile", uf);
+	}
+	
+	@Override
+	public int selectuploadFilesSeq(String newFileName) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".selectuploadFilesSeq", newFileName);
+	}
+
+	@Override
+	public int updateMemberProfile(int uploadFilesSeq, String memberId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("uploadFilesSeq", uploadFilesSeq);
+		
+		return ses.update(ns + ".updateMemberProfile", params);
+	}
+
+	@Override
+	public String selectMemeberProfileImg(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".selectMemeberProfileImg", memberId);
+	}
+	
+	@Override
+	public List<SelectWishlist> selectWishlist(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns+".selectWishlist", memberId);
+	}
+	
+	@Override
+	public int addShoppingCart(String memberId, String productId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("productId", productId);
+		
+		return ses.insert(ns + ".addShoppingCart", params);
+	}
 
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
@@ -638,6 +687,9 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".insertShipping", shipping);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+
+
 
 
 }

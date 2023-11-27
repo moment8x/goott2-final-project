@@ -110,6 +110,12 @@ public interface MemberService {
 	
 	//배송완료시 교환하기
 	boolean exchangeOrder(exchangeDTO ed, String memberId) throws SQLException, NamingException;
+	
+	//멤버 프로필 사진 업로드
+	boolean insertUploadProfile(UploadFiles uf, String memberId) throws SQLException, NamingException;
+	
+	//찜 목록에 있는 상품 장바구니 추가
+	boolean addShoppingCart(String memberId, String productId) throws SQLException, NamingException;
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -119,6 +125,8 @@ public interface MemberService {
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
+	
+	
 
 	
 	

@@ -315,6 +315,34 @@
 		})
 		
 	})
+	
+	function uploadProfile() {
+		let fileInput = document.getElementById("uploadProfile")
+		let file = fileInput.files[0]
+		
+		if(file){
+			let formData = new FormData();
+			formData.append('uploadFile', file)
+			
+			$.ajax({
+				url : '/user/profileUpload', // 데이터를 수신받을 서버 주소
+				type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+				data : formData,
+				dataType : 'json',
+				async : false,
+				processData : false,
+				contentType : false,
+				success : function(data) {
+					console.log(data);
+					if(data.fileSize > 0){
+						location.reload();
+					}
+				},
+				error : function() {
+				}
+			});
+		}
+	}
 
 	// 유효성 검사 메세지
 	function printMsg(focusId, msgId, msg, isFocus) {
@@ -827,7 +855,7 @@
 					output += `</li>`			
 				}
 				
-				for (let i = page.startNumOfCurrentPagingBlock; i < page.endNumOfCurrentPagingBlock + 1 ; i++) {
+				for (let i = page.startNumOfCurrentPagingBlock; i < page.endNumOfCurrentPagingBlock ; i++) {
 					output += `<li class="page-item">`
 					output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${i}); return false;">\${i}</a> `
 					output += `</li>`
@@ -876,6 +904,46 @@
 		output += `</ul>`		
 		
 		$('.custome-pagination').html(output)
+	}
+	
+	function delWishlist(productId) {
+		$.ajax({
+			url : '/user/delWishlist', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				productId
+			},
+			dataType : 'text',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data == "success"){
+					let wishlistItem = $('#' + productId);
+	                wishlistItem.fadeOut(300, function () {
+	                    wishlistItem.remove(); // 또는 wishlistItem.hide();
+	                });
+				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	function addShoppingCart(productId) {
+		$.ajax({
+			url : '/user/addShoppingCart', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				productId
+			},
+			dataType : 'text',
+			async : false,
+			success : function(data) {
+				console.log(data);
+			},
+			error : function() {
+			}
+		});
 	}
 </script>
 <style>
@@ -1078,13 +1146,22 @@
 							<div class="profile-contain">
 								<div class="profile-image">
 									<div class="position-relative">
-										<img src="#" class="blur-up lazyload update_img" alt="" />
-										<div class="cover-icon">
-											<i class="fa-solid fa-pen"> <input type="file"
-												onchange="readURL(this,0)" />
-											</i>
-										</div>
+										<c:choose>
+											<c:when test="${memberImg == '' }">
+												<img src="/resources/assets/images/profile/user.png"
+													class="blur-up lazyload update_img" alt="" />
+											</c:when>
+											<c:otherwise>
+												<img src="/resources/assets/images/profile/${memberImg}"
+													class="blur-up lazyload update_img" alt="" />
+											</c:otherwise>
+										</c:choose>
 									</div>
+								</div>
+								<div class="cover-icon">
+									<input type="file" onchange="readURL(this,0)"
+										id="uploadProfile" /> <input type="button" value="등록"
+										onclick="uploadProfile();" />
 								</div>
 
 								<div class="profile-name">
@@ -1308,23 +1385,25 @@
 																				<div class="product border-0">
 																					<div class="product-detail">
 																						<ul>
-																						
-																						<c:forEach var="bankTransfers" items="${bankTransfers }">
-																						<c:choose>
-																							<c:when test="${curOrder.paymentMethod eq 'bkt'}">
-																								<li class="name">총 금액 : <fmt:formatNumber
-																									value="${bankTransfers.amountToPay }"
-																					 				type="NUMBER" />원
-																							</li>
-																							</c:when>
-																							<c:otherwise>
-																								<li class="name">총 금액 : <fmt:formatNumber
-																										value="${curOrder.actualPaymentAmount }"
-																										type="NUMBER" />원
-																								</li>
-																							</c:otherwise>
-																						</c:choose>
-																						</c:forEach>
+
+																							<c:forEach var="bankTransfers"
+																								items="${bankTransfers }">
+																								<c:choose>
+																									<c:when
+																										test="${curOrder.paymentMethod eq 'bkt'}">
+																										<li class="name">총 금액 : <fmt:formatNumber
+																												value="${bankTransfers.amountToPay }"
+																												type="NUMBER" />원
+																										</li>
+																									</c:when>
+																									<c:otherwise>
+																										<li class="name">총 금액 : <fmt:formatNumber
+																												value="${curOrder.actualPaymentAmount }"
+																												type="NUMBER" />원
+																										</li>
+																									</c:otherwise>
+																								</c:choose>
+																							</c:forEach>
 																						</ul>
 																						<ul>
 																							<li class="name">총 권수 :
@@ -1362,433 +1441,53 @@
                         </svg>
 										</span>
 									</div>
+
 									<div class="row g-sm-4 g-3">
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/2.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
+										<c:forEach var="item" items="${wishlist }">
+											<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6" id="${item.productId }">
+												<div class="product-box-3 theme-bg-white h-100">
+													<div class="product-header">
+														<div class="product-image">
+															<a href="/detail/${item.productId }"> <img
+																src="${item.productImage }"
+																class="img-fluid blur-up lazyload"
+																alt="${item.productName }" />
+															</a>
 
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
+															<div class="product-header-top">
+																<button class="btn wishlist-button close_button" onclick="delWishlist('${item.productId }');">
+																	<i data-feather="x"></i>
+																</button>
+															</div>
 														</div>
 													</div>
-												</div>
 
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Vegetable</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">Fresh Bread and Pastry Flour 200 g
+													<div class="product-footer">
+														<div class="product-detail">
+															<a href="/detail/${item.productId }">
+																<h5 class="name">${item.productName }</h5>
+															</a>
+
+
+															<h5 class="price">
+																<span class="theme-color"> <fmt:formatNumber
+																		value="${item.sellingPrice }" type="NUMBER" /> 원
+																</span>
+																<del>
+																	<fmt:formatNumber value="${item.consumerPrice }"
+																		type="NUMBER" />원
+																</del>
 															</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Cheesy feet cheesy grin brie. Mascarpone cheese and wine
-															hard cheese the big cheese everyone loves smelly cheese
-															macaroni cheese croque monsieur.</p>
-														<h6 class="unit mt-1">250 ml</h6>
-														<h5 class="price">
-															<span class="theme-color">$08.02</span>
-															<del>$15.15</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
+															<div class="add-to-cart-box mt-2">
+																<button class="btn btn-add-cart addcart-button" onclick="addShoppingCart('${item.productId }');"
+																	tabindex="0">Add</button>
+
 															</div>
 														</div>
 													</div>
 												</div>
 											</div>
-										</div>
-
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/3.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
-
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
-														</div>
-													</div>
-												</div>
-
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Vegetable</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">Peanut Butter Bite Premium Butter
-																Cookies 600 g</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Feta taleggio croque monsieur swiss manchego cheesecake
-															dolcelatte jarlsberg. Hard cheese danish fontina boursin
-															melted cheese fondue.</p>
-														<h6 class="unit mt-1">350 G</h6>
-														<h5 class="price">
-															<span class="theme-color">$04.33</span>
-															<del>$10.36</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/4.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
-
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
-														</div>
-													</div>
-												</div>
-
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Snacks</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">SnackAmor Combo Pack of Jowar Stick
-																and Jowar Chips</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Lancashire hard cheese parmesan. Danish fontina
-															mozzarella cream cheese smelly cheese cheese and wine
-															cheesecake dolcelatte stilton. Cream cheese parmesan who
-															moved my cheese when the cheese comes out everybody's
-															happy cream cheese red leicester ricotta edam.</p>
-														<h6 class="unit mt-1">570 G</h6>
-														<h5 class="price">
-															<span class="theme-color">$12.52</span>
-															<del>$13.62</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/5.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
-
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
-														</div>
-													</div>
-												</div>
-
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Snacks</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">Yumitos Chilli Sprinkled Potato
-																Chips 100 g</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Cheddar cheddar pecorino hard cheese hard cheese cheese
-															and biscuits bocconcini babybel. Cow goat paneer cream
-															cheese fromage cottage cheese cauliflower cheese
-															jarlsberg.</p>
-														<h6 class="unit mt-1">100 G</h6>
-														<h5 class="price">
-															<span class="theme-color">$10.25</span>
-															<del>$12.36</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/6.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
-
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
-														</div>
-													</div>
-												</div>
-
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Vegetable</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">Fantasy Crunchy Choco Chip Cookies
-															</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Bavarian bergkase smelly cheese swiss cut the cheese
-															lancashire who moved my cheese manchego melted cheese.
-															Red leicester paneer cow when the cheese comes out
-															everybody's happy croque monsieur goat melted cheese
-															port-salut.</p>
-														<h6 class="unit mt-1">550 G</h6>
-														<h5 class="price">
-															<span class="theme-color">$14.25</span>
-															<del>$16.57</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/7.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
-
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
-														</div>
-													</div>
-												</div>
-
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Vegetable</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">Fresh Bread and Pastry Flour 200 g
-															</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Melted cheese babybel chalk and cheese. Port-salut
-															port-salut cream cheese when the cheese comes out
-															everybody's happy cream cheese hard cheese cream cheese
-															red leicester.</p>
-														<h6 class="unit mt-1">1 Kg</h6>
-														<h5 class="price">
-															<span class="theme-color">$12.68</span>
-															<del>$14.69</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/2.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
-
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
-														</div>
-													</div>
-												</div>
-
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Vegetable</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">Fresh Bread and Pastry Flour 200 g
-															</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Squirty cheese cottage cheese cheese strings. Red
-															leicester paneer danish fontina queso lancashire when the
-															cheese comes out everybody's happy cottage cheese paneer.
-														</p>
-														<h6 class="unit mt-1">250 ml</h6>
-														<h5 class="price">
-															<span class="theme-color">$08.02</span>
-															<del>$15.15</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
+										</c:forEach>
 									</div>
 								</div>
 							</div>
@@ -1904,21 +1603,21 @@
 																<div class="size-box">
 																	<div id="orderStatus">
 
-																			<c:if test="${order.deliveryStatus eq '배송중' }">
-																				<button class="btn theme-bg-color text-white m-0"
-																					type="button" id="button-addon1">
-																					<span>배송조회</span>
-																				</button>
-																				<div>${order.invoiceNumber }</div>
-																			</c:if>
-																			
-																			<c:if test="${order.deliveryStatus eq '배송완료' }">
-																				<div>배송완료</div>
-																			</c:if>
-																		
+																		<c:if test="${order.deliveryStatus eq '배송중' }">
+																			<button class="btn theme-bg-color text-white m-0"
+																				type="button" id="button-addon1">
+																				<span>배송조회</span>
+																			</button>
+																			<div>${order.invoiceNumber }</div>
+																		</c:if>
+
+																		<c:if test="${order.deliveryStatus eq '배송완료' }">
+																			<div>배송완료</div>
+																		</c:if>
+
 																	</div>
 																</div>
-															</li> 
+															</li>
 														</ul>
 													</div>
 												</div>
@@ -2134,44 +1833,6 @@
 																</div>
 															</div>
 														</form>
-
-														<form name="form" id="form" method="post">
-
-	<input type="button" onClick="goPopup();" value="팝업_domainChk"/>
-	<div id="list"></div>
-	<div id="callBackDiv">
-		<table>
-			<tr><td>도로명주소 전체(포멧)</td><td><input type="text"  style="width:500px;" id="roadFullAddr"  name="roadFullAddr" /></td></tr>
-			<tr><td>도로명주소           </td><td><input type="text"  style="width:500px;" id="roadAddrPart1"  name="roadAddrPart1" /></td></tr>
-			<tr><td>고객입력 상세주소    </td><td><input type="text"  style="width:500px;" id="addrDetail"  name="addrDetail" /></td></tr>
-			<tr><td>참고주소             </td><td><input type="text"  style="width:500px;" id="roadAddrPart2"  name="roadAddrPart2" /></td></tr>
-			<tr><td>영문 도로명주소      </td><td><input type="text"  style="width:500px;" id="engAddr"  name="engAddr" /></td></tr>
-			<tr><td>지번                 </td><td><input type="text"  style="width:500px;" id="jibunAddr"  name="jibunAddr" /></td></tr>
-			<tr><td>우편번호             </td><td><input type="text"  style="width:500px;" id="zipNo"  name="zipNo" /></td></tr>
-			<tr><td>행정구역코드        </td><td><input type="text"  style="width:500px;" id="admCd"  name="admCd" /></td></tr>
-			<tr><td>도로명코드          </td><td><input type="text"  style="width:500px;" id="rnMgtSn"  name="rnMgtSn" /></td></tr>
-			<tr><td>건물관리번호        </td><td><input type="text"  style="width:500px;" id="bdMgtSn"  name="bdMgtSn" /></td></tr>
-			<tr><td>상세번물명        	</td><td><input type="text"  style="width:500px;" id="detBdNmList"  name="detBdNmList" /></td></tr>
-			<tr><td>건물명        		</td><td><input type="text"  style="width:500px;" id="bdNm"  name="bdNm" /></td></tr>
-			<tr><td>공동주택여부       </td><td><input type="text"  style="width:500px;" id="bdKdcd"  name="bdKdcd" /></td></tr>
-			<tr><td>시도명        		</td><td><input type="text"  style="width:500px;" id="siNm"  name="siNm" /></td></tr>
-			<tr><td>시군구명        	</td><td><input type="text"  style="width:500px;" id="sggNm"  name="sggNm" /></td></tr>
-			<tr><td>읍면동명        	</td><td><input type="text"  style="width:500px;" id="emdNm"  name="emdNm" /></td></tr>
-			<tr><td>법정리명        	</td><td><input type="text"  style="width:500px;" id="liNm"  name="liNm" /></td></tr>
-			<tr><td>도로명        		</td><td><input type="text"  style="width:500px;" id="rn"  name="rn" /></td></tr>
-			<tr><td>지하여부        	</td><td><input type="text"  style="width:500px;" id="udrtYn"  name="udrtYn" /></td></tr>
-			<tr><td>건물본번        	</td><td><input type="text"  style="width:500px;" id="buldMnnm"  name="buldMnnm" /></td></tr>
-			<tr><td>건물부번        	</td><td><input type="text"  style="width:500px;" id="buldSlno"  name="buldSlno" /></td></tr>
-			<tr><td>산여부        		</td><td><input type="text"  style="width:500px;" id="mtYn"  name="mtYn" /></td></tr>
-			<tr><td>지번본번(번지)     </td><td><input type="text"  style="width:500px;" id="lnbrMnnm"  name="lnbrMnnm" /></td></tr>
-			<tr><td>지번부번(호)       </td><td><input type="text"  style="width:500px;" id="lnbrSlno"  name="lnbrSlno" /></td></tr>
-			<tr><td>읍면동일련번호       </td><td><input type="text"  style="width:500px;" id="emdNo"  name="emdNo" /></td></tr>
-		</table>
-	</div>
-
-</form>
-
-
 
 														<form class="row g-4" action="modifyUser" method="post">
 															<div class="col-12">

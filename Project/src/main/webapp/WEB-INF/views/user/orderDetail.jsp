@@ -56,9 +56,11 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script type="text/javascript">
+
 let newZipNoA = "";
 let newAddrA = "";
 let newDetailAddrA = "";
+
 //도로명주소API 
 function goPopup(zipNo, addr , detailAddr) {
 	newZipNoA = zipNo;
@@ -127,7 +129,8 @@ function applyExchange() {
 				exchangeDetailAddr,
 				exchangeMsg,
 				detailedOrderId,
-				orderNo
+				orderNo,
+				exchangeReason
 			},
 			dataType : '',
 			async : false,

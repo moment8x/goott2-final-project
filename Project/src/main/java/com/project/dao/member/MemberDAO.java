@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.project.vodto.BankTransfer;
 import com.project.vodto.Member;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.UploadFiles;
 import com.project.vodto.jmj.CancelDTO;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
@@ -20,6 +21,7 @@ import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.jmj.ReturnOrder;
+import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
@@ -200,6 +202,23 @@ public interface MemberDAO {
 	//모든 상태가 교환신청이라면 주문내역 상태 교환신청으로 바꾸기
 	int updateDeliveryStatusWithExchange(String memberId, String orderNo)throws SQLException, NamingException;
 	
+	//멤버 프로필사진 인서트
+	int insertUploadProfile(UploadFiles uf) throws SQLException, NamingException;
+	
+	//업로드파일 uploadFilesSeq 가져오기
+	int selectuploadFilesSeq(String newFileName) throws SQLException, NamingException;
+	
+	//멤버테이블 프로필사진 업데이트
+	int updateMemberProfile(int uploadFilesSeq, String memberId) throws SQLException, NamingException;
+	
+	//멤버 프로필사진 가져오기
+	String selectMemeberProfileImg(String memberId) throws SQLException, NamingException;
+	
+	//찜목록 가져오기
+	List<SelectWishlist> selectWishlist(String memberId) throws SQLException, NamingException;
+	
+	//찜목록에 있는 상품 장바구니 추가
+	int addShoppingCart(String memberId, String productId) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -215,5 +234,7 @@ public interface MemberDAO {
 	// ----------------------------------- 김진솔 끝 ------------------------------------
 	
 	
-
+	
+	
+	
 }

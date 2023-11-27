@@ -2,6 +2,7 @@
 package com.project.controller.jmj;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -29,11 +30,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.project.etc.jmj.UploadProfileFileProcess;
+import com.project.service.kjy.ListService;
 import com.project.service.member.MemberService;
 import com.project.vodto.Member;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.UploadFiles;
 import com.project.vodto.jmj.CancelDTO;
 import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
@@ -43,6 +48,7 @@ import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.jmj.ReturnOrder;
+import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
 import com.project.vodto.kjy.Memberkjy;
 
@@ -52,6 +58,11 @@ public class myPageController {
 
 	@Inject
 	private MemberService mService;
+	
+	@Inject 
+	private ListService lService;
+	
+	private UploadFiles uf;
 	
 	@RequestMapping(value = "myPage")
 	public void myPage(Model model, HttpServletRequest request, @RequestParam(value = "pageNo", defaultValue = "1")int pageNo) {
@@ -87,7 +98,15 @@ public class myPageController {
 			
 			//무통장 주문 내역
 			List<GetBankTransfer> bankTransfers = (List<GetBankTransfer>)map.get("bankTransfer");
-			model.addAttribute("bankTransfers", bankTransfers);
+			model.addAttribute("bankTransfers", bankTransfers);	
+			
+			//멤버 프로필 사진
+			String memberImg = (String)map.get("memberImg");
+			model.addAttribute("memberImg", memberImg);	
+			
+			//찜목록
+			List<SelectWishlist> wishlist = (List<SelectWishlist>)map.get("wishlist");
+			model.addAttribute("wishlist", wishlist);	
 
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
@@ -562,7 +581,7 @@ public class myPageController {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
-System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@키워드" + keyword.toString());
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@키워드" + keyword.toString());
 		ResponseEntity<Map<String, Object>> result = null;
 
 		HttpHeaders header = new HttpHeaders();
@@ -652,4 +671,83 @@ System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@키워드" + keyword.toString());
 			
 		return result;
 	}
+	
+	@PostMapping("profileUpload")
+	public ResponseEntity<UploadFiles> rofileUpload(MultipartFile uploadFile, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		System.out.println(member.toString());
+		
+		System.out.println("프로필 업로드 시작");
+		System.out.println("파일의 오리지널 이름 : " + uploadFile.getOriginalFilename());
+		System.out.println("파일의 사이즈 : " + uploadFile.getSize());
+		System.out.println("파일의 contentType : " + uploadFile.getContentType());
+		
+		String realPath = request.getSession().getServletContext().getRealPath("resources/assets/images/profile");
+		
+		System.out.println(realPath);
+		
+		HttpHeaders header = new HttpHeaders();
+		header.add("Content-Type", "application/json; charset=UTF-8");
+		ResponseEntity<UploadFiles> result = null;
+		
+		UploadFiles uf = null;
+		try {
+			uf = UploadProfileFileProcess.fileUpload(uploadFile.getOriginalFilename(),  uploadFile.getSize(), uploadFile.getContentType(),
+						 uploadFile.getBytes(), realPath, memberId);
+			System.out.println(uf.toString());
+			if(mService.insertUploadProfile(uf, memberId)) {
+				result = new ResponseEntity<UploadFiles>(uf, header, HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	@RequestMapping(value = "delWishlist", method = RequestMethod.POST)
+	public ResponseEntity<String> delWishlist(@RequestParam("productId") String productId, HttpServletRequest request) {
+		System.out.println(productId + "번 상품 삭제");
+		
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
+		ResponseEntity<String> result = null;
+		
+		try {
+			if(lService.deleteWishList(memberId, productId)) {
+				result = new ResponseEntity<String>("success", HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@RequestMapping(value = "addShoppingCart", method = RequestMethod.POST)
+	public ResponseEntity<String> addShoppingCart(@RequestParam("productId") String productId, HttpServletRequest request) {
+		System.out.println(productId + "번 상품 장바구니 추가");
+		
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
+		ResponseEntity<String> result = null;
+		
+		try {
+			if(mService.addShoppingCart(memberId, productId)) {
+				result = new ResponseEntity<String>("success", HttpStatus.OK);
+			}
+		} catch (SQLException | NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+
 }

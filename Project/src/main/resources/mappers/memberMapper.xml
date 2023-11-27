@@ -397,6 +397,36 @@
 		update order_history set delivery_status = '교환신청' where member_id = #{memberId} and order_no = #{orderNo}
 	</update>
 	
+	<insert id="insertUploadProfile">
+		insert into upload_files(extension, original_file_name, new_file_name, file_size) 
+		values( #{extension}, #{originalFileName}, #{newFileName}, #{fileSize})
+	</insert>
+	
+	<select id="selectuploadFilesSeq" resultType="int">
+		SELECT upload_files_seq FROM upload_files WHERE new_file_name = #{newFileName}
+	</select>
+	
+	<update id="updateMemberProfile">
+		update member set profile_image = #{uploadFilesSeq} where member_id = #{memberId}
+	</update>
+	
+	<select id="selectMemeberProfileImg" resultType="String">
+		select u.new_file_name from  upload_files u, member m
+		where member_id = #{memberId}
+		and m.profile_image = u.upload_files_seq
+	</select>
+	
+	<select id="selectWishlist" resultType="com.project.vodto.jmj.SelectWishlist">
+		select prod.product_id, prod.product_name, prod.selling_price, prod.consumer_price, p.product_image
+		from (SELECT * FROM product_images GROUP BY product_id) p, wishlist w, products prod
+		where w.member_id = #{memberId}
+		and p.product_id = w.product_id
+		and prod.product_id = w.product_id
+	</select>
+	
+	<insert id="addShoppingCart">
+		insert into shopping_cart(member_id, product_id, member_check) values(#{memberId},#{productId},1)
+	</insert>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">
 		SELECT member_id FROM member WHERE member_id = #{memberId}  

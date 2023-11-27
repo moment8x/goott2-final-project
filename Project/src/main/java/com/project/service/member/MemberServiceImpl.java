@@ -143,6 +143,8 @@ public class MemberServiceImpl implements MemberService {
 		result.put("orderHistory", lst);
 		result.put("pagination", pi);
 		result.put("bankTransfer", bankTransfer);
+		result.put("memberImg", mDao.selectMemeberProfileImg(memberId));
+		result.put("wishlist", mDao.selectWishlist(memberId));
 
 		return result;
 	}
@@ -558,6 +560,36 @@ public class MemberServiceImpl implements MemberService {
 		return result;
 	}
 
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean insertUploadProfile(UploadFiles uf, String memberId) throws SQLException, NamingException {
+		System.out.println(uf.toString());
+		boolean result = false;
+
+//		System.out.println(uploadFilesSeq);
+
+		if (mDao.insertUploadProfile(uf) == 1) {
+			System.out.println("멤버 프로필 이미지 업로드 완");
+			int uploadFilesSeq = mDao.selectuploadFilesSeq(uf.getNewFileName());
+			
+			System.out.println(uploadFilesSeq);
+			if (mDao.updateMemberProfile(uploadFilesSeq, memberId) == 1) {
+				System.out.println("멤버 프로필 이미지 업데이트 완");
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	@Override
+	public boolean addShoppingCart(String memberId, String productId) throws SQLException, NamingException {
+		boolean result = false;
+		if(mDao.addShoppingCart(memberId, productId) == 1) {
+			result = true;
+		}
+		return result;
+	}
+
 	// --------------------------------------- 장민정 끝
 	// ----------------------------------------
 	// --------------------------------------- 김진솔 시작
@@ -631,6 +663,8 @@ public class MemberServiceImpl implements MemberService {
 
 		return result;
 	}
+
+
 
 	// --------------------------------------- 김진솔 끝
 	// ----------------------------------------

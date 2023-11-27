@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.project.vodto.PagingInfo;
 import com.project.vodto.ProductCategory;
+import com.project.vodto.Wishlist;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
 import com.project.vodto.kjy.ProductsForList;
@@ -53,4 +54,26 @@ public interface ListDao {
 	public List<ProductsForList> selectProductOrderByCart() throws Exception;
 	// 평점 순
 	public List<ProductsForList> selectProductOrderByRating() throws Exception;
+
+//--------------------------------------------------------민정---------------------------------------------------------
+	//해당 상품 카테고리 키 가져오기
+	public String selectProductCategoryKey(String productId);
+
+	//찜하기
+	public int insertlikeProduct(String memberId, String productId, String productCategoryKey);
+	
+	//찜목록에 있는 상품아이디 가져오기
+	public Wishlist getProductId(String productId, String memberId) throws Exception;
+	
+	//찜목록 가져오기
+	public List<Wishlist> selectWishiList(String memberId) throws Exception;
+	
+	//찜 삭제
+	public int deleteWishlist(String productId, String memberId) throws Exception;
+//---------------------------------------------------------민정 끝------------------------------------------------------ 
+
+	
+
+
+
 }

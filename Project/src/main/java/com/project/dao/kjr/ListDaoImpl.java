@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import com.project.vodto.PagingInfo;
 import com.project.vodto.ProductCategory;
+import com.project.vodto.Wishlist;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
 import com.project.vodto.kjy.ProductsForList;
@@ -208,7 +209,47 @@ public class ListDaoImpl implements ListDao {
 	
 		return ses.selectList(ns+".selectProductsOrderByRating");
 	}
-
+//--------------------------------------------------------민정---------------------------------------------------------
+	@Override
+	public String selectProductCategoryKey(String productId) {
 	
+		return ses.selectOne(ns + ".selectProductCategoryKey", productId);
+	}
+
+	@Override
+	public int insertlikeProduct(String memberId, String productId, String productCategoryKey) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("productId", productId);
+		params.put("productCategoryKey", productCategoryKey);
+		
+		return ses.insert(ns + ".insertWishList", params);
+	}
+
+	@Override
+	public Wishlist getProductId(String productId, String memberId) throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("productId", productId);
+		
+		return ses.selectOne(ns + ".getProductId", params);
+	}
+
+	@Override
+	public List<Wishlist> selectWishiList(String memberId) throws Exception {
+		
+		return ses.selectList(ns + ".selectWishiList", memberId);
+	}
+
+	@Override
+	public int deleteWishlist(String productId, String memberId) throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("productId", productId);
+		
+		return ses.delete(ns + ".deleteWishlist", params);
+	}
+
+//---------------------------------------------------------민정 끝------------------------------------------------------ 
 
 }

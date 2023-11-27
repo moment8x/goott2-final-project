@@ -1,4 +1,4 @@
-package com.project.vodto;
+package com.project.vodto.jmj;
 
 import java.sql.Timestamp;
 
@@ -13,10 +13,10 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Wishlist {
-	private int wishlistSeq;
-	private String memberId;
+public class SelectWishlist {
 	private String productId;
-	private Timestamp registrationDate;
-	private String categoryKey;
+	private String productName;
+	private int sellingPrice;
+	private int consumerPrice;
+	private String productImage;
 }

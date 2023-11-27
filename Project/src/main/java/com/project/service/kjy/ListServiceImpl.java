@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.project.dao.kjr.ListDao;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.Product;
+import com.project.vodto.Wishlist;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
 import com.project.vodto.kjy.ProductsForList;
@@ -178,5 +179,45 @@ public class ListServiceImpl implements ListService {
 		map.put("ratingList", ratingList);
 		return map;
 	}
+
+//--------------------------------------------------------민정---------------------------------------------------------
+	@Override
+	public boolean insertlikeProduct(String memberId, String productId) throws Exception {
+		boolean result = false;
+		
+		String productCategoryKey = lDao.selectProductCategoryKey(productId);
+		System.out.println(productCategoryKey);
+		
+		if(lDao.insertlikeProduct(memberId, productId, productCategoryKey) != 0) {
+			result = true;
+		}
+		
+		return result;
+	}
+
+	@Override
+	public boolean deleteWishList(String memberId, String productId) throws Exception {
+		boolean result = false;
+		
+		if(lDao.deleteWishlist(productId, memberId) == 1) {
+			result =true;
+		}
+		return result;
+	}
+	
+	@Override
+	public List<Wishlist> getProductId(String memberId) throws Exception {
+		List<Wishlist> wish = lDao.selectWishiList(memberId);
+		System.out.println(wish.toString());
+//		Wishlist wishProduct = null;
+//		for(Wishlist w : wish) {
+//			if(w.getProductId().equals(productId)) {
+//				wishProduct = lDao.getProductId(w.getProductId(), memberId);
+//			}
+//		}
+		
+		return wish;
+	}
+//---------------------------------------------------------민정 끝------------------------------------------------------ 
 
 }

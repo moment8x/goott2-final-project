@@ -147,4 +147,28 @@
   	<select id="selectProductsOrderByRating" resultMap="ProductsForList">
   		select r.product_id, r.rating, r.participation_count, p.product_name,p.publisher, p.selling_price, p.consumer_price, (select i.product_image from product_images i where i.product_id = p.product_id limit 1)as product_image from ratings r left join products p on r.product_id = p.product_id order by rating desc limit 5
   	</select>
+  
+ <!-- ================================================민정=========================================================== -->
+ 	<select id="selectProductCategoryKey" resultType="String">
+ 		select pc.category_key from product_categories pc, products p
+		where product_id = #{productId}
+		and pc.category_key = p.category_key
+ 	</select>
+ 	
+ 	<insert id="insertWishList">
+ 		insert into wishlist(member_id, product_id, category_key) values(#{memberId},#{productId},#{productCategoryKey})
+ 	</insert> 
+ 	
+ 	<select id="getProductId" resultType="com.project.vodto.Wishlist">
+ 		select product_id from wishlist where member_id = #{memberId} and product_id = #{productId}
+ 	</select>
+ 	
+ 	<select id="selectWishiList" resultType="com.project.vodto.Wishlist">
+ 		SELECT * FROM wishlist where member_id = #{memberId}
+ 	</select>
+ 	
+ 	<delete id="deleteWishlist">
+ 		delete from wishlist where product_id = #{productId} and member_id = #{memberId}
+ 	</delete>
+ <!-- ==============================================-민정 끝========================================================= -->
   </mapper>
