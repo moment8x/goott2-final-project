@@ -389,7 +389,7 @@
 															</a>
 														</c:otherwise>
 													</c:choose>
-													${wishlist }
+													
 													<ul class="product-option">
 														<li data-bs-toggle="tooltip" data-bs-placement="top"
 															id="payModalBtn" value="${product.product_id }"

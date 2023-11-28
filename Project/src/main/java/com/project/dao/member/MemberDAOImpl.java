@@ -12,7 +12,10 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.BankTransfer;
+import com.project.vodto.CouponLog;
 import com.project.vodto.Member;
+import com.project.vodto.PointLog;
+import com.project.vodto.RewardLog;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.UploadFiles;
 import com.project.vodto.jmj.CancelDTO;
@@ -22,6 +25,7 @@ import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
+import com.project.vodto.jmj.MyPageCouponLog;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.kjs.ShippingAddrDTO;
@@ -29,6 +33,7 @@ import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
+import com.project.vodto.jmj.myPageReview;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO {
@@ -270,6 +275,7 @@ public class MemberDAOImpl implements MemberDAO {
 	
 	@Override
 	public List<MyPageOrderList> selectCurOrderHistory(String memberId) throws SQLException, NamingException {
+
 		
 		return ses.selectList(ns + ".getCurOrderHistory", memberId);
 	}
@@ -640,6 +646,42 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".addShoppingCart", params);
 	}
 
+	@Override
+	public List<PointLog> selectPointLog(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".selectPointLog", memberId);
+	}
+	
+	@Override
+	public int getTotalPointLogCnt(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".getTotalPointLogCnt", memberId);
+	}
+	
+	@Override
+	public List<RewardLog> selectRewardLog(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".selectRewardLog", memberId);
+	}
+	
+	@Override
+	public List<MyPageCouponLog> selectCouponLog(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".selectCouponLog", memberId);
+	}
+	
+	@Override
+	public List<MyPageOrderList> selectPaymentMethodAndOrderNo(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".selectPaymentMethodAndOrderNo", memberId);
+	}
+
+	@Override
+	public List<myPageReview> selectMyreview(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".selectMyreview", memberId);
+	}
+
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
@@ -687,9 +729,6 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".insertShipping", shipping);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
-
-
-
 
 
 }

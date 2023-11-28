@@ -8,7 +8,10 @@ import javax.naming.NamingException;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.BankTransfer;
+import com.project.vodto.CouponLog;
 import com.project.vodto.Member;
+import com.project.vodto.PointLog;
+import com.project.vodto.RewardLog;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.UploadFiles;
 import com.project.vodto.jmj.CancelDTO;
@@ -18,11 +21,13 @@ import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
+import com.project.vodto.jmj.MyPageCouponLog;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
+import com.project.vodto.jmj.myPageReview;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
 
@@ -219,6 +224,24 @@ public interface MemberDAO {
 	
 	//찜목록에 있는 상품 장바구니 추가
 	int addShoppingCart(String memberId, String productId) throws SQLException, NamingException;
+	
+	//포인트로그 가져오기
+	List<PointLog> selectPointLog(String memberId) throws SQLException, NamingException;
+	
+	//포인트로그 총 갯수 가져오기
+	int getTotalPointLogCnt(String memberId) throws SQLException, NamingException;
+	
+	//적립금로그 가져오기
+	List<RewardLog> selectRewardLog(String memberId) throws SQLException, NamingException;
+	
+	//쿠폰로그 가져오기
+	List<MyPageCouponLog> selectCouponLog(String memberId) throws SQLException, NamingException;
+	
+	//결제수단, 주문번호 가져오기
+	List<MyPageOrderList> selectPaymentMethodAndOrderNo(String memberId) throws SQLException, NamingException;
+	
+	//작성한 리뷰 가져오기
+	List<myPageReview> selectMyreview(String memberId) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -234,7 +257,6 @@ public interface MemberDAO {
 	// ----------------------------------- 김진솔 끝 ------------------------------------
 	
 	
-	
-	
+
 	
 }

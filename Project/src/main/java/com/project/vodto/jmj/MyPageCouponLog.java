@@ -1,4 +1,4 @@
-package com.project.vodto;
+package com.project.vodto.jmj;
 
 import java.sql.Timestamp;
 
@@ -13,12 +13,14 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class CouponLog {
+public class MyPageCouponLog {
 	private int couponLogsSeq;
 	private String memberId;
-	private String couponNumber;
-	private String couponName;
 	private Timestamp obtainedDate; //얻은 날짜
 	private Timestamp usedDate;
 	private Timestamp expirationDate; //만료 날짜
+	private String couponNumber;
+	private int discountAmount; //할인율(금액)
+	private int termOfValidity; //사용가능한 기간?
+	private String couponName;
 }

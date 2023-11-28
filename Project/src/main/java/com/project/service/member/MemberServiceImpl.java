@@ -132,7 +132,7 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public Map<String, Object> getOrderHistory(String memberId, int pageNo) throws SQLException, NamingException {
+	public Map<String, Object> memberInfo(String memberId, int pageNo) throws SQLException, NamingException {
 		PagingInfo pi = pagination(pageNo, memberId);
 
 		List<MyPageOrderList> lst = mDao.selectOrderHistory(memberId, pi);
@@ -145,6 +145,10 @@ public class MemberServiceImpl implements MemberService {
 		result.put("bankTransfer", bankTransfer);
 		result.put("memberImg", mDao.selectMemeberProfileImg(memberId));
 		result.put("wishlist", mDao.selectWishlist(memberId));
+		result.put("pointLog", mDao.selectPointLog(memberId));
+		result.put("rewardLog", mDao.selectRewardLog(memberId));
+		result.put("couponLog", mDao.selectCouponLog(memberId));
+		result.put("myReview", mDao.selectMyreview(memberId));
 
 		return result;
 	}
@@ -157,6 +161,9 @@ public class MemberServiceImpl implements MemberService {
 
 		// 전체 주문 갯수
 		result.setTotalPostCnt(mDao.getTotalOrderCnt(memberId));
+		
+		// 총 포인트로그 갯수
+		result.setTotalPointLogCnt(mDao.getTotalPointLogCnt(memberId));
 
 		// 총페이지 수 구하기
 		result.setTotalPageCnt(result.getTotalPostCnt(), result.getViewPostCntPerPage());
@@ -296,8 +303,15 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public List<MyPageOrderList> getCurOrderHistory(String memberId) throws SQLException, NamingException {
-
-		return mDao.selectCurOrderHistory(memberId);
+//		List<MyPageOrderList> sp = mDao.selectPaymentMethodAndOrderNo(memberId);
+		
+//		for(MyPageOrderList po: sp) {
+//			String paymentMethod = po.getPaymentMethod();
+//			String orderNo = po.getOrderNo();
+			List<MyPageOrderList> curOrder = mDao.selectCurOrderHistory(memberId);
+//		}
+		
+		return curOrder;
 	}
 
 	@Override
@@ -425,7 +439,7 @@ public class MemberServiceImpl implements MemberService {
 					System.out.println("디테일 상태 업데이트 완");
 					for (DetailOrder cancelDetail : detailOrders) {
 						// 모든 디테일 상품 상태가 취소라면 주문내역 배송상태 취소로 변경
-						if (!"취소".equals(cancelDetail.getProductStatus())) {
+						if (!"주문취소".equals(cancelDetail.getProductStatus())) {
 							allCancel = false;
 							break;
 						} else {

@@ -755,7 +755,7 @@ function editRturnAccount() {
 														<h5>${order.productStatus }</h5>
 													</td>
 													<td>
-														<div>취소</div>
+														<div>주문 취소</div>
 													</td>
 												</c:when>
 												<c:when test="${order.productStatus eq '반품신청' }">

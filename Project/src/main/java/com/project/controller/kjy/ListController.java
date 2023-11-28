@@ -76,8 +76,22 @@ public class ListController {
 	}
 	
 	@RequestMapping("/categoryList/{key}")
-	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page,@RequestParam(value="active", defaultValue = "grid-btn d-xxl-inline-block d-none") String active) {	
+	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page,@RequestParam(value="active", defaultValue = "grid-btn d-xxl-inline-block d-none") String active, HttpServletRequest request) {	
 		this.page = page;
+		
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		if(member != null) {
+			String memberId = member.getMemberId();		
+			List<Wishlist> wishlist;
+			try {
+				wishlist = lService.getProductId(memberId);
+				model.addAttribute("wishlist", wishlist);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		String lang = key.substring(0, 3);
 		System.out.println("랭" + lang);
@@ -115,6 +129,7 @@ public class ListController {
 			model.addAttribute("products", lst);
 			model.addAttribute("paging_info", paging);
 			model.addAttribute("sortBy", sortBy);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -277,22 +292,6 @@ public class ListController {
 	}
 	
 //----------------------------------------------민정-----------------------------------------------------------------------
-	@RequestMapping("categoryList")
-	public String getWishlist(HttpServletRequest request, Model model) {
-		HttpSession session = request.getSession();
-		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
-		
-		List<Wishlist> wishlist;
-		try {
-			wishlist = lService.getProductId(memberId);
-			model.addAttribute("wishlist", wishlist);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return "/list/categoryList/";
-	}
 	
 	@RequestMapping(value = "likeProduct", method = RequestMethod.POST)
 	public ResponseEntity<String> likeProduct(@RequestParam("productId") String productId, HttpServletRequest request, Model model) {
@@ -318,7 +317,6 @@ public class ListController {
 	
 	@RequestMapping(value = "disLikeProduct", method = RequestMethod.POST)
 	public void disLikeProduct(@RequestParam("productId") String productId, HttpServletRequest request) {
-		System.out.println(productId + "번 상품 찜 삭제@@");
 		
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
@@ -326,7 +324,7 @@ public class ListController {
 		
 		try {
 			if(lService.deleteWishList(memberId, productId)) {
-				System.out.println(productId + "번 상품 찜 삭제");
+				System.out.println(productId + "번 상품 찜 삭제 완룡");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

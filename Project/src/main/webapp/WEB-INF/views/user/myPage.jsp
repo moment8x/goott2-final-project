@@ -940,6 +940,9 @@
 			async : false,
 			success : function(data) {
 				console.log(data);
+				if(data == 'success'){
+					alert("장바구니에 추가 되었습니다.")
+				}
 			},
 			error : function() {
 			}
@@ -1065,6 +1068,7 @@
 #selectOrderStatus, #checkOrderPeriod {
 	margin-top: 30px;
 }
+
 </style>
 </head>
 
@@ -1168,7 +1172,7 @@
 									<h3>${userInfo.memberId }</h3>
 									<h6 class="text-content">
 										<img width="50" height="50"
-											src="https://img.icons8.com/external-vitaliy-gorbachev-lineal-vitaly-gorbachev/60/external-deer-winter-vitaliy-gorbachev-lineal-vitaly-gorbachev.png"
+											src="/resources/assets/images/deerWithMemberGrade.png"
 											alt="external-deer-winter-vitaliy-gorbachev-lineal-vitaly-gorbachev" />${userInfo.membershipGrade }</h6>
 								</div>
 							</div>
@@ -1240,11 +1244,30 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="pills-profile-tab"
-									data-bs-toggle="pill" data-bs-target="#pills-profile"
-									type="button" role="tab" aria-controls="pills-profile"
+								<button class="nav-link" id="pills-card-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-card"
+									type="button" role="tab" aria-controls="pills-card"
 									aria-selected="false">
-									<i data-feather="smile"></i>포인트/쿠폰/적립금 내역
+									<i data-feather="smile"></i>포인트 내역
+								</button>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-rewards-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-rewards"
+									type="button" role="tab" aria-controls="pills-rewards"
+									aria-selected="false">
+									<i data-feather="smile"></i>적립금 내역
+								</button>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-coupons-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-coupons"
+									type="button" role="tab"
+									aria-controls="pills-coupons
+									aria-selected="false">
+									<i data-feather="smile"></i>쿠폰 내역
 								</button>
 							</li>
 						</ul>
@@ -1385,25 +1408,26 @@
 																				<div class="product border-0">
 																					<div class="product-detail">
 																						<ul>
-
 																							<c:forEach var="bankTransfers"
 																								items="${bankTransfers }">
 																								<c:choose>
 																									<c:when
-																										test="${curOrder.paymentMethod eq 'bkt'}">
+																										test="${curOrder.orderNo == bankTransfers.orderNo && curOrder.paymentMethod == 'bkt'}">
 																										<li class="name">총 금액 : <fmt:formatNumber
 																												value="${bankTransfers.amountToPay }"
 																												type="NUMBER" />원
 																										</li>
 																									</c:when>
-																									<c:otherwise>
-																										<li class="name">총 금액 : <fmt:formatNumber
-																												value="${curOrder.actualPaymentAmount }"
-																												type="NUMBER" />원
-																										</li>
-																									</c:otherwise>
+
 																								</c:choose>
 																							</c:forEach>
+
+																							<c:if test="${curOrder.paymentMethod != 'bkt'}">
+																								<li class="name">총 금액 : <fmt:formatNumber
+																										value="${curOrder.actualPaymentAmount }"
+																										type="NUMBER" />원
+																								</li>
+																							</c:if>
 																						</ul>
 																						<ul>
 																							<li class="name">총 권수 :
@@ -1433,7 +1457,7 @@
 								role="tabpanel" aria-labelledby="pills-wishlist-tab">
 								<div class="dashboard-wishlist">
 									<div class="title">
-										<h2>My Wishlist History</h2>
+										<h2>My Wishlist</h2>
 										<span class="title-leaf title-leaf-gray"> <svg
 												class="icon-width bg-gray">
                           <use
@@ -1444,7 +1468,8 @@
 
 									<div class="row g-sm-4 g-3">
 										<c:forEach var="item" items="${wishlist }">
-											<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6" id="${item.productId }">
+											<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6"
+												id="${item.productId }">
 												<div class="product-box-3 theme-bg-white h-100">
 													<div class="product-header">
 														<div class="product-image">
@@ -1455,7 +1480,8 @@
 															</a>
 
 															<div class="product-header-top">
-																<button class="btn wishlist-button close_button" onclick="delWishlist('${item.productId }');">
+																<button class="btn wishlist-button close_button"
+																	onclick="delWishlist('${item.productId }');">
 																	<i data-feather="x"></i>
 																</button>
 															</div>
@@ -1475,11 +1501,13 @@
 																</span>
 																<del>
 																	<fmt:formatNumber value="${item.consumerPrice }"
-																		type="NUMBER" />원
+																		type="NUMBER" />
+																	원
 																</del>
 															</h5>
 															<div class="add-to-cart-box mt-2">
-																<button class="btn btn-add-cart addcart-button" onclick="addShoppingCart('${item.productId }');"
+																<button class="btn btn-add-cart addcart-button"
+																	onclick="addShoppingCart('${item.productId }');"
 																	tabindex="0">Add</button>
 
 															</div>
@@ -1538,7 +1566,7 @@
 									</div>
 									<div class="order-contain orderHistory">
 										<div class="order-box dashboard-bg-box">
-
+											${orderList }
 											<c:forEach var="order" items="${orderList }">
 												<div class="product-order-detail" id="productOrderDetail">
 													<c:choose>
@@ -1583,12 +1611,26 @@
 															<li>
 																<div class="size-box">
 																	<h6 class="text-content">결제금액 :</h6>
-																	<h5>
-																		<fmt:formatNumber value="${order.actualPaymentAmount}"
-																			type="NUMBER" />
-																		원
-																	</h5>
-
+																	<c:forEach var="bankTransfers"
+																		items="${bankTransfers }">
+																		<c:choose>
+																			<c:when
+																				test="${order.orderNo == bankTransfers.orderNo && order.paymentMethod == 'bkt'}">
+																				<h5>
+																					<fmt:formatNumber
+																						value="${bankTransfers.amountToPay}" type="NUMBER" />
+																					원
+																				</h5>
+																			</c:when>
+																		</c:choose>
+																	</c:forEach>
+																	<c:if test="${order.paymentMethod != 'bkt'}">
+																		<h5>
+																			<fmt:formatNumber
+																				value="${order.actualPaymentAmount}" type="NUMBER" />
+																			원
+																		</h5>
+																	</c:if>
 																</div>
 															</li>
 
@@ -2093,7 +2135,7 @@
 								<div class="dashboard-card">
 									<div class="title title-flex">
 										<div>
-											<h2>My Card Details</h2>
+											<h2>포인트 내역</h2>
 											<span class="title-leaf"> <svg
 													class="icon-width bg-gray">
                             <use
@@ -2101,238 +2143,194 @@
                           </svg>
 											</span>
 										</div>
-
-										<button
-											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
-											data-bs-toggle="modal" data-bs-target="#editCard">
-											<i data-feather="plus" class="me-2"></i> Add New Card
-										</button>
 									</div>
 
 									<div class="row g-4">
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
-											<div class="payment-card-detail">
-												<div class="card-details">
-													<div class="card-number">
-														<h4>XXXX - XXXX - XXXX - 2548</h4>
-													</div>
-
-													<div class="valid-detail">
-														<div class="title">
-															<span>valid</span> <span>thru</span>
-														</div>
-														<div class="date">
-															<h3>08/05</h3>
-														</div>
-														<div class="primary">
-															<span class="badge bg-pill badge-light">primary</span>
-														</div>
-													</div>
-
-													<div class="name-detail">
-														<div class="name">
-															<h5>Audrey Carol</h5>
-														</div>
-														<div class="card-img">
-															<img src="/resources/assets/images/payment-icon/1.jpg"
-																class="img-fluid blur-up lazyloaded" alt="" />
-														</div>
-													</div>
-												</div>
-
-												<div class="edit-card">
-													<a data-bs-toggle="modal" data-bs-target="#editCard"
-														href="javascript:void(0)"><i class="far fa-edit"></i>
-														edit</a> <a href="javascript:void(0)" data-bs-toggle="modal"
-														data-bs-target="#removeProfile"><i
-														class="far fa-minus-square"></i> delete</a>
-												</div>
-											</div>
-
-											<div class="edit-card-mobile">
-												<a data-bs-toggle="modal" data-bs-target="#editCard"
-													href="javascript:void(0)"><i class="far fa-edit"></i>
-													edit</a> <a href="javascript:void(0)"><i
-													class="far fa-minus-square"></i> delete</a>
-											</div>
-										</div>
-
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
-											<div class="payment-card-detail">
-												<div class="card-details card-visa">
-													<div class="card-number">
-														<h4>XXXX - XXXX - XXXX - 1536</h4>
-													</div>
-
-													<div class="valid-detail">
-														<div class="title">
-															<span>valid</span> <span>thru</span>
-														</div>
-														<div class="date">
-															<h3>12/23</h3>
-														</div>
-														<div class="primary">
-															<span class="badge bg-pill badge-light">primary</span>
-														</div>
-													</div>
-
-													<div class="name-detail">
-														<div class="name">
-															<h5>Leah Heather</h5>
-														</div>
-														<div class="card-img">
-															<img src="/resources/assets/images/payment-icon/2.jpg"
-																class="img-fluid blur-up lazyloaded" alt="" />
-														</div>
-													</div>
-												</div>
-
-												<div class="edit-card">
-													<a data-bs-toggle="modal" data-bs-target="#editCard"
-														href="javascript:void(0)"><i class="far fa-edit"></i>
-														edit</a> <a href="javascript:void(0)" data-bs-toggle="modal"
-														data-bs-target="#removeProfile"><i
-														class="far fa-minus-square"></i> delete</a>
-												</div>
-											</div>
-
-											<div class="edit-card-mobile">
-												<a data-bs-toggle="modal" data-bs-target="#editCard"
-													href="javascript:void(0)"><i class="far fa-edit"></i>
-													edit</a> <a href="javascript:void(0)"><i
-													class="far fa-minus-square"></i> delete</a>
-											</div>
-										</div>
-
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
-											<div class="payment-card-detail">
-												<div class="card-details dabit-card">
-													<div class="card-number">
-														<h4>XXXX - XXXX - XXXX - 1366</h4>
-													</div>
-
-													<div class="valid-detail">
-														<div class="title">
-															<span>valid</span> <span>thru</span>
-														</div>
-														<div class="date">
-															<h3>05/21</h3>
-														</div>
-														<div class="primary">
-															<span class="badge bg-pill badge-light">primary</span>
-														</div>
-													</div>
-
-													<div class="name-detail">
-														<div class="name">
-															<h5>mark jecno</h5>
-														</div>
-														<div class="card-img">
-															<img src="/resources/assets/images/payment-icon/3.jpg"
-																class="img-fluid blur-up lazyloaded" alt="" />
-														</div>
-													</div>
-												</div>
-
-												<div class="edit-card">
-													<a data-bs-toggle="modal" data-bs-target="#editCard"
-														href="javascript:void(0)"><i class="far fa-edit"></i>
-														edit</a> <a href="javascript:void(0)" data-bs-toggle="modal"
-														data-bs-target="#removeProfile"><i
-														class="far fa-minus-square"></i> delete</a>
-												</div>
-											</div>
-
-											<div class="edit-card-mobile">
-												<a data-bs-toggle="modal" data-bs-target="#editCard"
-													href="javascript:void(0)"><i class="far fa-edit"></i>
-													edit</a> <a href="javascript:void(0)"><i
-													class="far fa-minus-square"></i> delete</a>
-											</div>
+										<div class="container mt-3">
+											<table class="table">
+												<thead>
+													<tr>
+														<th>등록일</th>
+														<th>상세내용</th>
+														<th>포인트</th>
+														<th>남은 포인트</th>
+													</tr>
+												</thead>
+												<tbody>
+													<c:forEach var="pl" items="${pointLog }">
+														<tr>
+															<td><fmt:formatDate value="${pl.date }" type="date" /></td>
+															<td>${pl.reason }</td>
+															<td><fmt:formatNumber value="${pl.point }"
+																	type="NUMBER" />점</td>
+															<td><fmt:formatNumber value="${pl.balance }"
+																	type="NUMBER" />점</td>
+														</tr>
+													</c:forEach>
+												</tbody>
+											</table>
 										</div>
 									</div>
 								</div>
 							</div>
 
-
-
-							<div class="tab-pane fade show" id="pills-security"
-								role="tabpanel" aria-labelledby="pills-security-tab">
-								<div class="dashboard-privacy">
-									<div class="dashboard-bg-box">
-										<div class="dashboard-title mb-4">
-											<h3>Privacy</h3>
+							<div class="tab-pane fade show" id="pills-coupons"
+								role="tabpanel" aria-labelledby="pills-coupons-tab">
+								<div class="dashboard-card">
+									<div class="title title-flex">
+										<div>
+											<h2>쿠폰 내역</h2>
+											<span class="title-leaf"> <svg
+													class="icon-width bg-gray">
+                            <use
+														xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
+                          </svg>
+											</span>
 										</div>
-
-										<div class="privacy-box">
-											<div class="d-flex align-items-start">
-												<h6>Allows others to see my profile</h6>
-												<div class="form-check form-switch switch-radio ms-auto">
-													<input class="form-check-input" type="checkbox"
-														role="switch" id="redio" aria-checked="false" /> <label
-														class="form-check-label" for="redio"></label>
-												</div>
-											</div>
-
-											<p class="text-content">all peoples will be able to see
-												my profile</p>
-										</div>
-
-										<div class="privacy-box">
-											<div class="d-flex align-items-start">
-												<h6>who has save this profile only that people see my
-													profile</h6>
-												<div class="form-check form-switch switch-radio ms-auto">
-													<input class="form-check-input" type="checkbox"
-														role="switch" id="redio2" aria-checked="false" /> <label
-														class="form-check-label" for="redio2"></label>
-												</div>
-											</div>
-
-											<p class="text-content">all peoples will not be able to
-												see my profile</p>
-										</div>
-
-										<button
-											class="btn theme-bg-color btn-md fw-bold mt-4 text-white">
-											Save Changes</button>
 									</div>
 
-									<div class="dashboard-bg-box mt-4">
-										<div class="dashboard-title mb-4">
-											<h3>Account settings</h3>
+									<div class="row g-4">
+										<div class="container mt-3">
+											<table class="table">
+												<thead>
+													<tr>
+														<th>얻은 날짜</th>
+														<th>쿠폰 이름</th>
+														<th>쿠폰 쿠폰번호</th>
+														<th>만료 날짜</th>
+														<th>사용 날짜</th>
+													</tr>
+												</thead>
+												<tbody>
+													<c:forEach var="cl" items="${couponLog }">
+														<tr>
+															<td><fmt:formatDate value="${cl.obtainedDate }"
+																	type="date" /></td>
+															<td>${cl.couponName }</td>
+															<td>${cl.couponNumber }</td>
+															<td><fmt:formatDate value="${cl.obtainedDate }"
+																	type="date" /></td>
+															<td><fmt:formatDate value="${cl.usedDate }"
+																	type="date" /></td>
+														</tr>
+													</c:forEach>
+												</tbody>
+											</table>
 										</div>
+									</div>
+								</div>
+							</div>
 
-										<div class="privacy-box">
-											<div class="d-flex align-items-start">
-												<h6>Deleting Your Account Will Permanently</h6>
-												<div class="form-check form-switch switch-radio ms-auto">
-													<input class="form-check-input" type="checkbox"
-														role="switch" id="redio3" aria-checked="false" /> <label
-														class="form-check-label" for="redio3"></label>
-												</div>
-											</div>
-											<p class="text-content">Once your account is deleted, you
-												will be logged out and will be unable to log in back.</p>
+							<div class="tab-pane fade show" id="pills-rewards"
+								role="tabpanel" aria-labelledby="pills-rewards-tab">
+								<div class="dashboard-card">
+									<div class="title title-flex">
+										<div>
+											<h2>적립금 내역</h2>
+											<span class="title-leaf"> <svg
+													class="icon-width bg-gray">
+                            <use
+														xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
+                          </svg>
+											</span>
 										</div>
+									</div>
 
-										<div class="privacy-box">
-											<div class="d-flex align-items-start">
-												<h6>Deleting Your Account Will Temporary</h6>
-												<div class="form-check form-switch switch-radio ms-auto">
-													<input class="form-check-input" type="checkbox"
-														role="switch" id="redio4" aria-checked="false" /> <label
-														class="form-check-label" for="redio4"></label>
-												</div>
-											</div>
-
-											<p class="text-content">Once your account is deleted, you
-												will be logged out and you will be create new account</p>
+									<div class="row g-4">
+										<div class="container mt-3">
+											<table class="table">
+												<thead>
+													<tr>
+														<th>등록일</th>
+														<th>상세내용</th>
+														<th>적립금</th>
+														<th>남은 적립금</th>
+													</tr>
+												</thead>
+												<tbody>
+													<c:forEach var="rl" items="${rewardLog }">
+														<tr>
+															<td><fmt:formatDate value="${rl.date }" type="date" /></td>
+															<td>${rl.reason }</td>
+															<td><fmt:formatNumber value="${rl.reward }"
+																	type="NUMBER" />원</td>
+															<td><fmt:formatNumber value="${rl.balance }"
+																	type="NUMBER" />원</td>
+														</tr>
+													</c:forEach>
+												</tbody>
+											</table>
 										</div>
+									</div>
+								</div>
+							</div>
 
-										<button
-											class="btn theme-bg-color btn-md fw-bold mt-4 text-white">
-											Delete My Account</button>
+							<div class="tab-pane fade show" id="pills-review" role="tabpanel"
+								aria-labelledby="pills-review"-tab">
+								<div class="dashboard-card">
+									<div class="title title-flex">
+										<div>
+											<h2>나의 리뷰</h2>
+											<span class="title-leaf"> <svg
+													class="icon-width bg-gray">
+                            <use
+														xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
+                          </svg>
+											</span>
+										</div>
+									</div>
+${reviewList }
+									<div class="row g-4">
+										<div class="container mt-3">
+											<c:forEach var="review" items="${reviewList }">
+												<table class="table">
+													<thead>
+														<tr>
+															<th>
+																<div class="product border-0">
+																	<a href="/detail/${review.productId }"> <c:choose>
+																			<c:when test="${review.productImage == '' }">
+																				<img src="/resources/assets/images/noimage.jpg"
+																					class="img-fluid blur-up lazyload"
+																					alt="${review.productName }" />
+																			</c:when>
+																			<c:otherwise>
+																				<img src="${review.productImage }"
+																					class="img-fluid blur-up lazyload reviewImg"
+																					alt="${review.productName }" 
+																					width="80px"/>
+																			</c:otherwise>
+																		</c:choose>
+																	</a>
+																	<div class="product-detail">
+																		<ul>
+																			<li class="name"><a
+																				href="/detail/${review.productId }">
+																					${review.productName } </a></li>
+																		</ul>
+																	</div>
+																</div>
+															</th>
+															<th></th>
+															<th></th>
+															<th>수정</th>
+															<th>삭제</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<td>별점별점${review.rating }</td>
+														</tr>
+														<tr>
+															<td>${review.content }</td>
+														</tr>
+														<tr></tr>
+														<tr></tr>
+														<tr></tr>
+													</tbody>
+												</table>
+											</c:forEach>
+										</div>
 									</div>
 								</div>
 							</div>
