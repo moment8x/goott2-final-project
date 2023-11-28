@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.service.kkb.admin.AdminOrderService;
 import com.project.vodto.kkb.DepositCondition;
-import com.project.vodto.kkb.DepositConfirmRequest;
-import com.project.vodto.kkb.DepositOrderCancelRequest;
+import com.project.vodto.kkb.DepositProductCancelRequest;
 import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
 
@@ -96,8 +95,8 @@ public class AdminOrderController {
 		
 		/* 입금 전 관리 (입금 확인 버튼)*/
 		@PutMapping("/confirm")
-		public ResponseEntity<String> setDepositConfirm(@RequestBody DepositConfirmRequest orderNoList) throws Exception {	
-			int result = adminOrderService.editDepositConfirm(orderNoList.getOrderNoList());
+		public ResponseEntity<String> setDepositConfirm(@RequestBody List<String> orderNoList) throws Exception {	
+			int result = adminOrderService.editDepositConfirm(orderNoList);
 			
 			if (result > 0) {
 		        return new ResponseEntity<>("Deposit confirmation update successful", HttpStatus.CREATED);
@@ -106,13 +105,29 @@ public class AdminOrderController {
 		    }
 		} 
 		
-		/* 입금 전 관리 (주문 취소 버튼)*/
-		@PutMapping("/cancel")
-		public ResponseEntity<String> setDepositOrderCancel(@RequestBody DepositOrderCancelRequest orderNoList) throws Exception {	
-			int result = adminOrderService.editDepositOrderCancel(orderNoList.getOrderNoList());
+		/* 입금 전 관리 (주문 취소 버튼 - 주문번호별) */
+		@PutMapping("/cancel/order")
+		public ResponseEntity<String> setDepositOrderCancel(
+				@RequestBody List<String> orderNoList) throws Exception {	
+			
+			int result = adminOrderService.editDepositOrderCancel(orderNoList);
 			
 			if (result > 0) {
 		        return new ResponseEntity<>("Order cancellation update successful", HttpStatus.CREATED);
+		    } else {
+		        return new ResponseEntity<>("No orders were found to update", HttpStatus.NOT_FOUND);
+		    }
+		} 
+		
+		/* 입금 전 관리 (주문 취소 버튼 - 품목주문별) */
+		@PutMapping("/cancel/product")
+		public ResponseEntity<String> setDepositProductCancel(
+				@RequestBody List<DepositProductCancelRequest> productOrderNoList) throws Exception {	
+			
+			int result = adminOrderService.editDepositProductCancel(productOrderNoList);
+			
+			if (result > 0) {
+		        return new ResponseEntity<>("Order cancellation by item update successful", HttpStatus.CREATED);
 		    } else {
 		        return new ResponseEntity<>("No orders were found to update", HttpStatus.NOT_FOUND);
 		    }

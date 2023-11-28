@@ -5,6 +5,7 @@ import java.util.List;
 import com.project.vodto.kkb.DepositCancelInfoResponse;
 import com.project.vodto.kkb.DepositCondition;
 import com.project.vodto.kkb.DepositNoResponse;
+import com.project.vodto.kkb.DepositProductCancelRequest;
 import com.project.vodto.kkb.DepositProductResponse;
 import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
@@ -36,32 +37,33 @@ public interface AdminOrderDAO {
 	
 	/* 입금 전 관리 (입금 확인 버튼 - 주문 내역 상태) */
 	int changeDepositConfirmHistory(List<String> orderNoList) throws Exception;
-	
+
 	/* 입금 전 관리 (주문 취소 버튼 - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
 	int changeDepositOrderCancel(List<String> orderNoList) throws Exception;
 
-	/* 입금 전 관리 (주문 취소 버튼 - 주문 내역 테이블 update(column : delivery_status)) */
+	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 주문 내역 테이블 update(column : delivery_status)) */
 	int changeDepositOrderCancelHistory(List<String> orderNoList) throws Exception;
 	
-	/* 입금 전 관리 (주문 취소 버튼 - 결제 테이블 update(column : payment_status)) */
+	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 결제 테이블 update(column : payment_status)) */
 	int changeDepositOrderCancelPayments(List<String> orderNoList) throws Exception;
 	
-	/* 입금 전 관리 (주문 취소 버튼 - 쿠폰 로그 테이블 update(column : used_date, related_order)) */
+	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) */
 	int changeDepositOrderCancelCoupon(List<String> orderNoList) throws Exception;
 	
-	/* 입금 전 관리 (주문 취소 버튼 - 적립금 로그 테이블 update(column : reason, balance, reward)) */
+	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 적립금 로그 테이블 update(column : reason, balance, reward)) */
 	int changeDepositOrderCancelReward(List<String> orderNoList) throws Exception;
 	
-	/* 입금 전 관리 (주문 취소 버튼 - 포인트 로그 테이블 update(column : reason, balance, point)) */
+	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 포인트 로그 테이블 update(column : reason, balance, point)) */
 	int changeDepositOrderCancelPoint(List<String> orderNoList) throws Exception;
 	
-	/* 입금 전 관리 (주문 취소 버튼 - ) */
+	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 회원 테이블 update(column : coupon_count, total_points, 
+	 * 							total_rewards, accumulated_use_reward,accumulated_use_point)) */
 	int changeDepositOrderCancelMember(List<String> orderNoList) throws Exception;
 
-	/* 입금 전 관리 (주문 취소 버튼 - 취소용 추가 정보 조회) */
+	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 취소용 추가 정보 조회) */
 	List<DepositCancelInfoResponse> findDepositCancelInfo(List<String> orderNoList) throws Exception;
 	
-	/* 입금 전 관리 (주문 취소 버튼 - 취소 테이블에 추가) */
+	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 취소 테이블에 추가) */
 	int saveDepositOrderCancel(List<DepositCancelInfoResponse> cancelInfoList) throws Exception;
 	
 	
@@ -76,4 +78,18 @@ public interface AdminOrderDAO {
 	
 	/* 배송 준비중 관리 (주문내역 송장번호 저장) */
 	int changeInvoiceHistory(InvoiceCondition invoiceCond) throws Exception;
+
+	int changeDepositProductCancel(List<DepositProductCancelRequest> productOrderNoList);
+
+	int changeDepositProductCancelHistory(List<DepositProductCancelRequest> productOrderNoList);
+
+	int changeDepositProductCancelPayments(List<DepositProductCancelRequest> productOrderNoList);
+
+	int changeDepositProductCancelCoupon(List<DepositProductCancelRequest> productOrderNoList);
+
+	int changeDepositProductCancelReward(List<DepositProductCancelRequest> productOrderNoList);
+
+	int changeDepositProductCancelPoint(List<DepositProductCancelRequest> productOrderNoList);
+
+	int changeDepositProductCancelMember(List<DepositProductCancelRequest> productOrderNoList);
 }

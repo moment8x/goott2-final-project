@@ -13,6 +13,7 @@ import com.project.vodto.kkb.DepositByProduct;
 import com.project.vodto.kkb.DepositCancelInfoResponse;
 import com.project.vodto.kkb.DepositCondition;
 import com.project.vodto.kkb.DepositNoResponse;
+import com.project.vodto.kkb.DepositProductCancelRequest;
 import com.project.vodto.kkb.DepositProductResponse;
 import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderByProduct;
@@ -75,8 +76,57 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		
 		return result;
 	}
+	
+	/* 입금 전 관리 (주문 취소 버튼 - 품목주문별) */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int editDepositProductCancel(List<DepositProductCancelRequest> productOrderNoList) throws Exception {
+		
+		int result = -1;
+		
+		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
+		if(adminOrderRepository.changeDepositProductCancel(productOrderNoList) <= 0 ) {
+			return result;
+		}
+		/* 주문 내역 테이블 update(column : delivery_status) */
+		if(adminOrderRepository.changeDepositProductCancelHistory(productOrderNoList) <= 0) {
+			return result;
+		}
+		/* 결제 테이블 update(column : payment_status) */
+		if(adminOrderRepository.changeDepositProductCancelPayments(productOrderNoList) <= 0) {
+			return result;
+		}
+		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
+		if(adminOrderRepository.changeDepositProductCancelCoupon(productOrderNoList) <= 0) {
+			return result;
+		}
+		/* 적립금 로그 테이블 update(column : reason, balance, reward) */
+		if(adminOrderRepository.changeDepositProductCancelReward(productOrderNoList) <= 0) {
+			return result;
+		}
+		/* 포인트 로그 테이블 update(column : reason, balance, point) */
+		if(adminOrderRepository.changeDepositProductCancelPoint(productOrderNoList) <= 0) {
+			return result;
+		}
+		/* 회원 테이블 update(column : total_points, total_rewards, coupon_count,
+		 * accumulated_reward, accumulated_use_reward, accumulated_pointm, accumulated_use_point ) */
+		if(adminOrderRepository.changeDepositProductCancelMember(productOrderNoList) > 0) {
+			
+			List<String> orderNoList = productOrderNoList
+					.stream()
+					.map(DepositProductCancelRequest::getOrderNo)
+					.collect(Collectors.toList());
+							
+			List<DepositCancelInfoResponse> cancelInfoList = 
+					adminOrderRepository.findDepositCancelInfo(orderNoList);
+			
+			result = adminOrderRepository.saveDepositOrderCancel(cancelInfoList);
+		}
+		
+		return result;
+	}
 
-	/* 입금전 관리 - 주문 취소 */
+	/* 입금 전 관리 (주문 취소 버튼 - 주문번호별) */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public int editDepositOrderCancel(List<String> orderNoList) throws Exception {
