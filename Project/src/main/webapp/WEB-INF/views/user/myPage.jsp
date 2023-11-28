@@ -948,6 +948,79 @@
 			}
 		});
 	}
+	function selectReview(postNo) {
+		$.ajax({
+			url : '/user/selectModifyReview', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				postNo
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data)
+				outputModifyReview(data)
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	function outputModifyReview(review) {
+		$.each(review, function(i, e) {
+			console.log(e)
+			let output = `<table class="table mb-0 productInfo">`;
+			output += `<tbody>`;
+			output += `<tr>`;
+			output += `<td class="product-detail">`;
+			output += `<div class="product border-0">`;
+			if(e.productImage == null){
+				output += `<a href="/detail/\${e.productId}" class="product-image">`;
+				output += `<img src="/resources/assets/images/noimage.jpg" class="img-fluid blur-up lazyload" alt="\${e.productName}">`;
+				output += `</a>`;
+			}else{
+				output += `<a href="/detail/\${e.productId}" class="product-image">`;
+				output += `<img src="\${e.productImage}" class="img-fluid blur-up lazyload" alt="\${e.productName}">`;
+				output += `</a>`;
+			}
+			output += `</div>`;
+			output += `</td>`;
+			output += `<td></td>`;
+			output += `</tr>`
+			output += `<tr>`
+			output += `<td class="name">`
+			output += `<h4 class="table-title text-content">\${e.productName}</h4>` 
+			output += `<a href="/detail/\${e.productId}" id="productName"></a>`
+			output += `</td>`
+			output += `<td class="name">`
+			output += `<h4 class="table-title text-content">`
+			for(j = 0; j < 5; j++){
+				output += `<i class="fa-regular fa-star" style="color: #0DA487;"></i>`						
+			}
+			output += `</h4>` 
+			output += `</td>`
+			output += `</tr>`
+			output += `</tbody>`
+			output += `</table>`
+			output += `<div class="form-floating mb-4 theme-form-floating">`
+			output += `content<input type="text" class="form-control" id="exchangeReason"
+				value="\${e.content}" name="reason"/>`
+			output += `<div>`
+			output += `<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>`
+			output += `상품에 하자가 있는 경우에만 교환이 가능합니다.`
+			output += `</div>`
+			output += `</div>`
+			output += `<div class="form-floating mb-4 theme-form-floating">`
+			output += `사진첨부`
+			output += `<div>`
+			output += `<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>`
+			output += `상품에 하자가 있는 경우에만 교환이 가능합니다.`
+			output += `</div>`
+			output += `</div>`
+			
+			$('.modal-body.modifyReview').html(output);
+		})
+	}
 </script>
 <style>
 #deliveryStatus, #successPwd, #successPhoneNumber,
@@ -1069,6 +1142,19 @@
 	margin-top: 30px;
 }
 
+.table.reviewTable {
+	border-bottom: 1.5px solid gray;
+}
+
+.btn.theme-bg-color.btn-md.text-white.delReview, .btn.theme-bg-color.btn-md.text-white.modifyReview
+	{
+	width: 25px;
+	height: 20px;
+}
+
+.btn.theme-bg-color.btn-md.text-white.modifyReview {
+	text-align: right;
+}
 </style>
 </head>
 
@@ -2279,54 +2365,49 @@
 											</span>
 										</div>
 									</div>
-${reviewList }
+									${reviewList }
 									<div class="row g-4">
 										<div class="container mt-3">
 											<c:forEach var="review" items="${reviewList }">
-												<table class="table">
-													<thead>
-														<tr>
-															<th>
-																<div class="product border-0">
-																	<a href="/detail/${review.productId }"> <c:choose>
-																			<c:when test="${review.productImage == '' }">
-																				<img src="/resources/assets/images/noimage.jpg"
-																					class="img-fluid blur-up lazyload"
-																					alt="${review.productName }" />
-																			</c:when>
-																			<c:otherwise>
-																				<img src="${review.productImage }"
-																					class="img-fluid blur-up lazyload reviewImg"
-																					alt="${review.productName }" 
-																					width="80px"/>
-																			</c:otherwise>
-																		</c:choose>
-																	</a>
-																	<div class="product-detail">
-																		<ul>
-																			<li class="name"><a
-																				href="/detail/${review.productId }">
-																					${review.productName } </a></li>
-																		</ul>
-																	</div>
-																</div>
-															</th>
-															<th></th>
-															<th></th>
-															<th>수정</th>
-															<th>삭제</th>
-														</tr>
-													</thead>
+												<table class="table table-borderless reviewTable">
 													<tbody>
 														<tr>
-															<td>별점별점${review.rating }</td>
+															<td><a href="/detail/${review.productId }"> <c:choose>
+																		<c:when test="${review.productImage == '' }">
+																			<img src="/resources/assets/images/noimage.jpg"
+																				class="img-fluid blur-up lazyload"
+																				alt="${review.productName }" />
+																		</c:when>
+																		<c:otherwise>
+																			<img src="${review.productImage }"
+																				class="img-fluid blur-up lazyload reviewImg"
+																				alt="${review.productName }" width="80px" />
+																		</c:otherwise>
+																	</c:choose>
+															</a> <a href="/detail/${review.productId }">
+																	${review.productName } </a></td>
+															<td class="reviewBtn"><button type="button"
+																	class="btn theme-bg-color btn-md text-white modifyReview"
+																	data-bs-toggle="modal"
+																	data-bs-target="#modifyReviewModal"
+																	onclick="selectReview(${review.postNo})">수정</button></td>
+															<td><button type="button"
+																	class="btn theme-bg-color btn-md text-white delReview"
+																	onclick="delReview();">삭제</button></td>
+														</tr>
+
+														<tr>
+															<td><c:forEach begin="1" end="${review.rating }">
+																	<i class="fa-solid fa-star" style="color: #0DA487;"></i>
+																</c:forEach></td>
+															<td></td>
+															<td></td>
 														</tr>
 														<tr>
 															<td>${review.content }</td>
+															<td></td>
+															<td></td>
 														</tr>
-														<tr></tr>
-														<tr></tr>
-														<tr></tr>
 													</tbody>
 												</table>
 											</c:forEach>
@@ -2429,75 +2510,67 @@ ${reviewList }
 	<!-- Add address modal box end -->
 
 	<!-- Location Modal Start -->
-	<div class="modal location-modal fade theme-modal" id="locationModal"
+	<div class="modal fade theme-modal" id="modifyReviewModal"
 		tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div
 			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel1">Choose your
-						Delivery Location</h5>
-					<p class="mt-1 text-content">Enter your address and we will
-						specify the offer for your area.</p>
+					<h5 class="modal-title" id="exampleModalLabel">리뷰수정</h5>
+
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
-				<div class="modal-body">
-					<div class="location-list">
-						<div class="search-input">
-							<input type="search" class="form-control"
-								placeholder="Search Your Area" /> <i
-								class="fa-solid fa-magnifying-glass"></i>
+
+				<div class="modal-body modifyReview">
+					<!--  <table class="table mb-0 productInfo">
+						<tbody>
+							<tr>
+								<td class="product-detail">
+									<div class="product border-0">
+										<a href="/detail/" class="product-image"> <img
+											src="/resources/assets/images/noimage.jpg"
+											class="img-fluid blur-up lazyload" alt="">
+										</a>
+									</div>
+								</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td class="name">
+									<h4 class="table-title text-content">상품이름</h4> <a
+									href="/detail/" id="productName"></a>
+								</td>
+								<td class="name">
+									<h4 class="table-title text-content">별점</h4> 
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="form-floating mb-4 theme-form-floating">
+						content<input type="text" class="form-control" id="exchangeReason"
+							value="상품 하자" name="reason" readonly="readonly" />
+						<div class="deliverMsg">
+							<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>
+							상품에 하자가 있는 경우에만 교환이 가능합니다.
 						</div>
-
-						<div class="disabled-box">
-							<h6>Select a Location</h6>
-						</div>
-
-						<ul class="location-select custom-height">
-							<li><a href="javascript:void(0)">
-									<h6>Alabama</h6> <span>Min: $130</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Arizona</h6> <span>Min: $150</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>California</h6> <span>Min: $110</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Colorado</h6> <span>Min: $140</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Florida</h6> <span>Min: $160</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Georgia</h6> <span>Min: $120</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Kansas</h6> <span>Min: $170</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Minnesota</h6> <span>Min: $120</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>New York</h6> <span>Min: $110</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Washington</h6> <span>Min: $130</span>
-							</a></li>
-						</ul>
 					</div>
+					<div class="form-floating mb-4 theme-form-floating">
+						사진첨부<input type="text" class="form-control" id="exchangeReason"
+							value="상품 하자" name="reason" readonly="readonly" />
+						<div class="deliverMsg">
+							<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>
+							상품에 하자가 있는 경우에만 교환이 가능합니다.
+						</div>
+					</div>-->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-md"
+						data-bs-dismiss="modal">닫기</button>
+					<button type="button" class="btn theme-bg-color btn-md text-white"
+						onclick="">수정</button>
 				</div>
 			</div>
 		</div>

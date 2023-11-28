@@ -28,6 +28,7 @@ import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.jmj.MyPageReview;
 import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
@@ -603,6 +604,12 @@ public class MemberServiceImpl implements MemberService {
 		}
 		return result;
 	}
+	
+	@Override
+	public MyPageReview selectMyReview(String memberId, int postNo) throws SQLException, NamingException {
+	
+		return mDao.selectMyReview(memberId, postNo);
+	}
 
 	// --------------------------------------- 장민정 끝
 	// ----------------------------------------
@@ -677,6 +684,8 @@ public class MemberServiceImpl implements MemberService {
 
 		return result;
 	}
+
+
 
 
 

@@ -27,7 +27,7 @@ import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
-import com.project.vodto.jmj.myPageReview;
+import com.project.vodto.jmj.MyPageReview;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
 
@@ -240,8 +240,11 @@ public interface MemberDAO {
 	//결제수단, 주문번호 가져오기
 	List<MyPageOrderList> selectPaymentMethodAndOrderNo(String memberId) throws SQLException, NamingException;
 	
-	//작성한 리뷰 가져오기
-	List<myPageReview> selectMyreview(String memberId) throws SQLException, NamingException;
+	//작성한 리뷰 전체 가져오기
+	List<MyPageReview> selectMyreview(String memberId) throws SQLException, NamingException;
+	
+	//작성한 리뷰 한개 가져오기
+	MyPageReview selectMyReview(String memberId, int postNo) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -255,6 +258,7 @@ public interface MemberDAO {
 	// 기본 배송지 설정
 	int insertShipping(ShippingAddrDTO shipping) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+
 	
 	
 

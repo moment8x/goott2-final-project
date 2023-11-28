@@ -18,6 +18,7 @@ import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.jmj.MyPageReview;
 import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.exchangeDTO;
@@ -116,6 +117,9 @@ public interface MemberService {
 	
 	//찜 목록에 있는 상품 장바구니 추가
 	boolean addShoppingCart(String memberId, String productId) throws SQLException, NamingException;
+	
+	//리뷰 한개 가져오기
+	MyPageReview selectMyReview(String memberId, int postNo) throws SQLException, NamingException;
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -125,10 +129,5 @@ public interface MemberService {
 	// 로그인 시도
 	Member login(String memberId, String password) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
-	
-	
-
-	
-	
 
 }

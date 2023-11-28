@@ -33,7 +33,7 @@ import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
-import com.project.vodto.jmj.myPageReview;
+import com.project.vodto.jmj.MyPageReview;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO {
@@ -677,9 +677,18 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public List<myPageReview> selectMyreview(String memberId) throws SQLException, NamingException {
+	public List<MyPageReview> selectMyreview(String memberId) throws SQLException, NamingException {
 		
 		return ses.selectList(ns + ".selectMyreview", memberId);
+	}
+
+	@Override
+	public MyPageReview selectMyReview(String memberId, int postNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("postNo", postNo);
+		
+		return ses.selectOne(ns + ".selectMyReview", params);
 	}
 
 
@@ -729,6 +738,7 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".insertShipping", shipping);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
 
 
 }

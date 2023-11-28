@@ -12,7 +12,8 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-public class myPageReview {
+public class MyPageReview {
+	private int postNo;
 	private Timestamp createdDate;
 	private String content;
 	private int rating;

@@ -454,10 +454,18 @@
 		and pay.order_no = o.order_no;
 	</select>
 	
-	<select id="selectMyreview" resultType="com.project.vodto.jmj.myPageReview">
-		select rb.created_date, rb.content, rb.rating, rb.product_id, rb.is_delete, pi.product_image, p.product_name
+	<select id="selectMyreview" resultType="com.project.vodto.jmj.MyPageReview">
+		select rb.post_no, rb.created_date, rb.content, rb.rating, rb.product_id, rb.is_delete, pi.product_image, p.product_name
 		from review_board rb, (SELECT * FROM product_images GROUP BY product_id) pi, products p
 		where rb.author = #{memberId}
+		and rb.product_id = pi.product_id
+		and pi.product_id = p.product_id
+	</select>
+	
+	<select id="selectMyReview" resultType="com.project.vodto.jmj.MyPageReview">
+		select rb.post_no, rb.created_date, rb.content, rb.rating, rb.product_id, rb.is_delete, pi.product_image, p.product_name
+		from review_board rb, (SELECT * FROM product_images GROUP BY product_id) pi, products p
+		where rb.author = #{memberId} and post_no = #{postNo}
 		and rb.product_id = pi.product_id
 		and pi.product_id = p.product_id
 	</select>

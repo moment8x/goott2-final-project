@@ -54,7 +54,7 @@ import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
-import com.project.vodto.jmj.myPageReview;
+import com.project.vodto.jmj.MyPageReview;
 import com.project.vodto.kjy.Memberkjy;
 
 @Controller
@@ -124,7 +124,7 @@ public class myPageController {
 				model.addAttribute("couponLog", cl);
 				
 				//작성한 리뷰
-				List<myPageReview> reviewList = (List<myPageReview>)map.get("myReview");
+				List<MyPageReview> reviewList = (List<MyPageReview>)map.get("myReview");
 				model.addAttribute("reviewList", reviewList);
 				
 			} catch (SQLException | NamingException e) {
@@ -768,6 +768,30 @@ public class myPageController {
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	@RequestMapping(value = "selectModifyReview", method = RequestMethod.POST)
+	public ResponseEntity<MyPageReview> selectModifyReview(@RequestParam("postNo") int postNo, HttpServletRequest request){
+		System.out.println(postNo + "번 리뷰수정");
+		
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
+		ResponseEntity<MyPageReview> result = null;
+		
+		HttpHeaders header = new HttpHeaders();
+		header.add("Content-Type", "application/json; charset=UTF-8");
+		try {
+			MyPageReview review = mService.selectMyReview(memberId, postNo);
+			result = new ResponseEntity<MyPageReview>(review, header, HttpStatus.OK);
+		} catch (SQLException | NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
+		
 	}
 
 }
