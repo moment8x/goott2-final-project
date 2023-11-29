@@ -11,8 +11,13 @@ import javax.naming.NamingException;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.project.vodto.BankTransfer;
+import com.project.vodto.CouponLog;
 import com.project.vodto.Member;
+import com.project.vodto.PointLog;
+import com.project.vodto.RewardLog;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.UploadFiles;
 import com.project.vodto.jmj.CancelDTO;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
@@ -20,11 +25,15 @@ import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
+import com.project.vodto.jmj.MyPageCouponLog;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.jmj.ReturnOrder;
+import com.project.vodto.jmj.SelectWishlist;
+import com.project.vodto.jmj.exchangeDTO;
+import com.project.vodto.jmj.MyPageReview;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO {
@@ -266,6 +275,7 @@ public class MemberDAOImpl implements MemberDAO {
 	
 	@Override
 	public List<MyPageOrderList> selectCurOrderHistory(String memberId) throws SQLException, NamingException {
+
 		
 		return ses.selectList(ns + ".getCurOrderHistory", memberId);
 	}
@@ -518,6 +528,7 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("zipNo", ro.getZipNo());
 		params.put("addr", ro.getAddr());
 		params.put("detailAddr", ro.getDetailAddr());
+		params.put("returnMsg", ro.getReturnMsg());
 		
 		return ses.insert(ns + ".insertReturnShippingAddress", params);
 	}
@@ -547,6 +558,139 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.update(ns + ".updatedeliveryStatusWithReturn", params);
 	}
+	
+	@Override
+	public int insertReturnWithExchange(String productId, exchangeDTO ed) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("productId", productId);
+		params.put("reason", ed.getExchangeReason());
+		params.put("detailedOrderId", ed.getDetailedOrderId());
+		
+		return ses.insert(ns + ".insertExchange", params);
+	}
+
+	@Override
+	public int insertExchangeShippingAddress(exchangeDTO ed) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("returnZipNo", ed.getReturnZipNo());
+		params.put("returnAddr", ed.getReturnAddr());
+		params.put("returnDetailAddr", ed.getReturnDetailAddr());
+		params.put("returnMsg", ed.getReturnMsg());
+		params.put("exchangeZipNo", ed.getExchangeZipNo());
+		params.put("exchangeAddr", ed.getExchangeAddr());
+		params.put("exchangeDetailAddr", ed.getExchangeDetailAddr());
+		params.put("exchangeMsg", ed.getExchangeMsg());
+		
+		return ses.insert(ns + ".insertExchangeShippingAddress", params);
+	}
+
+	@Override
+	public int updateDetailProductStatusWithExchange(int detailedOrderId) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".updateDetailProductStatusWithExchange", detailedOrderId);
+	}
+
+	@Override
+	public int updateDeliveryStatusWithExchange(String memberId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.update(ns + ".updateDeliveryStatusWithExchange", params);
+	}
+	
+	@Override
+	public int insertUploadProfile(UploadFiles uf) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("extension", uf.getExtension());
+		params.put("originalFileName", uf.getOriginalFileName());
+		params.put("newFileName", uf.getNewFileName());
+		params.put("fileSize", uf.getFileSize());
+		
+		return ses.insert(ns+ ".insertUploadProfile", uf);
+	}
+	
+	@Override
+	public int selectuploadFilesSeq(String newFileName) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".selectuploadFilesSeq", newFileName);
+	}
+
+	@Override
+	public int updateMemberProfile(int uploadFilesSeq, String memberId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("uploadFilesSeq", uploadFilesSeq);
+		
+		return ses.update(ns + ".updateMemberProfile", params);
+	}
+
+	@Override
+	public String selectMemeberProfileImg(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".selectMemeberProfileImg", memberId);
+	}
+	
+	@Override
+	public List<SelectWishlist> selectWishlist(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns+".selectWishlist", memberId);
+	}
+	
+	@Override
+	public int addShoppingCart(String memberId, String productId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("productId", productId);
+		
+		return ses.insert(ns + ".addShoppingCart", params);
+	}
+
+	@Override
+	public List<PointLog> selectPointLog(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".selectPointLog", memberId);
+	}
+	
+	@Override
+	public int getTotalPointLogCnt(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".getTotalPointLogCnt", memberId);
+	}
+	
+	@Override
+	public List<RewardLog> selectRewardLog(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".selectRewardLog", memberId);
+	}
+	
+	@Override
+	public List<MyPageCouponLog> selectCouponLog(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".selectCouponLog", memberId);
+	}
+	
+	@Override
+	public List<MyPageOrderList> selectPaymentMethodAndOrderNo(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".selectPaymentMethodAndOrderNo", memberId);
+	}
+
+	@Override
+	public List<MyPageReview> selectMyreview(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".selectMyreview", memberId);
+	}
+
+	@Override
+	public MyPageReview selectMyReview(String memberId, int postNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("postNo", postNo);
+		
+		return ses.selectOne(ns + ".selectMyReview", params);
+	}
+
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
@@ -589,15 +733,6 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".insertShipping", shipping);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
-
-
-	
-
-	
-
-
-
-
 
 
 

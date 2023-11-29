@@ -2,7 +2,8 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,15 +16,15 @@
 <script type="text/javascript">
 	$(function() {
 		$(document).ready(function() {
-		    $(".grid-option ul li").on("click", function() {
-		        let clickedClass = $(this).attr("class").split("active")[0];
+			$(".grid-option ul li").on("click", function() {
+				let clickedClass = $(this).attr("class").split("active")[0];
 
-		        console.log("클릭한 리스트 항목의 클래스: " + clickedClass);
-		        useState(clickedClass);
-		      
-		    });
+				console.log("클릭한 리스트 항목의 클래스: " + clickedClass);
+				useState(clickedClass);
+
+			});
 		});
-		
+
 		// 시큐리티 적용시 결제모달 링크 적용
 		//$('#payModalBtn').on("click", function() {
 		//	let pId = $(this).attr("value");
@@ -40,14 +41,14 @@
 				async : false,
 				success : function(data) {
 					payLink(data, pId);
-				
+
 				},
 				error : function() {
 					// 전송에 실패하면 이 콜백 함수를 실행
 				}
 			});
 		});
-		
+
 		$('.dropdown-item').on("click", function(evt) {
 			let sortBy = $(this).attr('id');
 			let key = "${key}"
@@ -65,17 +66,19 @@
 				}
 			});
 		});
-		
+
 		insertSort();
 		changeGrid();
 	});
-	 
+
 	function payLink(data, pId) {
-		if(data.isLogin == "loginOK"){
-			$('#MemberLoginPay').attr("href","/order/requestOrder?productId="+pId+"&isLogin=Y");
+		if (data.isLogin == "loginOK") {
+			$('#MemberLoginPay').attr("href",
+					"/order/requestOrder?productId=" + pId + "&isLogin=Y");
 		} else {
-			$('#loginPay').attr("href","/login/");
-			$('#noLoginPay').attr("href","/order/requestOrder?productISd="+pId+"&isLogin=N");
+			$('#loginPay').attr("href", "/login/");
+			$('#noLoginPay').attr("href",
+					"/order/requestOrder?productISd=" + pId + "&isLogin=N");
 		}
 	}
 
@@ -83,22 +86,25 @@
 		console.log(data);
 		$.each(data.list_product, function(i, product) {
 			console.log(i);
-			if(product.product_image != null){
-			$('#pImage' + (i+1)).attr("src",product.product_image);				
+			if (product.product_image != null) {
+				$('#pImage' + (i + 1)).attr("src", product.product_image);
 			} else {
-				$('#pImage' + (i+1)).attr("src","/resources/assets/images/deer.png");
+				$('#pImage' + (i + 1)).attr("src",
+						"/resources/assets/images/deer.png");
 			}
-			$('#publisher' + (i+1)).html(product.publisher);
-			$('#pName'+ (i+1)).html(product.product_name);
-			$('#pIntro'+ (i+1)).html(product.introduction_detail);
-			$('#page' + (i+1)).html(product.page_count+"p");
-			$('#sPrice'+ (i+1)).html(product.selling_price.toLocaleString()+"원");
-			$('#cPrice'+ (i+1)).html(product.consumer_price.toLocaleString()+"원");
-		console.log($('#pImage' + (i+1)).attr("src"));
+			$('#publisher' + (i + 1)).html(product.publisher);
+			$('#pName' + (i + 1)).html(product.product_name);
+			$('#pIntro' + (i + 1)).html(product.introduction_detail);
+			$('#page' + (i + 1)).html(product.page_count + "p");
+			$('#sPrice' + (i + 1)).html(
+					product.selling_price.toLocaleString() + "원");
+			$('#cPrice' + (i + 1)).html(
+					product.consumer_price.toLocaleString() + "원");
+			console.log($('#pImage' + (i + 1)).attr("src"));
 		})
 
 	}
-	
+
 	function insertSort() {
 		let sortBy = "${sortBy}";
 		switch (sortBy) {
@@ -116,32 +122,33 @@
 			break;
 		}
 	}
-	
+
 	// 시큐리티 적용시 결제 모달창 링크 적용
 	//function getHrefModal(pId) {
 	//	$('#MemberLoginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=Y");
 	//	$('#loginPay').attr("href","/login/");
 	//	$('#noLoginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=N");
 	//}
-	
+
 	function changeGrid() {
 		console.log("${active}");
 		let active = "${active}";
-		$("."+active).attr("class",(active+" active"));
+		$("." + active).attr("class", (active + " active"));
 	}
-	
+
 	function useState(active) {
 		let activeClass = active;
-		
-		for(let i = 1; i < 11; i++){
-			$('.link'+i).attr("href",($(".link"+i).attr("href")+"&active="+activeClass));
+
+		for (let i = 1; i < 11; i++) {
+			$('.link' + i).attr("href",
+					($(".link" + i).attr("href") + "&active=" + activeClass));
 		}
 	}
 	function shoppingcart(pId) {
 		$.ajax({
 			url : '/shoppingCart/insert',
 			type : 'POST',
-			data:{
+			data : {
 				"productId" : pId,
 			},
 			dataType : 'json',
@@ -156,23 +163,79 @@
 			}
 		});
 	}
-	
+
 	function openShoppingModal(data) {
-		if(data.status == 'success'){
+		if (data.status == 'success') {
 			$(".modal-body").html("저장에 성공하셨습니다.");
 			$("#shoppingCartModal").show();
-		}else if(data.status == 'exist'){
+		} else if (data.status == 'exist') {
 			$(".modal-body").html("이미 저장된 상품입니다.");
 			$("#shoppingCartModal").show();
-		}else if(data.status == "fails"){
+		} else if (data.status == "fails") {
 			$(".modal-body").html("저장에 실패하셨습니다.");
 			$("#shoppingCartModal").show();
 		}
 	}
-	
+
 	function shoppingClose() {
 		$("#shoppingCartModal").hide();
 	}
+
+	//-----------------------------------------------------------민정 --------------------------------------------------------------
+	function likeDisLike(productId) {
+		let likeDislikeId = $(`#\${productId}`);
+		let member = '${sessionScope.loginMember.memberId}'
+		if (member == "") {
+			alert("로그인 해주세요");
+			location.href = '/login/';
+		} else if (likeDislikeId.hasClass("fa-regular")) {
+			likeDislikeId.removeClass("fa-regular").addClass("fa-solid");
+			console.log(productId + "좋아요")
+
+			$.ajax({
+				url : '/list/likeProduct',
+				type : 'POST',
+				data : {
+					"productId" : productId,
+				},
+				dataType : 'text',
+				async : false,
+				success : function(data) {
+					console.log(data)
+
+				},
+				error : function(error) {
+					if (error.status === 409) {
+						alert("상품이 이미 리스트에 있습니다.")
+						likeDislikeId.removeClass("fa-solid").addClass(
+								"fa-regular");
+					}
+				}
+			});
+
+		} else if (likeDislikeId.hasClass("fa-solid")) {
+			likeDislikeId.removeClass("fa-solid").addClass("fa-regular");
+			console.log(productId + "싫어요")
+
+			$.ajax({
+				url : '/list/disLikeProduct',
+				type : 'POST',
+				data : {
+					"productId" : productId,
+				},
+				dataType : 'json',
+				async : false,
+				success : function(data) {
+					console.log(productId + "번 상품 좋아요")
+
+				},
+				error : function() {
+					// 전송에 실패하면 이 콜백 함수를 실행
+				}
+			});
+		}
+	}
+	//--------------------------------------------------------민정 끝-----------------------------------------------------------------
 </script>
 </head>
 <body>
@@ -311,44 +374,79 @@
 										<div class="product-box-3 h-100 wow fadeInUp">
 											<div class="product-header">
 												<div class="product-image">
-												<c:choose>
-												<c:when test="${product.product_image != null}">
-													<a href="/detail/${product.product_id}"> <img id="pImage${loop.index + 1 }"
-														src="${product.product_image}"
-														class="img-fluid blur-up lazyload" alt="">
-													</a>
-													</c:when>
-													<c:otherwise>
-													<a href="/detail/${product.product_id}"> <img id="pImage${loop.index + 1 }"
-														src="/resources/assets/images/deer.png"
-														class="img-fluid blur-up lazyload" alt="">
-													</a>
-													</c:otherwise>
+													<c:choose>
+														<c:when test="${product.product_image != null}">
+															<a href="/detail/${product.product_id}"> <img
+																id="pImage${loop.index + 1 }"
+																src="${product.product_image}"
+																class="img-fluid blur-up lazyload" alt="">
+															</a>
+														</c:when>
+														<c:otherwise>
+															<a href="/detail/${product.product_id}"> <img
+																id="pImage${loop.index + 1 }"
+																src="/resources/assets/images/deer.png"
+																class="img-fluid blur-up lazyload" alt="">
+															</a>
+														</c:otherwise>
 													</c:choose>
+													
 													<ul class="product-option">
-															<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="${product.product_id }"
-															title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i>
-															</a></li>
-														
+														<li data-bs-toggle="tooltip" data-bs-placement="top"
+															id="payModalBtn" value="${product.product_id }"
+															title="바로 구매"><a href="javascript:void(0)"
+															data-bs-toggle="modal" data-bs-target="#view"><i
+																data-feather="credit-card"></i> </a></li>
 
-														<li  data-bs-toggle="tooltip" data-bs-placement="top"
-															title="장바구니" ><a href="javascript:void(0)" onclick="shoppingcart('${product.product_id}');"><i data-feather="shopping-cart"></i></a>
-														</li>
 
 														<li data-bs-toggle="tooltip" data-bs-placement="top"
-															title="Wishlist"><a href="wishlist.html"
-															class="notifi-wishlist"> <i data-feather="heart"></i>
-														</a></li>
+															title="장바구니"><a href="javascript:void(0)"
+															onclick="shoppingcart('${product.product_id}');"><i
+																data-feather="shopping-cart"></i></a></li>
+														
+														<c:set var="shouldRender" value="true" />
+														<c:forEach var="wish" items="${wishlist }">
+															<c:set var="productId" value="${product.product_id }"></c:set>
+															<c:set var="wishProduct" value="${wish.productId}"></c:set>
+
+															<c:choose>
+																<c:when
+																	test="${sessionScope.loginMember.memberId != '' && productId eq wishProduct}">
+																	<c:set var="shouldRender" value="false" />
+																	<li data-bs-toggle="tooltip" data-bs-placement="top"
+																		value="${product.product_id }" title="찜 삭제"><a
+																		href="javascript:void(0)"
+																		class="notifi-wishlist likeProduct"> <i
+																			id="${product.product_id}" class="fa-solid fa-heart"
+																			style="color: #ff007b;"
+																			onclick="likeDisLike('${product.product_id}');"></i>
+																	</a></li>
+																</c:when>
+															</c:choose>
+														</c:forEach>
+
+														<c:if test="${shouldRender}">
+															<li data-bs-toggle="tooltip" data-bs-placement="top"
+																value="${product.product_id }" title="찜"><a
+																href="javascript:void(0)" class="notifi-wishlist"> <i
+																	id="${product.product_id}" class="fa-regular fa-heart"
+																	style="color: #ff007b;"
+																	onclick="likeDisLike('${product.product_id}');"></i>
+															</a></li>
+														</c:if>
+
+
 													</ul>
 												</div>
 											</div>
 											<div class="product-footer">
 												<div class="product-detail">
-													<span class="span-name" id="publisher${loop.index + 1 }">${product.publisher }</span> <a
-														href="product-left-thumbnail.html">
+													<span class="span-name" id="publisher${loop.index + 1 }">${product.publisher }</span>
+													<a href="product-left-thumbnail.html">
 														<h5 class="name" id="pName${loop.index + 1 }">${product.product_name }</h5>
 													</a>
-													<p class="text-content mt-1 mb-2 product-content" id="pIntro${loop.index + 1 }">${product.introduction_detail }</p>
+													<p class="text-content mt-1 mb-2 product-content"
+														id="pIntro${loop.index + 1 }">${product.introduction_detail }</p>
 													<div class="product-rating mt-2">
 														<!-- 나중에 리뷰 보고 만들기 -->
 														<ul class="rating">
@@ -390,7 +488,8 @@
 									<c:forEach var="i"
 										begin="${paging_info.startNumOfCurrentPagingBlock}"
 										end="${paging_info.endNumOfCurrentPagingBlock }" step="1">
-										<li class="page-item active"><a class="page-link link${i}"
+										<li class="page-item active"><a
+											class="page-link link${i}"
 											href="/list/categoryList/${key }?page=${i}">${i}</a></li>
 									</c:forEach>
 								</c:when>
@@ -413,8 +512,8 @@
 			</div>
 	</section>
 	<!-- Shop Section End -->
-	
-	
+
+
 
 	<!-- Quick View Modal Box Start -->
 	<div class="modal fade theme-modal view-modal" id="view" tabindex="-1"
@@ -432,11 +531,12 @@
 					<div class="row g-sm-4 g-2">
 						<div class="col-lg-6" style="display: flex">
 							<div class="slider-image">
-								<img src="https://media.istockphoto.com/id/1437657408/ko/%EB%B2%A1%ED%84%B0/%ED%9D%B0%EC%83%89-%EB%B0%B0%EA%B2%BD%EC%97%90-%EA%B2%A9%EB%A6%AC%EB%90%9C-%EC%88%98%EC%B1%84%ED%99%94-%EC%95%84%EA%B8%B0-%EC%82%AC%EC%8A%B4-%EA%B7%80%EC%97%AC%EC%9A%B4-%EC%82%BC%EB%A6%BC-%EB%8F%99%EB%AC%BC-%EC%86%90%EC%9C%BC%EB%A1%9C-%EA%B7%B8%EB%A6%B0-%EA%B7%B8%EB%A6%BC-%ED%82%A4%EC%A6%88-%EB%94%94%EC%9E%90%EC%9D%B8.jpg?s=1024x1024&w=is&k=20&c=U3NghfcvPpFArhj6oAg9-6iVjW4pINKHcjNHFarbEzk="
+								<img
+									src="https://media.istockphoto.com/id/1437657408/ko/%EB%B2%A1%ED%84%B0/%ED%9D%B0%EC%83%89-%EB%B0%B0%EA%B2%BD%EC%97%90-%EA%B2%A9%EB%A6%AC%EB%90%9C-%EC%88%98%EC%B1%84%ED%99%94-%EC%95%84%EA%B8%B0-%EC%82%AC%EC%8A%B4-%EA%B7%80%EC%97%AC%EC%9A%B4-%EC%82%BC%EB%A6%BC-%EB%8F%99%EB%AC%BC-%EC%86%90%EC%9C%BC%EB%A1%9C-%EA%B7%B8%EB%A6%B0-%EA%B7%B8%EB%A6%BC-%ED%82%A4%EC%A6%88-%EB%94%94%EC%9E%90%EC%9D%B8.jpg?s=1024x1024&w=is&k=20&c=U3NghfcvPpFArhj6oAg9-6iVjW4pINKHcjNHFarbEzk="
 									class="img-fluid blur-up lazyload" alt="" />
 							</div>
 							<div>
-							<!-- 
+								<!-- 
 							<sec:authorize  access="isAuthenticated()">
 								<a href="/order/requestOrder?product_id="+pId+"&isLogin=Y" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
 							</sec:authorize>
@@ -445,15 +545,22 @@
 								<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>
 							</sec:authorize>	
 							 -->
-							 <c:choose>
-							 	<c:when test="${sessionScope.loginMember != null }">
-							 		<a href="" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-							 	</c:when>
-							 	<c:otherwise>
-							 		<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-									<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>
-							 	</c:otherwise>
-							 </c:choose>												
+								<c:choose>
+									<c:when test="${sessionScope.loginMember != null }">
+										<a href="" id="MemberLoginPay"><button type="button"
+												class="btn buttonBuyMember"
+												style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+									</c:when>
+									<c:otherwise>
+										<a href="" id="loginPay"><button type="button"
+												class="btn buttonBuyMember"
+												style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+										<a href="" id="noLoginPay"><button type="button"
+												class="btn buttonBuyMember"
+												style="background-color: #F9B572;" onclick="">비 회원
+												구매</button></a>
+									</c:otherwise>
+								</c:choose>
 							</div>
 						</div>
 					</div>
@@ -462,31 +569,30 @@
 		</div>
 	</div>
 	<!-- Quick View Modal Box End -->
-	
-<div class="modal" id="shoppingCartModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
 
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h4 class="modal-title">Modal Heading</h4>
-        <button type="button" class="btn-close" onclick="shoppingClose()"></button>
-      </div>
+	<div class="modal" id="shoppingCartModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
 
-      <!-- Modal body -->
-      <div class="modal-body">
-        Modal body..
-      </div>
+				<!-- Modal Header -->
+				<div class="modal-header">
+					<h4 class="modal-title">Modal Heading</h4>
+					<button type="button" class="btn-close" onclick="shoppingClose()"></button>
+				</div>
 
-      <!-- Modal footer -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" onclick="shoppingClose()">Close</button>
-      </div>
+				<!-- Modal body -->
+				<div class="modal-body">Modal body..</div>
 
-    </div>
-  </div>
-</div>
-	
+				<!-- Modal footer -->
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger"
+						onclick="shoppingClose()">Close</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
 
 	<!-- Price Range Js -->
 	<script src="/resources/assets/js/ion.rangeSlider.min.js"></script>

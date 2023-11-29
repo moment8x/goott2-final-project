@@ -6,7 +6,7 @@
 <mapper namespace="com.project.mappers.memberMapper">
 	<select id="getOrderList"
 		resultType="com.project.vodto.jmj.MyPageOrderList">
-	SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, d.product_id, 
+	SELECT  o.order_no, o.order_time, o.delivery_status, o.invoice_number, d.product_id, pay.payment_method,
       pay.actual_payment_amount, p.product_image, prod.product_name, sum(d.product_quantity) as totalOrderCnt
       FROM products prod, detailed_order_items d, order_history o, payments pay, (SELECT * FROM product_images GROUP BY product_id) p
         where member_id = #{memberId}
@@ -277,7 +277,7 @@
 	</insert>
 	
 	<update id="updateDetailProductStatus">
-		update detailed_order_items set product_status = '취소' where detailed_order_id = #{detailedOrderId}
+		update detailed_order_items set product_status = '주문취소' where detailed_order_id = #{detailedOrderId}
 	</update>
 	
 	<update id="updateRefundAccount">
@@ -339,14 +339,14 @@
 	</update>
 	
 	<select id="selectBankTransfers" resultType="com.project.vodto.jmj.GetBankTransfer">
-		select b.bank_name, b.payer_name, b.deposited_account, b.payment_time, b.amount_to_pay
+		select b.order_no, b.bank_name, b.payer_name, b.deposited_account, b.payment_time, b.amount_to_pay
 		from bank_transfers b, order_history o
 		where  o.member_id = #{memberId}
         and b.order_no = o.order_no;
 	</select>
 	
 	<update id="updatedeliveryStatus" >
-		update order_history set delivery_status = '취소' where member_id = #{memberId} and order_no = #{orderNo}
+		update order_history set delivery_status = '주문취소' where member_id = #{memberId} and order_no = #{orderNo}
 	</update>
 	
 	<insert id="insertReturn">
@@ -358,8 +358,8 @@
 		<selectKey order="BEFORE" keyProperty="no" resultType="int">
 			SELECT max(returns_id) from returns
 		</selectKey>
-		insert into return_shipping_address(returns_id, return_shipping_address_zip_no, return_shipping_address_addr,return_shipping_address_detail_addr)
-		values(#{no},#{zipNo},#{addr},#{detailAddr})
+		insert into return_shipping_address(returns_id, return_shipping_address_zip_no, return_shipping_address_addr,return_shipping_address_detail_addr, return_shipping_address_return_msg)
+		values(#{no},#{zipNo},#{addr},#{detailAddr}, #{returnMsg})
 	</insert>
 	
 	<update id="updateRefundAccountWithReturn">
@@ -374,6 +374,101 @@
 		update order_history set delivery_status = '반품신청' where member_id = #{memberId} and order_no = #{orderNo}
 	</update>
 	
+	<insert id="insertExchange">
+		insert into returns(product_id, reason, processing_status, detailed_order_id) 
+		values(#{productId},#{reason},'교환신청',#{detailedOrderId})
+	</insert>
+	
+	<insert id="insertExchangeShippingAddress">
+		<selectKey order="BEFORE" keyProperty="no" resultType="int">
+			SELECT max(returns_id) from returns
+		</selectKey>
+		insert into return_shipping_address(returns_id, return_shipping_address_zip_no, return_shipping_address_addr,return_shipping_address_detail_addr,
+		return_shipping_address_return_msg, exchange_shipping_address_zip_no, exchange_shipping_address_addr, exchange_shipping_address_detail_addr, 
+		exchange_shipping_address_exchange_msg)
+		values(#{no},#{returnZipNo},#{returnAddr},#{returnDetailAddr},#{returnMsg},#{exchangeZipNo},#{exchangeAddr},#{exchangeDetailAddr},#{exchangeMsg})
+	</insert>
+	
+	<update id="updateDetailProductStatusWithExchange">
+		update detailed_order_items set product_status = '교환신청' where detailed_order_id = #{detailedOrderId}
+	</update>
+	
+	<update id="updateDeliveryStatusWithExchange" >
+		update order_history set delivery_status = '교환신청' where member_id = #{memberId} and order_no = #{orderNo}
+	</update>
+	
+	<insert id="insertUploadProfile">
+		insert into upload_files(extension, original_file_name, new_file_name, file_size) 
+		values( #{extension}, #{originalFileName}, #{newFileName}, #{fileSize})
+	</insert>
+	
+	<select id="selectuploadFilesSeq" resultType="int">
+		SELECT upload_files_seq FROM upload_files WHERE new_file_name = #{newFileName}
+	</select>
+	
+	<update id="updateMemberProfile">
+		update member set profile_image = #{uploadFilesSeq} where member_id = #{memberId}
+	</update>
+	
+	<select id="selectMemeberProfileImg" resultType="String">
+		select u.new_file_name from  upload_files u, member m
+		where member_id = #{memberId}
+		and m.profile_image = u.upload_files_seq
+	</select>
+	
+	<select id="selectWishlist" resultType="com.project.vodto.jmj.SelectWishlist">
+		select prod.product_id, prod.product_name, prod.selling_price, prod.consumer_price, p.product_image
+		from (SELECT * FROM product_images GROUP BY product_id) p, wishlist w, products prod
+		where w.member_id = #{memberId}
+		and p.product_id = w.product_id
+		and prod.product_id = w.product_id
+	</select>
+	
+	<insert id="addShoppingCart">
+		insert into shopping_cart(member_id, product_id, member_check) values(#{memberId},#{productId},1)
+	</insert>
+	
+	<select id="selectPointLog" resultType="com.project.vodto.PointLog">
+		SELECT * FROM point_logs where member_id = #{memberId} order by date desc
+	</select>
+	
+	<select id="getTotalPointLogCnt" resultType="int">
+		select count(*) from point_logs where member_id = #{memberId}
+	</select>
+	
+	<select id="selectRewardLog" resultType="com.project.vodto.RewardLog">
+		select * from reward_logs where member_id = #{memberId} order by date desc
+	</select>
+	
+	<select id="selectCouponLog" resultType="com.project.vodto.jmj.MyPageCouponLog">
+		SELECT cl.*, c.* FROM coupon_logs cl
+		left join coupons c 
+		on c.coupon_number = cl.coupon_number
+		where cl.member_id = #{memberId} order by obtained_date desc
+	</select>
+	
+	<select id="selectPaymentMethodAndOrderNo" resultType="com.project.vodto.jmj.MyPageOrderList">
+		select pay.payment_method, o.order_no
+		from payments pay, order_history o
+		where o.member_id = #{memberId}
+		and pay.order_no = o.order_no;
+	</select>
+	
+	<select id="selectMyreview" resultType="com.project.vodto.jmj.MyPageReview">
+		select rb.post_no, rb.created_date, rb.content, rb.rating, rb.product_id, rb.is_delete, pi.product_image, p.product_name
+		from review_board rb, (SELECT * FROM product_images GROUP BY product_id) pi, products p
+		where rb.author = #{memberId}
+		and rb.product_id = pi.product_id
+		and pi.product_id = p.product_id
+	</select>
+	
+	<select id="selectMyReview" resultType="com.project.vodto.jmj.MyPageReview">
+		select rb.post_no, rb.created_date, rb.content, rb.rating, rb.product_id, rb.is_delete, pi.product_image, p.product_name
+		from review_board rb, (SELECT * FROM product_images GROUP BY product_id) pi, products p
+		where rb.author = #{memberId} and post_no = #{postNo}
+		and rb.product_id = pi.product_id
+		and pi.product_id = p.product_id
+	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">
 		SELECT member_id FROM member WHERE member_id = #{memberId}  

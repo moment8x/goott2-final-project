@@ -7,18 +7,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @ToString
-
-public class GetBankTransfer {
-	//bank_transfers
-	private String orderNo;
-	private String bankName;
-	private String payerName;
-	private String depositedAccount; //입금계좌
-	private Timestamp paymentTime; //무통장 입금 시간
-	private int amountToPay;
+public class SelectWishlist {
+	private String productId;
+	private String productName;
+	private int sellingPrice;
+	private int consumerPrice;
+	private String productImage;
 }

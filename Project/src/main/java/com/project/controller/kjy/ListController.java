@@ -16,6 +16,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.service.kjy.ListService;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.Product;
+import com.project.vodto.Wishlist;
 import com.project.vodto.kjy.Memberkjy;
 import com.project.vodto.kjy.NaverBooks;
 import com.project.vodto.kjy.ProductCategories;
@@ -74,8 +76,22 @@ public class ListController {
 	}
 	
 	@RequestMapping("/categoryList/{key}")
-	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page,@RequestParam(value="active", defaultValue = "grid-btn d-xxl-inline-block d-none") String active, HttpServletRequest request) {
+	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page,@RequestParam(value="active", defaultValue = "grid-btn d-xxl-inline-block d-none") String active, HttpServletRequest request) {	
 		this.page = page;
+		
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		if(member != null) {
+			String memberId = member.getMemberId();		
+			List<Wishlist> wishlist;
+			try {
+				wishlist = lService.getProductId(memberId);
+				model.addAttribute("wishlist", wishlist);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		String lang = key.substring(0, 3);
 		System.out.println("랭" + lang);
@@ -112,7 +128,8 @@ public class ListController {
 			PagingInfo paging = (PagingInfo)map.get("paging_info");
 			model.addAttribute("products", lst);
 			model.addAttribute("paging_info", paging);
-			model.addAttribute("sortBy", sortBy);		
+			model.addAttribute("sortBy", sortBy);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -273,4 +290,46 @@ public class ListController {
 		
 		return mapJson;
 	}
+	
+//----------------------------------------------민정-----------------------------------------------------------------------
+	
+	@RequestMapping(value = "likeProduct", method = RequestMethod.POST)
+	public ResponseEntity<String> likeProduct(@RequestParam("productId") String productId, HttpServletRequest request, Model model) {
+		System.out.println(productId + "번 상품 찜@@");
+		
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
+		ResponseEntity<String> result = null;
+
+		try {
+			if(lService.insertlikeProduct(memberId, productId)) {
+				result = new ResponseEntity<String>("success", HttpStatus.OK);	
+			}
+			
+		} catch (Exception e) {
+			result = new ResponseEntity<String>("fail", HttpStatus.CONFLICT);	
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@RequestMapping(value = "disLikeProduct", method = RequestMethod.POST)
+	public void disLikeProduct(@RequestParam("productId") String productId, HttpServletRequest request) {
+		
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
+		try {
+			if(lService.deleteWishList(memberId, productId)) {
+				System.out.println(productId + "번 상품 찜 삭제 완룡");
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+//----------------------------------------------민정 끝------------------------------------------------------------------
 }

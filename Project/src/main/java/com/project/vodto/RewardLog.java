@@ -14,8 +14,11 @@ import lombok.ToString;
 @Setter
 @ToString
 public class RewardLog {
-	private int no;
-	private String member_id;
+	private int rewardLogsSeq;
+	private String memberId;
 	private Timestamp date;
 	private int reward;
+	private String relatedOrder;
+	private int balance;
+	private String reason;
 }

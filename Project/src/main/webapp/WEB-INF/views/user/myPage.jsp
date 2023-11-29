@@ -212,6 +212,7 @@
 			duplicateCellPhone();
 		})
 		
+		
 		//주문 상태별 조회
 		$("select[id=orderStatusKeyword]").change(function(){
 			let beforeDeposit = null;
@@ -315,6 +316,35 @@
 		})
 		
 	})
+	
+	//프로필사진 업로드
+	function uploadProfile() {
+		let fileInput = document.getElementById("uploadProfile")
+		let file = fileInput.files[0]
+		
+		if(file){
+			let formData = new FormData();
+			formData.append('uploadFile', file)
+			
+			$.ajax({
+				url : '/user/profileUpload', // 데이터를 수신받을 서버 주소
+				type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+				data : formData,
+				dataType : 'json',
+				async : false,
+				processData : false,
+				contentType : false,
+				success : function(data) {
+					console.log(data);
+					if(data.fileSize > 0){
+						location.reload();
+					}
+				},
+				error : function() {
+				}
+			});
+		}
+	}
 
 	// 유효성 검사 메세지
 	function printMsg(focusId, msgId, msg, isFocus) {
@@ -827,7 +857,7 @@
 					output += `</li>`			
 				}
 				
-				for (let i = page.startNumOfCurrentPagingBlock; i < page.endNumOfCurrentPagingBlock + 1 ; i++) {
+				for (let i = page.startNumOfCurrentPagingBlock; i < page.endNumOfCurrentPagingBlock ; i++) {
 					output += `<li class="page-item">`
 					output += `<a class="page-link" href="javascript:void(0);" onclick="orderStatusPaging(\${i}); return false;">\${i}</a> `
 					output += `</li>`
@@ -877,8 +907,157 @@
 		
 		$('.custome-pagination').html(output)
 	}
+	
+	function delWishlist(productId) {
+		$.ajax({
+			url : '/user/delWishlist', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				productId
+			},
+			dataType : 'text',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data == "success"){
+					let wishlistItem = $('#' + productId);
+	                wishlistItem.fadeOut(300, function () {
+	                    wishlistItem.remove(); // 또는 wishlistItem.hide();
+	                });
+				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	function addShoppingCart(productId) {
+		$.ajax({
+			url : '/user/addShoppingCart', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				productId
+			},
+			dataType : 'text',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data == 'success'){
+					alert("장바구니에 추가 되었습니다.")
+				}
+			},
+			error : function() {
+			}
+		});
+	}
+	
+	function selectReview(postNo) {
+		$.ajax({
+			url : '/user/selectModifyReview', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+				postNo
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log(data)
+				let output = `<table class="table mb-0 productInfo">`;
+				output += `<tbody>`;
+				output += `<tr>`;
+				output += `<td class="product-detail">`;
+				output += `<div class="product border-0">`;
+				if(data.productImage == null){
+					output += `<a href="/detail/\${data.productId}" class="product-image">`;
+					output += `<img src="/resources/assets/images/noimage.jpg" class="img-fluid blur-up lazyload" alt="\${data.productName}">`;
+					output += `</a>`;
+				}else{
+					output += `<a href="/detail/\${data.productId}" class="product-image">`;
+					output += `<img src="\${data.productImage}" class="img-fluid blur-up lazyload" alt="\${data.productName}" id="reviewProductImg">`;
+					output += `</a>`;
+				}
+				output += `</div>`;
+				output += `</td>`;
+				output += `<td></td>`;
+				output += `</tr>`
+				output += `<tr>`
+				output += `<td class="name">`
+				output += `<a href="/detail/\${data.productId}" id="productName">`
+				output += `<h4 class="table-title text-content">\${data.productName}</h4>` 
+				output += `</a>`
+				output += `</td>`
+				output += `<td class="name">`
+				output += `<h4 class="table-title text-content">`
+				let rating = `\${data.rating}`
+				output += `<i class="fa-regular fa-star" id="rating1" style="color: #0DA487;" onclick="reviewRating('rating1')" value="1"></i>`					
+				output += `<i class="fa-regular fa-star" id="rating2" style="color: #0DA487;" onclick="reviewRating('rating2')" value="2"></i>`					
+				output += `<i class="fa-regular fa-star" id="rating3" style="color: #0DA487;" onclick="reviewRating('rating3')" value="3"></i>`					
+				output += `<i class="fa-regular fa-star" id="rating4" style="color: #0DA487;" onclick="reviewRating('rating4')" value="4"></i>`					
+				output += `<i class="fa-regular fa-star" id="rating5" style="color: #0DA487;" onclick="reviewRating('rating5')" value="5"></i>`
+				output += `</h4>` 
+				output += `</td>`
+				output += `</tr>`
+				output += `</tbody>`
+				output += `</table>`
+				output += `<div class="form-floating mb-4 theme-form-floating">`
+				output += `<textarea rows="7" cols="62" value="">\${data.content}</textarea>`
+				output += `<div>`
+				output += `<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>`
+				output += `몇글자까지 가능?`
+				output += `</div>`
+				output += `</div>`
+				output += `<div class="form-floating mb-4 theme-form-floating">`
+				output += `사진첨부`
+				output += `<div>`
+				output += `<div>`
+				output += `<input type="file" id="uploadReviewImg" /> <input type="button" value="등록" onclick="uploadReviewImg();" />`
+				output += `</div>`
+				output += `<div class="uploadFile">`
+				output += `</div>`
+				output += `</div>`
+					
+				$('.modal-body.modifyReview').html(output);
+			},
+			error : function() {
+			}
+		});
+	}
+
+	function reviewRating(id) {
+		let reviewRatingId = $(`#\${id}`);
+		
+		if (reviewRatingId.hasClass("fa-regular")) {
+			reviewRatingId.removeClass("fa-regular").addClass("fa-solid")
+			console.log(reviewRatingId.attr("value"))
+		}else if (reviewRatingId.hasClass("fa-solid")) {
+			reviewRatingId.removeClass("fa-solid").addClass("fa-regular")
+		}
+	}
+	
+	function uploadReviewImg() {
+		
+	}
+
 </script>
 <style>
+.upFileArea{
+	width: 100%;
+	height: 100px;
+	border: 1px dotted #333;
+	padding: 10px;
+		
+	font-weight: bold;
+	color: #d6d2d8;
+	font-size: 20px;
+		
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+#reviewProductImg{
+	height: 250px;
+	margin-left: 140px;
+}
 #deliveryStatus, #successPwd, #successPhoneNumber,
 	#successCellPhoneNumber, #successEmail, #successAddr, #successRefund,
 	#checkOrder {
@@ -997,6 +1176,20 @@
 #selectOrderStatus, #checkOrderPeriod {
 	margin-top: 30px;
 }
+
+.table.reviewTable {
+	border-bottom: 1.5px solid gray;
+}
+
+.btn.theme-bg-color.btn-md.text-white.delReview, .btn.theme-bg-color.btn-md.text-white.modifyReview
+	{
+	width: 25px;
+	height: 20px;
+}
+
+.btn.theme-bg-color.btn-md.text-white.modifyReview {
+	text-align: right;
+}
 </style>
 </head>
 
@@ -1078,20 +1271,29 @@
 							<div class="profile-contain">
 								<div class="profile-image">
 									<div class="position-relative">
-										<img src="#" class="blur-up lazyload update_img" alt="" />
-										<div class="cover-icon">
-											<i class="fa-solid fa-pen"> <input type="file"
-												onchange="readURL(this,0)" />
-											</i>
-										</div>
+										<c:choose>
+											<c:when test="${memberImg == '' }">
+												<img src="/resources/assets/images/profile/user.png"
+													class="blur-up lazyload update_img" alt="" />
+											</c:when>
+											<c:otherwise>
+												<img src="/resources/assets/images/profile/${memberImg}"
+													class="blur-up lazyload update_img" alt="" />
+											</c:otherwise>
+										</c:choose>
 									</div>
+								</div>
+								<div class="cover-icon">
+									<input type="file" onchange="readURL(this,0)"
+										id="uploadProfile" /> <input type="button" value="등록"
+										onclick="uploadProfile();" />
 								</div>
 
 								<div class="profile-name">
 									<h3>${userInfo.memberId }</h3>
 									<h6 class="text-content">
 										<img width="50" height="50"
-											src="https://img.icons8.com/external-vitaliy-gorbachev-lineal-vitaly-gorbachev/60/external-deer-winter-vitaliy-gorbachev-lineal-vitaly-gorbachev.png"
+											src="/resources/assets/images/deerWithMemberGrade.png"
 											alt="external-deer-winter-vitaliy-gorbachev-lineal-vitaly-gorbachev" />${userInfo.membershipGrade }</h6>
 								</div>
 							</div>
@@ -1163,11 +1365,30 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="pills-profile-tab"
-									data-bs-toggle="pill" data-bs-target="#pills-profile"
-									type="button" role="tab" aria-controls="pills-profile"
+								<button class="nav-link" id="pills-card-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-card"
+									type="button" role="tab" aria-controls="pills-card"
 									aria-selected="false">
-									<i data-feather="smile"></i>포인트/쿠폰/적립금 내역
+									<i data-feather="smile"></i>포인트 내역
+								</button>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-rewards-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-rewards"
+									type="button" role="tab" aria-controls="pills-rewards"
+									aria-selected="false">
+									<i data-feather="smile"></i>적립금 내역
+								</button>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-coupons-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-coupons"
+									type="button" role="tab"
+									aria-controls="pills-coupons
+									aria-selected="false">
+									<i data-feather="smile"></i>쿠폰 내역
 								</button>
 							</li>
 						</ul>
@@ -1308,23 +1529,26 @@
 																				<div class="product border-0">
 																					<div class="product-detail">
 																						<ul>
-																						
-																						<c:forEach var="bankTransfers" items="${bankTransfers }">
-																						<c:choose>
-																							<c:when test="${curOrder.paymentMethod eq 'bkt'}">
-																								<li class="name">총 금액 : <fmt:formatNumber
-																									value="${bankTransfers.amountToPay }"
-																					 				type="NUMBER" />원
-																							</li>
-																							</c:when>
-																							<c:otherwise>
+																							<c:forEach var="bankTransfers"
+																								items="${bankTransfers }">
+																								<c:choose>
+																									<c:when
+																										test="${curOrder.orderNo == bankTransfers.orderNo && curOrder.paymentMethod == 'bkt'}">
+																										<li class="name">총 금액 : <fmt:formatNumber
+																												value="${bankTransfers.amountToPay }"
+																												type="NUMBER" />원
+																										</li>
+																									</c:when>
+
+																								</c:choose>
+																							</c:forEach>
+
+																							<c:if test="${curOrder.paymentMethod != 'bkt'}">
 																								<li class="name">총 금액 : <fmt:formatNumber
 																										value="${curOrder.actualPaymentAmount }"
 																										type="NUMBER" />원
 																								</li>
-																							</c:otherwise>
-																						</c:choose>
-																						</c:forEach>
+																							</c:if>
 																						</ul>
 																						<ul>
 																							<li class="name">총 권수 :
@@ -1354,7 +1578,7 @@
 								role="tabpanel" aria-labelledby="pills-wishlist-tab">
 								<div class="dashboard-wishlist">
 									<div class="title">
-										<h2>My Wishlist History</h2>
+										<h2>My Wishlist</h2>
 										<span class="title-leaf title-leaf-gray"> <svg
 												class="icon-width bg-gray">
                           <use
@@ -1362,433 +1586,57 @@
                         </svg>
 										</span>
 									</div>
+
 									<div class="row g-sm-4 g-3">
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/2.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
+										<c:forEach var="item" items="${wishlist }">
+											<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6"
+												id="${item.productId }">
+												<div class="product-box-3 theme-bg-white h-100">
+													<div class="product-header">
+														<div class="product-image">
+															<a href="/detail/${item.productId }"> <img
+																src="${item.productImage }"
+																class="img-fluid blur-up lazyload"
+																alt="${item.productName }" />
+															</a>
 
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
+															<div class="product-header-top">
+																<button class="btn wishlist-button close_button"
+																	onclick="delWishlist('${item.productId }');">
+																	<i data-feather="x"></i>
+																</button>
+															</div>
 														</div>
 													</div>
-												</div>
 
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Vegetable</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">Fresh Bread and Pastry Flour 200 g
+													<div class="product-footer">
+														<div class="product-detail">
+															<a href="/detail/${item.productId }">
+																<h5 class="name">${item.productName }</h5>
+															</a>
+
+
+															<h5 class="price">
+																<span class="theme-color"> <fmt:formatNumber
+																		value="${item.sellingPrice }" type="NUMBER" /> 원
+																</span>
+																<del>
+																	<fmt:formatNumber value="${item.consumerPrice }"
+																		type="NUMBER" />
+																	원
+																</del>
 															</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Cheesy feet cheesy grin brie. Mascarpone cheese and wine
-															hard cheese the big cheese everyone loves smelly cheese
-															macaroni cheese croque monsieur.</p>
-														<h6 class="unit mt-1">250 ml</h6>
-														<h5 class="price">
-															<span class="theme-color">$08.02</span>
-															<del>$15.15</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
+															<div class="add-to-cart-box mt-2">
+																<button class="btn btn-add-cart addcart-button"
+																	onclick="addShoppingCart('${item.productId }');"
+																	tabindex="0">Add</button>
+
 															</div>
 														</div>
 													</div>
 												</div>
 											</div>
-										</div>
-
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/3.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
-
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
-														</div>
-													</div>
-												</div>
-
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Vegetable</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">Peanut Butter Bite Premium Butter
-																Cookies 600 g</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Feta taleggio croque monsieur swiss manchego cheesecake
-															dolcelatte jarlsberg. Hard cheese danish fontina boursin
-															melted cheese fondue.</p>
-														<h6 class="unit mt-1">350 G</h6>
-														<h5 class="price">
-															<span class="theme-color">$04.33</span>
-															<del>$10.36</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/4.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
-
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
-														</div>
-													</div>
-												</div>
-
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Snacks</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">SnackAmor Combo Pack of Jowar Stick
-																and Jowar Chips</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Lancashire hard cheese parmesan. Danish fontina
-															mozzarella cream cheese smelly cheese cheese and wine
-															cheesecake dolcelatte stilton. Cream cheese parmesan who
-															moved my cheese when the cheese comes out everybody's
-															happy cream cheese red leicester ricotta edam.</p>
-														<h6 class="unit mt-1">570 G</h6>
-														<h5 class="price">
-															<span class="theme-color">$12.52</span>
-															<del>$13.62</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/5.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
-
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
-														</div>
-													</div>
-												</div>
-
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Snacks</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">Yumitos Chilli Sprinkled Potato
-																Chips 100 g</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Cheddar cheddar pecorino hard cheese hard cheese cheese
-															and biscuits bocconcini babybel. Cow goat paneer cream
-															cheese fromage cottage cheese cauliflower cheese
-															jarlsberg.</p>
-														<h6 class="unit mt-1">100 G</h6>
-														<h5 class="price">
-															<span class="theme-color">$10.25</span>
-															<del>$12.36</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/6.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
-
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
-														</div>
-													</div>
-												</div>
-
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Vegetable</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">Fantasy Crunchy Choco Chip Cookies
-															</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Bavarian bergkase smelly cheese swiss cut the cheese
-															lancashire who moved my cheese manchego melted cheese.
-															Red leicester paneer cow when the cheese comes out
-															everybody's happy croque monsieur goat melted cheese
-															port-salut.</p>
-														<h6 class="unit mt-1">550 G</h6>
-														<h5 class="price">
-															<span class="theme-color">$14.25</span>
-															<del>$16.57</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/7.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
-
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
-														</div>
-													</div>
-												</div>
-
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Vegetable</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">Fresh Bread and Pastry Flour 200 g
-															</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Melted cheese babybel chalk and cheese. Port-salut
-															port-salut cream cheese when the cheese comes out
-															everybody's happy cream cheese hard cheese cream cheese
-															red leicester.</p>
-														<h6 class="unit mt-1">1 Kg</h6>
-														<h5 class="price">
-															<span class="theme-color">$12.68</span>
-															<del>$14.69</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
-											<div class="product-box-3 theme-bg-white h-100">
-												<div class="product-header">
-													<div class="product-image">
-														<a href="product-left-thumbnail.html"> <img
-															src="/resources/assets/images/cake/product/2.png"
-															class="img-fluid blur-up lazyload" alt="" />
-														</a>
-
-														<div class="product-header-top">
-															<button class="btn wishlist-button close_button">
-																<i data-feather="x"></i>
-															</button>
-														</div>
-													</div>
-												</div>
-
-												<div class="product-footer">
-													<div class="product-detail">
-														<span class="span-name">Vegetable</span> <a
-															href="product-left-thumbnail.html">
-															<h5 class="name">Fresh Bread and Pastry Flour 200 g
-															</h5>
-														</a>
-														<p class="text-content mt-1 mb-2 product-content">
-															Squirty cheese cottage cheese cheese strings. Red
-															leicester paneer danish fontina queso lancashire when the
-															cheese comes out everybody's happy cottage cheese paneer.
-														</p>
-														<h6 class="unit mt-1">250 ml</h6>
-														<h5 class="price">
-															<span class="theme-color">$08.02</span>
-															<del>$15.15</del>
-														</h5>
-														<div class="add-to-cart-box mt-2">
-															<button class="btn btn-add-cart addcart-button"
-																tabindex="0">
-																Add <span class="add-icon"> <i
-																	class="fa-solid fa-plus"></i>
-																</span>
-															</button>
-															<div class="cart_qty qty-box">
-																<div class="input-group">
-																	<button type="button" class="qty-left-minus"
-																		data-type="minus" data-field="">
-																		<i class="fa fa-minus" aria-hidden="true"></i>
-																	</button>
-																	<input class="form-control input-number qty-input"
-																		type="text" name="quantity" value="0" />
-																	<button type="button" class="qty-right-plus"
-																		data-type="plus" data-field="">
-																		<i class="fa fa-plus" aria-hidden="true"></i>
-																	</button>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
+										</c:forEach>
 									</div>
 								</div>
 							</div>
@@ -1839,7 +1687,7 @@
 									</div>
 									<div class="order-contain orderHistory">
 										<div class="order-box dashboard-bg-box">
-
+											${orderList }
 											<c:forEach var="order" items="${orderList }">
 												<div class="product-order-detail" id="productOrderDetail">
 													<c:choose>
@@ -1884,12 +1732,26 @@
 															<li>
 																<div class="size-box">
 																	<h6 class="text-content">결제금액 :</h6>
-																	<h5>
-																		<fmt:formatNumber value="${order.actualPaymentAmount}"
-																			type="NUMBER" />
-																		원
-																	</h5>
-
+																	<c:forEach var="bankTransfers"
+																		items="${bankTransfers }">
+																		<c:choose>
+																			<c:when
+																				test="${order.orderNo == bankTransfers.orderNo && order.paymentMethod == 'bkt'}">
+																				<h5>
+																					<fmt:formatNumber
+																						value="${bankTransfers.amountToPay}" type="NUMBER" />
+																					원
+																				</h5>
+																			</c:when>
+																		</c:choose>
+																	</c:forEach>
+																	<c:if test="${order.paymentMethod != 'bkt'}">
+																		<h5>
+																			<fmt:formatNumber
+																				value="${order.actualPaymentAmount}" type="NUMBER" />
+																			원
+																		</h5>
+																	</c:if>
 																</div>
 															</li>
 
@@ -1904,21 +1766,21 @@
 																<div class="size-box">
 																	<div id="orderStatus">
 
-																			<c:if test="${order.deliveryStatus eq '배송중' }">
-																				<button class="btn theme-bg-color text-white m-0"
-																					type="button" id="button-addon1">
-																					<span>배송조회</span>
-																				</button>
-																				<div>${order.invoiceNumber }</div>
-																			</c:if>
-																			
-																			<c:if test="${order.deliveryStatus eq '배송완료' }">
-																				<div>배송완료</div>
-																			</c:if>
-																		
+																		<c:if test="${order.deliveryStatus eq '배송중' }">
+																			<button class="btn theme-bg-color text-white m-0"
+																				type="button" id="button-addon1">
+																				<span>배송조회</span>
+																			</button>
+																			<div>${order.invoiceNumber }</div>
+																		</c:if>
+
+																		<c:if test="${order.deliveryStatus eq '배송완료' }">
+																			<div>배송완료</div>
+																		</c:if>
+
 																	</div>
 																</div>
-															</li> 
+															</li>
 														</ul>
 													</div>
 												</div>
@@ -2134,44 +1996,6 @@
 																</div>
 															</div>
 														</form>
-
-														<form name="form" id="form" method="post">
-
-	<input type="button" onClick="goPopup();" value="팝업_domainChk"/>
-	<div id="list"></div>
-	<div id="callBackDiv">
-		<table>
-			<tr><td>도로명주소 전체(포멧)</td><td><input type="text"  style="width:500px;" id="roadFullAddr"  name="roadFullAddr" /></td></tr>
-			<tr><td>도로명주소           </td><td><input type="text"  style="width:500px;" id="roadAddrPart1"  name="roadAddrPart1" /></td></tr>
-			<tr><td>고객입력 상세주소    </td><td><input type="text"  style="width:500px;" id="addrDetail"  name="addrDetail" /></td></tr>
-			<tr><td>참고주소             </td><td><input type="text"  style="width:500px;" id="roadAddrPart2"  name="roadAddrPart2" /></td></tr>
-			<tr><td>영문 도로명주소      </td><td><input type="text"  style="width:500px;" id="engAddr"  name="engAddr" /></td></tr>
-			<tr><td>지번                 </td><td><input type="text"  style="width:500px;" id="jibunAddr"  name="jibunAddr" /></td></tr>
-			<tr><td>우편번호             </td><td><input type="text"  style="width:500px;" id="zipNo"  name="zipNo" /></td></tr>
-			<tr><td>행정구역코드        </td><td><input type="text"  style="width:500px;" id="admCd"  name="admCd" /></td></tr>
-			<tr><td>도로명코드          </td><td><input type="text"  style="width:500px;" id="rnMgtSn"  name="rnMgtSn" /></td></tr>
-			<tr><td>건물관리번호        </td><td><input type="text"  style="width:500px;" id="bdMgtSn"  name="bdMgtSn" /></td></tr>
-			<tr><td>상세번물명        	</td><td><input type="text"  style="width:500px;" id="detBdNmList"  name="detBdNmList" /></td></tr>
-			<tr><td>건물명        		</td><td><input type="text"  style="width:500px;" id="bdNm"  name="bdNm" /></td></tr>
-			<tr><td>공동주택여부       </td><td><input type="text"  style="width:500px;" id="bdKdcd"  name="bdKdcd" /></td></tr>
-			<tr><td>시도명        		</td><td><input type="text"  style="width:500px;" id="siNm"  name="siNm" /></td></tr>
-			<tr><td>시군구명        	</td><td><input type="text"  style="width:500px;" id="sggNm"  name="sggNm" /></td></tr>
-			<tr><td>읍면동명        	</td><td><input type="text"  style="width:500px;" id="emdNm"  name="emdNm" /></td></tr>
-			<tr><td>법정리명        	</td><td><input type="text"  style="width:500px;" id="liNm"  name="liNm" /></td></tr>
-			<tr><td>도로명        		</td><td><input type="text"  style="width:500px;" id="rn"  name="rn" /></td></tr>
-			<tr><td>지하여부        	</td><td><input type="text"  style="width:500px;" id="udrtYn"  name="udrtYn" /></td></tr>
-			<tr><td>건물본번        	</td><td><input type="text"  style="width:500px;" id="buldMnnm"  name="buldMnnm" /></td></tr>
-			<tr><td>건물부번        	</td><td><input type="text"  style="width:500px;" id="buldSlno"  name="buldSlno" /></td></tr>
-			<tr><td>산여부        		</td><td><input type="text"  style="width:500px;" id="mtYn"  name="mtYn" /></td></tr>
-			<tr><td>지번본번(번지)     </td><td><input type="text"  style="width:500px;" id="lnbrMnnm"  name="lnbrMnnm" /></td></tr>
-			<tr><td>지번부번(호)       </td><td><input type="text"  style="width:500px;" id="lnbrSlno"  name="lnbrSlno" /></td></tr>
-			<tr><td>읍면동일련번호       </td><td><input type="text"  style="width:500px;" id="emdNo"  name="emdNo" /></td></tr>
-		</table>
-	</div>
-
-</form>
-
-
 
 														<form class="row g-4" action="modifyUser" method="post">
 															<div class="col-12">
@@ -2432,7 +2256,7 @@
 								<div class="dashboard-card">
 									<div class="title title-flex">
 										<div>
-											<h2>My Card Details</h2>
+											<h2>포인트 내역</h2>
 											<span class="title-leaf"> <svg
 													class="icon-width bg-gray">
                             <use
@@ -2440,238 +2264,189 @@
                           </svg>
 											</span>
 										</div>
-
-										<button
-											class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
-											data-bs-toggle="modal" data-bs-target="#editCard">
-											<i data-feather="plus" class="me-2"></i> Add New Card
-										</button>
 									</div>
 
 									<div class="row g-4">
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
-											<div class="payment-card-detail">
-												<div class="card-details">
-													<div class="card-number">
-														<h4>XXXX - XXXX - XXXX - 2548</h4>
-													</div>
-
-													<div class="valid-detail">
-														<div class="title">
-															<span>valid</span> <span>thru</span>
-														</div>
-														<div class="date">
-															<h3>08/05</h3>
-														</div>
-														<div class="primary">
-															<span class="badge bg-pill badge-light">primary</span>
-														</div>
-													</div>
-
-													<div class="name-detail">
-														<div class="name">
-															<h5>Audrey Carol</h5>
-														</div>
-														<div class="card-img">
-															<img src="/resources/assets/images/payment-icon/1.jpg"
-																class="img-fluid blur-up lazyloaded" alt="" />
-														</div>
-													</div>
-												</div>
-
-												<div class="edit-card">
-													<a data-bs-toggle="modal" data-bs-target="#editCard"
-														href="javascript:void(0)"><i class="far fa-edit"></i>
-														edit</a> <a href="javascript:void(0)" data-bs-toggle="modal"
-														data-bs-target="#removeProfile"><i
-														class="far fa-minus-square"></i> delete</a>
-												</div>
-											</div>
-
-											<div class="edit-card-mobile">
-												<a data-bs-toggle="modal" data-bs-target="#editCard"
-													href="javascript:void(0)"><i class="far fa-edit"></i>
-													edit</a> <a href="javascript:void(0)"><i
-													class="far fa-minus-square"></i> delete</a>
-											</div>
-										</div>
-
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
-											<div class="payment-card-detail">
-												<div class="card-details card-visa">
-													<div class="card-number">
-														<h4>XXXX - XXXX - XXXX - 1536</h4>
-													</div>
-
-													<div class="valid-detail">
-														<div class="title">
-															<span>valid</span> <span>thru</span>
-														</div>
-														<div class="date">
-															<h3>12/23</h3>
-														</div>
-														<div class="primary">
-															<span class="badge bg-pill badge-light">primary</span>
-														</div>
-													</div>
-
-													<div class="name-detail">
-														<div class="name">
-															<h5>Leah Heather</h5>
-														</div>
-														<div class="card-img">
-															<img src="/resources/assets/images/payment-icon/2.jpg"
-																class="img-fluid blur-up lazyloaded" alt="" />
-														</div>
-													</div>
-												</div>
-
-												<div class="edit-card">
-													<a data-bs-toggle="modal" data-bs-target="#editCard"
-														href="javascript:void(0)"><i class="far fa-edit"></i>
-														edit</a> <a href="javascript:void(0)" data-bs-toggle="modal"
-														data-bs-target="#removeProfile"><i
-														class="far fa-minus-square"></i> delete</a>
-												</div>
-											</div>
-
-											<div class="edit-card-mobile">
-												<a data-bs-toggle="modal" data-bs-target="#editCard"
-													href="javascript:void(0)"><i class="far fa-edit"></i>
-													edit</a> <a href="javascript:void(0)"><i
-													class="far fa-minus-square"></i> delete</a>
-											</div>
-										</div>
-
-										<div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
-											<div class="payment-card-detail">
-												<div class="card-details dabit-card">
-													<div class="card-number">
-														<h4>XXXX - XXXX - XXXX - 1366</h4>
-													</div>
-
-													<div class="valid-detail">
-														<div class="title">
-															<span>valid</span> <span>thru</span>
-														</div>
-														<div class="date">
-															<h3>05/21</h3>
-														</div>
-														<div class="primary">
-															<span class="badge bg-pill badge-light">primary</span>
-														</div>
-													</div>
-
-													<div class="name-detail">
-														<div class="name">
-															<h5>mark jecno</h5>
-														</div>
-														<div class="card-img">
-															<img src="/resources/assets/images/payment-icon/3.jpg"
-																class="img-fluid blur-up lazyloaded" alt="" />
-														</div>
-													</div>
-												</div>
-
-												<div class="edit-card">
-													<a data-bs-toggle="modal" data-bs-target="#editCard"
-														href="javascript:void(0)"><i class="far fa-edit"></i>
-														edit</a> <a href="javascript:void(0)" data-bs-toggle="modal"
-														data-bs-target="#removeProfile"><i
-														class="far fa-minus-square"></i> delete</a>
-												</div>
-											</div>
-
-											<div class="edit-card-mobile">
-												<a data-bs-toggle="modal" data-bs-target="#editCard"
-													href="javascript:void(0)"><i class="far fa-edit"></i>
-													edit</a> <a href="javascript:void(0)"><i
-													class="far fa-minus-square"></i> delete</a>
-											</div>
+										<div class="container mt-3">
+											<table class="table">
+												<thead>
+													<tr>
+														<th>등록일</th>
+														<th>상세내용</th>
+														<th>포인트</th>
+														<th>남은 포인트</th>
+													</tr>
+												</thead>
+												<tbody>
+													<c:forEach var="pl" items="${pointLog }">
+														<tr>
+															<td><fmt:formatDate value="${pl.date }" type="date" /></td>
+															<td>${pl.reason }</td>
+															<td><fmt:formatNumber value="${pl.point }"
+																	type="NUMBER" />점</td>
+															<td><fmt:formatNumber value="${pl.balance }"
+																	type="NUMBER" />점</td>
+														</tr>
+													</c:forEach>
+												</tbody>
+											</table>
 										</div>
 									</div>
 								</div>
 							</div>
 
-
-
-							<div class="tab-pane fade show" id="pills-security"
-								role="tabpanel" aria-labelledby="pills-security-tab">
-								<div class="dashboard-privacy">
-									<div class="dashboard-bg-box">
-										<div class="dashboard-title mb-4">
-											<h3>Privacy</h3>
+							<div class="tab-pane fade show" id="pills-coupons"
+								role="tabpanel" aria-labelledby="pills-coupons-tab">
+								<div class="dashboard-card">
+									<div class="title title-flex">
+										<div>
+											<h2>쿠폰 내역</h2>
+											<span class="title-leaf"> <svg
+													class="icon-width bg-gray">
+                            <use
+														xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
+                          </svg>
+											</span>
 										</div>
-
-										<div class="privacy-box">
-											<div class="d-flex align-items-start">
-												<h6>Allows others to see my profile</h6>
-												<div class="form-check form-switch switch-radio ms-auto">
-													<input class="form-check-input" type="checkbox"
-														role="switch" id="redio" aria-checked="false" /> <label
-														class="form-check-label" for="redio"></label>
-												</div>
-											</div>
-
-											<p class="text-content">all peoples will be able to see
-												my profile</p>
-										</div>
-
-										<div class="privacy-box">
-											<div class="d-flex align-items-start">
-												<h6>who has save this profile only that people see my
-													profile</h6>
-												<div class="form-check form-switch switch-radio ms-auto">
-													<input class="form-check-input" type="checkbox"
-														role="switch" id="redio2" aria-checked="false" /> <label
-														class="form-check-label" for="redio2"></label>
-												</div>
-											</div>
-
-											<p class="text-content">all peoples will not be able to
-												see my profile</p>
-										</div>
-
-										<button
-											class="btn theme-bg-color btn-md fw-bold mt-4 text-white">
-											Save Changes</button>
 									</div>
 
-									<div class="dashboard-bg-box mt-4">
-										<div class="dashboard-title mb-4">
-											<h3>Account settings</h3>
+									<div class="row g-4">
+										<div class="container mt-3">
+											<table class="table">
+												<thead>
+													<tr>
+														<th>얻은 날짜</th>
+														<th>쿠폰 이름</th>
+														<th>쿠폰 쿠폰번호</th>
+														<th>만료 날짜</th>
+														<th>사용 날짜</th>
+													</tr>
+												</thead>
+												<tbody>
+													<c:forEach var="cl" items="${couponLog }">
+														<tr>
+															<td><fmt:formatDate value="${cl.obtainedDate }"
+																	type="date" /></td>
+															<td>${cl.couponName }</td>
+															<td>${cl.couponNumber }</td>
+															<td><fmt:formatDate value="${cl.obtainedDate }"
+																	type="date" /></td>
+															<td><fmt:formatDate value="${cl.usedDate }"
+																	type="date" /></td>
+														</tr>
+													</c:forEach>
+												</tbody>
+											</table>
 										</div>
+									</div>
+								</div>
+							</div>
 
-										<div class="privacy-box">
-											<div class="d-flex align-items-start">
-												<h6>Deleting Your Account Will Permanently</h6>
-												<div class="form-check form-switch switch-radio ms-auto">
-													<input class="form-check-input" type="checkbox"
-														role="switch" id="redio3" aria-checked="false" /> <label
-														class="form-check-label" for="redio3"></label>
-												</div>
-											</div>
-											<p class="text-content">Once your account is deleted, you
-												will be logged out and will be unable to log in back.</p>
+							<div class="tab-pane fade show" id="pills-rewards"
+								role="tabpanel" aria-labelledby="pills-rewards-tab">
+								<div class="dashboard-card">
+									<div class="title title-flex">
+										<div>
+											<h2>적립금 내역</h2>
+											<span class="title-leaf"> <svg
+													class="icon-width bg-gray">
+                            <use
+														xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
+                          </svg>
+											</span>
 										</div>
+									</div>
 
-										<div class="privacy-box">
-											<div class="d-flex align-items-start">
-												<h6>Deleting Your Account Will Temporary</h6>
-												<div class="form-check form-switch switch-radio ms-auto">
-													<input class="form-check-input" type="checkbox"
-														role="switch" id="redio4" aria-checked="false" /> <label
-														class="form-check-label" for="redio4"></label>
-												</div>
-											</div>
-
-											<p class="text-content">Once your account is deleted, you
-												will be logged out and you will be create new account</p>
+									<div class="row g-4">
+										<div class="container mt-3">
+											<table class="table">
+												<thead>
+													<tr>
+														<th>등록일</th>
+														<th>상세내용</th>
+														<th>적립금</th>
+														<th>남은 적립금</th>
+													</tr>
+												</thead>
+												<tbody>
+													<c:forEach var="rl" items="${rewardLog }">
+														<tr>
+															<td><fmt:formatDate value="${rl.date }" type="date" /></td>
+															<td>${rl.reason }</td>
+															<td><fmt:formatNumber value="${rl.reward }"
+																	type="NUMBER" />원</td>
+															<td><fmt:formatNumber value="${rl.balance }"
+																	type="NUMBER" />원</td>
+														</tr>
+													</c:forEach>
+												</tbody>
+											</table>
 										</div>
+									</div>
+								</div>
+							</div>
 
-										<button
-											class="btn theme-bg-color btn-md fw-bold mt-4 text-white">
-											Delete My Account</button>
+							<div class="tab-pane fade show" id="pills-review" role="tabpanel"
+								aria-labelledby="pills-review"-tab">
+								<div class="dashboard-card">
+									<div class="title title-flex">
+										<div>
+											<h2>나의 리뷰</h2>
+											<span class="title-leaf"> <svg
+													class="icon-width bg-gray">
+                            <use
+														xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
+                          </svg>
+											</span>
+										</div>
+									</div>
+									${reviewList }
+									<div class="row g-4">
+										<div class="container mt-3">
+											<c:forEach var="review" items="${reviewList }">
+												<table class="table table-borderless reviewTable">
+													<tbody>
+														<tr>
+															<td><a href="/detail/${review.productId }"> <c:choose>
+																		<c:when test="${review.productImage == '' }">
+																			<img src="/resources/assets/images/noimage.jpg"
+																				class="img-fluid blur-up lazyload"
+																				alt="${review.productName }" />
+																		</c:when>
+																		<c:otherwise>
+																			<img src="${review.productImage }"
+																				class="img-fluid blur-up lazyload reviewImg"
+																				alt="${review.productName }" width="80px" />
+																		</c:otherwise>
+																	</c:choose>
+															</a> <a href="/detail/${review.productId }">
+																	${review.productName } </a></td>
+															<td class="reviewBtn"><button type="button"
+																	class="btn theme-bg-color btn-md text-white modifyReview"
+																	data-bs-toggle="modal"
+																	data-bs-target="#modifyReviewModal"
+																	onclick="selectReview(${review.postNo})">수정</button></td>
+															<td><button type="button"
+																	class="btn theme-bg-color btn-md text-white delReview"
+																	onclick="delReview();">삭제</button></td>
+														</tr>
+
+														<tr>
+															<td><c:forEach begin="1" end="${review.rating }">
+																	<i class="fa-solid fa-star" style="color: #0DA487;"></i>
+																</c:forEach></td>
+															<td></td>
+															<td></td>
+														</tr>
+														<tr>
+															<td>${review.content }</td>
+															<td></td>
+															<td></td>
+														</tr>
+													</tbody>
+												</table>
+											</c:forEach>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -2770,75 +2545,67 @@
 	<!-- Add address modal box end -->
 
 	<!-- Location Modal Start -->
-	<div class="modal location-modal fade theme-modal" id="locationModal"
+	<div class="modal fade theme-modal" id="modifyReviewModal"
 		tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div
 			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel1">Choose your
-						Delivery Location</h5>
-					<p class="mt-1 text-content">Enter your address and we will
-						specify the offer for your area.</p>
+					<h5 class="modal-title" id="exampleModalLabel">리뷰수정</h5>
+
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
-				<div class="modal-body">
-					<div class="location-list">
-						<div class="search-input">
-							<input type="search" class="form-control"
-								placeholder="Search Your Area" /> <i
-								class="fa-solid fa-magnifying-glass"></i>
+
+				<div class="modal-body modifyReview">
+					<!--  <table class="table mb-0 productInfo">
+						<tbody>
+							<tr>
+								<td class="product-detail">
+									<div class="product border-0">
+										<a href="/detail/" class="product-image"> <img
+											src="/resources/assets/images/noimage.jpg"
+											class="img-fluid blur-up lazyload" alt="">
+										</a>
+									</div>
+								</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td class="name">
+									<h4 class="table-title text-content">상품이름</h4> <a
+									href="/detail/" id="productName"></a>
+								</td>
+								<td class="name">
+									<h4 class="table-title text-content">별점</h4> 
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="form-floating mb-4 theme-form-floating">
+						content<input type="text" class="form-control" id="exchangeReason"
+							value="상품 하자" name="reason" readonly="readonly" />
+						<div class="deliverMsg">
+							<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>
+							상품에 하자가 있는 경우에만 교환이 가능합니다.
 						</div>
-
-						<div class="disabled-box">
-							<h6>Select a Location</h6>
+					</div>-->
+					<div class="form-floating mb-4 theme-form-floating">
+						사진첨부<input type="text" class="form-control" id="exchangeReason"
+							value="상품 하자" name="reason" readonly="readonly" />
+						<div class="deliverMsg">
+							<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>
+							상품에 하자가 있는 경우에만 교환이 가능합니다.
 						</div>
-
-						<ul class="location-select custom-height">
-							<li><a href="javascript:void(0)">
-									<h6>Alabama</h6> <span>Min: $130</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Arizona</h6> <span>Min: $150</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>California</h6> <span>Min: $110</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Colorado</h6> <span>Min: $140</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Florida</h6> <span>Min: $160</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Georgia</h6> <span>Min: $120</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Kansas</h6> <span>Min: $170</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Minnesota</h6> <span>Min: $120</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>New York</h6> <span>Min: $110</span>
-							</a></li>
-
-							<li><a href="javascript:void(0)">
-									<h6>Washington</h6> <span>Min: $130</span>
-							</a></li>
-						</ul>
 					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-md"
+						data-bs-dismiss="modal">닫기</button>
+					<button type="button" class="btn theme-bg-color btn-md text-white"
+						onclick="">수정</button>
 				</div>
 			</div>
 		</div>

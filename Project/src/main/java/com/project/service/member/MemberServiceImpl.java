@@ -32,10 +32,12 @@ import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetBankTransfer;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.jmj.MyPageReview;
 import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.jmj.ReturnOrder;
+import com.project.vodto.jmj.exchangeDTO;
 import com.project.vodto.UploadFiles;
 
 @Service
@@ -137,17 +139,27 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public Map<String, Object> getOrderHistory(String memberId, int pageNo) throws SQLException, NamingException {
+	public Map<String, Object> memberInfo(String memberId, int pageNo) throws SQLException, NamingException {
 		PagingInfo pi = pagination(pageNo, memberId);
 
 		List<MyPageOrderList> lst = mDao.selectOrderHistory(memberId, pi);
 		List<GetBankTransfer> bankTransfer = mDao.selectBankTransfers(memberId);
 
 		Map<String, Object> result = new HashMap<String, Object>();
-		
+		List<MyPageReview> myReview = mDao.selectMyreview(memberId);
+		for(MyPageReview review : myReview) {
+			review.setContent(review.getContent().replace("\r\n", "<br/>"));
+		}
+
 		result.put("orderHistory", lst);
 		result.put("pagination", pi);
 		result.put("bankTransfer", bankTransfer);
+		result.put("memberImg", mDao.selectMemeberProfileImg(memberId));
+		result.put("wishlist", mDao.selectWishlist(memberId));
+		result.put("pointLog", mDao.selectPointLog(memberId));
+		result.put("rewardLog", mDao.selectRewardLog(memberId));
+		result.put("couponLog", mDao.selectCouponLog(memberId));
+		result.put("myReview", mDao.selectMyreview(memberId));
 
 		return result;
 	}
@@ -160,6 +172,9 @@ public class MemberServiceImpl implements MemberService {
 
 		// 전체 주문 갯수
 		result.setTotalPostCnt(mDao.getTotalOrderCnt(memberId));
+		
+		// 총 포인트로그 갯수
+		result.setTotalPointLogCnt(mDao.getTotalPointLogCnt(memberId));
 
 		// 총페이지 수 구하기
 		result.setTotalPageCnt(result.getTotalPostCnt(), result.getViewPostCntPerPage());
@@ -299,8 +314,15 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public List<MyPageOrderList> getCurOrderHistory(String memberId) throws SQLException, NamingException {
-
-		return mDao.selectCurOrderHistory(memberId);
+//		List<MyPageOrderList> sp = mDao.selectPaymentMethodAndOrderNo(memberId);
+		
+//		for(MyPageOrderList po: sp) {
+//			String paymentMethod = po.getPaymentMethod();
+//			String orderNo = po.getOrderNo();
+			List<MyPageOrderList> curOrder = mDao.selectCurOrderHistory(memberId);
+//		}
+		
+		return curOrder;
 	}
 
 	@Override
@@ -380,33 +402,33 @@ public class MemberServiceImpl implements MemberService {
 		List<CouponHistory> coupons = (List<CouponHistory>) order.get("couponsHistory");
 		Member member = mDao.selectMyInfo(memberId);
 		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, tmpCancel.getOrderNo());
-		
-		int amountAfterDiscount = 0; //할인 후 금액
-		int amountBeforeDiscount = 0; //할인 전 금액
+
+		int amountAfterDiscount = 0; // 할인 후 금액
+		int amountBeforeDiscount = 0; // 할인 전 금액
 		int productPrice = detailOrder.getProductPrice();
 		float discountAmount = 0; // 금액에 곱할 %
 		int dcAmount = 0; // 할인 전 금액에서 할인받은 금액
-		int refundCouponAmount = 0; //선택한 상품별 쿠폰 적용 금액
-		
+		int refundCouponAmount = 0; // 선택한 상품별 쿠폰 적용 금액
+
 		System.out.println("1");
 		System.out.println(coupons.size());
-		if(coupons.size() == 0) {//쿠폰 적용 안 했다
+		if (coupons.size() == 0) {// 쿠폰 적용 안 했다
 			amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - tmpCancel.getRefundRewardUsed();
 			amountBeforeDiscount = productPrice;
-		}else{// 쿠폰 적용 했다
-			for(CouponHistory coupon : coupons) {
-				 //if(coupon.getDiscountMethod() == 'P') {
-					 discountAmount = (float) (coupon.getDiscountAmount() * 0.01);
-					 dcAmount = (int) (tmpCancel.getTotalRefundAmount() * discountAmount);
-					 refundCouponAmount = (tmpCancel.getOrderQty() - tmpCancel.getTotalQty()) * dcAmount;
-					 amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - 
-							 				tmpCancel.getRefundRewardUsed() - refundCouponAmount;
-					 amountBeforeDiscount = productPrice;
-				 //}else {
-					 refundCouponAmount = (tmpCancel.getOrderQty() - tmpCancel.getTotalQty()) * coupon.getDiscountAmount();
-					 amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - 
-							 				tmpCancel.getRefundRewardUsed() - refundCouponAmount;
-					 amountBeforeDiscount = productPrice;
+		} else {// 쿠폰 적용 했다
+			for (CouponHistory coupon : coupons) {
+				// if(coupon.getDiscountMethod() == 'P') {
+				discountAmount = (float) (coupon.getDiscountAmount() * 0.01);
+				dcAmount = (int) (tmpCancel.getTotalRefundAmount() * discountAmount);
+				refundCouponAmount = (tmpCancel.getOrderQty() - tmpCancel.getTotalQty()) * dcAmount;
+				amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - tmpCancel.getRefundRewardUsed()
+						- refundCouponAmount;
+				amountBeforeDiscount = productPrice;
+				// }else {
+				refundCouponAmount = (tmpCancel.getOrderQty() - tmpCancel.getTotalQty()) * coupon.getDiscountAmount();
+				amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - tmpCancel.getRefundRewardUsed()
+						- refundCouponAmount;
+				amountBeforeDiscount = productPrice;
 				// }
 			}
 		}
@@ -415,23 +437,23 @@ public class MemberServiceImpl implements MemberService {
 		System.out.println("@@@@@@@@@@@@@@@@@@할인후금액" + amountAfterDiscount);
 		System.out.println("@@@@@@@@@@@@@@@@@@상품금액금액" + productPrice);
 
-		//취소테이블 인서트
+		// 취소테이블 인서트
 		if (mDao.insertCancelOrder(detailOrder.getProductId(), tmpCancel.getReason(), amountBeforeDiscount,
 				tmpCancel.getDetailedOrderId(), detailOrder.getPaymentMethod()) > 0) {
 			System.out.println("취소 저장 완");
 			// //환불테이블 인서트
-			if (mDao.insertRefund(detailOrder.getProductId(), tmpCancel, detailOrder.getPaymentMethod(), 
+			if (mDao.insertRefund(detailOrder.getProductId(), tmpCancel, detailOrder.getPaymentMethod(),
 					amountAfterDiscount, amountBeforeDiscount) > 0) {
 				System.out.println("환불 저장 완");
 				// 디테일 프로덕트상태 업데이트
-				if(mDao.updateDetailProductStatus(tmpCancel.getDetailedOrderId()) > 0) {
+				if (mDao.updateDetailProductStatus(tmpCancel.getDetailedOrderId()) > 0) {
 					System.out.println("디테일 상태 업데이트 완");
-					for(DetailOrder cancelDetail : detailOrders) {
-						//모든 디테일 상품 상태가 취소라면 주문내역 배송상태 취소로 변경
-						if(!"취소".equals(cancelDetail.getProductStatus())) {
+					for (DetailOrder cancelDetail : detailOrders) {
+						// 모든 디테일 상품 상태가 취소라면 주문내역 배송상태 취소로 변경
+						if (!"주문취소".equals(cancelDetail.getProductStatus())) {
 							allCancel = false;
 							break;
-						}else {
+						} else {
 							mDao.updatedeliveryStatus(memberId, tmpCancel.getOrderNo());
 							System.out.println("주문내역 배송상태 변경 완");
 						}
@@ -440,13 +462,13 @@ public class MemberServiceImpl implements MemberService {
 				// 환불계좌정보를 변경했다면
 				mDao.updateRefundAccount(memberId, tmpCancel);
 				System.out.println("환불 계좌 정보 변경 완");
-				
+
 				// if(환불 적립금이 있다면)
 				if (tmpCancel.getRefundRewardUsed() != 0) {
 					// 적립금 로그 인서트
 					int totalReward = mDao.selectRewardBalance(memberId) + tmpCancel.getRefundRewardUsed();
-					if(mDao.insertRewardLog(memberId, tmpCancel, totalReward) > 0) {
-						System.out.println("적립금 로그 인서트 완");				
+					if (mDao.insertRewardLog(memberId, tmpCancel, totalReward) > 0) {
+						System.out.println("적립금 로그 인서트 완");
 						// 멤버 총 적립금 업데이트
 						int addReward = member.getTotalRewards() + tmpCancel.getRefundRewardUsed();
 						mDao.updateMemberReward(addReward, memberId);
@@ -454,31 +476,32 @@ public class MemberServiceImpl implements MemberService {
 					}
 					result = true;
 				}
-				
+
 				if (tmpCancel.getRefundPointUsed() != 0) {
 					// -- if(환불 포인트가 있다면)
 					// 포인트 로그 인서트
 					int totalPoint = mDao.selectPointBalance(memberId) + tmpCancel.getRefundPointUsed();
-					if(mDao.insertPointLog(memberId, tmpCancel.getRefundPointUsed(), tmpCancel.getOrderNo(), totalPoint) > 0) {
+					if (mDao.insertPointLog(memberId, tmpCancel.getRefundPointUsed(), tmpCancel.getOrderNo(),
+							totalPoint) > 0) {
 						System.out.println("포인트로그 인서트 완");
 						// 멤버 총 포인트 업데이트
 						int addPoint = member.getTotalPoints() + tmpCancel.getRefundPointUsed();
 						mDao.updateMemberPoint(addPoint, memberId);
-						System.out.println("멤버 총 포인트 업데이트 완");		
+						System.out.println("멤버 총 포인트 업데이트 완");
 					}
 					result = true;
 				}
-				
+
 				if (coupons.size() != 0) {
 					for (CouponHistory coupon : coupons) {
 						// if(환불 쿠폰이 있다면)
 						// 쿠폰로그 사용일, 사용한 주문번호 null로 업데이트
-						if(mDao.updateCouponLog(coupon.getCouponLogsSeq()) > 0) {
+						if (mDao.updateCouponLog(coupon.getCouponLogsSeq()) > 0) {
 							System.out.println("쿠폰로그 업데이트 완");
 							// 멤버 총 쿠폰갯수 업데이트
 							int couponCnt = mDao.selectCouponCnt(memberId, tmpCancel.getOrderNo());
 							mDao.updateMemeberTotalCoupon(couponCnt, memberId);
-							System.out.println("멤버 총 쿠폰갯수 업데이트 완");	
+							System.out.println("멤버 총 쿠폰갯수 업데이트 완");
 						}
 					}
 					result = true;
@@ -491,31 +514,30 @@ public class MemberServiceImpl implements MemberService {
 		return result;
 	}
 
-
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean returnOrder(ReturnOrder ro, String memberId) throws SQLException, NamingException {
 		Map<String, Object> map = selectCancelOrder(memberId, ro.getOrderNo(), ro.getDetailedOrderId());
-		DetailOrder detailOrder = (DetailOrder)map.get("selectCancelOrder");
+		DetailOrder detailOrder = (DetailOrder) map.get("selectCancelOrder");
 		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, ro.getOrderNo());
 
 		boolean result = false;
 		boolean allApplyReturn = true;
-		
-		if(mDao.insertReturn(detailOrder.getProductId(), ro) > 0) {
+
+		if (mDao.insertReturn(detailOrder.getProductId(), ro) > 0) {
 			System.out.println("반품 인서트 완");
-			if(mDao.insertReturnShippingAddress(ro) > 0) {
+			if (mDao.insertReturnShippingAddress(ro) > 0) {
 				System.out.println("회수 배송지 입력 완");
-				if(mDao.updateRefundAccount(memberId, ro) > 0) {
+				if (mDao.updateRefundAccount(memberId, ro) > 0) {
 					System.out.println("멤버 환불정보 업데이트 완");
-					if(mDao.updateDetailProductStatusWithReturn(ro.getDetailedOrderId()) > 0) {
+					if (mDao.updateDetailProductStatusWithReturn(ro.getDetailedOrderId()) > 0) {
 						System.out.println("디테일 상품 상태 업데이트 완");
-						for(DetailOrder returnDetail : detailOrders) {
-							//모든 디테일 상품 상태가 취소라면 주문내역 배송상태 취소로 변경
-							if(!"반품신청".equals(returnDetail.getProductStatus())) {
+						for (DetailOrder returnDetail : detailOrders) {
+							// 모든 디테일 상품 상태가 반품신청이라면 주문내역 배송상태 반품신청으로 변경
+							if (!"반품신청".equals(returnDetail.getProductStatus())) {
 								allApplyReturn = false;
 								break;
-							}else {
+							} else {
 								mDao.updatedeliveryStatusWithReturn(memberId, ro.getOrderNo());
 								System.out.println("주문내역 배송상태 변경 완");
 							}
@@ -525,9 +547,81 @@ public class MemberServiceImpl implements MemberService {
 			}
 			result = true;
 		}
-		
+
 		return result;
 	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean exchangeOrder(exchangeDTO ed, String memberId) throws SQLException, NamingException {
+		Map<String, Object> map = selectCancelOrder(memberId, ed.getOrderNo(), ed.getDetailedOrderId());
+		DetailOrder detailOrder = (DetailOrder) map.get("selectCancelOrder");
+		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, ed.getOrderNo());
+
+		boolean result = false;
+		boolean allApplyExchange = true;
+
+		if (mDao.insertReturnWithExchange(detailOrder.getProductId(), ed) > 0) {
+			System.out.println("반품테이블 인서트 완");
+			if (mDao.insertExchangeShippingAddress(ed) > 0) {
+				System.out.println("회수 배송지, 교환 배송지 인서트 완");
+				if (mDao.updateDetailProductStatusWithExchange(ed.getDetailedOrderId()) > 0) {
+					System.out.println("디테일 상품 상태 업데이트 완");
+					for (DetailOrder exchangeDetail : detailOrders) {
+						// 모든 디테일 상품 상태가 교환신청이라면 주문내역 배송상태 교환신청으로 변경
+						if (!"교환신청".equals(exchangeDetail.getProductStatus())) {
+							allApplyExchange = false;
+							break;
+						} else {
+							mDao.updateDeliveryStatusWithExchange(memberId, ed.getOrderNo());
+							System.out.println("주문내역 배송상태 변경 완");
+						}
+					}
+				}
+			}
+			result = true;
+		}
+
+		return result;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean insertUploadProfile(UploadFiles uf, String memberId) throws SQLException, NamingException {
+		System.out.println(uf.toString());
+		boolean result = false;
+
+//		System.out.println(uploadFilesSeq);
+
+		if (mDao.insertUploadProfile(uf) == 1) {
+			System.out.println("멤버 프로필 이미지 업로드 완");
+			int uploadFilesSeq = mDao.selectuploadFilesSeq(uf.getNewFileName());
+			
+			System.out.println(uploadFilesSeq);
+			if (mDao.updateMemberProfile(uploadFilesSeq, memberId) == 1) {
+				System.out.println("멤버 프로필 이미지 업데이트 완");
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	@Override
+	public boolean addShoppingCart(String memberId, String productId) throws SQLException, NamingException {
+		boolean result = false;
+		if(mDao.addShoppingCart(memberId, productId) == 1) {
+			result = true;
+		}
+		return result;
+	}
+	
+	@Override
+	public MyPageReview selectMyReview(String memberId, int postNo) throws SQLException, NamingException {
+		MyPageReview review = mDao.selectMyReview(memberId, postNo);
+		 review.setContent(review.getContent().replace("<br/>", ""));
+		return review;
+	}
+
 	// --------------------------------------- 장민정 끝
 	// ----------------------------------------
 	// --------------------------------------- 김진솔 시작
@@ -558,8 +652,9 @@ public class MemberServiceImpl implements MemberService {
 				uDao.insertUploadImage(file);
 				newFileName = file.getNewFileName();
 			}
-		};
-		
+		}
+		;
+
 		// 회원 가입 - 회원 가입
 		if (mDao.insertMember(member) == 1) {
 			// 배송지 설정
@@ -578,7 +673,7 @@ public class MemberServiceImpl implements MemberService {
 				member.setBasicAddr("N");
 			}
 			shipping.setBasicAddr(member.getBasicAddr());
-			
+
 			// 배송지 추가
 			if (mDao.insertShipping(shipping) == 1) {
 				if (!newFileName.equals("")) {
