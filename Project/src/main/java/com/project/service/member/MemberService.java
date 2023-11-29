@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.MessagingException;
 import javax.naming.NamingException;
 
 import com.project.vodto.Board;
@@ -112,8 +113,10 @@ public interface MemberService {
 	boolean checkedDuplication(String memberId) throws SQLException, NamingException;
 	// 회원 가입
 	boolean insertMember(SignUpDTO member, UploadFiles file) throws SQLException, NamingException;
-	// 로그인 시도
-	Member login(String memberId, String password) throws SQLException, NamingException;
+	// 이메일 인증
+	void sendEmail(String email, String code) throws MessagingException;
+	// 코드 검증
+	boolean confirmCode(String sessionCode, String userCode);
 	// ------------------------------------ 김진솔 끝 -----------------------------------
 	
 	

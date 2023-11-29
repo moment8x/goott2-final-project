@@ -19,7 +19,7 @@ public interface ReviewDAO {
 	// 물품 구매 이력 및 배송 상태 조회
 	List<String> getPruchaseRecord(String memberId, String productId) throws SQLException, NamingException;
 	// 해당 물품 리뷰 작성 기록 조회
-	List<String> isExists(String memberId, String productId) throws SQLException, NamingException;
+	int isExists(String memberId, String productId) throws SQLException, NamingException;
 	// 포인트 법칙에 적용된 포인트 조회
 	Integer getPointRule(String reason) throws SQLException, NamingException;
 	// 리뷰 작성 시 point_logs 테이블에 기록
@@ -46,4 +46,13 @@ public interface ReviewDAO {
 	int insertRatings(Ratings ratings) throws SQLException, NamingException;
 	// 리뷰 수정
 	int updateReview(int postNo, String content, int rating) throws SQLException, NamingException;
+	// 리뷰 작성이 최초인가 확인
+	int firstCheck(String memberId, String productId) throws SQLException, NamingException;
+	// 리뷰 삭제 검사 - 넘어온 정보(id, postNo, productId)와 DB의 값이 같은 것이 존재하는가
+	int deleteCheck(int postNo, String memberId, String productId) throws SQLException, NamingException;
+	// 리뷰 삭제
+	int deleteReview(int postNo) throws SQLException, NamingException;
+	// ratings 테이블 업데이트
+	int updateRatings(Ratings ratings) throws SQLException, NamingException;
+	
 }

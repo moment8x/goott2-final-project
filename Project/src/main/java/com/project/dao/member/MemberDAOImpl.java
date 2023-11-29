@@ -11,7 +11,6 @@ import javax.naming.NamingException;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
-import com.project.vodto.BankTransfer;
 import com.project.vodto.Member;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.jmj.CancelDTO;
@@ -553,7 +552,6 @@ public class MemberDAOImpl implements MemberDAO {
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
 	@Override
 	public boolean selectId(String memberId) throws SQLException, NamingException {
-		System.out.println("======= 회원가입 DAO - 아이디 중복 조회 =======");
 		boolean result = false;	// 중복x
 		
 		if (ses.selectOne(ns + ".getId", memberId) != null) {
@@ -564,14 +562,11 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	public int insertMember(SignUpDTO member) throws SQLException, NamingException {
-		System.out.println("======= 회원가입 DAO - 회원 가입 =======");
-		
 		return ses.insert(ns + ".insertMember", member);
 	}
 	
 	@Override
 	public Member selectMember(String memberId, String password) throws SQLException, NamingException {
-		System.out.println("======= 회원가입 DAO - 로그인 비밀번호 체크 =======");
 		Map<String, String> param = new HashMap<String, String>();
 		param.put("memberId", memberId);
 		param.put("password", password);
@@ -582,7 +577,6 @@ public class MemberDAOImpl implements MemberDAO {
 	
 	@Override
 	public int updateProfile(String memberId, String newFileName) throws SQLException, NamingException {
-		System.out.println("======= 회원 정보 수정 DAO - 프로필 사진 변경 =======");
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("memberId", memberId);
 		params.put("newFileName", newFileName);

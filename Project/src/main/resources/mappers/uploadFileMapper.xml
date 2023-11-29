@@ -11,4 +11,7 @@
 	<select id="isExist" resultType="Integer">
 		SELECT upload_files_seq FROM upload_files WHERE new_file_name = #{newFileName}
 	</select>
+	<delete id="deleteUploadFile">
+		DELETE FROM upload_files WHERE upload_files_seq = #{uploadFilesSeq}
+	</delete>
 </mapper>

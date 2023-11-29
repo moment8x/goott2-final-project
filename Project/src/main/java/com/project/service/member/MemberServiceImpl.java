@@ -6,8 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.naming.NamingException;
 
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +45,8 @@ public class MemberServiceImpl implements MemberService {
 	private MemberDAO mDao;
 	@Inject
 	private UploadDAO uDao;
+	@Inject
+	private JavaMailSender mailSender;
 
 	// --------------------------------------- 장민정 시작
 	// ---------------------------------------
@@ -542,6 +548,10 @@ public class MemberServiceImpl implements MemberService {
 	public boolean insertMember(SignUpDTO member, UploadFiles file) throws SQLException, NamingException {
 		boolean result = false;
 		String newFileName = "";
+		
+		member.setPhoneNumber(member.getPhoneNumber1() + member.getPhoneNumber2() + member.getPhoneNumber1());
+		member.setCellPhoneNumber(member.getCellPhoneNumber1() + member.getCellPhoneNumber2() + member.getCellPhoneNumber3());
+		
 		// 회원 가입 - 프로필 사진 저장
 		if (file != null) {
 			if (ImgMimeType.contentTypeIsImage(file.getExtension())) {
@@ -582,20 +592,37 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public Member login(String memberId, String password) throws SQLException, NamingException {
-		Member result = null;
-
-		// Pwd 확인
-		result = mDao.selectMember(memberId, password);
-
-		if (result != null) {
-			System.out.println(result.toString());
-		}
-
-		return result;
+	public void sendEmail(String email, String code) throws MessagingException {
+		System.out.println("sendMail 서비스");
+		
+		String emailTo = email;
+		String emailFrom = "game046@naver.com";
+		String subject = "DeerBooks 이메일 인증";
+		String message = "코드 " + code + " 를 이용하여 홈페이지에서 인증을 마치십시오";
+		
+		MimeMessage mimeMsg = mailSender.createMimeMessage();
+		MimeMessageHelper mimeHelper = new MimeMessageHelper(mimeMsg);
+		
+		mimeHelper.setFrom(emailFrom);
+		mimeHelper.setTo(emailTo);
+		mimeHelper.setSubject(subject);
+		mimeHelper.setText(message);
+		
+		mailSender.send(mimeMsg);
 	}
 
-
+	@Override
+	public boolean confirmCode(String sessionCode, String userCode) {
+		boolean result = false;
+		System.out.println("코드 검증");
+		
+		if (sessionCode.equals(userCode)) {
+			result = true;
+		}
+		
+		return result;
+	}
+	
 	// --------------------------------------- 김진솔 끝 ----------------------------------------
 
 }

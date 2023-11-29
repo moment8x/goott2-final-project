@@ -24,4 +24,5 @@ public class ReviewBoard {
 	private int likes;
 	private int rating;
 	private String productId;
+	private char isDelete;
 }

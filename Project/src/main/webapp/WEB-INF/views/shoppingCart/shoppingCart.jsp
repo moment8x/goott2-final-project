@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -79,12 +80,13 @@
 				url: "/shoppingCart/items",
 				type:"POST",
 				data:{
-					'items':items
+					'itemNames' : items
 				},
 				dataType: "json",
 				async: false,
 				success:function(data) {
 					spreadView();
+					newCart(data.cartItems);
 				}, error:function(data) {
 					console.log("error");
 				}
@@ -120,34 +122,29 @@
 				let items = data.list.items;
 				isLogin = data.isLogin;
 				$.each(items, function(i, item) {
+					let productName = item.productName;
+					if (productName.length > 15) {
+						productName = productName.substring(0, 25) + "<br/>" + productName.substring(25);
+					}
 					let qty = data.list.list[i].quantity;
 					output += `<tr class="product-box-contain">`;
+					// 완성 전 주석처리!
+					output += `<td class="product-checkbox" style="min-width:15px;"><input class="checkbox_animated check-it" type="checkbox" name="check_item" value="\${item.productId}" checked/></td>`;
+					// 이미지, 책 제목
 					output += `<td class="product-detail">`;
 					output += `<div class="product border-0">`;
-					output += `<a href="#" class="product-image"><img src="\${item.productImage}" class="img-fluid blur-up lazyload" alt="\${item.productName}"/></a>`;
+					output += `<a href="/detail/\${item.productId}" class="product-image"><img src="\${item.productImage}" class="img-fluid blur-up lazyload" alt="\${item.productName}"/></a>`;
 					output += `<div class="product-detail">`;
 					output += `<ul>`;
-					output += `<li class="name"><a href="#">\${item.productName}</a></li>`;
+					output += `<li class="name"><a href="/detail/\${item.productId}">\${productName}</a></li>`;
 					output += `<li class="text-content"><span class="text-title">Sold By:</span> Fresho</li>`;
 					output += `<li class="text-content"><span class="text-title">Quantity</span> - 500 g</li>`;
-					output += `<li><h5 class="text-content d-inline-block">Price :</h5>`;
-					output += `<span>&#8361;\${item.sellingPrice}</span>`;
-					output += `<span class="text-content">&#8361;\${item.consumerPrice}</span></li>`;
-					output += `<li><h5 class="saving theme-color">Saving : &#8361;\${item.consumerPrice - item.sellingPrice}</h5></li>`;
-					output += `<li class="quantity-price-box">`;
-					output += `<div class="cart_qty">`;
-					output += `<div class="input-group">`;
-					output += `<button type="button" class="btn qty-left-minus" data-type="minus" data-field="">`;
-					output += `<i class="fa fa-minus ms-0" aria-hidden="true"></i></button>`;
-					output += `<input class="form-control input-number qty-input" type="text" name="quantity" value="0"/>`;
-					output += `<button type="button" class="btn qty-right-plus" data-type="plus" data-field="">`;
-					output += `<i class="fa fa-plus ms-0" aria-hidden="true"></i></button>`;
-					output += `</div></div></li>`;
-					output += `<li><h5>Total: $35.10</h5></li></ul></div></div></td>`;
 					// 가격
 					output += `<td class="price"><h4 class="table-title text-content">Price</h4>`;
-					output += `<h5>&#8361;\${item.sellingPrice} <del class="text-content">&#8361;\${item.consumerPrice}</del></h5>`;
-					output += `<h6 class="theme-color">You Save : &#8361;\${item.consumerPrice - item.sellingPrice}</h6></td>`;
+					output += '<h5>&#8361;' + item.sellingPrice.toLocaleString('ko-KR')
+					output += '<del class="text-content">&#8361;' + item.consumerPrice.toLocaleString('ko-KR') + '</del></h5>';
+					output += '<h6 class="theme-color">You Save : &#8361;'
+					output += (item.consumerPrice - item.sellingPrice).toLocaleString('ko-KR') + '</h6></td>';
 					// QTY
 					if (item.currentQuantity >  0) {
 						output += `<td class="quantity"><h4 class="table-title text-content">Qty</h4>`;
@@ -170,11 +167,16 @@
 					}
 					// 해당 아이템 최종 가격
 					output += `<td class="subtotal"><h4 class="table-title text-content">Total</h4>`;
-					output += `<h5 id="\${'total' + item.productId}" class="subtotal calc_total">&#8361;\${item.sellingPrice * item.quantity}</h5></td>`;
-					// ???
-					output += `<td class="save-remove"><h4 class="table-title text-content">Action</h4>`;
-					output += `<a class="save notifi-wishlist" href="javascript:void(0)">Save for later</a>`;
-					output += `<button class="remove close_button" onclick="deleteItem(this);" value="\${item.productId}">Remove</button></td></tr>`;
+					output += `<h5 id="\${'total' + item.productId}" class="subtotal calc_total">&#8361;`;
+					output += (item.sellingPrice * item.quantity).toLocaleString('ko-KR') + '</h5></td>';
+					// 완성 전 주석 처리
+					output += '<td class="save-remove" style="min-width:20px;"><h4 class="table-title text-content">Action</h4>';
+					output += `<button class="remove close_button" onclick="deleteItem(this);" value="\${item.productId}">`
+					output += '<i class="fa-regular fa-trash-can"></i></button></td></tr>';
+					// 완성 전에는 주석 풀고 냅두기
+					//output += `<td class="save-remove"><h4 class="table-title text-content">Action</h4>`;
+					//output += `<a class="save notifi-wishlist" href="javascript:void(0)">Save for later</a>`;
+					//output += `<button class="remove close_button" onclick="deleteItem(this);" value="\${item.productId}">Remove</button></td></tr>`;
 					
 					// 아오 ㅠㅠ
 					if (item.currentQuantity > 0) {
@@ -221,7 +223,7 @@
 				output += `<input type="hidden" name="productQuantity" value="\${buyInfo[i].quantity}">`;
 				output += `<input type='hidden' name="fromCart" value="Y">`;
 				
-				$('.move-payment').html(output);
+				//$('.move-payment').html(output);
 			}
 			$('.move-payment').html(output);
 		}
@@ -287,7 +289,6 @@
 		// QTY값 DB에 변경
 		// (productId, qty)
 		function updateQTY(productId, quantity) {
-			console.log("여기까진 오는데;;");
 			$.ajax({
 				url: "/shoppingCart/updateQTY",
 				type: "POST",
@@ -336,8 +337,6 @@
 		// 단일 아이템 삭제
 		function deleteItem(elt) {
 			let productId = elt.value;
-			console.log("elt : ", elt);
-			console.log("elt.value : ", elt.value);
 			$.ajax({
 				url : "/shoppingCart/" + productId,
 				type : "DELETE",
@@ -349,11 +348,30 @@
 				success : function(data) {
 					if (data.status == "success") {
 						spreadView();
+						newCart(data.cartItems);
 					}
 				}, error : function() {
 					console.log("help!me!");
 				}
 			});
+		}
+		
+		// 전체 선택
+		function addChecked() {
+			const checkboxes = document.getElementsByName('check_item');
+		  
+			checkboxes.forEach((checkbox) => {
+				checkbox.checked = true;
+			})
+		}
+		
+		// 전체 선택 해제
+		function AllUnchecked() {
+			const checkboxes = document.getElementsByName('check_item');
+			  
+			checkboxes.forEach((checkbox) => {
+				checkbox.checked = false;
+			})
 		}
 	</script>
 	<style>
@@ -443,6 +461,11 @@
     <!-- Cart Section Start -->
     <section class="cart-section section-b-space">
         <div class="container-fluid-lg">
+        	<div>
+        		<button onclick="addChecked();">전체 선택</button>
+        		<button onclick="AllUnchecked();">전체 선택 해제</button>
+        		<button onclick="delCheckedItem();">선택 삭제</button>
+        	</div>
             <div class="row g-sm-5 g-3">
                 <div class="col-xxl-9">
                     <div class="cart-table">
@@ -462,39 +485,9 @@
                             <h3>Cart Total</h3>
                         </div>
 
-                        <div class="summery-contain">
-                            <!-- <div class="coupon-cart">
-                                <h6 class="text-content mb-2">Coupon Apply</h6>
-                                <div class="mb-3 coupon-box input-group">
-                                    <input type="email" class="form-control" id="exampleFormControlInput1"
-                                        placeholder="Enter Coupon Code Here...">
-                                    <button class="btn-apply">Apply</button>
-                                </div>
-                            </div>
-                            <ul>
-                                <li>
-                                    <h4>Subtotal</h4>
-                                    <h4 class="price" id="subtotal">&#8361;---</h4>
-                                </li>
+                        <div class="summery-contain"></div>
 
-                                <li>
-                                    <h4>Coupon Discount</h4>
-                                    <h4 class="price">(-) 0.00</h4>
-                                </li>
-
-                                <li class="align-items-start">
-                                    <h4>Shipping</h4>
-                                    <h4 class="price text-end" id="shipping">&#8361;3,000</h4>
-                                </li>
-                            </ul> -->
-                        </div>
-
-                        <ul class="summery-total">
-                            <!-- <li class="list-total border-top-0">
-                                <h4>Total (USD)</h4>
-                                <h4 class="price theme-color" id="total_amount">&#8361;---</h4>
-                            </li> -->
-                        </ul>
+                        <ul class="summery-total"></ul>
 
                         <div class="button-group cart-button">
                             <ul>

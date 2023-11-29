@@ -46,12 +46,12 @@ public class ReviewDAOImpl implements ReviewDAO {
 	}
 
 	@Override
-	public List<String> isExists(String memberId, String productId) throws SQLException, NamingException {
+	public int isExists(String memberId, String productId) throws SQLException, NamingException {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("memberId", memberId);
 		params.put("productId", productId);
 		
-		return session.selectList(ns + ".isExists", params);
+		return session.selectOne(ns + ".isExists", params);
 	}
 
 	@Override
@@ -135,5 +135,32 @@ public class ReviewDAOImpl implements ReviewDAO {
 		params.put("rating", rating);
 		
 		return session.update(ns + ".updateReview", params);
+	}
+
+	@Override
+	public int firstCheck(String memberId, String productId) throws SQLException, NamingException {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("memberId", memberId);
+		params.put("productId", productId);
+		return session.selectOne(ns + ".firstCheck", params);
+	}
+
+	@Override
+	public int deleteCheck(int postNo, String memberId, String productId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("postNo", postNo);
+		params.put("memberId", memberId);
+		params.put("productId", productId);
+		return session.selectOne(ns + ".deleteCheck", params);
+	}
+
+	@Override
+	public int deleteReview(int postNo) throws SQLException, NamingException {
+		return session.update(ns + ".deleteReview", postNo);
+	}
+
+	@Override
+	public int updateRatings(Ratings ratings) throws SQLException, NamingException {
+		return session.update(ns + ".updateRatings", ratings);
 	}
 }

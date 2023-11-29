@@ -47,7 +47,6 @@ public class SessionCheck implements HttpSessionListener {
 	
 	@Override
 	public synchronized void sessionCreated(HttpSessionEvent se) {
-		System.out.println("세션이 생성됨");
 		System.out.println("생성된 세션 id : " + se.getSession().getId());
 		
 		// 세션 생성 시 세션 등록

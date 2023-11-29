@@ -77,7 +77,7 @@ public class CustomerServiceController {
 
 		if (fileList.size() > 0) {
 			for (UploadFiles file : fileList) {
-				ufService.deleteFile(file, realPath);
+				ufService.deleteFile(file.getNewFileName(), realPath);
 			}
 			fileList.clear();
 			deleteFileList.clear();
