@@ -1,5 +1,6 @@
 package com.project.dao.ksh.inquiry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,8 @@ import com.project.vodto.CustomerInquiry;
 import com.project.vodto.InquiryFile;
 import com.project.vodto.UploadFiles;
 import com.project.vodto.ksh.CustomerInquiryDTO;
+import com.project.vodto.ksh.PagingInfo;
+import com.project.vodto.ksh.UploadFilesDTO;
 
 @Repository
 public class InquiryDAOImpl implements InquiryDAO {
@@ -46,9 +49,12 @@ public class InquiryDAOImpl implements InquiryDAO {
 
 
 	@Override
-	public List<CustomerInquiry> getInquiries(String memberId) throws Exception {
+	public List<CustomerInquiry> getInquiries(String memberId, PagingInfo pi) throws Exception {
 		// 문의 내역 가져오기
-		return ses.selectList(ns+".getInquiries", memberId);
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("pi", pi);
+		return ses.selectList(ns+".getInquiries", params);
 	}
 
 
@@ -76,7 +82,6 @@ public class InquiryDAOImpl implements InquiryDAO {
 	public int checkValidation(int postNo, String memberId) {
 		// 수정하려는 사람과 글의 작성자가 일치하는지
 		Map<String, Object> params = new HashMap<String, Object>();
-		postNo = 11;
 		params.put("author", memberId);
 		params.put("postNo", postNo);
 		return ses.selectOne(ns+".checkValidation", params);
@@ -84,6 +89,36 @@ public class InquiryDAOImpl implements InquiryDAO {
 	}
 
 
+	@Override
+	public int deleteFiles(List<UploadFiles> deleteFiles) throws Exception {
+		// 수정 시 기존 이미지 삭제했다면 디비에도 삭제해줘야함
+		int i = 0;
+		for(UploadFiles uf : deleteFiles) {
+			i += ses.delete(ns+".deleteFiles", uf.getNewFileName());
+		}
+		System.out.println("지웠다 드디어" + i);
+		return i;
+	}
+
+
+	@Override
+	public int updateInquiry(CustomerInquiry inquiry) throws Exception {
+		// 문의 업데이트
+		return ses.update(ns+".updateInquiry", inquiry);
+	}
+
+
+	@Override
+	public int deleteInquiry(CustomerInquiryDTO inquiry) throws Exception {
+		// 답변 전 문의 글 삭제
+		
+		return ses.delete(ns+".deleteInquiry", inquiry);
+	}
+
+	@Override
+	public int getTotalPostCnt(String memberId) throws Exception {
+		return ses.selectOne(ns+".getInquiryCnt", memberId);
+	}
 	
 
 }

@@ -245,7 +245,6 @@
                 //"cardName" : data.response.cardName,
                 //"cardNumber" : data.response.cardNumber,   주석 처리 한 것은 백에서 작업.
                 "recipientName" : $("#recipient").text(),
-                "paymentStatus" : $('#deliveryStatus').val(),
                 "impUid" : rsp.imp_uid,
                 products,
                 couponNumbers
@@ -1543,7 +1542,7 @@
                            </li>
                            <li>
                               <h4>배송비</h4>
-                              <h4 class="price" id="shippingFee">${requestScope.paymentInfo.shippingFee }원</h4>
+                              <h4 class="price"><span id="shippingFee">${requestScope.paymentInfo.shippingFee }</span>원</h4>
                            </li>
 
 

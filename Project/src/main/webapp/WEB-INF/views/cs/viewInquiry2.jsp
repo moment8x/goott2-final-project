@@ -3,7 +3,7 @@
 <%@ taglib uri="http://www.springframework.org/security/tags"
 	prefix="sec"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html>
 
@@ -62,6 +62,22 @@
 <!-- App css -->
 <link rel="stylesheet" type="text/css"
 	href="/resources/boardAssets/css/style.css">
+<style>
+.pagination2 {
+	display: flex;
+	margin-left: auto;
+}
+
+.pagination2 button {
+	
+}
+
+.pagination {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+</style>
 </head>
 
 <body>
@@ -98,35 +114,42 @@
 									<tr>
 										<th>제목</th>
 										<th>상태</th>
-										<th>수정</th>
+										<th>삭제</th>
 									</tr>
 								</thead>
 
 								<tbody>
 									<c:forEach var="inquiry" items="${requestScope.myInquiries }">
-										<tr id="${inquiry.postNo }" onclick="detailInquiry(this.id);">
-											<td>${inquiry.title }</td>
+										<tr>
+											<td onclick="detailInquiry('${inquiry.postNo}');">${inquiry.title }</td>
 											<c:choose>
-												<c:when test="${fn:contains(inquiry.answerStatus, 'y')}">
-													<td>답변완료</td>
+												<c:when test="${inquiry.answerStatus == 'y'}">
+													<td onclick="detailInquiry('${inquiry.postNo}');">답변완료</td>
+													<td>
+														<ul>
+															<li><a href="javascript:void(0)"
+																data-bs-toggle="modal"
+																data-bs-target="#exampleModalToggle"> <i
+																	class="ri-delete-bin-line"
+																	onclick="alert('답변완료 된 건은 삭제 불가합니다.')"></i>
+															</a></li>
+														</ul>
+													</td>
 												</c:when>
 												<c:otherwise>
-													<td>문의접수</td>
+													<td onclick="detailInquiry('${inquiry.postNo}');">문의접수</td>
+													<td>
+														<ul>
+															<li><a href="javascript:void(0)"
+																data-bs-toggle="modal"
+																data-bs-target="#exampleModalToggle"> <i
+																	class="ri-delete-bin-line"
+																	onclick="location.href='/cs/delete?postNo=${inquiry.postNo}'"></i>
+															</a></li>
+														</ul>
+													</td>
 												</c:otherwise>
 											</c:choose>
-											<td>
-												<ul>
-													<li><a href="javascript:void(0)"> <i
-															class="ri-pencil-line"></i>
-													</a></li>
-
-													<li><a href="javascript:void(0)"
-														data-bs-toggle="modal"
-														data-bs-target="#exampleModalToggle"> <i
-															class="ri-delete-bin-line"></i>
-													</a></li>
-												</ul>
-											</td>
 										</tr>
 									</c:forEach>
 
@@ -225,145 +248,173 @@
 							</table>
 						</div>
 					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- All User Table Ends-->
+					<!-- 요기  -->
+					<div class="pagination2">
+				<div>${requestScope.pagingInfo }</div>
+						<ul class="pagination">
+							<c:if test="${param.pageNo > 1 }">
+								<li class="page-item"><a class="page-link"
+									href="/cs/viewInquiry?pageNo=${param.pageNo - 1 }&viewPostCntPerPage=${param.viewPostCntPerPage}">Previous</a></li>
+							</c:if>
+							<c:forEach var="i"
+								begin="${requestScope.pagingInfo.startNumOfCurrentPagingBlock }"
+								end="${requestScope.pagingInfo.endNumOfCurrentPagingBlock }"
+								step="1">
 
-	<div class="container-fluid">
-		<!-- footer start-->
-		<footer class="footer">
-			<div class="footer-copyright text-center">
-				<p class="mb-0">Copyright 2022 © Fastkart theme by pixelstrap</p>
-			</div>
-		</footer>
-		<!-- footer end-->
-	</div>
+								<li class="page-item"><a class="page-link"
+									href="/cs/viewInquiry?pageNo=${i }&viewPostCntPerPage=${param.viewPostCntPerPage}">${i }</a></li>
+							</c:forEach>
+							<c:if
+								test="${param.pageNo < requestScope.pagingInfo.totalPageCnt}">
+								<li class="page-item"><a class="page-link"
+									href="/cs/viewInquiry?pageNo=${param.pageNo + 1 }&viewPostCntPerPage=${param.viewPostCntPerPage}">Next</a></li>
+							</c:if>
+						</ul>
+
+						<button type="button" class="btn btn-primary"
+							onclick="location.href='makeInquiry';">글쓰기</button>
 
 
-	<!-- Modal Start -->
-	<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
-		data-bs-keyboard="false" tabindex="-1">
-		<div class="modal-dialog  modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-body">
-					<h5 class="modal-title" id="staticBackdropLabel">Logging Out</h5>
-					<p>Are you sure you want to log out?</p>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close"></button>
-					<div class="button-box">
-						<button type="button" class="btn btn--no" data-bs-dismiss="modal">No</button>
-						<button type="button" class="btn  btn--yes btn-primary">Yes</button>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<!-- Modal End -->
+		<!-- All User Table Ends-->
 
-
-	<!-- Delete Modal Box Start -->
-	<div class="modal fade theme-modal remove-coupon"
-		id="exampleModalToggle" aria-hidden="true" tabindex="-1">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header d-block text-center">
-					<h5 class="modal-title w-100" id="exampleModalLabel22">Are You
-						Sure ?</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close">
-						<i class="fas fa-times"></i>
-					</button>
+		<div class="container-fluid">
+			<!-- footer start-->
+			<footer class="footer">
+				<div class="footer-copyright text-center">
+					<p class="mb-0">Copyright 2022 © Fastkart theme by pixelstrap</p>
 				</div>
-				<div class="modal-body">
-					<div class="remove-box">
-						<p>The permission for the use/group, preview is inherited from
-							the object, object will create a new permission for this object</p>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-animation btn-sm fw-bold"
-						data-bs-dismiss="modal">No</button>
-					<button type="button" class="btn btn-animation btn-sm fw-bold"
-						data-bs-target="#exampleModalToggle2" data-bs-toggle="modal"
-						data-bs-dismiss="modal">Yes</button>
-				</div>
-			</div>
+			</footer>
+			<!-- footer end-->
 		</div>
-	</div>
 
-	<div class="modal fade theme-modal remove-coupon"
-		id="exampleModalToggle2" aria-hidden="true" tabindex="-1">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title text-center" id="exampleModalLabel12">Done!</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close">
-						<i class="fas fa-times"></i>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="remove-box text-center">
-						<div class="wrapper">
-							<svg class="checkmark" xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 52 52">
-                                <circle class="checkmark__circle"
-									cx="26" cy="26" r="25" fill="none" />
-                                <path class="checkmark__check"
-									fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-                            </svg>
+
+		<!-- Modal Start -->
+		<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
+			data-bs-keyboard="false" tabindex="-1">
+			<div class="modal-dialog  modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-body">
+						<h5 class="modal-title" id="staticBackdropLabel">Logging Out</h5>
+						<p>Are you sure you want to log out?</p>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+						<div class="button-box">
+							<button type="button" class="btn btn--no" data-bs-dismiss="modal">No</button>
+							<button type="button" class="btn  btn--yes btn-primary">Yes</button>
 						</div>
-						<h4 class="text-content">It's Removed.</h4>
 					</div>
-				</div>
-				<div class="modal-footer">
-					<button class="btn btn-primary" data-bs-toggle="modal"
-						data-bs-dismiss="modal">Close</button>
 				</div>
 			</div>
 		</div>
-	</div>
-	<!-- Delete Modal Box End -->
+		<!-- Modal End -->
 
-	<!-- latest js -->
-	<script src="/resources/boardAssets/js/jquery-3.6.0.min.js"></script>
 
-	<!-- Bootstrap js -->
-	<script
-		src="/resources/boardAssets/js/bootstrap/bootstrap.bundle.min.js"></script>
+		<!-- Delete Modal Box Start -->
+		<div class="modal fade theme-modal remove-coupon"
+			id="exampleModalToggle" aria-hidden="true" tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header d-block text-center">
+						<h5 class="modal-title w-100" id="exampleModalLabel22">Are
+							You Sure ?</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="remove-box">
+							<p>The permission for the use/group, preview is inherited
+								from the object, object will create a new permission for this
+								object</p>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-animation btn-sm fw-bold"
+							data-bs-dismiss="modal">No</button>
+						<button type="button" class="btn btn-animation btn-sm fw-bold"
+							data-bs-target="#exampleModalToggle2" data-bs-toggle="modal"
+							data-bs-dismiss="modal">Yes</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
-	<!-- feather icon js -->
-	<script
-		src="/resources/boardAssets/js/icons/feather-icon/feather.min.js"></script>
-	<script
-		src="/resources/boardAssets/js/icons/feather-icon/feather-icon.js"></script>
+		<div class="modal fade theme-modal remove-coupon"
+			id="exampleModalToggle2" aria-hidden="true" tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title text-center" id="exampleModalLabel12">Done!</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="remove-box text-center">
+							<div class="wrapper">
+								<svg class="checkmark" xmlns="http://www.w3.org/2000/svg"
+									viewBox="0 0 52 52">
+                                <circle class="checkmark__circle"
+										cx="26" cy="26" r="25" fill="none" />
+                                <path class="checkmark__check"
+										fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                            </svg>
+							</div>
+							<h4 class="text-content">It's Removed.</h4>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-primary" data-bs-toggle="modal"
+							data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Delete Modal Box End -->
 
-	<!-- scrollbar simplebar js -->
-	<script src="/resources/boardAssets/js/scrollbar/simplebar.js"></script>
-	<script src="/resources/boardAssets/js/scrollbar/custom.js"></script>
+		<!-- latest js -->
+		<script src="/resources/boardAssets/js/jquery-3.6.0.min.js"></script>
 
-	<!-- customizer js -->
-	<script src="/resources/boardAssets/js/customizer.js"></script>
+		<!-- Bootstrap js -->
+		<script
+			src="/resources/boardAssets/js/bootstrap/bootstrap.bundle.min.js"></script>
 
-	<!-- Sidebar js -->
-	<script src="/resources/boardAssets/js/config.js"></script>
+		<!-- feather icon js -->
+		<script
+			src="/resources/boardAssets/js/icons/feather-icon/feather.min.js"></script>
+		<script
+			src="/resources/boardAssets/js/icons/feather-icon/feather-icon.js"></script>
 
-	<!-- Plugins JS -->
-	<script src="/resources/boardAssets/js/sidebar-menu.js"></script>
-	<script src="/resources/boardAssets/js/notify/bootstrap-notify.min.js"></script>
-	<script src="/resources/boardAssets/js/notify/index.js"></script>
+		<!-- scrollbar simplebar js -->
+		<script src="/resources/boardAssets/js/scrollbar/simplebar.js"></script>
+		<script src="/resources/boardAssets/js/scrollbar/custom.js"></script>
 
-	<!-- Data table js -->
-	<script src="/resources/boardAssets/js/jquery.dataTables.js"></script>
-	<script src="/resources/boardAssets/js/custom-data-table.js"></script>
+		<!-- customizer js -->
+		<script src="/resources/boardAssets/js/customizer.js"></script>
 
-	<!-- sidebar effect -->
-	<script src="/resources/boardAssets/js/sidebareffect.js"></script>
+		<!-- Sidebar js -->
+		<script src="/resources/boardAssets/js/config.js"></script>
 
-	<!-- Theme js -->
-	<script src="/resources/boardAssets/js/script.js"></script>
+		<!-- Plugins JS -->
+		<script src="/resources/boardAssets/js/sidebar-menu.js"></script>
+		<script src="/resources/boardAssets/js/notify/bootstrap-notify.min.js"></script>
+		<script src="/resources/boardAssets/js/notify/index.js"></script>
+
+		<!-- Data table js -->
+		<script src="/resources/boardAssets/js/jquery.dataTables.js"></script>
+		<script src="/resources/boardAssets/js/custom-data-table.js"></script>
+
+		<!-- sidebar effect -->
+		<script src="/resources/boardAssets/js/sidebareffect.js"></script>
+
+		<!-- Theme js -->
+		<script src="/resources/boardAssets/js/script.js"></script>
 </body>
 
 </html>

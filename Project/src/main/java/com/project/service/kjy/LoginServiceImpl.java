@@ -88,10 +88,8 @@ public class LoginServiceImpl implements LoginService {
 	}
 	
 	public boolean emailaSend(String email) throws MessagingException{
-		System.out.println("!!333s");
 		String code = UUID.randomUUID().toString();
-		System.out.println("안녕???????");
-		System.setProperty("mail.debug", "true");
+		//System.setProperty("mail.debug", "true");
 		
 		boolean result = false;
 		

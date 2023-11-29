@@ -20,9 +20,14 @@ public class CompleteOrder {
 	private String cardName;
 	private int totalAmount;
 	private int actualPaymentAmount;
+	private int amountToPay;
 	private String recipientName;
 	private String recipientPhoneNumber;
 	private String shippingAddress;
 	private String detailedShippingAddress;
+	private String nonRecipientName;
+	private String nonRecipientPhoneNumber;
+	private String nonShippingAddress;
+	private String nonDetailedShippingAddress;
 	
 }

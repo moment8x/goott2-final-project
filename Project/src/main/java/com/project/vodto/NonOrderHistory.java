@@ -16,16 +16,16 @@ import lombok.ToString;
 public class NonOrderHistory {
 	private String nonOrderNo;
 	private String nonMemberId;
-	private String invoiceNumber;
-	private String recipientName;
-	private String recipientPhoneNumber;
-	private Timestamp orderTime;
-	private String zipCode;
-	private String shippingAddress;
-	private String detailedShippingAddress;
-	private String deliveryStatus;
-	private String deliveryMessage;
-	private Timestamp nonDeletedDate;
+	private String nonInvoiceNumber;
+	private String nonRecipientName;
+	private String nonRecipientPhoneNumber;
+	private Timestamp nonOrderTime;
+	private String nonZipCode;
+	private String nonShippingAddress;
+	private String nonDetailedShippingAddress;
+	private String nonDeliveryStatus;
+	private String nonDeliveryMessage;
+	private Timestamp nonRegisterDate;
 	private String nonPassword;
 	private String nonEmail;
 }

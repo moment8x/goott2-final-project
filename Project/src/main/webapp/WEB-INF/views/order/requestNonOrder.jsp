@@ -14,15 +14,36 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 
 <script>
+let itemLen = $(".summery-contain").find("li").length; // 상품 종류
+let addrValid = false;
+let detailAddrValid = false;
+let zipCodeValid = false;
+let recipientValid = false;
+let phoneNumberValid = false;
+let passwordValid = false;
+let emailValid = false;
+let totalAmount = Number('${requestScope.paymentInfo.totalAmount}');
+let shippingFee = Number('${requestScope.paymentInfo.shippingFee}');
+let IMP = window.IMP;
+IMP.init("${impKey}") // 예: 'imp00000000a'
+let isPaid = false;
+let orderId = ('${requestScope.orderId}');
+//console.log(orderId);
+let products = [];
+let createName = "";
+let finalTotal = 0;
 	$(function() {
 
+		finalTotal = totalAmount + shippingFee;
+		console.log(finalTotal);
+		$("#payToAmount").text(finalTotal);
 		// 이메일 유효성 검사
 		// =========================================================== 수정 필요!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		$('#email').on('blur', function() {
+		$('#nonEmail').on('blur', function() {
 			let regEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
-			if (regEmail.test($('#email').val())) {
+			if (regEmail.test($('#nonEmail').val())) {
 				isValidEmail = true;
-				$('#email').parent().next().html('');
+				$('#nonEmail').parent().next().html('');
 			} else {
 				alert("올바른 이메일이 아닙니다.");
 				isValidEmail = false;
@@ -30,9 +51,9 @@
 		});
 		
 		// 휴대폰 번호 유효성 검사
-		$('#recipientPhoneNumber').on('blur', function () {
+		$('#nonRecipientPhoneNumber').on('blur', function () {
 			let regNumber = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
-			if (regNumber.test($('#recipientPhoneNumber').val())) {
+			if (regNumber.test($('#nonRecipientPhoneNumber').val())) {
 				isValidCellPhone = true;
 				
 			} else {
@@ -43,13 +64,8 @@
 		});
 		
 		$("#nonOrderNo").val(orderId);
-		$("#nonMemberId").val("1232123");
-		$("#zipCode").val("12321");
-		$("#deliveryStatus").val("출고전");
-		let totalAmount = '${requestScope.paymentInfo.totalAmount}';
-		let shippingFee = '${requestScope.paymentInfo.shippingFee}';
-		// discountAmount에 쿠폰도 넣어야함
-		let discountAmount = (Number($("#points").val())) + (Number($("#reward").val()));
+		
+
 		
 		$("#selectMessage").on("change", function(){
 
@@ -60,26 +76,13 @@
 			$('#directInput').attr('style', 'display:none');	
 		}
 		});
+		itemLen = $(".summery-contain").find("li").length; // 상품 종류
 	});
 		
 		//$("#subTotal").val();
 	
-	let addrValid = false;
-	let detailAddrValid = false;
-	let zipCodeValid = false;
-	let recipientValid = false;
-	let phoneNumberValid = false;
-	let passwordValid = false;
-	let emailValid = false;
 	
-	let IMP = window.IMP;
-	IMP.init("${impKey}") // 예: 'imp00000000a'
-	let isPaid = false;
-	let orderId = ('${requestScope.orderId}');
-	//console.log(orderId);
-	let product = new Object();
-	let product2 = [];
-	let product3 = [];
+
 	
 	function goPopup() {
 		// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
@@ -125,21 +128,13 @@
 			let product = new Object();
 		}
 
-		
-		console.log(product2);
-		console.log(product3);
 		//console.log(itemLen);
 		for(i=0; i<itemLen; i++) { 
 			product.nonOrderNo = orderId;
 			product.productId = $(".summery-contain").find("li").eq(i).attr("id");
-			
-			product.productStatus = $("#deliveryStatus").val(),
 			products2[i] = product; 
 		}
 		
-		ob = {
-				
-		}
 		
 	}
 		
@@ -167,84 +162,66 @@
 	}
 
 	function kg_pay() {
-		console.log("!!");
-		IMP.request_pay({ // 결제 정보 채우기
-			pg : "html5_inicis",
-			pay_method : "card",
-			merchant_uid : orderId, // 주문번호
-			name : "노르웨이 회전 의자",
-			amount : 200, // 숫자 타입
-			buyer_email : "ssingfly3232@gmail.com",
-			buyer_name : "김상희",
-			buyer_tel : "010-4242-4242",
-			buyer_addr : "서울특별시 강남구 신사동",
-			buyer_postcode : "01181"
-
-		}, function(rsp) { // callback
-			//rsp.imp_uid 값으로 결제 단건조회 API를 호출하여 결제결과를 판단합니다.
-			if (rsp.success) { // 결제 내역 받기
-				// 결제 검증 ajax
-				$.ajax({
-					url : '/pay/verify/' + rsp.imp_uid,
-					type : "POST",
-					data : rsp.imp_uid,
-					async : false,
-				}).done(function(data) {
-					console.log(data);
-					
-					// 결제 내역 저장 ajax
-					obj = {
-						"paymentNumber" : rsp.imp_uid, // 결제번호
-						"nonOrderNo" : rsp.merchant_uid, // 주문번호
-						"paymentMethod" : rsp.pay_method, // 결제수단
-						"totalAmount" : rsp.paid_amount, // 총 상품 금액, 수정 필요
-						"shippingFee" : 0, // 배송비
-						"usedPoints" : 0, // 사용한 포인트
-						"usedReward" : 0, // 사용한 적립금
-						"actualPaymentAmount" : data.response.amount, // 실 결제 금액
-						"paymentTime" : data.response.paidAt,// 결제 시각
-						"amountToPay" : rsp.paid_amount,
-						"productId" : products,
-						"productPrice" : price,
-						"cardName" : data.response.cardName,
-						"cardNumber" : data.response.cardNumber,
-						"recipientName" : $("#recipientName").val(),
-						
-
-					// 선택한 상품 보내줘야함
-					};
-					
-
-					$.ajax({
-						url : "/pay/output/",
-						type : "POST",
-						contentType : "application/json",
-						data : JSON.stringify(obj),
-						async : false,
-						success : function(result) {
-							isPaid = true;
-							console.log("ajax 결과 : ", isPaid);
-
-							if (isPaid) {
-								$("#requestOrder").submit();
-							}
-
-							//return true;
-							// alert("결제 완료");
-
-						},
-						error : function(error) {
-							console.log(error);
-							//failVerification();
-
-						}
-					})
-				})
-			} else {
-				alert("결제에 실패하였습니다. 에러 내용: " + rsp.error_msg);
-			}
-		})
-	}
+        console.log("!!");
+        IMP.request_pay({ // 결제 정보 채우기
+          pg : "html5_inicis",
+          pay_method : "card",
+          merchant_uid : orderId, // 주문번호
+          name : createName, // 수정필______________________________________
+          amount : Number($('#payToAmount').text()), // 숫자 타입
+          buyer_email : "",
+          buyer_name : $('#nonRecipientName').val(),
+          buyer_tel : $('#nonRecipientPhoneNumber').val(),
+          buyer_addr : $('#addAddr').text(),
+          buyer_postcode :  $('#addZipNo').text(),
+        }, function(rsp) { // callback
+          //rsp.imp_uid 값으로 결제 단건조회 API를 호출하여 결제결과를 판단합니다.
+          if (rsp.success) { // 결제 내역 받기
+            // 결제 검증 ajax        
+              // 결제 내역 저장 ajax
+              obj = {
+                "paymentNumber" : rsp.imp_uid, // 결제번호
+                "nonOrderNo" : rsp.merchant_uid, // 주문번호
+                "paymentMethod" : rsp.pay_method, // 결제수단
+                "totalAmount" : totalAmount, // 총 상품 금액, 수정 필요
+                "shippingFee" : shippingFee, // 배송비
+                "usedPoints" : Number($('#usingPoints').val()), // 사용한 포인트
+                "usedReward" : Number($('#usingRewards').val()), // 사용한 적립금
+                //"actualPaymentAmount" : data.response.amount, // 실 결제 금액
+                //"paymentTime" : data.response.paidAt,// 결제 시각
+                "amountToPay" : rsp.paid_amount,
+                //"cardName" : data.response.cardName,
+                //"cardNumber" : data.response.cardNumber,   주석 처리 한 것은 백에서 작업.
+                "nonRecipientName" : $("#nonRecipientName").val(),
+                "nonRecipientPhoneNumber" : $('#nonRecipientPhoneNumber').val(),    
+                "impUid" : rsp.imp_uid,
+                products,         
+              }
+              $.ajax({
+                url : "/pay/output/",
+                type : "POST",
+                contentType : "application/json",
+                data : JSON.stringify(obj),
+                async : false,
+                success : function(result) {
+                  isPaid = true;
+                  console.log("ajax 결과 : ", isPaid);
+                  if (isPaid) {
+                     console.log("띠용?");
+                    $("#requestNonOrder").submit();
+                  }
+                  // alert("결제 완료");
+                },
+                error : function(error) {
+                  console.log(error);
+                  alert("검증 실패로 인해 결제가 취소되었습니다.")
+                },
+              })
+            } else {
+            alert("결제에 실패하였습니다. 에러 내용: " + rsp.error_msg);
+          }
+        })
+      }
 
 	// 검증 실패로 인한 취소
 	function failVerification() {
@@ -307,10 +284,10 @@
 		if($('#addZipNo').val() != "") {
 			zipCodeValid = true;
 		}
-		if($('#recipientName').val() != "") {
+		if($('#nonRecipientName').val() != "") {
 			recipientValid = true;
 		}
-		if($('#recipientPhoneNumber').val() != "") {
+		if($('#nonRecipientPhoneNumber').val() != "") {
 			phoneNumberValid = true;
 		}
 		if($('#nonPassword').val() != "") {
@@ -321,89 +298,97 @@
 		}
 	
 		if(addrValid && detailAddrValid && zipCodeValid && recipientValid && phoneNumberValid && passwordValid && emailValid) {
-			console.log("통과하셨습니다~")
-			return false;
+			console.log("통과하셨습니다~");
+			return true;
 		} else {
 			console.log("제대로 입력해");
 			console.log(addrValid);
+			return false;
 		}
 		
 	}
+	function packData() {
+	      for(i=0; i<itemLen; i++) {
+	         products[i] = new Object;
+	         products[i].nonOrderNo = orderId;
+	         products[i].productId = $(".summery-contain").find("li").eq(i).attr("id");
+	         products[i].productQuantity = $('#productQty'+i).text();
+	         products[i].productPrice = $('#productPrice'+i).text();
+	       
+	         products[i].productOrderNo = orderId + "-"+(i+1);
+	      }
+	         /* $('#addRecipient').val($('#recipient').text());
+	         $('#addAddress').val($('#address').text());
+	         $('#addDetailAddress').val($('#detailAddress').text());
+	         $('#addZipCode').val($('#zipCode').text());
+	         $('#addRecipientContact').val($('#recipientContact').text());
+	         console.log("아?",$('#addRecipientContact').val());
+	         console.log("아?",$('#addAddress').val());
+	         console.log("아?",$('#addDetailAddress').val());
+	         console.log("아?",$('#addZipCode').val());
+	         console.log("아?",$('#addRecipientContact').val()); */
+
+	      if(itemLen > 1) {
+	         createName = $('#productName0').text()+" 외 "+(itemLen - 1)+"개";
+	      } else {
+	         createName = $('#productName0').text();
+	      }
+	      console.log(createName);
+	      console.log(products);
+	   
+	   }
 	
 	function checkPayMethod() {
 		if(validateAll()) {
 			if ($("input[name='payMethod']").is(':checked')) {
-				// 전체 radio 중에서 하나라도 체크되어 있는지 확인
-				// 아무것도 선택안되어있으면, false
-				
-				let payMethod = $("input[name='payMethod']:checked").val();
-				// score의 라디오 중 체크된 것의 값만 가져옴
-				// 아무것도 선택안되어있으면, undefined
-				console.log(payMethod);
-				if (payMethod == "bkt") {
-					let bktPayNo = "bkt"
-							+ ((String(new Date().getTime())).substring(1));
-					$("#deliveryStatus").val("입금전");
-					
-					
-					products = [{
-						"nonOrderNo" : orderId,
-						"product_id" : S000210833411,
-						"product_price" : 16650,
-						"product_quantity" : 2,
-						"product_status" : $("#deliveryStatus").val(),
-						
-				},{
-					"nonOrderNo" : orderId,
-					"product_id" : S000210833273,
-					"product_price" : 5,
-					"product_quantity" : 6,
-					"product_status" : $("#deliveryStatus").val(),
-				},];
-					
-					
-					obj = {
-						"paymentNumber" : bktPayNo, // 결제번호 생성 코드 필요
-						"nonOrderNo" : orderId, // 주문번호
-						"paymentMethod" : payMethod, // 결제수단
-						"totalAmount" : 200, // 총 상품 금액, 수정 필요
-						"shippingFee" : 0, // 배송비
-						"usedPoints" : 0, // 사용한 포인트
-						"usedReward" : 0, // 사용한 적립금
-						"amountToPay" : 200, // (total+배송비-포인트-적립금)
-						"actualPaymentAmount" : 0, // 실 결제 금액(무통장입금은 default 0)
-						"recipientName" : $("#recipientName").val(),
-						products,
-						
-					};
-					console.log(obj);
-
-					$.ajax({
-						url : "/pay/output",
-						type : "POST",
-						contentType : "application/json",
-						data : JSON.stringify(obj),
-						async : false,
-						success : function(result) {
-							
-							isPaid = true;
-							console.log(result);
-							
-							if (isPaid) {
-								// 주문 완료 페이지에 필요한 것
-								$("#requestOrder").submit();
-							}
-							// alert("결제 완료");
-						},
-						error : function(error) {
-
-							alert("결제 실패" + error);
-						}
-					})
-				} else {
-					kg_pay();
-				}
-			}
+		         // 전체 radio 중에서 하나라도 체크되어 있는지 확인
+		         // 아무것도 선택안되어있으면, false
+		         let payMethod = $("input[name='payMethod']:checked").val();
+		         // score의 라디오 중 체크된 것의 값만 가져옴
+		         // 아무것도 선택안되어있으면, undefined
+		         console.log(payMethod);
+		         if (payMethod == "bkt") {
+		            let bktPayNo = "bkt"
+		                  + ((String(new Date().getTime())).substring(1));
+		            packData();
+		            obj = {
+		               "paymentNumber" : bktPayNo, // 결제번호 생성 코드 필요
+		               "nonOrderNo" : orderId, // 주문번호
+		               "paymentMethod" : payMethod, // 결제수단
+		               "totalAmount" : totalAmount, // 총 상품 금액, 수정 필요
+		               "shippingFee" : shippingFee, // 배송비
+		               "amountToPay" : Number($('#payToAmount').text()), // (total+배송비-포인트-적립금)
+		               "actualPaymentAmount" : 0, // 실 결제 금액(무통장입금은 default 0)
+		               "nonRecipientName" : $("#nonRecipientName").val(),
+		               "nonRecipientPhoneNumber" : $('#nonRecipientPhoneNumber').val(),    
+		               products,   
+		            };
+		            console.log(obj);
+		            $.ajax({
+		               url : "/pay/output",
+		               type : "POST",
+		               contentType : "application/json",
+		               data : JSON.stringify(obj),
+		               async : false,
+		               success : function(result) {
+		                  isPaid = true;
+		                  console.log(result);
+		                  if (isPaid) {
+		                     // 주문 완료 페이지에 필요한 것
+		                     $("#requestNonOrder").submit();
+		                  }
+		                  // alert("결제 완료");
+		               },
+		               error : function(error) {
+		                  alert("결제 실패" + error);
+		                  console.log(error);
+		               }
+		            })
+		         } else {
+		            packData();
+		            kg_pay();
+		         }
+		      }
 		};
 		
 		
@@ -476,11 +461,9 @@
 	<!-- Checkout section Start -->
 	<section class="checkout-section-2 section-b-space">
 		<div>${requestScope.productInfos }</div>
-		<form action="nonOrderComplete" method="post" id="requestOrder">
+		<form action="nonOrderComplete" method="post" id="requestNonOrder">
 			<input type="hidden" name="nonOrderNo" id="nonOrderNo" value="">
-			<input type="hidden" name="nonMemberId" value="" id="nonMemberId"><input
-				type="hidden" name="zipCode" value="" id="zipCode"><input
-				type="hidden" name="deliveryStatus" id="deliveryStatus" value="">
+			
 			<div class="container-fluid-lg">
 				<div class="row g-sm-4 g-3">
 					<div class="col-lg-8">
@@ -523,14 +506,14 @@
 																		<h6 class="text-content">
 
 																			<span class="text-title">우편번호:</span><input class="form-control"
-																				name="detailedShippingAddress" id="addZipNo" value="" readOnly>
+																				name="nonZipCode" id="addZipNo" value="" readOnly>
 																		</h6>
 																	</li>
 
 																	<li>
 																		<h6 class="text-content">
 																			<span class="text-title"> 주소 : </span><input class="form-control"
-																				name="shippingAddress" id="addAddr" value="" readOnly>
+																				name="nonShippingAddress" id="addAddr" value="" readOnly>
 
 																		</h6>
 																	</li>
@@ -538,7 +521,7 @@
 																		<h6 class="text-content">
 
 																			<span class="text-title">상세주소:</span><input class="form-control"
-																				name="detailedShippingAddress" id="addAddrDetail" value="">
+																				name="nonDetailedShippingAddress" id="addAddrDetail" value="">
 																		</h6>
 																	</li>
 																	
@@ -547,14 +530,14 @@
 																	<li>
 																		<h6 class="text-content">
 																			<span class="text-title">수령인: </span> <input class="form-control"
-																				id="recipientName" name="recipientName">
+																				id="nonRecipientName" name="nonRecipientName">
 																		</h6>
 																	</li>
 
 																	<li>
 																		<h6 class="text-content mb-0">
 																			<span class="text-title">휴대폰: </span> <input class="form-control"
-																				name="recipientPhoneNumber" id="recipientPhoneNumber">
+																				name="nonRecipientPhoneNumber" id="nonRecipientPhoneNumber">
 
 																		</h6>
 																	</li>
@@ -578,7 +561,7 @@
 																				<div class="form-floating theme-form-floating">
 																					<select class="form-select theme-form-select"
 																						aria-label="Default select example"
-																						name="deliveryMessage" id="selectMessage">
+																						name="nonDeliveryMessage" id="selectMessage">
 																						<option value="없음">배송메시지를 선택해 주세요.</option>
 																						<option>배송 전 연락주세요.</option>
 																						<option>부재 시 연락주세요.</option>
@@ -1066,15 +1049,21 @@
 									<h3>Order Summery</h3>
 								</div>
 								<ul class="summery-contain">
-									<c:forEach var="info" items="${requestScope.productInfos }">
-										<li id="${info.productId }"><img
-											src="${info.productImage }"
-											class="img-fluid blur-up lazyloaded checkout-image" alt="">
-											<h4>
-												${info.productName } <span>X ${info.productQuantity }</span>
-											</h4>
-											<h4 class="price">${info.sellingPrice }원</h4></li>
-									</c:forEach>
+									<c:forEach var="info" items="${requestScope.productInfos }"
+                              varStatus="status">
+                              <input type="hidden" name="products"
+                                 value="${info.productId }" />
+                              <li id="${info.productId }"><img
+                                 src="${info.productImage }"
+                                 class="img-fluid blur-up lazyloaded checkout-image" alt="">
+                                 <h4>
+                                    <span id="productName${status.index }">${info.productName }</span>
+                                    X<span id="productQty${status.index }">${info.productQuantity }</span>
+                                 </h4>
+                                 <h4 class="price">
+                                    <span id="productPrice${status.index }">${info.sellingPrice }</span>원
+                                 </h4></li>
+                           </c:forEach>
 
 									<!-- <li><img
 										src="/resources/assets/images/vegetable/product/2.png"
@@ -1119,20 +1108,22 @@
 
 								<ul class="summery-total">
 									<li>
-										<h4>총 상품 가격</h4>
-										<h4 class="price" id="subTotal">${requestScope.paymentInfo.totalAmount }원</h4>
-									</li>
+                              <h4>총 상품 가격</h4>
+                              <h4 class="price">
+                                 <span id="subTotal">${requestScope.paymentInfo.totalAmount }</span>원
+                              </h4>
+                           </li>
 
-									<li>
-										<h4>배송비</h4>
-										<h4 class="price">${requestScope.paymentInfo.shippingFee }원</h4>
-									</li>
-
-
-									<li class="list-total">
-										<h4>총 결제 금액</h4>
-										<h4 class="price">$19.28</h4>
-									</li>
+                           <li>
+                              <h4>배송비</h4>
+                              <h4 class="price"><span id="shippingFee">${requestScope.paymentInfo.shippingFee }</span>원</h4>
+                           </li>
+                           <li class="list-total">
+                              <h4>총 결제 금액</h4>
+                              <h4 class="price">
+                                 <span id="payToAmount">${requestScope.paymentInfo.totalAmount }</span>원
+                              </h4>
+                           </li>
 								</ul>
 							</div>
 
