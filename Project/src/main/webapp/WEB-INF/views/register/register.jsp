@@ -42,8 +42,12 @@
     	
     	let isValidName = false;
     	let isValidEmail = false;
-    	let isValidPhone = false;
-    	let isValidCellPhone = false;
+    	let isValidEmailCode = false;
+    	let isValidPhone1 = false;
+    	let isValidPhone2 = false;
+    	let isValidPhone3 = false;
+    	let isValidCellPhone1 = false;
+    	let isValidCellPhone2 = false;
     	let isValidBirth = false;
     	let isValidZipCode = false;
     	let isValidAddress = false;
@@ -127,30 +131,60 @@
     				isValidEmail = false;
     			}
     		});
-    		
-    		// 전화번호 유효성 검사
-    		$('#phoneNumber').on('blur', function () {
-    			let regNumber = /^([0-9]{2,4})-?([0-9]{3,4})->([0-9]{4})$/;
-    			if (regNumber.test($('#phoneNumber').val())) {
-    				isValidPhone = true;
-    				$('#phoneNumber').parent().next().html('');
+    		// 전화번호1 유효성 검사
+    		$('#phone-number1').on('blur', function() {
+    			let regNumber = /^[0-9]{2,4}$/;
+    			if (!regNumber.test($(this).val())) {
+    				$('#phone-number').parent().next().html('');
+    				isValidPhone1 = true;
     			} else {
-    				$('#phoneNumber').parent().next().html("올바른 전화번호가 아닙니다.");
-    				notValidCss("phoneNumber");
-    				isValidPhone = false;
+    				$('#phone-number').parent().next().html('숫자만 입력이 가능합니다.');
+    				isValidPhone1 = false;
+    			}
+    		});
+    		// 전화번호2 유효성 검사
+    		$('#phone-number2').on('blur', function() {
+    			let regNumber = /^[0-9]{3,4}$/;
+    			if (!regNumber.test($(this).val())) {
+    				$('#phone-number2').parent().next().html('');
+    				isValidPhone2 = true;
+    			} else {
+    				$('#phone-number2').parent().next().html('숫자만 입력이 가능합니다.');
+    				isValidPhone2 = false;
+    			}
+    		});
+    		// 전화번호3 유효성 검사
+    		$('#phone-number3').on('blur', function() {
+    			let regNumber = /^[0-9]{4}$/;
+    			if (!regNumber.test($(this).val())) {
+    				$('#phone-number3').parent().next().html('');
+    				isValidPhone3 = true;
+    			} else {
+    				$('#phone-number3').parent().next().html('숫자만 입력이 가능합니다.');
+    				isValidPhone3 = false;
     			}
     		});
     		
-    		// 휴대폰 번호 유효성 검사
-    		$('#cellPhoneNumber').on('blur', function () {
-    			let regNumber = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
-    			if (regNumber.test($('#cellPhoneNumber').val())) {
-    				isValidCellPhone = true;
-    				$('#cellPhoneNumber').parent().next().html('');
+    		// 휴대폰 번호1 유효성 검사
+    		$('#cell-phone-number1').on('blur', function() {
+    			let regNumber = /^[0-9]{3,4}$/;
+    			if (!regNumber.test($(this).val())) {
+    				$('#cell-phone-number1').parent().next().html('');
+    				isValidCellPhone1 = true;
     			} else {
-    				$('#cellPhoneNumber').parent().next().html("올바른 전화번호가 아닙니다.");
-    				notValidCss("cellPhoneNumber");
-    				isValidCellPhone = false;
+    				$('#cell-phone-number1').parent().next().html('숫자만 입력이 가능합니다.');
+    				isValidCellPhone1 = false;
+    			}
+    		});
+    		// 휴대폰 번호2 유효성 검사
+    		$('#cell-phone-number2').on('blur', function() {
+    			let regNumber = /^[0-9]{4}$/;
+    			if (!regNumber.test($(this).val())) {
+    				$('#cell-phone-number2').parent().next().html('');
+    				isValidCellPhone2 = true;
+    			} else {
+    				$('#cell-phone-number2').parent().next().html('숫자만 입력이 가능합니다.');
+    				isValidCellPhone2 = false;
     			}
     		});
     		
@@ -222,6 +256,53 @@
     		});
     	});
     	
+    	// 이메일 인증하기
+    	function sendMail() {
+    		if ($('#email').val() != '') {
+    			// 이메일 전송
+    			$.ajax({
+    				url : "/register/sendMail",
+    				type : "GET",
+    				data : {
+    					"email" : $('#email').val()
+    				},
+    				dataType : "JSON",
+    				async : false,
+    				success : function(data) {
+    					console.log("success", data);
+    					if (data.status = "success") {
+    						alert('메일을 발송했습니다.');
+    					}
+    				}, error : function(data) {
+    					console.log("error", data);
+    					alert('메일 발송에 실패했습니다.');
+    				}
+    			});
+    		} else {
+				alert('이메일 주소를 기입하고 인증 버튼을 눌러주세요');
+			}
+    	}
+    	// 이메일 인증 확인하기
+    	function confirmCode() {
+    		$.ajax({
+    			url : "/register/confirmCode",
+    			type : "GET",
+    			data : {
+    				"emailCode" : $('#email-code').val();
+    			},
+    			dataType : "JSON",
+    			async : false,
+    			success : function(data) {
+    				console.log("success", data);
+    				if (data === "pass") {
+    					isValidEmailCode = true;
+    				}
+    			}, error : function(data) {
+    				console.log("error", data);
+    			}
+    		});
+    	}
+    	
 		// 업로드 된 파일 표시    	
     	function showUploadedFile(json) {
     		let output = "";
@@ -266,13 +347,19 @@
     	// 회원가입 유효성검사 통과 여부
     	function isValid() {
     		let result = false;
-    		console.log("isValidId",isValidId,"isValidPassword",isValidPassword,"isValidName",isValidName,"isValidEmail",isValidEmail,"isValidBirth",isValidBirth,"isValidZipCode",isValidZipCode,"isValidAddress",isValidAddress)
-    		if (isValidId && isValidPassword && isValidName && isValidEmail && isValidBirth && isValidZipCode && isValidAddress) {
-    			if (isValidPhone || isValidCellPhone) {
-    				alert("유효성 검사 통과, 회원가입 가능");
-    				result = true;
+    		console.log("isValidId",isValidId,"isValidPassword",isValidPassword,"isValidName",isValidName,"isValidEmail",isValidEmail, "isValidEmailCode", isValidEmailCode,"isValidBirth",isValidBirth,"isValidZipCode",isValidZipCode,"isValidAddress",isValidAddress)
+    		if (isValidId && isValidPassword && isValidName && isValidBirth && isValidZipCode && isValidAddress) {
+    			if (isValidEmailCode) {
+	    			if ((isValidPhone1 && isValidPhone2 isValidPhone3) || (isValidCellPhone1 && isValidCellPhone2)) {
+	    				alert("유효성 검사 통과, 회원가입 가능");
+	    				result = true;
+	    			} else {
+	    				alert("전화번호 또는 핸드폰 번호는 필수입니다.");
+	    				document.getElementById("phoneNumber1").focus();
+	    			}
     			} else {
-    				alert("전화번호 또는 핸드폰 번호는 필수입니다.");
+    				alert("이메일 인증은 필수입니다.");
+    				document.getElementById("email").focus();
     			}
     		} else {
     			alert("필수 항목은 모두 입력해주세요");
@@ -303,32 +390,9 @@
     		});
     	}
     	
-    	// 본인 인증
-    	function identify() {
-    		// IMP.certification(param, callback) 호출
-    		IMP.certification({ // param
-    			pg : 'MIIiasTest',//본인인증 설정이 2개이상 되어 있는 경우 필수 
-    			merchant_uid : "ORD20180131-0000011", // 주문 번호
-    			m_redirect_url : "http://localhost:8081/order/nonMemberOrder?productId=S000208719388", // 모바일환경에서 popup:false(기본값) 인 경우 필수, 예: https://www.myservice.com/payments/complete/mobile
-    			popup : false
-    			// PC환경에서는 popup 파라미터가 무시되고 항상 true 로 적용됨
-    		},
-    		function(rsp) { // callback
-    			if (rsp.success) {
-    				alert("본인인증 성공");
-    				console.log(rsp);
-    				let output = '<input type="hidden" value="Y" name="" readonly>';
-    				output += '<button type="button" class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold" disabled>본인 인증 완료</button>'
-    				document.getElementById("identify").innerHTML = output;
-   				} else {
-   					alert("본인인증에 실패하였습니다. 에러 내용: " + rsp.error_msg);
-   				}
-    		});
-    	}
-    	
     	function validCss(value) {
     		$('#' + value).parent().next().css("color", "#33cc33");
-			$('#' + value).parent().next().css("font-weight", "bold");
+    		$('#' + value).parent().next().css("font-weight", "bold");
     	}    	
     	function notValidCss(value) {
     		$('#' + value).parent().next().css("color", "#e33");
@@ -346,6 +410,11 @@
     		window.onbeforeunload = null;
     	});
     </script>
+    <style>
+    	.phone-number > input {
+    		
+    	}
+    </style>
 </head>
 
 <body>
@@ -479,13 +548,21 @@
                                         <input type="email" class="form-control" id="email" name="email" placeholder="Email Address">
                                         <label for="email">*Email Address</label>
                                     </div>
+                                    <button onclick="sendMail();">인증하기</button>
+                                    <div class="form-floating theme-form-floating">
+                                    	<input type="text" class="form-control" id="email-code" placeholder="인증 코드 입력">
+                                    	<label for="email-code">인증코드 입력</label>
+                                    	<button onclick="confirmCode();">확인</button>
+                                    </div>
                                     <div class="validation"></div>
                                 </div>
                                 
                                 <!-- 전화번호 -->
 								<div class="col-12">
-                                    <div class="form-floating theme-form-floating">
-                                        <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="전화번호 '-' 없이 입력">
+                                    <div class="form-floating theme-form-floating phone-number" id="phone-number">
+                                        <input type="text" class="form-control" id="phone-number1" name="phoneNumber1" style="width:30%; display:inline;">&nbsp;-&nbsp;
+                                        <input type="text" class="form-control" id="phone-number2" name="phoneNumber2" style="width:30%; display:inline;">&nbsp;-&nbsp;
+                                        <input type="text" class="form-control" id="phone-number3" name="phoneNumber3" style="width:30%; display:inline;">
                                         <label for="phoneNumber">전화 번호</label>
                                     </div>
                                     <div class="validation"></div>
@@ -493,8 +570,10 @@
                                 
                                 <!-- 핸드폰 번호 -->
 								<div class="col-12">
-                                    <div class="form-floating theme-form-floating">
-                                        <input type="text" class="form-control" id="cellPhoneNumber" name="cellPhoneNumber" placeholder="전화번호 '-'도 입력">
+                                    <div class="form-floating theme-form-floating phone-number" id="cell-phone-number">
+                                        <input type="text" class="form-control" id="cell-phone-number1" name="cellPhoneNumber1" style="width:30%; display:inline;">&nbsp;-&nbsp;
+                                        <input type="text" class="form-control" id="cell-phone-number2" name="cellPhoneNumber2" style="width:30%; display:inline;">&nbsp;-&nbsp;
+                                        <input type="text" class="form-control" id="cell-phone-number3" name="cellPhoneNumber3" style="width:30%; display:inline;">
                                         <label for="cellPhoneNumber">핸드폰 번호</label>
                                     </div>
                                     <div class="validation"></div>
@@ -567,15 +646,6 @@
                                     </div>
                                     <div class="validation"></div>
                                 </div>
-                                
-                                <!-- 본인 인증 
-                                <div class="col-12">
-                                    <div class="form-floating theme-form-floating">
-                                        <input type="checkbox" class="form-control" id="identity" name="identity" placeholder="본인 인증">
-                                        <label for="identity">본인 인증</label>
-                                    </div>
-                                    <div class="validation"></div>
-                                </div> -->
                                 
                                 <div class="col-12">
                                 	<div class="form-floating theme-form-floating" id="identify">
@@ -666,7 +736,7 @@
                         <div class="other-log-in">
                             <h6></h6>
                         </div>
-
+						
                         <div class="sign-up-box">
                             <h4>Already have an account?</h4>
                             <a href="login.html">Log In</a>

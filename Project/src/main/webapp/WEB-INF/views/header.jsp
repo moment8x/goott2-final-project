@@ -1,6 +1,7 @@
 <%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html >
@@ -91,8 +92,6 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 			let output = "";
 			let output2 = "";
 			let output3 = "";
-			//let output3 = '<i data-feather="shopping-cart"></i>';
-			
 			output += `<c:if test='${cartItems != "none"}'>`;
 			
 			output += `<c:forEach var="item" items="${cartItems}">`;
@@ -103,7 +102,8 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     		output += `<div class="drop-contain">`;
     		output += `<a href="#">`;
     		output += `<h5>${item.productName}</h5></a>`;
-    		output += `<h6><span>${item.quantity} x </span> ${item.sellingPrice}원</h6>`;
+    		output += `<h6><span>${item.quantity} x </span>`
+    		output += '<fmt:formatNumber value="${item.sellingPrice}" pattern="#,###" />원</h6>';
     		output += `<button class="close-button close_button" onclick="delCart('${item.productId}');">`;
     		output += `<i class="fa-solid fa-xmark"></i></button></div></div></li>`;
     		output += `</c:forEach></c:if>`;
@@ -116,7 +116,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
             output2 += `<c:forEach var="item" items="${cartItems}" varStatus="status">`;
             output2 += `<c:set var="total" value="${total + (item.sellingPrice * item.quantity)}" />`;
             output2 += `</c:forEach>`;
-            output2 += `<c:out value="${total }"/>원</c:if>`;
+            output2 += `<fmt:formatNumber value="${total}" pattern="#,###" />원</c:if>`;
             output2 += `<c:if test='${cartItems == "none"}'>--</c:if>`;
             
             output3 += `<c:if test='${cartItems != "none"}'>`;
@@ -143,20 +143,19 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 		    		output += `<div class="drop-contain">`;
 		    		output += `<a href="#">`;
 		    		output += '<h5>' + item.productName + '</h5></a>';
-		    		output += '<h6><span>1 x</span>' + item.sellingPrice + '원</h6>';
+		    		output += '<h6><span>' + item.quantity + 'x</span>' + item.sellingPrice.toLocaleString('ko-KR') + '원</h6>';
 		    		output += '<button class="close-button close_button"';
 		    		output += 'onclick=\"delCart(\'' + item.productId + '\');\">';
 		    		output += `<i class="fa-solid fa-xmark"></i></button></div></div></li>`;
 		    		
 		            total += item.sellingPrice;
 				});
-				output2 += total + '원';
+				output2 += total.toLocaleString('ko-KR') + '원';
 				output3 += '<span class="position-absolute top-0 start-100 translate-middle badge">';
 				output3 += items.length + '<span class="visually-hidden">unread messages</span></span>';
 			} else {
 				output += '등록된 상품이 없습니다.';
 	            output2 += '--';
-	            // output3에 빨간거 없애기!
 			}
 			
 			$('.cart-list').html(output);
@@ -164,7 +163,15 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 			$('.red-icon').html(output3);
 		}
 	</script>
-	
+	<style>
+		.cart-list {
+			max-height: 600px;
+			overflow-y: auto;
+		}
+		.cart-list::-webkit-scrollbar {
+			display: none; /* 크롬, 사파리, 오페라, 엣지 */
+		}
+	</style>
   </head>
 
   <!-- Header Start -->

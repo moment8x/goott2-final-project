@@ -6,4 +6,7 @@
 	<insert id="insertImage">
 		INSERT INTO review_uf(post_no, upload_files_seq) VALUES(#{postNo}, #{uploadFilesSeq})
 	</insert>
+	<delete id="deleteImage">
+		DELETE FROM review_uf WHERE upload_files_seq = #{uploadFilesSeq}
+	</delete>
 </mapper>

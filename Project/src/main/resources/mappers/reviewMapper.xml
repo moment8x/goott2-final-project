@@ -19,8 +19,11 @@
 			AND product_id='${productId}'
 		GROUP BY o.order_no
 	</select>
-	<select id="isExists" resultType="String">
-		SELECT post_no FROM review_board WHERE author=#{memberId} AND product_id=#{productId}
+	<select id="firstCheck" resultType="int">
+		SELECT count(post_no) FROM review_board WHERE author=#{memberId} AND product_id=#{productID}
+	</select>
+	<select id="isExists" resultType="int">
+		SELECT post_no FROM review_board WHERE author=#{memberId} AND product_id=#{productId} AND is_delete = 'N'
 	</select>
 	<select id="getPointRule" resultType="Integer">
 		SELECT point FROM point_rules WHERE reason=#{reason}
@@ -36,10 +39,10 @@
 		WHERE member_id = #{memberId}
 	</update>
 	<select id="selectProductCount" resultType="int">
-  		SELECT count(post_no) FROM review_board WHERE product_id = #{key}
+  		SELECT count(post_no) FROM review_board WHERE product_id = #{key} AND is_delete='N'
   	</select>
   	<select id="getReviewList" resultType="com.project.vodto.kjs.ReviewBoardDTO">
-  		SELECT * FROM review_board WHERE product_id=#{productId} ORDER BY created_date desc LIMIT #{startRowIndex}, #{viewProductPerPage}
+  		SELECT * FROM review_board WHERE product_id=#{productId} AND is_delete='N' ORDER BY created_date desc LIMIT #{startRowIndex}, #{viewProductPerPage}
   	</select>
   	<select id="getCountImages" resultType="Integer">
   		SELECT count(post_no) FROM review_uf WHERE post_no=#{postNo}
@@ -81,5 +84,16 @@
   		UPDATE review_board
 		SET content = #{content}, rating = #{rating}
 		WHERE post_no = #{postNo}
+  	</update>
+  	<update id="updateRatings">
+  		UPDATE ratings
+  		SET rating=#{rating}, participation_count=#{participationCount}, highest_rating=#{highestRating}, lowest_rating=#{lowestRating}
+  		WHERE product_id=#{productId}
+  	</update>
+  	<select id="deleteCheck" resultType="int">
+  		SELECT count(post_no) FROM review_board WHERE post_no=#{postNo} AND author=#{memberId} AND product_id=#{productId} AND is_delete='N'
+  	</select>
+  	<update id="deleteReview">
+  		UPDATE review_board SET is_delete = 'Y' WHERE post_no=#{postNo}
   	</update>
 </mapper>

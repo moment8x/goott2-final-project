@@ -70,7 +70,7 @@ public class CustomerServiceController {
 
 		if (fileList.size() > 0) {
 			for (UploadFiles file : fileList) {
-				ufService.deleteFile(file, realPath);
+				ufService.deleteFile(file.getNewFileName(), realPath);
 			}
 			fileList.clear();
 		}
@@ -136,7 +136,7 @@ public class CustomerServiceController {
 		file.setThumbnailFileName(thumbFileName);
 		ResponseEntity<String> result = new ResponseEntity<String>("fail", HttpStatus.CONFLICT);
 		int i = 0;
-		if (ufService.deleteFile(file, realPath) > 0) {
+		if (ufService.deleteFile(file.getNewFileName(), realPath) > 0) {
 			System.out.println("체크 2");
 			for (UploadFiles uf : fileList) {
 				System.out.println("uf : " + uf.getNewFileName());

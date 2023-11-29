@@ -149,6 +149,7 @@
 			success : function(data) {
 				// 전송에 성공하면 이 콜백 함수를 실행 (data 에는 응답받은 데이터가 저장된다)
 				openShoppingModal(data);
+				newCart(data.cartItems);
 			},
 			error : function() {
 				// 전송에 실패하면 이 콜백 함수를 실행

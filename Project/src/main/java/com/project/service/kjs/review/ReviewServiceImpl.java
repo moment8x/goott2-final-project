@@ -15,6 +15,7 @@ import com.project.dao.kjs.review.ReviewDAO;
 import com.project.dao.kjs.upload.ReviewUploadDAO;
 import com.project.dao.kjs.upload.UploadDAO;
 import com.project.etc.kjs.ImgMimeType;
+import com.project.service.kjs.upload.UploadFileService;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.Ratings;
 import com.project.vodto.ReviewBoard;
@@ -31,6 +32,8 @@ public class ReviewServiceImpl implements ReviewService {
 	UploadDAO uDao;
 	@Inject
 	ReviewUploadDAO ruDao;
+	@Inject
+	UploadFileService ufService;
 	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -47,36 +50,39 @@ public class ReviewServiceImpl implements ReviewService {
 				for (UploadFiles file : fileList) {
 					if (ImgMimeType.extIsImage(file.getExtension())) {
 						if (uDao.insertUploadImage(file) == 1) {
-							// 3) insert 성공 시 board_uf 테이블에도 insert
+							// 3) insert 성공 시 review_uf 테이블에도 insert
 							ReviewUf reviewUf = new ReviewUf();
-							reviewUf.setUploadFilesSeq(uDao.selectUploadFile(file));
+							reviewUf.setUploadFilesSeq(uDao.selectUploadFile(file.getNewFileName()));
 							reviewUf.setPostNo(boardNo);
 							ruDao.insertImage(reviewUf);
 						}
 					}
 				}
 			}
-			// 4) 포인트 지급 -> member Table update, point_logs Table insert
-			point = rDao.getPointRule("리뷰작성");
-			if (point != -1) {
-				if (rDao.insertPointLog(review.getAuthor(), point) == 0) {
-					if (rDao.updatePoint(review.getAuthor(), point) > 0) {
-						// Ratings 테이블에 넣을 값 정리하기
-						Ratings ratings = rDao.getCalcRatingData(review.getProductId());
-						if (ratings.getHighestRating() < review.getRating()) {
-							ratings.setHighestRating(review.getRating());
-						} else if (ratings.getLowestRating() > review.getRating()) {
-							ratings.setLowestRating(review.getRating());
-						}
-						ratings.setProductId(review.getProductId());
-						// 연산 시작
-						float totalRating = Math.round(ratings.getRating() * 10) / 10f;
-						ratings.setParticipationCount(ratings.getParticipationCount() + 1);
-						totalRating /= ratings.getParticipationCount();
-						ratings.setRating(totalRating);
-						// 연산 결과 DB에 저장
-						if (rDao.insertRatings(ratings) == 1) {
-							result = true;
+			// 4) 최초 등록인가 확인
+			if (rDao.firstCheck(review.getAuthor(), review.getProductId()) == 0) {
+				// 5) 최초 등록 일 시 포포인트 지급 -> member Table update, point_logs Table insert
+				point = rDao.getPointRule("리뷰작성");
+				if (point != -1) {
+					if (rDao.insertPointLog(review.getAuthor(), point) == 0) {
+						if (rDao.updatePoint(review.getAuthor(), point) > 0) {
+							// Ratings 테이블에 넣을 값 정리하기
+							Ratings ratings = rDao.getCalcRatingData(review.getProductId());
+							if (ratings.getHighestRating() < review.getRating()) {
+								ratings.setHighestRating(review.getRating());
+							} else if (ratings.getLowestRating() > review.getRating()) {
+								ratings.setLowestRating(review.getRating());
+							}
+							ratings.setProductId(review.getProductId());
+							// 연산 시작
+							float totalRating = Math.round(ratings.getRating() * 10) / 10f;
+							ratings.setParticipationCount(ratings.getParticipationCount() + 1);
+							totalRating /= ratings.getParticipationCount();
+							ratings.setRating(totalRating);
+							// 연산 결과 DB에 저장
+							if (rDao.insertRatings(ratings) == 1) {
+								result = true;
+							}
 						}
 					}
 				}
@@ -96,8 +102,7 @@ public class ReviewServiceImpl implements ReviewService {
 		int orderSize = orderNo.size();
 		if (orderSize > 0) {
 			// 3. 해당 물품의 리뷰를 작성한 적이 있는가 확인
-			List<String> postNo = rDao.isExists(memberId, productId);
-			int reviewSize = postNo.size();
+			int reviewSize = rDao.isExists(memberId, productId);
 			// 4. 3의 결과 row의 수와 2를 비교하여 2 > 3 이면 리뷰 작성 가능.
 			if (orderSize > reviewSize) {
 				result = true;
@@ -176,31 +181,86 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
-	public boolean updateReview(int postNo, String content, int rating, List<UploadFiles> fileList)
+	@Transactional(rollbackFor = Exception.class)
+	public boolean updateReview(int postNo, String content, int rating, List<UploadFiles> calcFileList, List<String> deleteFileList, String realPath, String productId)
 			throws SQLException, NamingException {
 		System.out.println("서비스 - 리뷰 수정");
 		boolean result = false;
-		
 		if (rDao.updateReview(postNo, content, rating) == 1) {
-			// 업데이트 성공
+			
 			// fileList에 값이 있으면 이미지도 수정!
-			if (fileList.size() > 0) {
-				// 기존에 존재하는 파일인지 확인
-				
-				
-				for (UploadFiles file : fileList) {
-					if (ImgMimeType.extIsImage(file.getExtension())) {
-						if (uDao.insertUploadImage(file) == 1) {
-							// 3) insert 성공 시 board_uf 테이블에도 insert
-							ReviewUf reviewUf = new ReviewUf();
-							reviewUf.setUploadFilesSeq(uDao.selectUploadFile(file));
-//							reviewUf.setPostNo(boardNo);
-							ruDao.insertImage(reviewUf);
+			if (calcFileList.size() > 0) {
+				for (UploadFiles file : calcFileList) {
+					// 기존에 존재하는 파일인지 확인
+					if (!ufService.isExist(file.getNewFileName())) {
+						// 기존에 존재하지 않는 파일이라면
+						if (ImgMimeType.extIsImage(file.getExtension())) {
+							if (uDao.insertUploadImage(file) == 1) {
+								// 3) insert 성공 시 review_uf 테이블에도 insert
+								ReviewUf reviewUf = new ReviewUf();
+								reviewUf.setUploadFilesSeq(uDao.selectUploadFile(file.getNewFileName()));
+								reviewUf.setPostNo(postNo);
+								ruDao.insertImage(reviewUf);
+							}
 						}
 					}
 				}
 			}
+			if (deleteFileList.size() > 0) {
+				for (String deleteFile : deleteFileList) {
+					if (ufService.isExist(deleteFile)) {
+						int uploadFilesSeq = uDao.selectUploadFile(deleteFile);
+						if (ruDao.deleteImage(uploadFilesSeq) == 1) {
+							uDao.deleteUploadFile(uploadFilesSeq);
+						}
+					}
+					ufService.deleteFile(deleteFile, realPath);
+				}
+			}
+			
+			// 리뷰 업데이트 성공 시 ratings 테이블도 업데이트
+			Ratings ratings = rDao.getCalcRatingData(productId);
+			if (ratings.getHighestRating() < rating) {
+				ratings.setHighestRating(rating);
+			} else if (ratings.getLowestRating() > rating) {
+				ratings.setLowestRating(rating);
+			}
+			ratings.setProductId(productId);
+			// 연산 시작
+			float totalRating = Math.round(ratings.getRating() * 10) / 10f;
+			ratings.setParticipationCount(ratings.getParticipationCount() + 1);
+			totalRating /= ratings.getParticipationCount();
+			ratings.setRating(totalRating);
+			// 연산 결과 DB에 저장
+			if (rDao.updateRatings(ratings) == 1) {
+				result = true;
+			}
 		}
+		return result;
+	}
+
+	@Override
+	public boolean deleteCheck(int postNo, String memberId, String productId) throws SQLException, NamingException {
+		boolean result = false;
+		System.out.println("리뷰 삭제 체크 서비스");
+		System.out.println("postNo : " + postNo);
+		System.out.println("memberId : " + memberId);
+		System.out.println("productId : " + productId);
+		
+		if (rDao.deleteCheck(postNo, memberId, productId) == 1) {
+			// 삭제 가능함을 확인
+			result = true;
+		}
+		
+		return result;
+	}
+
+	@Override
+	public boolean deleteReview(int postNo) throws SQLException, NamingException {
+		System.out.println("리뷰 삭제 서비스");
+		boolean result = false;
+		
+		if (rDao.deleteReview(postNo) == 1) result = true;
 		
 		return result;
 	}

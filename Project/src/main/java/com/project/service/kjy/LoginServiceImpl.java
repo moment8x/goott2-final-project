@@ -1,29 +1,15 @@
 package com.project.service.kjy;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeUtility;
 
-import org.springframework.core.io.InputStreamSource;
-import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.google.protobuf.compiler.PluginProtos.CodeGeneratorResponse.File;
 import com.project.dao.kjr.LoginDao;
 import com.project.vodto.kjy.LoginDTO;
 import com.project.vodto.kjy.Memberkjy;
@@ -88,10 +74,8 @@ public class LoginServiceImpl implements LoginService {
 	}
 	
 	public boolean emailaSend(String email) throws MessagingException{
-		System.out.println("!!333s");
 		String code = UUID.randomUUID().toString();
-		System.out.println("안녕???????");
-		System.setProperty("mail.debug", "true");
+		System.out.println("CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOODDDDDDDDDDDDDDDDDDEEEEEEEEEEEEEE" + code);
 		
 		boolean result = false;
 		

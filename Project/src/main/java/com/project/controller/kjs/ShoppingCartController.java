@@ -142,28 +142,50 @@ public class ShoppingCartController {
 	
 	// 체크된 items 삭제
 	@RequestMapping(value="items", method=RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> deleteCheckedItems(HttpServletRequest request, @RequestParam(value="items[]") List<String> items) {
+	public ResponseEntity<Map<String, Object>> deleteCheckedItems(HttpServletRequest request, @RequestParam(value="itemNames[]") List<String> itemNames) {
 		ResponseEntity<Map<String, Object>> result = null;
 		Map<String, Object> map = new HashMap<String, Object>();
-		System.out.println("items : " + items);
+		System.out.println("items : " + itemNames);
+		List<ShowCartDTO> items = null;
 		// 로그인 여부 확인
-		// 로그인을 했으면
-		
-		// 비회원이면 
-		Cookie cookie = WebUtils.getCookie(request, "nom");
-		if (cookie != null) {
-			try {
-				if(scService.dellteItems(cookie.getValue(), false, items)) {
+		HttpSession session = request.getSession();
+		try {
+			if (session.getAttribute("loginMember") != null) {
+				String memberId = ((Memberkjy)session.getAttribute("loginMember")).getMemberId();
+				// 로그인을 했으면
+				if (scService.dellteItems(memberId, true, itemNames)) {
+					if (scService.countList(memberId, false) > 0) {
+						items = scService.getCartList(memberId, false);
+						map.put("cartItems", items);
+					} else {
+						map.put("cartItems", "none");
+					}
 					map.put("status", "success");
 				} else {
 					map.put("status", "fail");
 				}
-				result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.OK);
-			} catch (SQLException | NamingException e) {
-				map.put("status", "fail");
-				result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.BAD_REQUEST);
-				e.printStackTrace();
+			} else {
+				// 비회원이면 
+				Cookie cookie = WebUtils.getCookie(request, "nom");
+				if (cookie != null) {
+					if(scService.dellteItems(cookie.getValue(), false, itemNames)) {
+						if (scService.countList(cookie.getValue(), false) > 0) {
+							items = scService.getCartList(cookie.getValue(), false);
+							map.put("cartItems", items);
+						} else {
+							map.put("cartItems", "none");
+						}
+						map.put("status", "success");
+					} else {
+						map.put("status", "fail");
+					}
+				}
 			}
+			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.OK);
+		} catch (SQLException | NamingException e) {
+			map.put("status", "fail");
+			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.BAD_REQUEST);
+			e.printStackTrace();
 		}
 		
 		return result;
@@ -175,6 +197,7 @@ public class ShoppingCartController {
 			@RequestParam("productId") String productId, @RequestParam(value="quantity", defaultValue = "1") int quantity) {
 		ResponseEntity<Map<String, Object>> result = null;
 		Map<String,Object> map = new HashMap<String, Object>();
+		List<ShowCartDTO> items = null;
 		
 		// 로그인 여부 확인
 		HttpSession session = request.getSession();
@@ -182,6 +205,8 @@ public class ShoppingCartController {
 			if (session.getAttribute("loginMember") != null) {
 				// 로그인 했을 시
 				if (scService.insertItem(((Memberkjy)session.getAttribute("loginMember")).getMemberId(), true, productId, quantity)) {
+					items = scService.getCartList(((Memberkjy)session.getAttribute("loginMember")).getMemberId(), true);
+					map.put("cartItems", items);
 					map.put("status", "success");
 				} else {
 					// 이미 담긴 상품일 시
@@ -193,6 +218,8 @@ public class ShoppingCartController {
 				Cookie cookie = WebUtils.getCookie(request, "nom");
 				if (cookie != null) {
 					if (scService.insertItem(cookie.getValue(), false, productId, quantity)) {
+						items = scService.getCartList(cookie.getValue(), false);
+						map.put("cartItems", items);
 						map.put("status", "success");
 					} else {
 						// 이미 담긴 상품일 시

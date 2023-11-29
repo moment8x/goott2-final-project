@@ -5,8 +5,10 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,7 +26,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.project.service.kjs.upload.UploadFileService;
 import com.project.service.member.MemberService;
 import com.project.vodto.UploadFiles;
-import com.project.vodto.kjy.NaverRegisterInfo;
+import com.project.vodto.kjy.SnsRegisterInfo;
 import com.project.vodto.kjs.SignUpDTO;
 
 
@@ -37,7 +39,6 @@ public class RegisterController {
 	@Inject
 	private UploadFileService ufService;
 	
-//	private UploadFile file = new UploadFile();
 	private List<UploadFiles> fileList = null;
 	
 	@RequestMapping("register")
@@ -75,9 +76,13 @@ public class RegisterController {
 	public void signUp(SignUpDTO member, Model model) {
 		
 		try {
-			System.out.println("zipCode : " + member.getZipCode());
-			System.out.println("address : " + member.getAddress());
-			System.out.println("detailAddress : " + member.getDetailedAddress());
+			System.out.println("number1 : " + member.getPhoneNumber1());
+			System.out.println("number2 : " + member.getPhoneNumber2());
+			System.out.println("number3 : " + member.getPhoneNumber3());
+			System.out.println("cellNumber1 : " + member.getCellPhoneNumber1());
+			System.out.println("cellNumber2 : " + member.getCellPhoneNumber2());
+			System.out.println("cellNumber3 : " + member.getCellPhoneNumber3());
+			
 			if (fileList != null) {
 				mService.insertMember(member, fileList.get(0));
 				fileList.clear();
@@ -98,8 +103,8 @@ public class RegisterController {
 			// 2. 파일 업로드
 			if (fileList.get(0) != null) {
 				// 기존 파일 삭제. 단, DB에 저장된 파일일 경우 삭제X
-				if (!ufService.isExist(fileList.get(0))) {
-					ufService.deleteFile(fileList.get(0), realPath);
+				if (!ufService.isExist(fileList.get(0).getNewFileName())) {
+					ufService.deleteFile(fileList.get(0).getNewFileName(), realPath);
 				}
 			}
 			// 새 파일 업로드.
@@ -118,15 +123,50 @@ public class RegisterController {
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
 		
 		if (fileList.size() > 0) {
-			ufService.deleteFile(fileList.get(0), realPath);
+			ufService.deleteFile(fileList.get(0).getNewFileName(), realPath);
 			fileList.clear();
 		}
 	}
 	
+	@RequestMapping("sendMail")
+	public ResponseEntity<String> sendMail(HttpServletRequest request, @RequestParam("email") String email) {
+		System.out.println("메일 보내기");
+		ResponseEntity<String> result = null;
+		
+		String code = UUID.randomUUID().toString();
+		request.getSession().setAttribute("authCode", code);
+		
+		try {
+			mService.sendEmail(email, code);
+			result = new ResponseEntity<String>("success", HttpStatus.OK);
+		} catch (MessagingException e) {
+			e.printStackTrace();
+			result = new ResponseEntity<String>("error", HttpStatus.BAD_REQUEST);
+		}
+		
+		return result;
+	}
+	
+	@RequestMapping("confirmCode")
+	public ResponseEntity<String> confirmCode(HttpServletRequest request, @RequestParam("emailCode") String emailCode) {
+		System.out.println("코드 검증");
+		ResponseEntity<String> result = null;
+		String code = (String)request.getSession().getAttribute("authCode");
+		
+		if (mService.confirmCode(code, emailCode)) {
+			result = new ResponseEntity<String>("pass", HttpStatus.OK);
+		} else {
+			result = new ResponseEntity<String>("fail", HttpStatus.OK);
+		}
+		
+		return result;
+	}
+	
 	@RequestMapping("snsRegister")
-	public void snsRegister(@RequestParam("uerInfo") NaverRegisterInfo naverInfo) {
+	public void snsRegister(Model model) {
 		System.out.println("================스타트=================");
-		System.out.println("왔다 감 영민♥승준 " + naverInfo);
+		SnsRegisterInfo snsInfo = (SnsRegisterInfo) model.asMap().get("snsInfo");
+		System.out.println("정보받음 " + snsInfo);
 		
 		System.out.println("================끝났음=================");
 	}

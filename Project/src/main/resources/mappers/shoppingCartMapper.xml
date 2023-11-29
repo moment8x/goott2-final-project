@@ -23,7 +23,7 @@
 		DELETE FROM shopping_cart WHERE member_id = #{memberId} AND product_id = #{productId}
 	</delete>
 	<select id="getNonMemberShoppingCart" resultType="com.project.vodto.kjs.ShowCartDTO">
-		SELECT sc.non_member_id, sc.product_id, prod_img.product_image, p.product_name, p.selling_price 
+		SELECT sc.non_member_id, sc.product_id, prod_img.product_image, p.product_name, p.selling_price, sc.quantity
 		FROM products p 
 		INNER JOIN shopping_cart sc 
 		ON sc.product_id = p.product_id 
