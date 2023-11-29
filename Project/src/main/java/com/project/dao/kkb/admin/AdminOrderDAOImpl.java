@@ -62,6 +62,41 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	}
 
 	@Override
+	public int changeDepositProductCancel(List<DepositProductCancelRequest> productOrderNoList) {
+		return ses.update(ns + ".updateDepositProductCancel", productOrderNoList);
+	}
+
+	@Override
+	public int changeDepositProductCancelHistory(List<DepositProductCancelRequest> convertedNoList) {
+		return ses.update(ns + ".updateDepositProductCancelHistory", convertedNoList);
+	}
+
+	@Override
+	public int changeDepositProductCancelPayments(List<DepositProductCancelRequest> productOrderNoList) {
+		return ses.update(ns + ".updateDepositProductCancelPayments", productOrderNoList);
+	}
+
+	@Override
+	public int changeDepositProductCancelCoupon(List<DepositProductCancelRequest> productOrderNoList) {
+		return ses.update(ns + ".updateDepositProductCancelCoupon", productOrderNoList);
+	}
+
+	@Override
+	public int changeDepositProductCancelReward(List<DepositProductCancelRequest> productOrderNoList) {
+		return ses.update(ns + ".updateDepositProductCancelReward", productOrderNoList);
+	}
+
+	@Override
+	public int changeDepositProductCancelPoint(List<DepositProductCancelRequest> productOrderNoList) {
+		return ses.update(ns + ".updateDepositProductCancelPoint", productOrderNoList);
+	}
+
+	@Override
+	public int changeDepositProductCancelMember(List<DepositProductCancelRequest> productOrderNoList) {
+		return ses.update(ns + ".updateDepositProductCancelMember", productOrderNoList);
+	}
+	
+	@Override
 	public int changeDepositOrderCancel(List<String> orderNoList) {
 		return ses.update(ns + ".updateDepositOrderCancel", orderNoList);
 	}
@@ -124,47 +159,5 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	@Override
 	public int changeInvoiceHistory(InvoiceCondition invoiceCond) {
 		return ses.update(ns + ".updateInvoiceHistory", invoiceCond);
-	}
-
-	@Override
-	public int changeDepositProductCancel(List<DepositProductCancelRequest> productOrderNoList) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int changeDepositProductCancelHistory(List<DepositProductCancelRequest> productOrderNoList) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int changeDepositProductCancelPayments(List<DepositProductCancelRequest> productOrderNoList) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int changeDepositProductCancelCoupon(List<DepositProductCancelRequest> productOrderNoList) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int changeDepositProductCancelReward(List<DepositProductCancelRequest> productOrderNoList) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int changeDepositProductCancelPoint(List<DepositProductCancelRequest> productOrderNoList) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int changeDepositProductCancelMember(List<DepositProductCancelRequest> productOrderNoList) {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 }

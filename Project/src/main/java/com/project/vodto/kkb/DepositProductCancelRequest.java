@@ -10,10 +10,17 @@ import lombok.Setter;
 public class DepositProductCancelRequest {
 	private List<String> productOrderNoList;
     private String OrderNo;
-
-    public void setOrderNo() {
-        if (productOrderNoList != null && !productOrderNoList.isEmpty()) {
-            OrderNo = productOrderNoList.get(0).split("-", 1)[0];
+    
+    public String getConvertedOrderNo() {
+    	if (productOrderNoList != null && !productOrderNoList.isEmpty()) {
+            OrderNo = productOrderNoList.get(0).split("-")[0];
         }
-    }		
+		return OrderNo;
+    }
+    
+    public void setConvertedOrderNo() {
+    	if (productOrderNoList != null && !productOrderNoList.isEmpty()) {
+            OrderNo = productOrderNoList.get(0).split("-")[0];
+        }
+    }
 }

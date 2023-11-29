@@ -29,6 +29,7 @@ public interface AdminOrderDAO {
 	/* 입금 전 관리 (품목주문별) */
 	List<DepositProductResponse> findDepositProductByInfo(DepositCondition depositCond);
 	
+	
 	/* 입금 전 관리 (입금 확인 버튼 - 주문 상세 상품 상태) */
 	int changeDepositConfirm(List<String> orderNoList);
 	
@@ -37,8 +38,9 @@ public interface AdminOrderDAO {
 	
 	/* 입금 전 관리 (입금 확인 버튼 - 주문 내역 상태) */
 	int changeDepositConfirmHistory(List<String> orderNoList);
+	
 
-	/* 입금 전 관리 (주문 취소 버튼 - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
+	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
 	int changeDepositOrderCancel(List<String> orderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 주문 내역 테이블 update(column : delivery_status)) */
@@ -67,6 +69,29 @@ public interface AdminOrderDAO {
 	int saveDepositOrderCancel(List<DepositCancelInfoResponse> cancelInfoList);
 	
 	
+	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
+	int changeDepositProductCancel(List<DepositProductCancelRequest> productOrderNoList);
+
+	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 주문 내역 테이블 update(column : delivery_status)) */
+	int changeDepositProductCancelHistory(List<DepositProductCancelRequest> productOrderNoList);
+
+	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 결제 테이블 update(column : payment_status)) */
+	int changeDepositProductCancelPayments(List<DepositProductCancelRequest> productOrderNoList);
+
+	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) */
+	int changeDepositProductCancelCoupon(List<DepositProductCancelRequest> productOrderNoList);
+
+	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 적립금 로그 테이블 update(column : reason, balance, reward)) */
+	int changeDepositProductCancelReward(List<DepositProductCancelRequest> productOrderNoList);
+
+	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 포인트 로그 테이블 update(column : reason, balance, point)) */
+	int changeDepositProductCancelPoint(List<DepositProductCancelRequest> productOrderNoList);
+
+	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 회원 테이블 update(column : coupon_count, total_points, 
+	 * 							total_rewards, accumulated_use_reward,accumulated_use_point)) */
+	int changeDepositProductCancelMember(List<DepositProductCancelRequest> productOrderNoList);
+	
+	
 	/* 배송 준비중 관리 (주문번호별) */
 	List<ReadyNoResponse> findReadyByInfo(OrderCondition readyCond);
 	
@@ -78,18 +103,4 @@ public interface AdminOrderDAO {
 	
 	/* 배송 준비중 관리 (주문내역 송장번호 저장) */
 	int changeInvoiceHistory(InvoiceCondition invoiceCond);
-
-	int changeDepositProductCancel(List<DepositProductCancelRequest> productOrderNoList);
-
-	int changeDepositProductCancelHistory(List<DepositProductCancelRequest> productOrderNoList);
-
-	int changeDepositProductCancelPayments(List<DepositProductCancelRequest> productOrderNoList);
-
-	int changeDepositProductCancelCoupon(List<DepositProductCancelRequest> productOrderNoList);
-
-	int changeDepositProductCancelReward(List<DepositProductCancelRequest> productOrderNoList);
-
-	int changeDepositProductCancelPoint(List<DepositProductCancelRequest> productOrderNoList);
-
-	int changeDepositProductCancelMember(List<DepositProductCancelRequest> productOrderNoList);
 }

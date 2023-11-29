@@ -191,6 +191,96 @@
 		ORDER BY h.order_time DESC, d.product_order_no DESC
 	</select>
 	
+	<update id="updateDepositProductCancel" parameterType="java.util.List">
+	        UPDATE detailed_order_items 
+	        SET product_status = '주문취소', coupon_discount = 0
+	        WHERE product_order_no IN
+	        <foreach collection="list" item="productOrderNo" open="(" close=")" separator=",">
+        		#{productOrderNo}
+    		</foreach>
+	</update>
+	
+	<update id="updateDepositProductCancelHistory" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
+			UPDATE 		order_history h
+			LEFT JOIN 	(
+							SELECT count(detailed_order_id) count, order_no
+							FROM   detailed_order_items 
+							WHERE  order_no = #{item.OrderNo} AND product_status REGEXP '^((?!취소|교환|환불).)*$'
+						) d
+			ON 			h.order_no = d.order_no
+			SET    		h.delivery_status = if(if(d.count is null, 0, d.count) = 0 ,'주문취소', '부분취소') 
+			WHERE  		h.order_no = #{item.OrderNo}
+		</foreach>
+	</update>
+	
+	<update id="updateDepositProductCancelPayments" parameterType="java.util.List">
+			UPDATE payments
+			SET    payment_status = '주문취소' 
+			WHERE  order_no IN
+			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+	        	#{orderNo}
+	    	</foreach>
+	</update>
+	
+	<update id="updateDepositProductCancelCoupon" parameterType="java.util.List">
+			UPDATE coupon_logs
+			SET    used_date = NULL,related_order = NULL
+			WHERE  related_order IN
+			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+	        	#{orderNo}
+	    	</foreach>
+	</update>
+	
+	<update id="updateDepositProductCancelReward" parameterType="java.util.List">
+		<foreach collection="list" item="orderNo" index="index" separator=";">			
+			UPDATE		 reward_logs r
+			INNER JOIN	 payments p
+			ON 			 r.related_order = p.order_no
+			INNER JOIN   member m
+			ON 			 r.member_id = m.member_id
+			SET 		 r.reason = '주문취소', 
+						 r.reward = p.used_reward,
+			             r.balance = total_rewards + p.used_reward
+			WHERE 		 r.related_order = #{orderNo} AND r.reason != '주문취소'
+		</foreach>
+	</update>
+	
+	<update id="updateDepositProductCancelPoint" parameterType="java.util.List">
+		<foreach collection="list" item="orderNo" index="index" separator=";">
+			UPDATE		 point_logs l
+			INNER JOIN	 payments p
+			ON 			 l.related_order = p.order_no
+			INNER JOIN   member m
+			ON 			 l.member_id = m.member_id
+			SET 		 l.reason = '주문취소', 
+						 l.point = p.used_points,
+			             l.balance = total_points + p.used_points
+			WHERE 		 l.related_order = #{orderNo}
+		</foreach>
+	</update>
+	
+	<update id="updateDepositProductCancelMember" parameterType="java.util.List">
+		<foreach collection="list" item="orderNo" index="index" separator=";">
+			UPDATE		 member m
+			INNER JOIN	 order_history o
+			ON  		 m.member_id = o.member_id
+			INNER JOIN	 payments p
+			ON 			 o.order_no = p.order_no
+			LEFT JOIN    (SELECT COUNT(detailed_order_id) count, order_no
+						  FROM   detailed_order_items
+						  WHERE  order_no = #{orderNo} AND 
+								(coupon_discount is not null AND coupon_discount != 0)) s
+			ON           o.order_no = s.order_no
+			SET 		 m.coupon_count = m.coupon_count + COALESCE(s.count, 0),
+						 m.total_points = m.total_points + p.used_points,
+			             m.total_rewards = m.total_rewards + p.used_reward,
+			             m.accumulated_use_reward = m.accumulated_use_reward - p.used_points,
+			             m.accumulated_use_point = m.accumulated_use_point - p.used_reward
+			WHERE 		 o.order_no = #{orderNo}
+		</foreach>
+	</update>
+	
 	<update id="updateDepositOrderCancel" parameterType="java.util.List">
 	        UPDATE detailed_order_items 
 	        SET product_status = '주문취소', coupon_discount = 0

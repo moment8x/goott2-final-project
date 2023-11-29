@@ -84,12 +84,20 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		
 		int result = -1;
 		
+		List<DepositProductCancelRequest> convertedNoList = 
+				productOrderNoList.stream()
+					.map(info -> {
+							info.setConvertedOrderNo();
+							return info;
+						})
+					.collect(Collectors.toList());
+	
 		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
 		if(adminOrderRepository.changeDepositProductCancel(productOrderNoList) <= 0 ) {
 			return result;
 		}
 		/* 주문 내역 테이블 update(column : delivery_status) */
-		if(adminOrderRepository.changeDepositProductCancelHistory(productOrderNoList) <= 0) {
+		if(adminOrderRepository.changeDepositProductCancelHistory(convertedNoList) <= 0) {
 			return result;
 		}
 		/* 결제 테이블 update(column : payment_status) */
@@ -112,9 +120,8 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		 * accumulated_reward, accumulated_use_reward, accumulated_pointm, accumulated_use_point ) */
 		if(adminOrderRepository.changeDepositProductCancelMember(productOrderNoList) > 0) {
 			
-			List<String> orderNoList = productOrderNoList
-					.stream()
-					.map(DepositProductCancelRequest::getOrderNo)
+			List<String> orderNoList = productOrderNoList.stream()
+					.map(DepositProductCancelRequest::getConvertedOrderNo)	
 					.collect(Collectors.toList());
 							
 			List<DepositCancelInfoResponse> cancelInfoList = 
@@ -160,6 +167,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		/* 회원 테이블 update(column : total_points, total_rewards, coupon_count,
 		 * accumulated_reward, accumulated_use_reward, accumulated_pointm, accumulated_use_point ) */
 		if(adminOrderRepository.changeDepositOrderCancelMember(orderNoList) > 0) {
+			
 			List<DepositCancelInfoResponse> cancelInfoList = 
 					adminOrderRepository.findDepositCancelInfo(orderNoList);
 			
