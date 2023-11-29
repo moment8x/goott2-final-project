@@ -76,13 +76,6 @@ public class RegisterController {
 	public void signUp(SignUpDTO member, Model model) {
 		
 		try {
-			System.out.println("number1 : " + member.getPhoneNumber1());
-			System.out.println("number2 : " + member.getPhoneNumber2());
-			System.out.println("number3 : " + member.getPhoneNumber3());
-			System.out.println("cellNumber1 : " + member.getCellPhoneNumber1());
-			System.out.println("cellNumber2 : " + member.getCellPhoneNumber2());
-			System.out.println("cellNumber3 : " + member.getCellPhoneNumber3());
-			
 			if (fileList != null) {
 				mService.insertMember(member, fileList.get(0));
 				fileList.clear();

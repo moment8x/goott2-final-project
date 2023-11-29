@@ -144,7 +144,6 @@ public class ReviewServiceImpl implements ReviewService {
 		int ProductCounts = rDao.selectProductCount(productId);
 		
 		PagingInfo pagingInfo = new PagingInfo(ProductCounts, 2, page, 10);
-		System.out.println(pagingInfo.getStartRowIndex() + "start");
 		return pagingInfo;
 	}
 
@@ -184,7 +183,6 @@ public class ReviewServiceImpl implements ReviewService {
 	@Transactional(rollbackFor = Exception.class)
 	public boolean updateReview(int postNo, String content, int rating, List<UploadFiles> calcFileList, List<String> deleteFileList, String realPath, String productId)
 			throws SQLException, NamingException {
-		System.out.println("서비스 - 리뷰 수정");
 		boolean result = false;
 		if (rDao.updateReview(postNo, content, rating) == 1) {
 			
@@ -242,10 +240,6 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public boolean deleteCheck(int postNo, String memberId, String productId) throws SQLException, NamingException {
 		boolean result = false;
-		System.out.println("리뷰 삭제 체크 서비스");
-		System.out.println("postNo : " + postNo);
-		System.out.println("memberId : " + memberId);
-		System.out.println("productId : " + productId);
 		
 		if (rDao.deleteCheck(postNo, memberId, productId) == 1) {
 			// 삭제 가능함을 확인
@@ -257,7 +251,6 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	public boolean deleteReview(int postNo) throws SQLException, NamingException {
-		System.out.println("리뷰 삭제 서비스");
 		boolean result = false;
 		
 		if (rDao.deleteReview(postNo) == 1) result = true;

@@ -205,7 +205,6 @@
     		$('#zipCode').on('change', function() {
     			if ($('#zipCode').val() !== "") {
     				isValidZipCode = true;
-    				console.log("zipCode", $('#zipCode').val());
     			} else {
     				isValidZipCode = false;
     			}
@@ -215,7 +214,6 @@
     		$('#address').on('change', function() {
     			if ($('#address').val() != "") {
     				isvalidAddress = true;
-    				console.log("address", $('#address').val());
     			} else {
     				isvalidAddress = false;
     			}
@@ -227,8 +225,6 @@
     		});
     		$(".upFileArea").on("drop", function(evt) {
     			evt.preventDefault();
-    			
-    			console.log(evt.originalEvent.dataTransfer.files);
     			
     			let files = evt.originalEvent.dataTransfer.files;
     			for (let i = 0; i < 1/*files.length*/; i++) {
@@ -347,7 +343,6 @@
     	// 회원가입 유효성검사 통과 여부
     	function isValid() {
     		let result = false;
-    		console.log("isValidId",isValidId,"isValidPassword",isValidPassword,"isValidName",isValidName,"isValidEmail",isValidEmail, "isValidEmailCode", isValidEmailCode,"isValidBirth",isValidBirth,"isValidZipCode",isValidZipCode,"isValidAddress",isValidAddress)
     		if (isValidId && isValidPassword && isValidName && isValidBirth && isValidZipCode && isValidAddress) {
     			if (isValidEmailCode) {
 	    			if ((isValidPhone1 && isValidPhone2 isValidPhone3) || (isValidCellPhone1 && isValidCellPhone2)) {

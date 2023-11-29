@@ -145,7 +145,6 @@ public class ShoppingCartController {
 	public ResponseEntity<Map<String, Object>> deleteCheckedItems(HttpServletRequest request, @RequestParam(value="itemNames[]") List<String> itemNames) {
 		ResponseEntity<Map<String, Object>> result = null;
 		Map<String, Object> map = new HashMap<String, Object>();
-		System.out.println("items : " + itemNames);
 		List<ShowCartDTO> items = null;
 		// 로그인 여부 확인
 		HttpSession session = request.getSession();

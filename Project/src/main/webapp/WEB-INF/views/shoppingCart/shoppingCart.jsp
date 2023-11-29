@@ -73,7 +73,6 @@
 		function delCheckedItem() {
 			let items = [];
 			$("input[name='check_item']:checked").each(function(i){   //jQuery로 for문 돌면서 check 된값 배열에 담는다
-				console.log("?? check",$(this).val());
 				items.push($(this).val());
 			});
 			
@@ -318,7 +317,6 @@
 		function subtotal() {
 			let sum = 0;
 			for (let i = 0; i < $('h5.subtotal').length; i++) {
-				console.log(document.getElementsByClassName('calc_total')[i].parentNode.parentNode.childNodes[0].childNodes[0].checked);
 				let temp = document.getElementsByClassName('calc_total')[i].innerHTML;
 				temp = digitizeNormal(temp);
 				sum += Number(temp);

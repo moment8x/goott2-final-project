@@ -236,7 +236,6 @@ public class ReviewController {
 	@RequestMapping("delete")
 	public ResponseEntity<Map<String, Object>> deleteReviewCheck(HttpServletRequest request, @RequestParam("postNo") int postNo,
 			@RequestParam("productId") String productId, @RequestParam("page") int page) {
-		System.out.println("리뷰 삭제");
 		ResponseEntity<Map<String, Object>> result = null;
 		Map<String, Object> data = new HashMap<String, Object>();
 		HttpSession session = request.getSession();

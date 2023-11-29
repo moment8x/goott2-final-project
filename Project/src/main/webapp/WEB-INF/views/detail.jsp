@@ -226,8 +226,6 @@
       $(".upFileArea").on("drop", function(e) {
          e.preventDefault();
          
-         console.log(e.originalEvent.dataTransfer.files);
-         
          let key = $(this).attr("id").split("-")[0];
          let files = e.originalEvent.dataTransfer.files;
          for (let i = 0; i < files.length; i++) {
