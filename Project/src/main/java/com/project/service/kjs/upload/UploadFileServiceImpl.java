@@ -138,6 +138,24 @@ public class UploadFileServiceImpl implements UploadFileService {
 		
 		return result;
 	}
+	
+	// 상희짱
+	@Override
+	   public int deleteFile(UploadFiles uf, String realPath) {
+	      int result = -1;
+	      File file = new File(realPath + uf.getNewFileName());
+	      if (file.exists()) {
+	         if (uf.getThumbnailFileName() != null || uf.getThumbnailFileName().equals("")) {
+	            new File(realPath + uf.getThumbnailFileName()).delete();
+	         }
+	         file.delete();
+	         result = 1;
+	      } else {
+	         result = 0;
+	      }
+	      
+	      return result;
+	   }
 
 	@Override
 	public void deleteUploadedFile(List<String> deleteFileList, String realPath) throws IOException {
@@ -156,4 +174,5 @@ public class UploadFileServiceImpl implements UploadFileService {
 		
 		return result;
 	}
+	
 }

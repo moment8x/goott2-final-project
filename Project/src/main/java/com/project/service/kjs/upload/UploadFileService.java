@@ -18,4 +18,7 @@ public interface UploadFileService {
 	boolean isExist(String newFileName) throws SQLException, NamingException;
 	// 특정 파일 삭제
 	void deleteUploadedFile(List<String> deleteFileList, String realPath) throws IOException;
+	
+	// 상희
+	 int deleteFile(UploadFiles uf, String realPath);
 }

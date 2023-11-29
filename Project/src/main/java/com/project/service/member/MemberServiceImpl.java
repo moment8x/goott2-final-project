@@ -25,6 +25,7 @@ import com.project.vodto.CustomerInquiry;
 import com.project.vodto.Member;
 import com.project.vodto.PointLog;
 import com.project.vodto.ShippingAddress;
+import com.project.vodto.UploadFiles;
 import com.project.vodto.jmj.CancelDTO;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
@@ -35,11 +36,10 @@ import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.MyPageReview;
 import com.project.vodto.jmj.PagingInfo;
-import com.project.vodto.kjs.ShippingAddrDTO;
-import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.exchangeDTO;
-import com.project.vodto.UploadFiles;
+import com.project.vodto.kjs.ShippingAddrDTO;
+import com.project.vodto.kjs.SignUpDTO;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -48,6 +48,8 @@ public class MemberServiceImpl implements MemberService {
 	private MemberDAO mDao;
 	@Inject
 	private UploadDAO uDao;
+	@Inject
+	private JavaMailSender mailSender;
 	@Inject
 	private AdminMemberService adminMemberService;
 

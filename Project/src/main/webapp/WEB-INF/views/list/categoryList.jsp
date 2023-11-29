@@ -390,15 +390,10 @@
 														<li  data-bs-toggle="tooltip" data-bs-placement="top"
 															title="장바구니" ><a href="javascript:void(0)" onclick="shoppingcart('${product.productId}');"><i data-feather="shopping-cart"></i></a>
 														</li>
-
-														<li data-bs-toggle="tooltip" data-bs-placement="top"
-															title="장바구니"><a href="javascript:void(0)"
-															onclick="shoppingcart('${product.product_id}');"><i
-																data-feather="shopping-cart"></i></a></li>
 														
 														<c:set var="shouldRender" value="true" />
 														<c:forEach var="wish" items="${wishlist }">
-															<c:set var="productId" value="${product.product_id }"></c:set>
+															<c:set var="productId" value="${product.productId }"></c:set>
 															<c:set var="wishProduct" value="${wish.productId}"></c:set>
 
 															<c:choose>
@@ -406,12 +401,12 @@
 																	test="${sessionScope.loginMember.memberId != '' && productId eq wishProduct}">
 																	<c:set var="shouldRender" value="false" />
 																	<li data-bs-toggle="tooltip" data-bs-placement="top"
-																		value="${product.product_id }" title="찜 삭제"><a
+																		value="${product.productId }" title="찜 삭제"><a
 																		href="javascript:void(0)"
 																		class="notifi-wishlist likeProduct"> <i
-																			id="${product.product_id}" class="fa-solid fa-heart"
+																			id="${product.productId}" class="fa-solid fa-heart"
 																			style="color: #ff007b;"
-																			onclick="likeDisLike('${product.product_id}');"></i>
+																			onclick="likeDisLike('${product.productId}');"></i>
 																	</a></li>
 																</c:when>
 															</c:choose>
@@ -419,11 +414,11 @@
 
 														<c:if test="${shouldRender}">
 															<li data-bs-toggle="tooltip" data-bs-placement="top"
-																value="${product.product_id }" title="찜"><a
+																value="${product.productId }" title="찜"><a
 																href="javascript:void(0)" class="notifi-wishlist"> <i
-																	id="${product.product_id}" class="fa-regular fa-heart"
+																	id="${product.productId}" class="fa-regular fa-heart"
 																	style="color: #ff007b;"
-																	onclick="likeDisLike('${product.product_id}');"></i>
+																	onclick="likeDisLike('${product.productId}');"></i>
 															</a></li>
 														</c:if>
 
