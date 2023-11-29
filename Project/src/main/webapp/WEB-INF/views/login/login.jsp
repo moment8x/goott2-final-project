@@ -48,7 +48,7 @@
 		if(resultId == true && resultPd == true){
 			return true;
 		}
-		window.alert("놉");
+		window.alert(resultId, resultPd);
 		return false;
 	}
 	

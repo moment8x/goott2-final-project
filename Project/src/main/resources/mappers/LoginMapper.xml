@@ -10,6 +10,8 @@
     <resultMap type="com.project.vodto.kjy.Memberkjy" id="memberLoginResultMap">
   		<result property="memberId" column="member_id"/>
   		<result property="remember" column="remember"/>
+  		<result property="name" column="name"/>
+  		<result property="email" column="email"/>
   	</resultMap>
     	<!-- 로그인 하는 유저의 정보가 DB에 있는지 조회 -->
     	<select id="selectLoginUser" resultMap="memberLoginResultMap">
@@ -33,6 +35,15 @@
     	</select>
     	<!-- 이름과 이메일로 계정 조회 -->
     	<select id="selectMemberByNameAndEmail" resultMap="memberLoginResultMap">
-    		select member_id,name,email from member where name = #{userName} and email = #{email}
+    		select member_id, name, email from member where name = #{userName} and email = #{email}
+    		<if test="userId != null and userId !='noId'">
+    			and member_id = #{userId}
+    		</if>
+    	</select>
+    	<update id="updatePassword">
+    		update member set password = sha1(md5(#{password})) where member_id = #{userId}
+    	</update>
+    	<select id="isAdminBySelectPermission" resultMap="memberLoginResultMap">
+    		select member_id, permission from member where member_id = #{id} and permission = "ROLE_ADMIN" 
     	</select>
   	</mapper>

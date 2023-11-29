@@ -84,23 +84,21 @@
 
 	function parse(data) {
 		console.log(data);
-		$.each(data.list_product, function(i, product) {
+		$.each(data.listProduct, function(i, product) {
 			console.log(i);
-			if (product.product_image != null) {
-				$('#pImage' + (i + 1)).attr("src", product.product_image);
+			if(product.productImage != null){
+			$('#pImage' + (i+1)).attr("src",product.productImage);				
 			} else {
 				$('#pImage' + (i + 1)).attr("src",
 						"/resources/assets/images/deer.png");
 			}
-			$('#publisher' + (i + 1)).html(product.publisher);
-			$('#pName' + (i + 1)).html(product.product_name);
-			$('#pIntro' + (i + 1)).html(product.introduction_detail);
-			$('#page' + (i + 1)).html(product.page_count + "p");
-			$('#sPrice' + (i + 1)).html(
-					product.selling_price.toLocaleString() + "원");
-			$('#cPrice' + (i + 1)).html(
-					product.consumer_price.toLocaleString() + "원");
-			console.log($('#pImage' + (i + 1)).attr("src"));
+			$('#publisher' + (i+1)).html(product.publisher);
+			$('#pName'+ (i+1)).html(product.productName);
+			$('#pIntro'+ (i+1)).html(product.introductionDetail);
+			$('#page' + (i+1)).html(product.pageCount+"p");
+			$('#sPrice'+ (i+1)).html(product.sellingPrice.toLocaleString()+"원");
+			$('#cPrice'+ (i+1)).html(product.consumerPrice.toLocaleString()+"원");
+		console.log($('#pImage' + (i+1)).attr("src"));
 		})
 
 	}
@@ -122,13 +120,7 @@
 			break;
 		}
 	}
-
-	// 시큐리티 적용시 결제 모달창 링크 적용
-	//function getHrefModal(pId) {
-	//	$('#MemberLoginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=Y");
-	//	$('#loginPay').attr("href","/login/");
-	//	$('#noLoginPay').attr("href","/order/requestOrder?product_id="+pId+"&isLogin=N");
-	//}
+	
 
 	function changeGrid() {
 		console.log("${active}");
@@ -273,15 +265,15 @@
 			<div class="row">
 				<div class="col-12">
 					<div class="breadscrumb-contain">
-						<h2>${nowCategory.category_name }</h2>
+						<h2>${nowCategory.categoryName }</h2>
 						<nav>
 							<ol class="breadcrumb mb-0">
 								<li class="breadcrumb-item"><a href="index.html"> <i
 										class="fa-solid fa-house"></i>
 								</a></li>
 								<li class="breadcrumb-item active" aria-current="page"><a
-									href="/list/category/${categoryLang.category_key }">${categoryLang.category_name }</a></li>
-								<li class="breadcrumb-item active" aria-current="page">${nowCategory.category_name }</li>
+									href="/list/category/${categoryLang.categoryKey }">${categoryLang.categoryName }</a></li>
+								<li class="breadcrumb-item active" aria-current="page">${nowCategory.categoryName }</li>
 							</ol>
 						</nav>
 					</div>
@@ -306,9 +298,9 @@
 										<button class="nav-link active" id="pills-vegetables"
 											data-bs-toggle="pill" data-bs-target="#pills-vegetable"
 											type="button" role="tab" aria-selected="true"
-											onclick="location.href='/list/categoryList/${category.category_key }'"
+											onclick="location.href='/list/categoryList/${category.categoryKey }'"
 											id="${loop.index }">
-											${category.category_name }<img
+											${category.categoryName }<img
 												src="/resources/assets/images/books.png"
 												class="blur-up lazyload" alt="">
 										</button>
@@ -374,30 +366,30 @@
 										<div class="product-box-3 h-100 wow fadeInUp">
 											<div class="product-header">
 												<div class="product-image">
-													<c:choose>
-														<c:when test="${product.product_image != null}">
-															<a href="/detail/${product.product_id}"> <img
-																id="pImage${loop.index + 1 }"
-																src="${product.product_image}"
-																class="img-fluid blur-up lazyload" alt="">
-															</a>
-														</c:when>
-														<c:otherwise>
-															<a href="/detail/${product.product_id}"> <img
-																id="pImage${loop.index + 1 }"
-																src="/resources/assets/images/deer.png"
-																class="img-fluid blur-up lazyload" alt="">
-															</a>
-														</c:otherwise>
+												<c:choose>
+												<c:when test="${product.productImage != null}">
+													<a href="/detail/${product.productId}"> <img id="pImage${loop.index + 1 }"
+														src="${product.productImage}"
+														class="img-fluid blur-up lazyload" alt="">
+													</a>
+													</c:when>
+													<c:otherwise>
+													<a href="/detail/${product.productId}"> <img id="pImage${loop.index + 1 }"
+														src="/resources/assets/images/deer.png"
+														class="img-fluid blur-up lazyload" alt="">
+													</a>
+													</c:otherwise>
 													</c:choose>
 													
 													<ul class="product-option">
-														<li data-bs-toggle="tooltip" data-bs-placement="top"
-															id="payModalBtn" value="${product.product_id }"
-															title="바로 구매"><a href="javascript:void(0)"
-															data-bs-toggle="modal" data-bs-target="#view"><i
-																data-feather="credit-card"></i> </a></li>
+															<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="${product.productId }"
+															title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i>
+															</a></li>
+														
 
+														<li  data-bs-toggle="tooltip" data-bs-placement="top"
+															title="장바구니" ><a href="javascript:void(0)" onclick="shoppingcart('${product.productId}');"><i data-feather="shopping-cart"></i></a>
+														</li>
 
 														<li data-bs-toggle="tooltip" data-bs-placement="top"
 															title="장바구니"><a href="javascript:void(0)"
@@ -440,13 +432,11 @@
 												</div>
 											</div>
 											<div class="product-footer">
+													<a href="/detail/${product.productId }">
 												<div class="product-detail">
 													<span class="span-name" id="publisher${loop.index + 1 }">${product.publisher }</span>
-													<a href="product-left-thumbnail.html">
-														<h5 class="name" id="pName${loop.index + 1 }">${product.product_name }</h5>
-													</a>
-													<p class="text-content mt-1 mb-2 product-content"
-														id="pIntro${loop.index + 1 }">${product.introduction_detail }</p>
+														<h5 class="name" id="pName${loop.index + 1 }">${product.productName }</h5>													
+													<p class="text-content mt-1 mb-2 product-content" id="pIntro${loop.index + 1 }">${product.introductionDetail }</p>
 													<div class="product-rating mt-2">
 														<!-- 나중에 리뷰 보고 만들기 -->
 														<ul class="rating">
@@ -458,17 +448,18 @@
 														</ul>
 														<span>(4.0)</span>
 													</div>
-													<h6 class="unit" id="page${loop.index + 1 }">${product.page_count }p</h6>
+													<h6 class="unit" id="page${loop.index + 1 }">${product.pageCount }p</h6>
 													<h5 class="price">
 														<span class="theme-color" id="sPrice${loop.index + 1 }"><fmt:formatNumber
-																value="${product.selling_price}" pattern="#,###원" /></span>
+																value="${product.sellingPrice}" pattern="#,###원" /></span>
 														<del id="cPrice${loop.index + 1 }">
-															<fmt:formatNumber value="${product.consumer_price}"
+															<fmt:formatNumber value="${product.consumerPrice}"
 																pattern="#,###원" />
 														</del>
 													</h5>
 													<div class="add-to-cart-box bg-white"></div>
 												</div>
+												</a>
 											</div>
 										</div>
 									</div>
@@ -484,19 +475,18 @@
 							</a></li>
 							<c:choose>
 								<c:when
-									test="${paging_info.totalPagingBlockCnt > paging_info.endNumOfCurrentPagingBlock }">
+									test="${pagingInfo.totalPagingBlockCnt > pagingInfo.endNumOfCurrentPagingBlock }">
 									<c:forEach var="i"
-										begin="${paging_info.startNumOfCurrentPagingBlock}"
-										end="${paging_info.endNumOfCurrentPagingBlock }" step="1">
-										<li class="page-item active"><a
-											class="page-link link${i}"
+										begin="${pagingInfo.startNumOfCurrentPagingBlock}"
+										end="${pagingInfo.endNumOfCurrentPagingBlock }" step="1">
+										<li class="page-item active"><a class="page-link link${i}"
 											href="/list/categoryList/${key }?page=${i}">${i}</a></li>
 									</c:forEach>
 								</c:when>
 								<c:otherwise>
 									<c:forEach var="i"
-										begin="${paging_info.startNumOfCurrentPagingBlock}"
-										end="${paging_info.totalPagingBlockCnt }" step="1">
+										begin="${pagingInfo.startNumOfCurrentPagingBlock}"
+										end="${pagingInfo.totalPagingBlockCnt }" step="1">
 										<li class="page-item active"><a class="page-link"
 											href="/list/categoryList/${key }?page=${i}">${i}</a></li>
 									</c:forEach>
@@ -536,31 +526,15 @@
 									class="img-fluid blur-up lazyload" alt="" />
 							</div>
 							<div>
-								<!-- 
-							<sec:authorize  access="isAuthenticated()">
-								<a href="/order/requestOrder?product_id="+pId+"&isLogin=Y" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-							</sec:authorize>
-							<sec:authorize access="isAnonymous()">
-								<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-								<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>
-							</sec:authorize>	
-							 -->
-								<c:choose>
-									<c:when test="${sessionScope.loginMember != null }">
-										<a href="" id="MemberLoginPay"><button type="button"
-												class="btn buttonBuyMember"
-												style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-									</c:when>
-									<c:otherwise>
-										<a href="" id="loginPay"><button type="button"
-												class="btn buttonBuyMember"
-												style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-										<a href="" id="noLoginPay"><button type="button"
-												class="btn buttonBuyMember"
-												style="background-color: #F9B572;" onclick="">비 회원
-												구매</button></a>
-									</c:otherwise>
-								</c:choose>
+							 <c:choose>
+							 	<c:when test="${sessionScope.loginMember != null }">
+							 		<a href="" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+							 	</c:when>
+							 	<c:otherwise>
+							 		<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+									<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>
+							 	</c:otherwise>
+							 </c:choose>												
 							</div>
 						</div>
 					</div>

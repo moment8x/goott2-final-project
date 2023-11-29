@@ -12,12 +12,12 @@ import lombok.ToString;
 @Setter
 @ToString
 public class SnsRegisterInfo {
-   private String id;
-   private String email;
-   private String mobile;
-   private String name;
-   private String birthday;
-   private String birthyear;
-   private String mobile_e164;
-   private String connected_at;
+	private String id;
+	private String email;
+	private String mobile;
+	private String name;
+	private String birthday;
+	private String birthyear;
+	private String mobile_e164;
+	private String connected_at;
 }

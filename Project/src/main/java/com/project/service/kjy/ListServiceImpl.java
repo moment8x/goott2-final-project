@@ -10,7 +10,7 @@ import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
 
-import com.project.dao.kjr.ListDao;
+import com.project.dao.kjy.ListDao;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.Product;
 import com.project.vodto.Wishlist;
@@ -52,8 +52,8 @@ public class ListServiceImpl implements ListService {
 			break;
 		}
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("list_product", lst);
-		map.put("paging_info", pagingInfo);
+		map.put("listProduct", lst);
+		map.put("pagingInfo", pagingInfo);
 		
 		return map;
 	}
@@ -73,12 +73,6 @@ public class ListServiceImpl implements ListService {
 		PagingInfo pagingInfo = new PagingInfo(ProductCounts, 12, page, 10);
 		System.out.println(pagingInfo.getStartRowIndex() + "start");
 		return pagingInfo;
-	}
-
-	@Override
-	public List<Products> getProductsBsetSeller(String key) throws Exception {
-		
-		return lDao.selectBsetSeller(key);
 	}
 
 	@Override
@@ -160,11 +154,11 @@ public class ListServiceImpl implements ListService {
 	public Map<String, Object> indexSlideList() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
 		// 베스트 셀러
-		List<Products> bestSellerList = lDao.selectBsetSeller(null);
+		List<ProductsForList> bestSellerList = lDao.selectBsetSeller(null);
 		// 최신 도서 (화제의 신상)
-		List<ProductsForList> newList = lDao.selectNewProducts();
+		List<ProductsForList> newList = lDao.selectNewProducts(null);
 		// 많이 팔린 순
-		List<ProductsForList> sellingList = lDao.selectProductOrderBySellings();
+		List<ProductsForList> sellingList = lDao.selectProductOrderBySellings(null);
 		// 장바구니에 많은 순
 		List<ProductsForList> cartList = lDao.selectProductOrderByCart();
 		// 찜에 많은 순 (많이 보는 상품) -- 폐기 예정
@@ -177,6 +171,22 @@ public class ListServiceImpl implements ListService {
 		map.put("sellingList", sellingList);
 		map.put("cartList", cartList);
 		map.put("ratingList", ratingList);
+		return map;
+	}
+
+	@Override
+	public Map<String, Object> langPageList(String lang) throws Exception {
+		Map<String, Object> map = new HashMap<String, Object>();
+		// 언어별 베스트 셀러
+		List<ProductsForList> bestSeller = lDao.selectBsetSeller(lang);
+		// 언어별 많이 팔린 순
+		List<ProductsForList> sellingList = lDao.selectProductOrderBySellings(lang);
+		// 새로나온 책
+		List<ProductsForList> newList = lDao.selectNewProducts(lang);
+		
+		map.put("newList", newList);
+		map.put("bestSellerList", bestSeller);
+		map.put("sellingList", sellingList);
 		return map;
 	}
 

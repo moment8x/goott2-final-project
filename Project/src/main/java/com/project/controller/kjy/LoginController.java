@@ -25,7 +25,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +35,7 @@ import com.project.interceptor.kjy.RememberInterceptor;
 import com.project.service.kjy.LoginService;
 import com.project.vodto.kjy.LoginDTO;
 import com.project.vodto.kjy.Memberkjy;
-import com.project.vodto.kjy.NaverRegisterInfo;
+import com.project.vodto.kjy.SnsRegisterInfo;
 
 
 @Controller
@@ -55,6 +57,9 @@ public class LoginController {
 		if(request.getParameter("csPath") != null && request.getParameter("csPath") != "") {
 			this.beforeUri = "http://localhost:8081/cs/" + request.getParameter("csPath");
 		}
+		if(beforeUri.contains("passwordUpdate") || beforeUri.contains("validCode") || beforeUri.contains("auth")) {
+			beforeUri ="http://localhost:8081/";
+		}
 		System.out.println("befo : " + this.beforeUri);
 		return "/login/login";
 	}
@@ -66,6 +71,7 @@ public class LoginController {
 		try {
 			Memberkjy loginMember = loginService.getLogin(loginDTO);
 			if(loginMember != null) {
+				System.out.println(loginMember);
 				request.getSession().setAttribute("loginMember", loginMember);
 				model.addObject("loginStatus", "loginOk");
 				if(beforeUri != null) {
@@ -89,16 +95,6 @@ public class LoginController {
 		}
 
 		return model;
-	}
-	
-	@RequestMapping("/accessError")
-	public void accessError() {
-		
-	}
-	
-	@RequestMapping("/loginTest")
-	public void goLoginTest() {
-		
 	}
 	
 	@RequestMapping("/logout")
@@ -141,16 +137,15 @@ public class LoginController {
 		return "redirect:" + apiURL;
 	}
 	@RequestMapping("/naverLoginCallBack")
-	public ModelAndView naverLoginCallBack(HttpServletRequest request, ModelAndView model) {
+	public String naverLoginCallBack(HttpServletRequest request, RedirectAttributes redirectAttributes, Model model) {
 	    String clientId = "QvibsLi5PSZRGzsKS_Zp";
 	    String clientSecret = "o6h8h8IDEQ";
 	    String code = request.getParameter("code");
 	    String state = request.getParameter("state");
 
 	    if (state == null || !state.equals(request.getSession().getAttribute("state"))) {
-	        // 상태(state) 값 검증에 실패한 경우, 예외 처리 또는 로깅
-	    	model.setViewName("error");
-	        return model; // 예시로 "error" 페이지를 리턴
+	        model.addAttribute("error", "getStateInfoFailed");
+	        return "/login/"; 
 	    }
 
 	    String redirectURI = "http://localhost:8081/login/naverLoginCallBack";
@@ -208,28 +203,24 @@ public class LoginController {
 	                    JsonNode jsonUserInfo = userInfoJson.get("response");
 	                    System.out.println("얍얍"+jsonUserInfo);
 	                    
-	                    NaverRegisterInfo naverInfo = objectMapper.treeToValue(jsonUserInfo, NaverRegisterInfo.class);
+	                    SnsRegisterInfo naverInfo = objectMapper.treeToValue(jsonUserInfo, SnsRegisterInfo.class);
 	                    System.out.println("네이버 정보임 : " + naverInfo);
 	                    
 	                    Memberkjy naverLoginUser = loginService.getMemberById(naverInfo.getId());
 	         
 	                    if(naverLoginUser == null) {
-	                    	model.setViewName("foward:/register/snsRegister");
-	                    	model.addObject("userInfo", naverInfo);
-	                    	return model;
+	                    	redirectAttributes.addFlashAttribute("snsInfo", naverInfo);
+	                    	return "redirect:/register/snsRegister";
 	                    } else if(beforeUri != null) {
 	                    	request.getSession().setAttribute("loginMember", naverLoginUser);
-	                    	model.setViewName("redirect:" + beforeUri);
-	                    } else {
-	                    	model.setViewName("/index");
-	                    }
-	                    
-	                    return model; // 사용자 정보 가져오기에 성공한 경우
+	                    	return"redirect:" + beforeUri;
+	                    } 
+	                    return "/index";
 	                } else {
 	                    // 사용자 정보 가져오기에 실패한 경우, 오류 처리 로직 추가
 	                    System.out.println("Error getting user info");
-	                    model.setViewName("error");
-	                    return model;
+	                    model.addAttribute("error", "getInfoFailed");
+	                    return "/login/";
 	                }
 	            } else {
 	                // 액세스 토큰이 유효하지 않은 경우, 리프레시 토큰을 사용하여 갱신
@@ -257,45 +248,43 @@ public class LoginController {
 	                        JsonNode userInfoJson = objectMapper.readTree(userInfoResponse.toString());
 		                    JsonNode naverUserInfo = userInfoJson.get("response");
 		                    
-		                    NaverRegisterInfo naverInfo = objectMapper.treeToValue(naverUserInfo, NaverRegisterInfo.class);
+		                    SnsRegisterInfo naverInfo = objectMapper.treeToValue(naverUserInfo, SnsRegisterInfo.class);
 		                    System.out.println("네이버 정보임 : " + naverInfo);
 		                    
 		                    Memberkjy naverLoginUser = loginService.getMemberById(naverInfo.getId());
 		                    
-		                    if(naverLoginUser == null) {
-		                    	model.setViewName("forward : /register/snsRegister");
-		                    	model.addObject("userInfo", naverInfo);
-		                    	return model;
+		                    if(naverLoginUser == null) {	                    	
+		                    	redirectAttributes.addFlashAttribute("snsInfo", naverUserInfo);
+		                    	return "redirect : /register/snsRegister";
 		                    } else {
 		                    	request.getSession().setAttribute("loginMember", naverLoginUser);
 		                    	if(beforeUri != null) {
-			                    	model.setViewName("redirect:" + beforeUri);
-			                    } else {
-			                    	model.setViewName("/index");
+			                    	return"redirect:" + beforeUri;
 			                    }
 		                    } 
 		                    
-		                    return model; // 사용자 정보 가져오기에 성공한 경우
+		                    return "/index"; 
 	                                  
 	                    } else {
 	                        // 사용자 정보 가져오기에 실패한 경우, 오류 처리 로직 추가
 	                        System.out.println("Error getting user info");
-	                        model.setViewName("error");
-	                        return model;
+	                        model.addAttribute("error", "getInfoFailed");
+	                        return "/login/";
 	                    }
 	                } else {
 	                    // 액세스 토큰 갱신이 실패한 경우
 	                    System.out.println("Error refreshing access token");
-	                    model.setViewName("error");
-	                    return model;
+	                    model.addAttribute("error", "getTokenRefreshFailed");
+	                    
+	                    return "/index/";
 	                }
 	            }
 	        }
 	    } catch (Exception e) {
 	        // 예외 로깅
 	        e.printStackTrace();
-	        model.setViewName("error");
-	        return model; // 또는 다른 오류 처리 로직 추가
+	        model.addAttribute("error", "uriConnectionFailed");
+	        return "/login/"; // 또는 다른 오류 처리 로직 추가
 	    }
 
 	    return null;
@@ -374,7 +363,7 @@ public class LoginController {
 	}
 	
 	@RequestMapping("/kakaoLogin")
-	public void kakaoLogin(HttpServletRequest request, ModelAndView model) {
+	public String kakaoLogin(HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) {
 		System.out.println("와! 카카오!");
 		String code = request.getParameter("code");
 		System.out.println("인가코드 : "+code);
@@ -412,6 +401,7 @@ public class LoginController {
 		            String access_token = jsonMapper.get("access_token").asText();
 		            String refresh_token = jsonMapper.get("refresh_token").asText();
 		            
+		            ObjectMapper objectMapper = new ObjectMapper();
 		            if(isAccessTokenRight(access_token)) { // 유효기간 검사
 		            	//지나지 않았다면
 		            	URL getInfoUrl = new URL("https://kapi.kakao.com/v2/user/me");
@@ -432,6 +422,24 @@ public class LoginController {
 		                    getInfoReader.close();
 		                    
 		                    System.out.println("카카오로그인 유저 정보다람쥐썬더 " + getInfoResponse.toString());
+		                    
+		                    JsonNode userInfoJson = objectMapper.readTree(getInfoResponse.toString());
+		                    
+		                    SnsRegisterInfo kakaoInfo = objectMapper.treeToValue(userInfoJson, SnsRegisterInfo.class);
+		                    System.out.println("카카오로그인 정보임 : " + kakaoInfo);
+		                    
+		                    Memberkjy kakaoMember = loginService.getMemberById(kakaoInfo.getId());
+		                    if(kakaoMember == null) {	                    	
+		                    	redirectAttributes.addFlashAttribute("snsInfo", kakaoInfo);
+		                    	return "redirect:/register/snsRegister";
+		                    } else {
+		                    	request.getSession().setAttribute("loginMember", kakaoMember);
+		                    	if(beforeUri != null) {
+			                    	return"redirect:" + beforeUri;
+			                    }
+		                    } 
+		                    
+		                    return "/index";
 		                }      
 		            } else {
 		            	Map<String, String> tokenMap = refreshKakaoToken(access_token, refresh_token);
@@ -456,13 +464,34 @@ public class LoginController {
 		                    getInfoReader.close();
 		                    
 		                    System.out.println("카카오로그인 유저 정보다람쥐썬더 " + getInfoResponse.toString());
+		                    
+		                    JsonNode userInfoJson = objectMapper.readTree(getInfoResponse.toString());
+		                    
+		                    SnsRegisterInfo kakaoInfo = objectMapper.treeToValue(userInfoJson, SnsRegisterInfo.class);
+		                    System.out.println("리프레쉬 된 카카오로그인 정보임 : " + kakaoInfo);
+		                    
+		                    Memberkjy kakaoMember = loginService.getMemberById(kakaoInfo.getId());
+		                    if(kakaoMember == null) {	                    	
+		                    	redirectAttributes.addFlashAttribute("snsInfo", kakaoInfo);
+		                    	return "redirect:/register/snsRegister";
+		                    } else {
+		                    	request.getSession().setAttribute("loginMember", kakaoMember);
+		                    	if(beforeUri != null) {
+			                    	return"redirect:" + beforeUri;
+			                    }
+		                    } 
+		                    
+		                    return "/index";
 		                }
 		            }
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
+			 System.out.println("Error getting user info");
+             model.addAttribute("error", "getInfoFailed");
+             return "/login/";
 		}
+		return "/login/";
 	}
 
 	private Map<String, String> refreshKakaoToken(String access_token, String refresh_token) {
@@ -560,13 +589,44 @@ public class LoginController {
 	
 	
 	@RequestMapping(value="/auth", method = RequestMethod.POST)
-	public String authController(@RequestParam("userName")String userName, @RequestParam("email")String email) {
-	try {
-		loginService.emailaSend(email);
-	} catch (MessagingException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+	public String authController(@RequestParam("userName")String userName, @RequestParam("email")String email, @RequestParam(value="userId", defaultValue = "noId")String userId, @RequestParam("status")String status, Model model) {
+		try {
+			if(loginService.emailAuth(email, userName, userId)) {
+				model.addAttribute("status", "auth");
+			}
+		} catch (Exception e) {
+			model.addAttribute("status", "error");
+			e.printStackTrace();
+		}
+		model.addAttribute("lookFor", status);
+		return "/login/forgot";
 	}
+	
+	@RequestMapping(value="/validCode", method = RequestMethod.POST)
+	public String vaildEmailCode(@RequestParam("emailCode")String emailCode, @RequestParam("status")String status, Model model) {
+		Memberkjy member = loginService.validEmailCode(emailCode);
+		if(member != null) {
+			model.addAttribute("lookFor", status);
+			if("id".equals(status)) {
+				model.addAttribute("memberId", member.getMemberId());
+				model.addAttribute("status", "success");
+			} else if("password".equals(status)) {
+				System.out.println("4444");
+				model.addAttribute("memberId", member.getMemberId());
+				model.addAttribute("status", "successPd");
+			}
+		} else {
+			model.addAttribute("status", "failed");
+		}
+		return "/login/forgot";
+	}
+	@RequestMapping(value="/passwordUpdate", method = RequestMethod.POST)
+	public String passwordUpdate(@RequestParam("password")String password, @RequestParam("userId")String userId, Model model) {
+		if(loginService.changePassword(userId, password)) {
+			model.addAttribute("status", "successUpdate");
+		} else {
+			model.addAttribute("status", "error");
+		}
 		return "/login/forgot";
 	}
 }

@@ -100,19 +100,19 @@ function parse(data) {
 	let output = "";
 	$.each(data, function(i, product) {
      		output += `<div><div class="product-box-3 h-100 wow fadeInUp"><div class="product-header"><div class="product-image">`
-     		output += `<a href="product-left-thumbnail.html"><img src="\${product.product_image }"class="img-fluid blur-up lazyload" alt=""></a>`
+     		output += `<a href="product-left-thumbnail.html"><img src="\${product.productImage }"class="img-fluid blur-up lazyload" alt=""></a>`
             output += `<ul class="product-option">`
-     		output += `<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="\${product.product_id }" title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i></a></li>`
-     		output += `<li  data-bs-toggle="tooltip" data-bs-placement="top" title="장바구니" ><a href="/shoppingCart/insert?product_id='\${product.product_id }"><i data-feather="shopping-cart"></i></a></li>`
+     		output += `<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="\${product.productId }" title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i></a></li>`
+     		output += `<li  data-bs-toggle="tooltip" data-bs-placement="top" title="장바구니" ><a href="/shoppingCart/insert?product_id='\${product.productId }"><i data-feather="shopping-cart"></i></a></li>`
 			output += `<li data-bs-toggle="tooltip" data-bs-placement="top"title="Wishlist"><a href="wishlist.html"class="notifi-wishlist"> <i data-feather="heart"></i></a></li>`
 			output += `</ul></div></div>`
-			output += `<div class="product-footer"><div class="product-detail"><span class="span-name">Vegetable</span><a href="product-left-thumbnail.html"><h5 class="name">\${product.product_name }</h5></a>`
-			output += `<p class="text-content mt-1 mb-2 product-content">\${product.introduction_intro }</p>`
+			output += `<div class="product-footer"><div class="product-detail"><span class="span-name">Vegetable</span><a href="product-left-thumbnail.html"><h5 class="name">\${product.productName }</h5></a>`
+			output += `<p class="text-content mt-1 mb-2 product-content">\${product.introductionIntro }</p>`
 			output += `<div class="product-rating mt-2"><ul class="rating">`
 			output += `<li><i data-feather="star" class="fill"></i></li><li><i data-feather="star" class="fill"></i></li><li><i data-feather="star" class="fill"></i></li><li><i data-feather="star" class="fill"></i></li><li><i data-feather="star"></i></li></ul><span>(4.0)</span>`
-			let sellPrice = product.selling_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-			let consumerPrice = product.consumer_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-			output += `</div><h6 class="unit">\${product.page_count }</h6><h5 class="price"><span class="theme-color"><span class="theme-color">\${sellPrice}원</span><del>\${consumerPrice}원</del></h5></div></div></div></div>`
+			let sellPrice = product.sellingPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+			let consumerPrice = product.consumerPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+			output += `</div><h6 class="unit">\${product.pageCount }</h6><h5 class="price"><span class="theme-color"><span class="theme-color">\${sellPrice}원</span><del>\${consumerPrice}원</del></h5></div></div></div></div>`
 	})
 	$(".product-list-section").html(output);
 	feather.replace();
@@ -268,10 +268,10 @@ function makePageButton(paging) {
                                             <c:forEach var="category" items="${categories }" varStatus="loop">  
                                                 <li>
                                                     <div class="form-check ps-0 m-0 category-list-box key-category">
-                                                        <input class="checkbox_animated" type="checkbox" id="categories${loop.index }" value="${category.category_key }">
+                                                        <input class="checkbox_animated" type="checkbox" id="categories${loop.index }" value="${category.categorykey }">
                                                         <label class="form-check-label" for="categories${loop.index }">
-                                                            <span class="name">${category.category_name }</span>
-                                                            <span class="number">${category.category_count }</span>
+                                                            <span class="name">${category.categoryName }</span>
+                                                            <span class="number">${category.categoryCount }</span>
                                                         </label>
                                                     </div>
                                                 </li>
@@ -613,17 +613,17 @@ function makePageButton(paging) {
                                 <div class="product-header">
                                     <div class="product-image">
                                         <a href="product-left-thumbnail.html">
-                                            <img src="${product.product_image }"
+                                            <img src="${product.productImage }"
                                                 class="img-fluid blur-up lazyload" alt="">
                                         </a>
                                         <ul class="product-option">
-													<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="${product.product_id }"
+													<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="${product.productId }"
 														title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i>
 													</a></li>
 														
 
 												<li  data-bs-toggle="tooltip" data-bs-placement="top"
-													title="장바구니" ><a href="/shoppingCart/insert?product_id='${product.product_id }"><i data-feather="shopping-cart"></i></a>
+													title="장바구니" ><a href="/shoppingCart/insert?product_id='${product.productId }"><i data-feather="shopping-cart"></i></a>
 												</li>
 
 												<li data-bs-toggle="tooltip" data-bs-placement="top"
@@ -637,11 +637,11 @@ function makePageButton(paging) {
                                     <div class="product-detail">
                                         <span class="span-name">Vegetable</span>
                                         <a href="product-left-thumbnail.html">
-                                            <h5 class="name">${product.product_name }</h5>
+                                            <h5 class="name">${product.productName }</h5>
                                         </a>
                                         <c:choose>
-                                        	<c:when test="${product.introduction_intro != null }">
-                                        		<p class="text-content mt-1 mb-2 product-content">${product.introduction_intro }</p>
+                                        	<c:when test="${product.introductionIntro != null }">
+                                        		<p class="text-content mt-1 mb-2 product-content">${product.introductionIntro }</p>
                                         	</c:when>
                                         </c:choose>
                                         <div class="product-rating mt-2">
@@ -664,10 +664,10 @@ function makePageButton(paging) {
                                             </ul>
                                             <span>(4.0)</span>
                                         </div>
-                                        <h6 class="unit">${product.page_count }</h6>
+                                        <h6 class="unit">${product.pageCount }</h6>
                                         <h5 class="price"><span class="theme-color">
-                                        <fmt:formatNumber value="${product.selling_price}" pattern="#,###원" /> 
-                                        <del><fmt:formatNumber value="${product.consumer_price}" pattern="#,###원" /></del>
+                                        <fmt:formatNumber value="${product.sellingPrice}" pattern="#,###원" /> 
+                                        <del><fmt:formatNumber value="${product.consumerPrice}" pattern="#,###원" /></del>
                                         </h5>
                                     </div>
                                 </div>
@@ -740,15 +740,6 @@ function makePageButton(paging) {
 									class="img-fluid blur-up lazyload" alt="" />
 							</div>
 							<div>
-							<!-- 
-							<sec:authorize  access="isAuthenticated()">
-								<a href="/order/requestOrder?product_id="+pId+"&isLogin=Y" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-							</sec:authorize>
-							<sec:authorize access="isAnonymous()">
-								<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-								<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>
-							</sec:authorize>	
-							 -->
 							 <c:choose>
 							 	<c:when test="${sessionScope.loginMember != null }">
 							 		<a href="/order/requestOrder?product_id="+pId+"&isLogin=Y" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>

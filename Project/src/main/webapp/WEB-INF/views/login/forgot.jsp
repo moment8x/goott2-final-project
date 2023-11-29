@@ -13,7 +13,7 @@
 <script>
 
 let resultName = false; let resultPhone = false;
-let regTypePd = /^(?=.*[0-9]+).{8,15}$/; 
+let regTypeEmail = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
 
 $(function () {
 	$("#userName").on("keyup", function() {
@@ -21,9 +21,35 @@ $(function () {
 		delayTime(function() {
 			if(val.length > 2) {
 				resultName = true;
+				$(".nameError").html("");
 			} else {
 				resultName = false;
 				$(".nameError").html("성함을 입력해주세요");
+			} 
+		}, 1000);
+	});
+	$("#userId").on("keyup", function() {
+		let val = $(this).val();
+		delayTime(function() {
+			if(val.length > 2) {
+				resultName = true;
+				$(".idError").html("");
+			} else {
+				resultName = false;
+				$(".idError").html("ID를 입력해주세요");
+			} 
+		}, 1000);
+	});
+	
+	$("#email").on("keyup", function() {
+		let val = $(this).val();
+		delayTime(function() {
+			if(regTypeEmail.test(val)) {
+				resultName = true;
+				$(".emailError").html("");
+			} else {
+				resultName = false;
+				$(".emailError").html("이메일을 입력해주세요");
 			} 
 		}, 1000);
 	});
@@ -39,9 +65,23 @@ let delayTime = (function() {
 	};
 })();
 
+function redirectToPage(going) {
+	if(going == "forgot"){
+		let status = "${lookFor}";
+    	window.location.href = '/login/forgot?status='+status;
+	} else {
+		window.location.href = '/login/';
+	}
+}
+
+function getSubmit() {
+	$("#idForgotForm").submit();
+	$("#pdForgotForm").submit();
+}
+
 </script>
 <style>
-	.nameError{
+	.nameError, .emailError, idError{
 		color: red;
 	}
 </style>
@@ -97,7 +137,21 @@ let delayTime = (function() {
             <div class="row">
                 <div class="col-12">
                     <div class="breadscrumb-contain">
-                        <h2>Forgot Password</h2>
+                    <c:choose>
+                    	<c:when test="${status == 'id' }">
+                    	<h2>아이디 찾기</h2>
+                    	</c:when>
+                    	<c:when test="${status == 'password' }">
+                    	<h2>비밀번호 찾기</h2>
+                    	</c:when>
+                    	<c:when test="${status == 'failed' }">
+                    	<h2>에러</h2>
+                    	</c:when>
+                    	<c:when test="${status == 'success' }">
+                    	<h2>아이디/비밀번호</h2>
+                    	</c:when>
+                    </c:choose>
+                        
                         <nav>
                             <ol class="breadcrumb mb-0">
                                 <li class="breadcrumb-item">
@@ -113,8 +167,6 @@ let delayTime = (function() {
             </div>
         </div>
     </section>
-    <!-- Breadcrumb Section End -->
-    <button id="test">버튼확인용</button>
     <c:choose>
 	<c:when test="${status == 'id' }">
     <!-- log in section start -->
@@ -135,21 +187,24 @@ let delayTime = (function() {
                             </div>
 
                             <div class="input-box">
-                                <form class="row g-4" onsubmit="return validate();" method="POST" action="/login/auth" >
+                                <form class="row g-4" method="POST" action="/login/auth" id="idForgotForm">
                                     <div class="col-12">
-                                        <div class="form-floating theme-form-floating log-in-form">
-                                       성함을 입력하세요 : 
+                                        <div class="form-floating theme-form-floating log-in-form"> 
                                             <input type="text" class="form-control" id="userName"
                                                 placeholder="성함을 입력하세요" name="userName">
+                                                <label for="userName">성함을 입력하세요</label>
                                                 <div class="nameError"></div>
-                                       이메일을 입력하세요
+                                        </div>
+                                        <div class="form-floating theme-form-floating log-in-form">
                                             <input type="email" class="form-control" id="email"
                                                 placeholder="이메일을 입력하세요" name="email">
+                                                <label for="email">이메일을 입력하세요</label>
+                                                 <div class="emailError"></div>
                                         </div>
                                     </div>
-
+									<input type="hidden" name="status" value="id" >
                                     <div class="col-12">
-                                        <button class="btn btn-animation w-100" type="submit">아이디 찾기</button>
+                                        <button class="btn btn-animation w-100" data-bs-toggle="modal" data-bs-target="#myModal" type="button" >아이디 찾기</button>
                                     </div>
                                 </form>
                             </div>
@@ -161,7 +216,227 @@ let delayTime = (function() {
     </section>
     <!-- log in section end -->
     </c:when>
-    
+    <c:when test="${status == 'auth' }">
+    <!-- log in section start -->
+    <section class="log-in-section section-b-space forgot-section">
+        <div class="container-fluid-lg w-100">
+            <div class="row">
+                <div class="col-xxl-6 col-xl-5 col-lg-6 d-lg-block d-none ms-auto">
+                    <div class="image-contain">
+                        <img src="/resources/assets/images/inner-page/forgot.png" class="img-fluid" alt="">
+                    </div>
+                </div>
+
+                <div class="col-xxl-4 col-xl-5 col-lg-6 col-sm-8 mx-auto">
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <div class="log-in-box">
+                            <div class="log-in-title">
+                                <h3>이메일 인증하기</h3>
+                            </div>
+
+                            <div class="input-box">
+                                <form class="row g-4" method="POST" action="/login/validCode" >
+                                    <div class="col-12">
+                                        <div class="form-floating theme-form-floating log-in-form">
+                                            <input type="text" class="form-control" id="emailCode"
+                                                placeholder="인증 코드를 입력하세요" name="emailCode"  style="width: 200px;">
+                                        	<label for="emailCode">인증 코드를 입력하세요</label>
+                                        	<div class="codeError"></div>
+                                    	</div>
+                                    	<input type="hidden" value="${lookFor }" name="status">
+                                    <div class="col-12">
+                                    <button class="btn btn-animation w-100" type="submit">인증 하기</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- log in section end -->
+    </c:when>
+     <c:when test="${status == 'success' }">
+    <!-- log in section start -->
+    <section class="log-in-section section-b-space forgot-section">
+        <div class="container-fluid-lg w-100">
+            <div class="row">
+                <div class="col-xxl-6 col-xl-5 col-lg-6 d-lg-block d-none ms-auto">
+                    <div class="image-contain">
+                        <img src="/resources/assets/images/inner-page/forgot.png" class="img-fluid" alt="">
+                    </div>
+                </div>
+
+                <div class="col-xxl-4 col-xl-5 col-lg-6 col-sm-8 mx-auto">
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <div class="log-in-box">
+                        	<div class="log-in-title">
+                        		<h3>회원가입된 아이디 : </h3>
+                        	</div>
+                        <div class="input-box">
+                        	<div class="col-12">
+                        		<div class="form-floating theme-form-floating log-in-form">
+                        			<input type="text" class="form-control" style="width: 400px; text-align: center;"readonly="readonly" value="${memberId }">
+                                </div>
+                                <button class="btn btn-animation w-100" onclick="redirectToPage('login');">로그인 페이지로 돌아가기</button>
+                           	</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- log in section end -->
+    </c:when>
+     <c:when test="${status == 'successUpdate' }">
+    <!-- log in section start -->
+    <section class="log-in-section section-b-space forgot-section">
+        <div class="container-fluid-lg w-100">
+            <div class="row">
+                <div class="col-xxl-6 col-xl-5 col-lg-6 d-lg-block d-none ms-auto">
+                    <div class="image-contain">
+                        <img src="/resources/assets/images/inner-page/forgot.png" class="img-fluid" alt="">
+                    </div>
+                </div>
+
+                <div class="col-xxl-4 col-xl-5 col-lg-6 col-sm-8 mx-auto">
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <div class="log-in-box">
+                        	<div class="log-in-title">
+                        		<h3>비밀번호가 변경되었습니다!</h3>
+                        	</div>
+                        <div class="input-box">
+                        	<div class="col-12">	
+                                <button class="btn btn-animation w-100" onclick="redirectToPage('login');">로그인 페이지로 돌아가기</button>
+                           	</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- log in section end -->
+    </c:when>
+<c:when test="${status == 'successPd' }">
+    <!-- log in section start -->
+    <section class="log-in-section section-b-space forgot-section">
+        <div class="container-fluid-lg w-100">
+            <div class="row">
+                <div class="col-xxl-6 col-xl-5 col-lg-6 d-lg-block d-none ms-auto">
+                    <div class="image-contain">
+                        <img src="/resources/assets/images/inner-page/forgot.png" class="img-fluid" alt="">
+                    </div>
+                </div>
+
+                <div class="col-xxl-4 col-xl-5 col-lg-6 col-sm-8 mx-auto">
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <div class="log-in-box">
+                            <div class="log-in-title">
+                                <h3>비밀번호 변경</h3>
+                            </div>
+
+                            <div class="input-box">
+                                <form class="row g-4"  method="POST" action="/login/passwordUpdate" >
+                                    <div class="col-12">
+                        					<input type="hidden" class="form-control" value="${memberId }" name="userId">
+                                        <div class="form-floating theme-form-floating log-in-form"> 
+                                            <input type="password" class="form-control" id="password"
+                                                placeholder="새로 설정한 비밀번호를 입력하세요" name="password">
+                                                <label for="password">새로 설정할 비밀번호를 입력하세요</label>
+                                                <div class="passError"></div>
+                                        </div>
+                                        <div class="form-floating theme-form-floating log-in-form">
+                                            <input type="password" class="form-control" id="rePassword"
+                                                placeholder="다시 한번 입력해 주세요" >
+                                                <label for="rePassword">다시 한번 입력해 주세요</label>
+                                                 <div class="rePassError"></div>
+                                        </div>
+                                    </div>
+									<input type="hidden" name="status" value="${status }" >
+                                    <div class="col-12">
+                                        <button class="btn btn-animation w-100" type="submit">비밀번호 변경</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- log in section end -->
+    </c:when>
+       <c:when test="${status == 'failed' }">
+    <!-- log in section start -->
+    <section class="log-in-section section-b-space forgot-section">
+        <div class="container-fluid-lg w-100">
+            <div class="row">
+                <div class="col-xxl-6 col-xl-5 col-lg-6 d-lg-block d-none ms-auto">
+                    <div class="image-contain">
+                        <img src="/resources/assets/images/inner-page/forgot.png" class="img-fluid" alt="">
+                    </div>
+                </div>
+
+                <div class="col-xxl-4 col-xl-5 col-lg-6 col-sm-8 mx-auto">
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <div class="log-in-box">
+                            <div class="log-in-title">
+                                <h3>인증에 실패하셨습니다.</h3>
+                            </div>
+
+                            <div class="input-box">
+                                
+                                    <div class="col-12">
+                                        <div>다시 인증해주세요</div>
+                                    <div class="col-12">
+                                    <button class="btn btn-animation w-100" type="button" onclick="redirectToPage('forgot')">처음 페이지로</button>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- log in section end -->
+    </c:when>
+       <c:when test="${status == 'error' }">
+    <!-- log in section start -->
+    <section class="log-in-section section-b-space forgot-section">
+        <div class="container-fluid-lg w-100">
+            <div class="row">
+                <div class="col-xxl-6 col-xl-5 col-lg-6 d-lg-block d-none ms-auto">
+                    <div class="image-contain">
+                        <img src="/resources/assets/images/inner-page/forgot.png" class="img-fluid" alt="">
+                    </div>
+                </div>
+
+                <div class="col-xxl-4 col-xl-5 col-lg-6 col-sm-8 mx-auto">
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <div class="log-in-box">
+                            <div class="log-in-title">
+                                <h3>작업 도중 에러가 발생하였습니다.</h3>
+                            </div>
+
+                            <div class="input-box">
+                                
+                                    <div class="col-12">
+                                        <div>처음부터 다시 시작해주세요</div>
+                                    <div class="col-12">
+                                    <button class="btn btn-animation w-100" type="button" onclick="redirectToPage('forgot')">처음 페이지로</button>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- log in section end -->
+    </c:when>
     <c:otherwise>
      <!-- log in section start -->
     <section class="log-in-section section-b-space forgot-section">
@@ -177,22 +452,35 @@ let delayTime = (function() {
                     <div class="d-flex align-items-center justify-content-center h-100">
                         <div class="log-in-box">
                             <div class="log-in-title">
-                                <h3>비밀번호 찾기</h3>
+                                <h3>비밀번호 변경</h3>
                             </div>
 
                             <div class="input-box">
-                                <form class="row g-4">
+                                <form class="row g-4"  method="POST" action="/login/auth" id="pdForgotForm">
                                     <div class="col-12">
                                         <div class="form-floating theme-form-floating log-in-form">
+                                            <input type="text" class="form-control" id="usetId"
+                                                placeholder="ID를 입력하세요">
+                                            <label for="usetId">ID를 입력하세요</label>
+                                             <div class="idError"></div>
+                                        </div>
+                                         <div class="form-floating theme-form-floating log-in-form">
+                                            <input type="text" class="form-control" id="userName"
+                                                placeholder="성함을 입력하세요" name="userName">
+                                                <label for="userName">성함을 입력하세요</label>
+                                                <div class="nameError"></div>
+                                        </div>
+                                        <div class="form-floating theme-form-floating log-in-form">
                                             <input type="email" class="form-control" id="email"
-                                                placeholder="Email Address">
-                                            <label for="email">Email Address</label>
+                                                placeholder="이메일을 입력하세요" name="email">
+                                                <label for="email">이메일을 입력하세요</label>
+                                                 <div class="emailError"></div>
+                                                 <div>*이메일은 도메인 주소까지 입력해 주세요.</div>
                                         </div>
                                     </div>
-
+									<input type="hidden" name="status" value="password" >
                                     <div class="col-12">
-                                        <button class="btn btn-animation w-100" type="submit">Forgot
-                                            Password</button>
+                                        <button class="btn btn-animation w-100" data-bs-toggle="modal" data-bs-target="#myModal" type="button">비밀번호 변경</button>
                                     </div>
                                 </form>
                             </div>
@@ -214,6 +502,29 @@ let delayTime = (function() {
             </a>
         </div>
     </div>
+    
+<div class="modal" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body" style="align-items: center; text-align: center;">
+      		등록된 이메일로 인증 code를 보내겠습니다.
+      		확인하여 인증해주세요
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="getSubmit();">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
     
     <jsp:include page="../footer.jsp"></jsp:include>

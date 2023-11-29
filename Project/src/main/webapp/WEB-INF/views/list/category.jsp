@@ -36,22 +36,22 @@
 	}
 
 	function changeBestInfo(data) {
-		let sell = data.selling_price.toLocaleString() + "원";
-		let con = data.consumer_price.toLocaleString() + "원";
+		let sell = data.sellingPrice.toLocaleString() + "원";
+		let con = data.consumerPrice.toLocaleString() + "원";
 
-		if ($("#bestSellerInfo_image").length) {
-			$("#bestSellerInfo_image").attr("src", data.product_image);
+		if ($("#bestSellerInfoImage").length) {
+			$("#bestSellerInfoImage").attr("src", data.productImage);
 		} else {
-			$('#bestSellerInfo_image').attr("src",
+			$('#bestSellerInfoImage').attr("src",
 					"/resources/assets/images/deer.png");
 		}
-		$("#bestSellerInfo_name").html(data.product_name);
-		if ($("#bestSellerInfo_intro").length) {
-			$("#bestSellerInfo_intro").html(data.introduction_intro);
+		$("#bestSellerInfoName").html(data.productName);
+		if ($("#bestSellerInfoIntro").length) {
+			$("#bestSellerInfoIntro").html(data.introductionIntro);
 		}
 
-		$("#bestSellerInfo_sell").html(sell);
-		$("#bestSellerInfo_consumer").html(con);
+		$("#bestSellerInfoSell").html(sell);
+		$("#bestSellerInfoConsumer").html(con);
 	}
 </script>
 <style>
@@ -79,13 +79,8 @@ body {
 }
 
 .swiper {
-	width: 100%;
-	height: 30%;
-}
-
-.swiper2 {
-	width: 100%;
-	height: 18%;
+	width: 80%;
+	height: 20%;
 }
 
 .swiper-slide {
@@ -97,31 +92,127 @@ body {
 	align-items: center;
 }
 
-.banner-slider img {
+.swiper-slide img{
+	width: 100%;
+	height: 100%;
+	border-radius: 10px;
+}
+
+.swiper-button-next {
+  background: url(/resources/assets/images/next1.png) no-repeat;
+  color:gray;
+  background-size: 100% auto;
+  background-position: center;
+}
+
+.swiper-button-prev {
+  background: url(/resources/assets/images/previous1.png) no-repeat;
+  background-size: 100% auto;
+  background-position: center;
+}
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  display: none;
+}
+
+#smallBanners {
+	display: flex;
+	margin-top: 20px;
+	margin-left: 140px;
+}
+#smallBanners div {
+	margin: 15px;
+}
+#smallBanners img {
+	width: 100%;
+	height: 100%;
+}
+
+#smallBanners div:active {
+	border:2px solid; black;
+}
+.bestSellerInfo{
+	margin-left: 80px;
+}
+
+#bestSellerId {
+	display: flex;
+}
+
+#bestSellerId img{
+	width: 40%;
+	height: 50%
+}
+
+#bestSellerTextInfo {
+	margin: 40px;
+	vertical-align: middle;
+}
+#bestSellerName{
+	margin-bottom: 40px;
+}
+#bestSellerPrice{
+	margin-bottom: 20px;
+}
+.swiper2 {
+	margin-top: 30px;
+}
+.sellingList ul{
+	list-style: none;
+}
+.sellingList li {
 	display: block;
-	width: 90%;
-	height: 50%;
-	object-fit: fill;
+    margin-right: 10px; /* 각 아이템 간 간격 설정 */
+    margin-bottom: 10px;
 }
-
-.bset-seller img {
-	display: block;
-	width: 80%;
-	height: 40%;
+.sellingList img {
+	width: 30%;
+	height: 35%;
 }
-
-.bsetScript {
-	margin: 20px 30px;
+.lankList{
+	display: flex;
 }
-
-#bestSellImg img {
-	width: 80%;
-	height: 70%;
-	object-fit: scale-down;
+.numberIcon{
+    width: 20px !important;
+    height : 20px !important;
+    margin-left: 10px;
+    margin-right: 5px;
 }
-
-#best {
-	margin: 0 150px;
+.sellingListInfo {
+	margin-left: 10px;
+	margin-top: 10px;
+}
+.subj {
+	margin-top : 100px;
+	margin-bottom: 30px;
+	color: green;
+}
+.newProd {
+	margin-left: 50px;
+	width: 200px;
+	height: 260px;
+}
+li:first-child.newProd {
+    padding-left: 0;
+}
+.newProd h3 {
+	margin-top : 20px;
+	width : 200px;
+	white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    font-weight: bold;
+}
+.newProd img {
+	width: 200px;
+	height: 260px;
+}
+.newPoductList {
+	height: 500px;
+	margin-left: 60px;
+}
+.newPoductList ul{
+	display: flex;
 }
 </style>
 </head>
@@ -134,15 +225,15 @@ body {
 			<div class="row">
 				<div class="col-12">
 					<div class="breadscrumb-contain">
-						<h2>${nowCategory.category_name }</h2>
+						<h2>${nowCategory.categoryName }</h2>
 						<nav>
 							<ol class="breadcrumb mb-0">
 								<li class="breadcrumb-item"><a href="index.html"> <i
 										class="fa-solid fa-house"></i>
 								</a></li>
 								<li class="breadcrumb-item active" aria-current="page"><a
-									href="/list/category/${categoryLang.category_key }">${categoryLang.category_name }</a></li>
-								<li class="breadcrumb-item active" aria-current="page">${nowCategory.category_name }</li>
+									href="/list/category/${categoryLang.categoryKey }">${categoryLang.categoryName }</a></li>
+								<li class="breadcrumb-item active" aria-current="page">${nowCategory.categoryName }</li>
 							</ol>
 						</nav>
 					</div>
@@ -156,15 +247,23 @@ body {
 	<section class="section-b-space shop-section">
 		<div class="container-fluid-lg">
 			<div class="row">
-				<div class="col-custome-3" style="width: 20%;">
+				<div class="col-custome-3">
 					<div class="left-box wow fadeInUp">
 						<div class="shop-left-sidebar">
 							<ul class="nav nav-pills mb-3 custom-nav-tab" id="pills-tab"
 								role="tablist">
 								<c:forEach var="category" items="${categories }"
 									varStatus="loop">
-									<li class="categoryList" role="presentation"><a
-										href='/list/categoryList/${category.category_key }'>${category.category_name }</a>
+									<li class="nav-item" role="presentation">
+										<button class="nav-link active" id="pills-vegetables"
+											data-bs-toggle="pill" data-bs-target="#pills-vegetable"
+											type="button" role="tab" aria-selected="true"
+											onclick="location.href='/list/categoryList/${category.categoryKey }'"
+											id="${loop.index }">
+											${category.categoryName }<img
+												src="/resources/assets/images/books.png"
+												class="blur-up lazyload" alt="">
+										</button>
 									</li>
 								</c:forEach>
 							</ul>
@@ -172,85 +271,118 @@ body {
 					</div>
 				</div>
 				<div class="col-custome-9">
-					<div class="swiper banner-swiper">
-						<div class="swiper-wrapper">
-							<div class="swiper-slide banner-slider">
-								<img src="/resources/assets/images/bann1.png" />
-							</div>
-							<div class="swiper-slide banner-slider">
-								<img src="/resources/assets/images/bann2.png" />
-							</div>
-						</div>
-						<div class="swiper-button-next"></div>
-						<div class="swiper-button-prev"></div>
-						<div class="swiper-pagination1"></div>
-					</div>
-					<div>
-						<div id="best">
-							<div class="bsetScript">
-								<h1>베스트셀러1</h1>
-							</div>
-							<div class="bestSellerInfo">
-								<c:forEach var="bestSeller" items="${bestSellers }"
+				<div class="swiper banner-swiper">
+				    <div class="swiper-wrapper">
+				      <div class="swiper-slide"><img src="/resources/assets/images/banner/banner2.png"></div>
+				      <div class="swiper-slide"><img src="/resources/assets/images/banner/banner3.png"></div>
+				      <div class="swiper-slide">Slide 3</div>
+				      <div class="swiper-slide">Slide 4</div>
+				      <div class="swiper-slide">Slide 5</div>
+				      <div class="swiper-slide">Slide 6</div>
+				      <div class="swiper-slide">Slide 7</div>
+				      <div class="swiper-slide">Slide 8</div>
+				      <div class="swiper-slide">Slide 9</div>
+				    </div>
+				    <div class="swiper-button-next"></div>
+				    <div class="swiper-button-prev"></div>
+				    <div class="swiper-pagination"></div>
+				  </div>
+				  
+				  <div id="smallBanners">
+				  	<div><img src="/resources/assets/images/banner/smallBanner1.png"></div>
+				  	<div><img src="/resources/assets/images/banner/smallBanner1.png"></div>
+				  </div>
+				  <div class="row">
+				  	<div class="col-6 bestSellerInfo">
+				  		<h2 class="subj">베스트 셀러</h2>
+								<c:forEach var="bestSeller" items="${listMap.bestSellerList }"
 									varStatus="loop">
 									<c:choose>
 										<c:when test="${loop.index == 3 }">
-											<div style="display: flex;">
+											<a href="/detail/${bestSeller.productId }">
+											<div id="bestSellerId">
 												<c:choose>
-													<c:when test="${bestSeller.introduction_intro != null }">
-														<div id="bestSellImg">
-															<img alt="" src="${bestSeller.product_image }"
-																style="margin-right: 20px;" id="bestSellerInfo_image" />
-														</div>
+													<c:when test="${bestSeller.introductionIntro != null }">
+														<img src="${bestSeller.productImage }" id="bestSellerInfo_image" />
 													</c:when>
 												</c:choose>
-												<div class="bsetinfo">
-													<div style="padding: 20px 20px 50px 20px;">
-														<h2 id="bestSellerInfo_name">${bestSeller.product_name }</h2>
+												<div id="bestSellerTextInfo">
+													<div id="bestSellerName">
+														<h2 id="bestSellerInfo_name">${bestSeller.productName }</h2>
 													</div>
-													<c:choose>
-														<c:when test="${bestSeller.introduction_intro != null }">
-															<div
-																style="padding-left: 10px; font-weight: bolder; font-size: 30px;"
-																id="bestSellerInfo_intro">
-																<h3>${bestSeller.introduction_intro }</h3>
-															</div>
-														</c:when>
-													</c:choose>
-													<div style="padding: 30px 15px; font-size: 24px;">
-														<span id="bestSellerInfo_sell"><fmt:formatNumber
-																value="${bestSeller.selling_price}" pattern="#,###원" /></span>
+													<div id="bestSellerPrice">
+													<span id="bestSellerInfo_sell"><fmt:formatNumber
+																value="${bestSeller.sellingPrice}" pattern="#,###원" /></span>
 														<del style="color: gray;" id="bestSellerInfo_consumer">
-															<fmt:formatNumber value="${bestSeller.consumer_price}"
+															<fmt:formatNumber value="${bestSeller.consumerPrice}"
 																pattern="#,###원" />
 														</del>
+													</div>
+													<c:choose>
+														<c:when test="${bestSeller.introductionIntro != null }">
+															<div id="bestSellerInfo_intro">
+																<h3>${bestSeller.introductionIntro }</h3>
+															</div>
+														</c:when>
+													</c:choose>	
+													</div>
+													</div>
+													</a>
+													<div class="swiper2 best-swiper" style="overflow: hidden;">
+														<div class="swiper-wrapper">
+															<c:forEach var="bestSeller" items="${listMap.bestSellerList }">
+																<div class="swiper-slide bset-seller"
+																	id="${bestSeller.productId }" onclick="bestFloating(id);">
+																	<img src="${bestSeller.productImage }"
+																		style="object-fit: scale-down;">
+																</div>
+															</c:forEach>
+															<c:forEach var="bestSeller" items="${listMap.bestSellerList }">
+																<div class="swiper-slide bset-seller">
+																	<img src="${bestSeller.productImage }"
+																		style="object-fit: scale-down;">
+																</div>
+															</c:forEach>
+														</div>
+													</div>
+												</div>	
+												<div class="col-4 sellingList">
+												<h2 class="subj">많이 팔린 상품</h2>
+													<div>
+														<ul>
+														<c:forEach var="sellingProduct" items="${listMap.sellingList }" varStatus="loop" begin="0" end="6">
+															<c:choose>
+																<c:when test="${loop.index == 0 || loop.index == 1 }">												
+																	<li><div class="lankList"><img src="${sellingProduct.productImage}"/><div class="sellingListInfo"><img class="numberIcon" src="/resources/assets/images/numberIcon/${loop.index + 1 }.png" /><div class="sellingListInfo"><h3>${sellingProduct.productName }</h3><div>${sellingProduct.publisher }</div></div><div class="sellingListInfo"><fmt:formatNumber value="${sellingProduct.sellingPrice}" pattern="#,###원" /></div></div></li>
+																</c:when>
+																<c:otherwise>
+																	<li><img class="numberIcon" src="/resources/assets/images/numberIcon/${loop.index + 1 }.png" />${sellingProduct.productName }</li>
+																</c:otherwise>
+															</c:choose>
+														</c:forEach>
+														</ul>
 													</div>
 												</div>
 											</div>
 										</c:when>
 									</c:choose>
 								</c:forEach>
+								<div class="newPoductList">
+								<h2 class="subj">새로 나온 책</h2>
+									<ul>
+									<c:forEach var="newProduct" items="${listMap.newList }">								
+										<li class="newProd">
+										<img src="${newProduct.productImage }">
+										<h3>${newProduct.productName }</h3>
+										<span><fmt:formatNumber value="${newProduct.sellingPrice}" pattern="#,###원" /></span>
+										<del style="color: gray;">
+										<fmt:formatNumber value="${newProduct.consumerPrice}" pattern="#,###원" /></del></li>
+									</c:forEach>
+									</ul>
+								</div>
 							</div>
 						</div>
-						<div class="swiper2 best-swiper" style="overflow: hidden;">
-							<div class="swiper-wrapper">
-								<c:forEach var="bestSeller" items="${bestSellers }">
-									<div class="swiper-slide bset-seller"
-										id="${bestSeller.product_id }" onclick="bestFloating(id);">
-										<img src="${bestSeller.product_image }"
-											style="object-fit: scale-down;">
-									</div>
-								</c:forEach>
-								<c:forEach var="bestSeller" items="${bestSellers }">
-									<div class="swiper-slide bset-seller">
-										<img src="${bestSeller.product_image }"
-											style="object-fit: scale-down;">
-									</div>
-								</c:forEach>
-							</div>
-						</div>
-						<div class="swiper-pagination2" style="text-align: center;"></div>
-					</div>
+				  </div>
 				</div>
 			</div>
 		</div>
@@ -280,15 +412,6 @@ body {
 									class="img-fluid blur-up lazyload" alt="" />
 							</div>
 							<div>
-								<!-- 
-							<sec:authorize  access="isAuthenticated()">
-								<a href="/order/requestOrder?product_id="+pId+"&isLogin=Y" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-							</sec:authorize>
-							<sec:authorize access="isAnonymous()">
-								<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-								<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>
-							</sec:authorize>	
-							 -->
 								<c:choose>
 									<c:when test="${sessionScope.loginMember != null }">
 										<a href="/order/requestOrder?product_id=" +pId+"&isLogin=Y
@@ -334,20 +457,20 @@ body {
 
 	<script>
 		let bannerSwiper = new Swiper(".banner-swiper", {
-			cssMode : true,
-			navigation : {
-				nextEl : ".swiper-button-next",
-				prevEl : ".swiper-button-prev",
-			},
-			autoplay : {
-				delay : 2500,
-				disableOnInteraction : false,
-			},
-			pagination : {
-				el : ".swiper-pagination1",
-			},
-			mousewheel : true,
-			keyboard : true,
+		   	  spaceBetween: 30,
+		      centeredSlides: true,
+		      autoplay: {
+		        delay: 7500,
+		        disableOnInteraction: false,
+		      },
+		      pagination: {
+		        el: ".swiper-pagination",
+		        clickable: true,
+		      },
+		      navigation: {
+		        nextEl: ".swiper-button-next",
+		        prevEl: ".swiper-button-prev",
+		      },
 		});
 
 		let bestSwiper = new Swiper(".best-swiper", {
