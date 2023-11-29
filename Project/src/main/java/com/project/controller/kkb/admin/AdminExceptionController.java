@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @RestController
 public class AdminExceptionController {
 	
@@ -22,7 +24,7 @@ public class AdminExceptionController {
         }
         
 		return new MemberDto(id, "hello " + id);
-	}
+	}	
 	
 	@Data
     @AllArgsConstructor

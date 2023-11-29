@@ -18,7 +18,7 @@ public class AdminShoppingCartServiceImpl implements AdminShoppingCartService {
 	private final AdminShoppingCartDAO adminShoppingCartDAO;
 
 	@Override
-	public Map<String, Object> getCartInfoById(String memberId) throws Exception {
+	public Map<String, Object> getCartInfoById(String memberId) {
 		
 		List<CartResponse> cartList = adminShoppingCartDAO.findCartInfoById(memberId);
 		

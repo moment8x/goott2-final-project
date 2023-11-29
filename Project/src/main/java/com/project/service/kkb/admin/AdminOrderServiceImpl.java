@@ -35,7 +35,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	/* 송장 번호 업데이트 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public int editInvoiceNumber(List<InvoiceCondition> invoiceCondList) throws Exception {
+	public int editInvoiceNumber(List<InvoiceCondition> invoiceCondList) {
 		
 		int result = -1;
 		
@@ -52,7 +52,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	}
 	
 	@Override
-	public Map<String, Object> getOrderInfo(OrderCondition orderCond) throws Exception {
+	public Map<String, Object> getOrderInfo(OrderCondition orderCond) {
 		
 		List<OrderNoResponse> orderList = adminOrderRepository.findOrderByInfo(orderCond);
 		List<OrderByProduct> productList = getOrderByProduct(orderCond);
@@ -65,7 +65,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	}
 	
 	@Override
-	public Map<String, Object> getDepositInfo(DepositCondition depositCond) throws Exception {
+	public Map<String, Object> getDepositInfo(DepositCondition depositCond) {
 		
 		List<DepositNoResponse> depositOrderList = adminOrderRepository.findDepositByInfo(depositCond);
 		List<DepositByProduct> depositProductList = getDepositByProduct(depositCond);
@@ -80,7 +80,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	/* 입금 전 관리 (주문 취소 버튼 - 품목주문별) */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public int editDepositProductCancel(List<DepositProductCancelRequest> productOrderNoList) throws Exception {
+	public int editDepositProductCancel(List<DepositProductCancelRequest> productOrderNoList) {
 		
 		int result = -1;
 		
@@ -129,7 +129,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	/* 입금 전 관리 (주문 취소 버튼 - 주문번호별) */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public int editDepositOrderCancel(List<String> orderNoList) throws Exception {
+	public int editDepositOrderCancel(List<String> orderNoList) {
 		
 		int result = -1;
 		
@@ -172,7 +172,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	/* 입금전 관리 - 입금 확인 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public int editDepositConfirm(List<String> orderNoList) throws Exception {
+	public int editDepositConfirm(List<String> orderNoList) {
 		
 		int result = -1;
 		
@@ -190,7 +190,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	}
 	
 	@Override
-	public Map<String, Object> getReadyInfo(OrderCondition readyCond) throws Exception {
+	public Map<String, Object> getReadyInfo(OrderCondition readyCond) {
 		
 		List<ReadyInfoByProduct> readyOrderList = getReadyByProduct(readyCond);
 		List<ReadyProductResponse> readyProductList = adminOrderRepository.findReadyProductByInfo(readyCond);
@@ -203,7 +203,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	}
 	
 		
-	private List<OrderByProduct> getOrderByProduct(OrderCondition orderCond) throws Exception {
+	private List<OrderByProduct> getOrderByProduct(OrderCondition orderCond) {
 	    
 		List<OrderProductResponse> list = adminOrderRepository.findProductByInfo(orderCond);
 
@@ -235,7 +235,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	            .collect(Collectors.toList());
 	}
 
-	private List<DepositByProduct> getDepositByProduct(DepositCondition depositCond) throws Exception {
+	private List<DepositByProduct> getDepositByProduct(DepositCondition depositCond) {
 		    
 			List<DepositProductResponse> list = adminOrderRepository.findDepositProductByInfo(depositCond);
 	
@@ -265,7 +265,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		            .collect(Collectors.toList());
 	}
 	
-	private List<ReadyInfoByProduct> getReadyByProduct(OrderCondition readyCond) throws Exception {
+	private List<ReadyInfoByProduct> getReadyByProduct(OrderCondition readyCond) {
 	    
 		List<ReadyNoResponse> list = adminOrderRepository.findReadyByInfo(readyCond);
 

@@ -19,7 +19,7 @@ public class AdminBoardServiceImpl implements AdminBoardService {
 	private final AdminBoardDAO adminBoardRepository;
 	
 	@Override
-	public Map<String, Object> getPostInfo(PostCondition postCond) throws Exception {
+	public Map<String, Object> getPostInfo(PostCondition postCond) {
 		List<PostResponse> postList = adminBoardRepository.findPostByInfo(postCond);
 		
 		Map<String, Object> result = new HashMap<>();

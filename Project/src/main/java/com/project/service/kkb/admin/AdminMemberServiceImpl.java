@@ -29,18 +29,17 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	private final ApplicationEventPublisher publisher;
 	
 	@Override
-	public Map<String, Object> getTotalMemberCount() throws Exception {
+	public Map<String, Object> getTotalMemberCount() {
 		
 		int totalCount = 0;
 		
 		if(memberCount.getCurrentCount() > 0) {
-			/* TotalMemberCountEvent에 저장해둔 값 가져옴 */
-			System.out.println("이벤트 객체에서 전체 회원 수 조회");
+			/* MemberCountListener에 저장해둔 값 가져옴 */
+			System.out.println("저장해둔 전체 회원 수 조회");
 			totalCount = memberCount.getCurrentCount(); 
 		} else {
 			System.out.println("DB에서 전체 회원 수 조회");
-			totalCount = adminMemberRepository.countAll();	
-			publisher.publishEvent(new TotalMemberCountEvent(totalCount));
+			updateMemberCount();
 		}
 		Map<String, Object> result = new HashMap<>();
 		result.put("total", totalCount);
@@ -49,7 +48,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	}
 	
 	@Override
-	public void updateMemberCount() throws Exception {
+	public void updateMemberCount(){
 		
 		int memberCount = adminMemberRepository.countAll();	
 		System.out.println("회원 수 갱신");
@@ -58,12 +57,12 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	}	
 	
 	@Override
-	public int editMemberDetailInfo(MemberParam member) throws Exception {		
+	public int editMemberDetailInfo(MemberParam member) {		
 		return adminMemberRepository.changeMemberDetailInfo(member);
 	}
 	
 	@Override
-	public Map<String, Object> getMemberDetailInfo(String memberId) throws Exception {
+	public Map<String, Object> getMemberDetailInfo(String memberId) {
 		
 		MemberParam detailInfo = adminMemberRepository.findDetailInfoById(memberId);
 		Map<String, Object> result = new HashMap<>();
@@ -73,7 +72,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	}
 	
 	@Override
-	public Map<String, Object> getHomeDetailInfo(String memberId) throws Exception {
+	public Map<String, Object> getHomeDetailInfo(String memberId) {
 		
 		MemberBasicInfo basicInfo = adminMemberRepository.findBasicInfoById(memberId);
 		List<MemberRecentOrder> recentOrder = adminMemberRepository.findRecentOrderById(memberId);
@@ -91,7 +90,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	
 	
 	@Override
-	public Map<String, Object> getMemberInfo(MemberCondition memberCond ) throws Exception {
+	public Map<String, Object> getMemberInfo(MemberCondition memberCond ) {
 		
 		/* 전화번호 "-" 제거 */
 		memberCond.setCellPhoneNumber(memberCond.getCellPhoneNumber().replace("-", "")); 

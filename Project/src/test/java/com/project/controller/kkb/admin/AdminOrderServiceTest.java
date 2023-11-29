@@ -26,6 +26,7 @@ public class AdminOrderServiceTest {
 	
 	@Autowired
     private AdminOrderService adminOrderService;
+	
 	@Autowired
 	private AdminOrderDAO adminOrderRepository;
 
@@ -42,7 +43,7 @@ public class AdminOrderServiceTest {
 
     @Test
     @Transactional
-    public void testEditDepositOrderCancel() throws Exception {
+    public void testEditDepositOrderCancel() {
     	
     	//Given
         List<String> orderNoList = Arrays.asList("O1700812765494", "O1700794968572");
@@ -59,7 +60,7 @@ public class AdminOrderServiceTest {
     
     @Test
     @Transactional
-    public void testEditDepositConfirm() throws Exception {
+    public void testEditDepositConfirm() {
 		
     	//Given
     	List<String> orderNoList = Arrays.asList("O1700034153645", "O1700034426708");
@@ -75,9 +76,9 @@ public class AdminOrderServiceTest {
     
     @Test
     @Transactional
-    public void testChangeDepositOrderCancelReward() throws Exception {
+    public void testChangeDepositOrderCancelReward() {
 		
-      //Given
+    	//Given
     	List<String> orderNoList = Arrays.asList("O1700034153645", "O1700034426708");
     	
     	//When

@@ -8,6 +8,6 @@ import com.project.vodto.kkb.InquiryResponse;
 public interface AdminInquiryDAO {
 	
 	/* 1:1 문의 조회 */
-	List<InquiryResponse> findInquiryByInfo(InquiryCondition inquiryCond) throws Exception;
+	List<InquiryResponse> findInquiryByInfo(InquiryCondition inquiryCond);
 
 }

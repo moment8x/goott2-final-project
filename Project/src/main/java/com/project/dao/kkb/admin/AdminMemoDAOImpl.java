@@ -19,12 +19,12 @@ public class AdminMemoDAOImpl implements AdminMemoDAO {
 	private final SqlSession ses;
 	
 	@Override
-	public List<MemoListResponse> findMemoById(MemoInfoCondition memoInfoCond) throws Exception {
+	public List<MemoListResponse> findMemoById(MemoInfoCondition memoInfoCond) {
 		return ses.selectList(ns + ".selectMemoInfo", memoInfoCond);
 	}
 
 	@Override
-	public int saveMemberMemo(MemoCondition memoCond) throws Exception {
+	public int saveMemberMemo(MemoCondition memoCond) {
 		return ses.insert(ns + ".insertMemberMemo", memoCond);
 	}
 

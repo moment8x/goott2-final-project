@@ -53,37 +53,37 @@ public class AdminMemberController {
 	
 	/* 회원 수 변경 시 이벤트 발행(test) */
 	@GetMapping("/test")
-	public void eventTest() throws Exception {
+	public void eventTest() {
 		adminMemberService.updateMemberCount();
 	}
 	
 	/* 총 회원 수 */
 	@GetMapping("/count")
-	public Map<String, Object> countTotalMember() throws Exception {
+	public Map<String, Object> countTotalMember() {
 		return adminMemberService.getTotalMemberCount();
 	}
 	
 	/* 회원 정보 조회 */
 	@PostMapping("/search")
-	public Map<String, Object> searchMemberInfo(@RequestBody MemberCondition memberCond) throws Exception {		
+	public Map<String, Object> searchMemberInfo(@RequestBody MemberCondition memberCond) {		
 		return adminMemberService.getMemberInfo(memberCond);
 	}
 	
 	/* CRM 홈 */
 	@GetMapping("/{memberId}")
-	public Map<String, Object> checkMemberDetailHome(@PathVariable("memberId") String memberId) throws Exception {
+	public Map<String, Object> checkMemberDetailHome(@PathVariable("memberId") String memberId) {
 		return adminMemberService.getHomeDetailInfo(memberId);
 	}
 	
 	/* CRM 회원 상세정보 */
 	@GetMapping("/{memberId}/detail")
-	public Map<String, Object> checkMemberDetail(@PathVariable("memberId") String memberId) throws Exception {
+	public Map<String, Object> checkMemberDetail(@PathVariable("memberId") String memberId) {
 		return adminMemberService.getMemberDetailInfo(memberId);
 	}
 	
 	/* CRM 회원 상세정보 수정 */
 	@PutMapping("/{memberId}/update")
-	public ResponseEntity<String> setMemberDetail(@RequestBody MemberParam member) throws Exception {
+	public ResponseEntity<String> setMemberDetail(@RequestBody MemberParam member) {
 		int result = adminMemberService.editMemberDetailInfo(member);
 		
 		if (result > 0) {
@@ -114,7 +114,7 @@ public class AdminMemberController {
 			@RequestParam String orderTimeStart,
 			@RequestParam String orderTimeEnd,
 			@RequestParam String paymentTimeStart,
-			@RequestParam String paymentTimeEnd) throws Exception {	
+			@RequestParam String paymentTimeEnd) {	
 
 		OrderCondition orderCond = OrderCondition.create(
 				orderNo,productOrderNo, invoiceNumber, name, memberId, 
@@ -127,7 +127,7 @@ public class AdminMemberController {
 	
 	/* CRM 게시물 정보 */  // 수정 대기
 	@PostMapping("/{memberId}/board")
-	public Map<String, Object> searchPostInfo(@RequestBody PostCondition postCond) throws Exception {
+	public Map<String, Object> searchPostInfo(@RequestBody PostCondition postCond) {
 		return adminBoardService.getPostInfo(postCond);
 	}
 	
@@ -144,7 +144,7 @@ public class AdminMemberController {
 			@RequestParam  String orderNo, 
 			@RequestParam  String answerStatus, 
 			@RequestParam  String inquiryType, 
-			@RequestParam  byte file) throws Exception {
+			@RequestParam  byte file) {
 		
 		InquiryCondition inquiryCond = InquiryCondition.create(
 				createdDateStart, createdDateEnd, title, email, content, author, name, orderNo, answerStatus, inquiryType, file);
@@ -154,31 +154,31 @@ public class AdminMemberController {
 	
 	/* CRM [적립금]/포인트/쿠폰 */
 	@GetMapping("/{memberId}/reward")
-	public Map<String, Object> checkRewardInfo(@PathVariable("memberId") String memberId) throws Exception {
+	public Map<String, Object> checkRewardInfo(@PathVariable("memberId") String memberId) {
 		return adminRewardService.getRewardInfo(memberId);
 	}
 	
 	/* CRM 적립금/[포인트]/쿠폰 */
 	@GetMapping("/{memberId}/point")
-	public Map<String, Object> checkPointInfo(@PathVariable("memberId") String memberId) throws Exception {
+	public Map<String, Object> checkPointInfo(@PathVariable("memberId") String memberId) {
 		return adminPointService.getPointInfo(memberId);
 	}
 	
 	/* CRM 적립금/포인트/[쿠폰] */
 	@GetMapping("/{memberId}/coupon")
-	public Map<String, Object> checkCouponInfo(@PathVariable("memberId") String memberId) throws Exception {
+	public Map<String, Object> checkCouponInfo(@PathVariable("memberId") String memberId) {
 		return adminCouponService.getCouponInfo(memberId);
 	}
 	
 	/* CRM 적립금/포인트/[쿠폰]  - 쿠폰 적용 카테고리*/
 	@GetMapping("/{memberId}/category/{couponNumber}")
-	public Map<String, Object> checkAppliedCategory(@PathVariable("couponNumber") String couponNumber) throws Exception {
+	public Map<String, Object> checkAppliedCategory(@PathVariable("couponNumber") String couponNumber) {
 		return adminCouponService.getCategoryByCouponNo(couponNumber);
 	}
 	
 	/* CRM 장바구니 정보 */
 	@GetMapping("/{memberId}/cart")
-	public Map<String, Object> checkCartInfo(@PathVariable("memberId") String memberId) throws Exception {
+	public Map<String, Object> checkCartInfo(@PathVariable("memberId") String memberId) {
 		return adminShoppingCartService.getCartInfoById(memberId);
 	}
 	
@@ -189,7 +189,7 @@ public class AdminMemberController {
 			@RequestParam  String createdDateEnd, 
 			@RequestParam  String memberId, 
 			@RequestParam  byte important, 
-			@RequestParam  String content) throws Exception {
+			@RequestParam  String content) {
 		
 		MemoInfoCondition memoInfoCond = MemoInfoCondition.create(
 				createdDateStart, createdDateEnd, memberId, important, content);
@@ -199,7 +199,7 @@ public class AdminMemberController {
 	
 	/* CRM 회원 메모 작성 */
 	@PostMapping("/{memberId}/memo/write")
-	public ResponseEntity<String> addMemberMemo(@RequestBody MemoCondition memoCond, HttpServletRequest req) throws Exception {
+	public ResponseEntity<String> addMemberMemo(@RequestBody MemoCondition memoCond, HttpServletRequest req) {
 		int result = adminMemoService.addMemberMemo(memoCond, req);
 		
 		if (result > 0) {

@@ -23,7 +23,7 @@ public class AdminMemoServiceImpl implements AdminMemoService {
 	private final AdminMemoDAO adminMemoDAO;
 	
 	@Override
-	public Map<String, Object> getMemoById(MemoInfoCondition memoInfoCond) throws Exception {
+	public Map<String, Object> getMemoById(MemoInfoCondition memoInfoCond) {
 		
 		List<MemoListResponse> memoList = adminMemoDAO.findMemoById(memoInfoCond);
 		
@@ -34,7 +34,7 @@ public class AdminMemoServiceImpl implements AdminMemoService {
 	}
 
 	@Override
-	public int addMemberMemo(MemoCondition memoCond, HttpServletRequest req) throws Exception {
+	public int addMemberMemo(MemoCondition memoCond, HttpServletRequest req) {
 		Memberkjy member = (Memberkjy) req.getSession().getAttribute("loginMember");
 		
 		if(member.getPermission().equals("ROLE_ADMIN")) {
@@ -43,7 +43,7 @@ public class AdminMemoServiceImpl implements AdminMemoService {
 			req.getSession().invalidate();
 			throw new RuntimeException("권한 없음");
 		}
-		
+		memoCond.setAdminId(member.getMemberId());
 		int result = adminMemoDAO.saveMemberMemo(memoCond);
 		
 		return result;

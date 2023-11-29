@@ -17,7 +17,7 @@ public class AdminShoppingCartDAOImpl implements AdminShoppingCartDAO {
 	private final SqlSession ses;
 	
 	@Override
-	public List<CartResponse> findCartInfoById(String memberId) throws Exception {
+	public List<CartResponse> findCartInfoById(String memberId) {
 		return ses.selectList(ns + ".selectCartInfo", memberId);
 	}
 

@@ -50,7 +50,7 @@ public class AdminOrderController {
 				@RequestParam String orderTimeStart,
 				@RequestParam String orderTimeEnd,
 				@RequestParam String paymentTimeStart,
-				@RequestParam String paymentTimeEnd) throws Exception {	
+				@RequestParam String paymentTimeEnd) {	
 
 			OrderCondition orderCond = OrderCondition.create(
 					orderNo,productOrderNo, invoiceNumber, name, memberId, 
@@ -82,7 +82,7 @@ public class AdminOrderController {
 				@RequestParam String orderTimeStart,
 				@RequestParam String orderTimeEnd,
 				@RequestParam String confirmDateStart,
-				@RequestParam String confirmDateEnd) throws Exception {	
+				@RequestParam String confirmDateEnd) {	
 		
 			DepositCondition depositCond = DepositCondition.create(
 					orderNo,productOrderNo, invoiceNumber, name, memberId, 
@@ -95,7 +95,7 @@ public class AdminOrderController {
 		
 		/* 입금 전 관리 (입금 확인 버튼)*/
 		@PutMapping("/confirm")
-		public ResponseEntity<String> setDepositConfirm(@RequestBody List<String> orderNoList) throws Exception {	
+		public ResponseEntity<String> setDepositConfirm(@RequestBody List<String> orderNoList) {	
 			int result = adminOrderService.editDepositConfirm(orderNoList);
 			
 			if (result > 0) {
@@ -108,7 +108,7 @@ public class AdminOrderController {
 		/* 입금 전 관리 (주문 취소 버튼 - 주문번호별) */
 		@PutMapping("/cancel/order")
 		public ResponseEntity<String> setDepositOrderCancel(
-				@RequestBody List<String> orderNoList) throws Exception {	
+				@RequestBody List<String> orderNoList) {	
 			
 			int result = adminOrderService.editDepositOrderCancel(orderNoList);
 			
@@ -122,7 +122,7 @@ public class AdminOrderController {
 		/* 입금 전 관리 (주문 취소 버튼 - 품목주문별) */
 		@PutMapping("/cancel/product")
 		public ResponseEntity<String> setDepositProductCancel(
-				@RequestBody List<DepositProductCancelRequest> productOrderNoList) throws Exception {	
+				@RequestBody List<DepositProductCancelRequest> productOrderNoList) {	
 			
 			int result = adminOrderService.editDepositProductCancel(productOrderNoList);
 			
@@ -154,7 +154,7 @@ public class AdminOrderController {
 				@RequestParam String orderTimeStart,
 				@RequestParam String orderTimeEnd,
 				@RequestParam String paymentTimeStart,
-				@RequestParam String paymentTimeEnd) throws Exception {	
+				@RequestParam String paymentTimeEnd) {	
 			
 			OrderCondition readyCond = OrderCondition.create(
 					orderNo,productOrderNo, invoiceNumber, name, memberId, 
@@ -167,7 +167,7 @@ public class AdminOrderController {
 		
 		/* 배송 준비중 관리 (송장번호 저장)*/
 		@PutMapping("/invoice")
-		public ResponseEntity<String> setInvoiceNumber(@RequestBody List<InvoiceCondition> invoiceCondList) throws Exception {	
+		public ResponseEntity<String> setInvoiceNumber(@RequestBody List<InvoiceCondition> invoiceCondList) {	
 			int result = adminOrderService.editInvoiceNumber(invoiceCondList);
 			
 			if (result > 0) {

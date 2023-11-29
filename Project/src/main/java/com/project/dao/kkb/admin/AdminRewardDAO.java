@@ -8,8 +8,8 @@ import com.project.vodto.kkb.RewardListResponse;
 public interface AdminRewardDAO {
 	
 	/* 적립금 정보 */
-	RewardInfoResponse findRewardInfoById(String memberId) throws Exception;
+	RewardInfoResponse findRewardInfoById(String memberId);
 	
 	/* 적립금 내역 */
-	List<RewardListResponse> findRewardListById(String memberId) throws Exception;
+	List<RewardListResponse> findRewardListById(String memberId);
 }

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.project.dao.kjs.upload.UploadDAO;
 import com.project.dao.member.MemberDAO;
 import com.project.etc.kjs.ImgMimeType;
+import com.project.service.kkb.admin.AdminMemberService;
 import com.project.vodto.Board;
 import com.project.vodto.CouponLog;
 import com.project.vodto.CustomerInquiry;
@@ -41,6 +42,8 @@ public class MemberServiceImpl implements MemberService {
 	private MemberDAO mDao;
 	@Inject
 	private UploadDAO uDao;
+	@Inject
+	private AdminMemberService adminMemberService;
 
 	// --------------------------------------- 장민정 시작
 	// ---------------------------------------
@@ -95,6 +98,11 @@ public class MemberServiceImpl implements MemberService {
 			// 탈퇴시킨다
 			if (mDao.updateWithdraw(memberId) == 1) {
 				result = true;
+				
+				// --------------- 김경배 ---------------
+				/* 전체 회원 수 갱신 이벤트 발행 */
+				adminMemberService.updateMemberCount();
+				// ------------------------------------
 			}
 		}
 		return result;
@@ -576,6 +584,10 @@ public class MemberServiceImpl implements MemberService {
 					mDao.updateProfile(member.getMemberId(), newFileName);
 				}
 				result = true;
+				// --------------- 김경배 ---------------
+				/* 전체 회원 수 갱신 이벤트 발행 */
+				adminMemberService.updateMemberCount();
+				// ------------------------------------
 			}
 		}
 		return result;

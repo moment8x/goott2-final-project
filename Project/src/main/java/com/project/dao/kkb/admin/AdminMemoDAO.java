@@ -9,8 +9,8 @@ import com.project.vodto.kkb.MemoListResponse;
 public interface AdminMemoDAO {
 
 	/* 회원 메모 조회 */
-	List<MemoListResponse> findMemoById(MemoInfoCondition memoInfoCond) throws Exception;
+	List<MemoListResponse> findMemoById(MemoInfoCondition memoInfoCond);
 	
 	/* 회원 메모 작성 */
-	int saveMemberMemo(MemoCondition memoCond) throws Exception;
+	int saveMemberMemo(MemoCondition memoCond);
 }

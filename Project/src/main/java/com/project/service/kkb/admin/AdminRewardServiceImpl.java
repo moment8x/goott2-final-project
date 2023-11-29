@@ -19,7 +19,7 @@ public class AdminRewardServiceImpl implements AdminRewardService {
 	private final AdminRewardDAO adminRewardRepository;
 	
 	@Override
-	public Map<String, Object> getRewardInfo(String memberId) throws Exception {
+	public Map<String, Object> getRewardInfo(String memberId) {
 		
 		RewardInfoResponse rewardInfo = adminRewardRepository.findRewardInfoById(memberId);
 		List<RewardListResponse> rewardList = adminRewardRepository.findRewardListById(memberId);
