@@ -212,6 +212,7 @@
 			duplicateCellPhone();
 		})
 		
+		
 		//주문 상태별 조회
 		$("select[id=orderStatusKeyword]").change(function(){
 			let beforeDeposit = null;
@@ -316,6 +317,7 @@
 		
 	})
 	
+	//프로필사진 업로드
 	function uploadProfile() {
 		let fileInput = document.getElementById("uploadProfile")
 		let file = fileInput.files[0]
@@ -948,6 +950,7 @@
 			}
 		});
 	}
+	
 	function selectReview(postNo) {
 		$.ajax({
 			url : '/user/selectModifyReview', // 데이터를 수신받을 서버 주소
@@ -959,70 +962,102 @@
 			async : false,
 			success : function(data) {
 				console.log(data)
-				outputModifyReview(data)
+				let output = `<table class="table mb-0 productInfo">`;
+				output += `<tbody>`;
+				output += `<tr>`;
+				output += `<td class="product-detail">`;
+				output += `<div class="product border-0">`;
+				if(data.productImage == null){
+					output += `<a href="/detail/\${data.productId}" class="product-image">`;
+					output += `<img src="/resources/assets/images/noimage.jpg" class="img-fluid blur-up lazyload" alt="\${data.productName}">`;
+					output += `</a>`;
+				}else{
+					output += `<a href="/detail/\${data.productId}" class="product-image">`;
+					output += `<img src="\${data.productImage}" class="img-fluid blur-up lazyload" alt="\${data.productName}" id="reviewProductImg">`;
+					output += `</a>`;
+				}
+				output += `</div>`;
+				output += `</td>`;
+				output += `<td></td>`;
+				output += `</tr>`
+				output += `<tr>`
+				output += `<td class="name">`
+				output += `<a href="/detail/\${data.productId}" id="productName">`
+				output += `<h4 class="table-title text-content">\${data.productName}</h4>` 
+				output += `</a>`
+				output += `</td>`
+				output += `<td class="name">`
+				output += `<h4 class="table-title text-content">`
+				let rating = `\${data.rating}`
+				output += `<i class="fa-regular fa-star" id="rating1" style="color: #0DA487;" onclick="reviewRating('rating1')" value="1"></i>`					
+				output += `<i class="fa-regular fa-star" id="rating2" style="color: #0DA487;" onclick="reviewRating('rating2')" value="2"></i>`					
+				output += `<i class="fa-regular fa-star" id="rating3" style="color: #0DA487;" onclick="reviewRating('rating3')" value="3"></i>`					
+				output += `<i class="fa-regular fa-star" id="rating4" style="color: #0DA487;" onclick="reviewRating('rating4')" value="4"></i>`					
+				output += `<i class="fa-regular fa-star" id="rating5" style="color: #0DA487;" onclick="reviewRating('rating5')" value="5"></i>`
+				output += `</h4>` 
+				output += `</td>`
+				output += `</tr>`
+				output += `</tbody>`
+				output += `</table>`
+				output += `<div class="form-floating mb-4 theme-form-floating">`
+				output += `<textarea rows="7" cols="62" value="">\${data.content}</textarea>`
+				output += `<div>`
+				output += `<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>`
+				output += `몇글자까지 가능?`
+				output += `</div>`
+				output += `</div>`
+				output += `<div class="form-floating mb-4 theme-form-floating">`
+				output += `사진첨부`
+				output += `<div>`
+				output += `<div>`
+				output += `<input type="file" id="uploadReviewImg" /> <input type="button" value="등록" onclick="uploadReviewImg();" />`
+				output += `</div>`
+				output += `<div class="uploadFile">`
+				output += `</div>`
+				output += `</div>`
+					
+				$('.modal-body.modifyReview').html(output);
 			},
 			error : function() {
 			}
 		});
 	}
-	
-	function outputModifyReview(review) {
-		$.each(review, function(i, e) {
-			console.log(e)
-			let output = `<table class="table mb-0 productInfo">`;
-			output += `<tbody>`;
-			output += `<tr>`;
-			output += `<td class="product-detail">`;
-			output += `<div class="product border-0">`;
-			if(e.productImage == null){
-				output += `<a href="/detail/\${e.productId}" class="product-image">`;
-				output += `<img src="/resources/assets/images/noimage.jpg" class="img-fluid blur-up lazyload" alt="\${e.productName}">`;
-				output += `</a>`;
-			}else{
-				output += `<a href="/detail/\${e.productId}" class="product-image">`;
-				output += `<img src="\${e.productImage}" class="img-fluid blur-up lazyload" alt="\${e.productName}">`;
-				output += `</a>`;
-			}
-			output += `</div>`;
-			output += `</td>`;
-			output += `<td></td>`;
-			output += `</tr>`
-			output += `<tr>`
-			output += `<td class="name">`
-			output += `<h4 class="table-title text-content">\${e.productName}</h4>` 
-			output += `<a href="/detail/\${e.productId}" id="productName"></a>`
-			output += `</td>`
-			output += `<td class="name">`
-			output += `<h4 class="table-title text-content">`
-			for(j = 0; j < 5; j++){
-				output += `<i class="fa-regular fa-star" style="color: #0DA487;"></i>`						
-			}
-			output += `</h4>` 
-			output += `</td>`
-			output += `</tr>`
-			output += `</tbody>`
-			output += `</table>`
-			output += `<div class="form-floating mb-4 theme-form-floating">`
-			output += `content<input type="text" class="form-control" id="exchangeReason"
-				value="\${e.content}" name="reason"/>`
-			output += `<div>`
-			output += `<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>`
-			output += `상품에 하자가 있는 경우에만 교환이 가능합니다.`
-			output += `</div>`
-			output += `</div>`
-			output += `<div class="form-floating mb-4 theme-form-floating">`
-			output += `사진첨부`
-			output += `<div>`
-			output += `<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>`
-			output += `상품에 하자가 있는 경우에만 교환이 가능합니다.`
-			output += `</div>`
-			output += `</div>`
-			
-			$('.modal-body.modifyReview').html(output);
-		})
+
+	function reviewRating(id) {
+		let reviewRatingId = $(`#\${id}`);
+		
+		if (reviewRatingId.hasClass("fa-regular")) {
+			reviewRatingId.removeClass("fa-regular").addClass("fa-solid")
+			console.log(reviewRatingId.attr("value"))
+		}else if (reviewRatingId.hasClass("fa-solid")) {
+			reviewRatingId.removeClass("fa-solid").addClass("fa-regular")
+		}
 	}
+	
+	function uploadReviewImg() {
+		
+	}
+
 </script>
 <style>
+.upFileArea{
+	width: 100%;
+	height: 100px;
+	border: 1px dotted #333;
+	padding: 10px;
+		
+	font-weight: bold;
+	color: #d6d2d8;
+	font-size: 20px;
+		
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+#reviewProductImg{
+	height: 250px;
+	margin-left: 140px;
+}
 #deliveryStatus, #successPwd, #successPhoneNumber,
 	#successCellPhoneNumber, #successEmail, #successAddr, #successRefund,
 	#checkOrder {
@@ -2556,7 +2591,7 @@
 							<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>
 							상품에 하자가 있는 경우에만 교환이 가능합니다.
 						</div>
-					</div>
+					</div>-->
 					<div class="form-floating mb-4 theme-form-floating">
 						사진첨부<input type="text" class="form-control" id="exchangeReason"
 							value="상품 하자" name="reason" readonly="readonly" />
@@ -2564,7 +2599,7 @@
 							<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>
 							상품에 하자가 있는 경우에만 교환이 가능합니다.
 						</div>
-					</div>-->
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary btn-md"

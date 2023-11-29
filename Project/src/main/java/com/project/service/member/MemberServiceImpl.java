@@ -140,6 +140,10 @@ public class MemberServiceImpl implements MemberService {
 		List<GetBankTransfer> bankTransfer = mDao.selectBankTransfers(memberId);
 
 		Map<String, Object> result = new HashMap<String, Object>();
+		List<MyPageReview> myReview = mDao.selectMyreview(memberId);
+		for(MyPageReview review : myReview) {
+			review.setContent(review.getContent().replace("\r\n", "<br/>"));
+		}
 
 		result.put("orderHistory", lst);
 		result.put("pagination", pi);
@@ -607,8 +611,9 @@ public class MemberServiceImpl implements MemberService {
 	
 	@Override
 	public MyPageReview selectMyReview(String memberId, int postNo) throws SQLException, NamingException {
-	
-		return mDao.selectMyReview(memberId, postNo);
+		MyPageReview review = mDao.selectMyReview(memberId, postNo);
+		 review.setContent(review.getContent().replace("<br/>", ""));
+		return review;
 	}
 
 	// --------------------------------------- 장민정 끝
