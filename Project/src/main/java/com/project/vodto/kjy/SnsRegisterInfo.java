@@ -11,7 +11,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class NaverRegisterInfo {
+public class SnsRegisterInfo {
 	private String id;
 	private String email;
 	private String mobile;
@@ -19,4 +19,5 @@ public class NaverRegisterInfo {
 	private String birthday;
 	private String birthyear;
 	private String mobile_e164;
+	private String connected_at;
 }

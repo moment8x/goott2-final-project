@@ -1,4 +1,4 @@
-package com.project.dao.kjr;
+package com.project.dao.kjy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,9 +85,9 @@ public class ListDaoImpl implements ListDao {
 	}
 
 	@Override
-	public List<Products> selectBsetSeller(String key) throws Exception {
+	public List<ProductsForList> selectBsetSeller(String key) throws Exception {
 		// TODO Auto-generated method stub
-		List<Products> lst = null;
+		List<ProductsForList> lst = null;
 		if (key != null) {
 			 lst = ses.selectList(ns+".selectBestSellerFromId", key);
 		} else {
@@ -185,15 +185,24 @@ public class ListDaoImpl implements ListDao {
 	}
 
 	@Override
-	public List<ProductsForList> selectNewProducts() throws Exception {
-		
-		return ses.selectList(ns+".selectNewPrducts");
+	public List<ProductsForList> selectNewProducts(String lang) throws Exception {
+		List<ProductsForList> lst = null;
+		if(lang == null) {
+			lst = ses.selectList(ns+".selectNewPrducts");	
+		} else {
+			lst = ses.selectList(ns+".selectNewPrductsInLang", lang);
+		}
+		return lst;
 	}
 
 	@Override
-	public List<ProductsForList> selectProductOrderBySellings() throws Exception {
-		List<ProductsForList> lst = ses.selectList(ns+".selectProductsOrderBySellings");
-		System.out.println("리스?트 : " + lst);
+	public List<ProductsForList> selectProductOrderBySellings(String lang) throws Exception {
+		List<ProductsForList> lst = null;
+		if(lang == null) {
+			lst = ses.selectList(ns+".selectProductsOrderBySellings");
+		} else {
+			lst = ses.selectList(ns+".selectProductsOrderBySellingsInLang", lang);
+		}
 		return lst;
 	}
 
@@ -208,7 +217,5 @@ public class ListDaoImpl implements ListDao {
 	
 		return ses.selectList(ns+".selectProductsOrderByRating");
 	}
-
-	
 
 }

@@ -12,7 +12,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ProductCategories {
-	private String category_key;
-	private String category_name;
+	private String categoryKey;
+	private String categoryName;
 	
 }

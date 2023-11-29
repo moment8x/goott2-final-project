@@ -1,4 +1,4 @@
-package com.project.dao.kjr;
+package com.project.dao.kjy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,13 +59,37 @@ public class LoginDaoImpl implements LoginDao {
 	}
 
 	@Override
-	public Memberkjy selectMemberByNameAndEmail(String email, String userName) throws Exception {
+	public Memberkjy selectMemberByNameAndEmail(String userId, String email, String userName) throws Exception {
 		Map<String,String> params = new HashMap<String, String>();
+		
+		params.put("userId", userId);
 		params.put("userName", userName);
 		params.put("email", email);
 		Memberkjy member = ses.selectOne(ns+".selectMemberByNameAndEmail", params);
 		System.out.println("멤버 : " + member);
 		return member;
+	}
+
+	@Override
+	public boolean updatePassword(String userId, String password) {
+		boolean result = false;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("userId", userId);
+		params.put("password", password);
+		if(ses.update(ns+".updatePassword", params) == 1) {
+			result = true;
+		}
+		return result;
+	}
+
+	@Override
+	public boolean isAdminBySelectPermission(String id) throws Exception {
+		boolean result = false;
+		Memberkjy member = ses.selectOne(ns+".isAdminBySelectPermission", id);
+		if(member != null) {
+			result = true;
+		}
+		return result;
 	}
 
 }

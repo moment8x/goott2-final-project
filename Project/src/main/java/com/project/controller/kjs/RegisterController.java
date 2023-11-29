@@ -24,7 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.project.service.kjs.upload.UploadFileService;
 import com.project.service.member.MemberService;
 import com.project.vodto.UploadFiles;
-import com.project.vodto.kjy.NaverRegisterInfo;
+import com.project.vodto.kjy.SnsRegisterInfo;
 import com.project.vodto.kjs.SignUpDTO;
 
 
@@ -124,9 +124,10 @@ public class RegisterController {
 	}
 	
 	@RequestMapping("snsRegister")
-	public void snsRegister(@RequestParam("uerInfo") NaverRegisterInfo naverInfo) {
+	public void snsRegister(Model model) {
 		System.out.println("================스타트=================");
-		System.out.println("왔다 감 영민♥승준 " + naverInfo);
+		SnsRegisterInfo snsInfo = (SnsRegisterInfo) model.asMap().get("snsInfo");
+		System.out.println("정보받음 " + snsInfo);
 		
 		System.out.println("================끝났음=================");
 	}

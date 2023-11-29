@@ -175,7 +175,6 @@ public class ShoppingCartController {
 			@RequestParam("productId") String productId, @RequestParam(value="quantity", defaultValue = "1") int quantity) {
 		ResponseEntity<Map<String, Object>> result = null;
 		Map<String,Object> map = new HashMap<String, Object>();
-		
 		// 로그인 여부 확인
 		HttpSession session = request.getSession();
 		try {

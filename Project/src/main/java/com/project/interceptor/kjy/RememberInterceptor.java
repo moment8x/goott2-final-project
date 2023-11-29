@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import com.project.dao.kjr.LoginDao;
+import com.project.dao.kjy.LoginDao;
 import com.project.service.kjy.LoginService;
 import com.project.vodto.kjy.Memberkjy;
 
@@ -34,9 +34,7 @@ public class RememberInterceptor extends HandlerInterceptorAdapter {
 						String key = value.split("/a@")[1];
 						try {
 							Memberkjy loginMember = loginService.getRememberCheck(member_id, key);
-							System.out.println("loginMember : " + loginMember);
 							if(loginMember != null) {
-								System.out.println("1");
 								request.getSession().setAttribute("loginMember", loginMember);
 								System.out.println("자동로그인!!");
 								response.sendRedirect("/");
@@ -57,7 +55,6 @@ public class RememberInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-		System.out.println("찍혔냐");
 		if (request.getMethod().equals("POST") && request.getRequestURI().equals("/login/")) {
 			String remember = request.getParameter("remember");
 			if (request.getSession().getAttribute("loginMember") != null) {

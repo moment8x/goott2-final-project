@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.project.mappers.adminRegisteringMapper">
+	  <insert id="insertProducts">
+	  	insert into gott123.products(
+	  		product_id, product_name, selling_price, consumer_price, supply_price, isbn, product_info_image, author_translator, original_author, illustrator, publisher, publication_date, page_count, size, total_volume, author_introduction, introduction_intro, introduction_detail, table_of_contents, category_key, current_key
+	  	)values(
+	  		#{product_id}, #{prduct_name}, #{selling_price}, #{consumer_price}, #{supply_price}, #{isbn}, #{product_info_image}, #{author_translator}, #{original_author}, #{illustrator}, #{publisher}, #{publication_date}, #{page_count}, #{size}, #{total_volume}, #{author_introduction}, #{introduction_intro}, #{introduction_detail}, #{table_of_contents}, #{category_key}, #{current_key}
+	  	)  
+	  </insert>
+  </mapper>

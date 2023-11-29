@@ -1,4 +1,4 @@
-package com.project.dao.kjr;
+package com.project.dao.kjy;
 
 import com.project.vodto.kjy.LoginDTO;
 import com.project.vodto.kjy.Memberkjy;
@@ -14,5 +14,9 @@ public interface LoginDao {
 	
 	public Memberkjy selectMemberById(String id) throws Exception;
 	
-	public Memberkjy selectMemberByNameAndEmail(String email, String userName) throws Exception;
+	public Memberkjy selectMemberByNameAndEmail(String userId, String email, String userName) throws Exception;
+	
+	public boolean updatePassword(String userId, String password);
+	
+	public boolean isAdminBySelectPermission(String id) throws Exception;
 }

@@ -12,13 +12,13 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ProductsForList {
-	private String product_id;
-	private String product_image;
-	private String product_name;
-	private int consumer_price;
-	private int selling_price;
+	private String productId;
+	private String productImage;
+	private String productName;
+	private int consumerPrice;
+	private int sellingPrice;
 	private float rating;
-	private int participation_count;
+	private int participationCount;
 	private int counts;
 	private String publisher;
 }

@@ -41,6 +41,7 @@ import com.project.vodto.kjy.Memberkjy;
 import com.project.vodto.kjy.NaverBooks;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
+import com.project.vodto.kjy.ProductsForList;
 import com.project.vodto.kjy.SearchVO;
 
 @Controller
@@ -60,10 +61,10 @@ public class ListController {
 			List<ProductCategories> lst = lService.getProductCategory(lang);
 			ProductCategories pd = lService.getCategoryInfo(lang);
 			System.out.println("pd"+pd +"lst"+lst);
-			List<Products> bestSellers = lService.getProductsBsetSeller(lang);
+			Map<String, Object> langPageSlideList = lService.langPageList(lang);
 			model.addAttribute("categories", lst);
 			model.addAttribute("nowCategory", pd);
-			model.addAttribute("bestSellers", bestSellers);
+			model.addAttribute("listMap", langPageSlideList);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -108,10 +109,10 @@ public class ListController {
 		// 상품 가져오기
 		try {
 			Map<String, Object> map = lService.getProductForList(key, page, sortBy);
-			List<Products> lst = (List<Products>)map.get("list_product");
-			PagingInfo paging = (PagingInfo)map.get("paging_info");
+			List<Products> lst = (List<Products>)map.get("listProduct");
+			PagingInfo paging = (PagingInfo)map.get("pagingInfo");
 			model.addAttribute("products", lst);
-			model.addAttribute("paging_info", paging);
+			model.addAttribute("pagingInfo", paging);
 			model.addAttribute("sortBy", sortBy);		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
