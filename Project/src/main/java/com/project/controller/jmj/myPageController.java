@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -68,6 +69,8 @@ public class myPageController {
 	private ListService lService;
 	
 	private UploadFiles uf;
+
+	private List<UploadFiles> fileList = new ArrayList<UploadFiles>();
 	
 	@RequestMapping(value = "myPage")
 	public void myPage(Model model, HttpServletRequest request, @RequestParam(value = "pageNo", defaultValue = "1")int pageNo) {
@@ -728,6 +731,78 @@ public class myPageController {
 		return result;
 	}
 	
+	@RequestMapping(value = "modifyReview", method = RequestMethod.POST)
+	public @ResponseBody List<UploadFiles> modifyReview(MultipartFile uploadFile, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
+		System.out.println("파일의 오리지널 이름 : " + uploadFile.getOriginalFilename());
+		System.out.println("파일의 사이즈 : " + uploadFile.getSize());
+		System.out.println("파일의 contentType : " + uploadFile.getContentType()); //mime-type 이다. server에 web.xml에 정의되어있다. 실제 어떤 형식의 파일인지 컴퓨터끼리 아는것.
+		//파일이 저장될 물리적 경로(realPath)
+		String realPath = request.getSession().getServletContext().getRealPath("resources/assets/images/review"); //java파일이랑 webapp 까지는 경로가 같아서 경로를 이렇게 지정한다.
+		System.out.println(realPath);
+	
+		UploadFiles uf = null;
+		
+		try {
+			uf = UploadProfileFileProcess.fileUpload(uploadFile.getOriginalFilename(),  uploadFile.getSize(), uploadFile.getContentType(),
+					 uploadFile.getBytes(), realPath, memberId);
+			System.out.println(uf.toString());
+			if(uf != null) {
+				this.fileList.add(uf);
+				
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			uf = null; 
+		}
+		
+		for(UploadFiles f : this.fileList) {
+			System.out.println("현재 파일 업로드 리스트 : " + f.toString());
+		}
+		return this.fileList;
+	}
+	
+	@RequestMapping("remFile")
+	public ResponseEntity<String> removeFile(@RequestParam("removeFile") String remFile, HttpServletRequest request) {
+		System.out.println(remFile + "파일을 삭제하자");
+		
+		//this.fileList[remInd] 번째의 파일을 하드디스크에서 먼저 삭제 한 뒤
+		//this.fileList[remInd] 번째 this.fileList에서 삭제
+		String realPath = request.getSession().getServletContext().getRealPath("resources/assets/images/review");
+		
+		ResponseEntity<String> result = null;
+		
+		UploadProfileFileProcess.deleteFile(this.fileList, remFile, realPath);
+			
+		int ind = 0;
+		for(UploadFiles uf : fileList) {
+			if(!remFile.equals(uf.getOriginalFileName())) {
+				ind++;
+			}else if(remFile.equals(uf.getOriginalFileName())){
+				break;
+			}
+		}
+		this.fileList.remove(ind);
+			result = new ResponseEntity<String>("success", HttpStatus.OK);
+		for(UploadFiles f : this.fileList) {
+			System.out.println("현재 파일 업로드 리스트 : " + f.toString());
+		}
+		return result;
+	}
+	
+	@RequestMapping("remAllFile")
+	public ResponseEntity<String> remAllFile(HttpServletRequest request) {
+		String realPath = request.getSession().getServletContext().getRealPath("resources/assets/images/review");
+		UploadProfileFileProcess.deleteAllFile(this.fileList, realPath);
+		
+		this.fileList.clear();
+		
+		return new ResponseEntity<String>("success", HttpStatus.ACCEPTED);
+	}
+	
 	@RequestMapping(value = "delWishlist", method = RequestMethod.POST)
 	public ResponseEntity<String> delWishlist(@RequestParam("productId") String productId, HttpServletRequest request) {
 		System.out.println(productId + "번 상품 삭제");
@@ -771,20 +846,21 @@ public class myPageController {
 	}
 	
 	@RequestMapping(value = "selectModifyReview", method = RequestMethod.POST)
-	public ResponseEntity<MyPageReview> selectModifyReview(@RequestParam("postNo") int postNo, HttpServletRequest request){
+	public ResponseEntity<Map<String, Object>> selectModifyReview(@RequestParam("postNo") int postNo, HttpServletRequest request){
 		System.out.println(postNo + "번 리뷰수정");
 		
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
 		
-		ResponseEntity<MyPageReview> result = null;
+		ResponseEntity<Map<String, Object>> result = null;
 		
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
 		try {
-			MyPageReview review = mService.selectMyReview(memberId, postNo);
-			result = new ResponseEntity<MyPageReview>(review, header, HttpStatus.OK);
+			Map<String, Object> map = mService.selectMyReview(memberId, postNo);
+			
+			result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);
 		} catch (SQLException | NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -793,6 +869,7 @@ public class myPageController {
 		return result;
 		
 	}
+	
 	
 	
 

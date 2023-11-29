@@ -967,13 +967,13 @@
 				output += `<tr>`;
 				output += `<td class="product-detail">`;
 				output += `<div class="product border-0">`;
-				if(data.productImage == null){
-					output += `<a href="/detail/\${data.productId}" class="product-image">`;
-					output += `<img src="/resources/assets/images/noimage.jpg" class="img-fluid blur-up lazyload" alt="\${data.productName}">`;
+				if(data.review.productImage == null){
+					output += `<a href="/detail/\${data.review.productId}" class="product-image">`;
+					output += `<img src="/resources/assets/images/noimage.jpg" class="img-fluid blur-up lazyload" alt="\${data.review.productName}">`;
 					output += `</a>`;
 				}else{
-					output += `<a href="/detail/\${data.productId}" class="product-image">`;
-					output += `<img src="\${data.productImage}" class="img-fluid blur-up lazyload" alt="\${data.productName}" id="reviewProductImg">`;
+					output += `<a href="/detail/\${data.review.productId}" class="product-image">`;
+					output += `<img src="\${data.review.productImage}" class="img-fluid blur-up lazyload" alt="\${data.review.productName}" id="reviewProductImg">`;
 					output += `</a>`;
 				}
 				output += `</div>`;
@@ -982,13 +982,12 @@
 				output += `</tr>`
 				output += `<tr>`
 				output += `<td class="name">`
-				output += `<a href="/detail/\${data.productId}" id="productName">`
-				output += `<h4 class="table-title text-content">\${data.productName}</h4>` 
+				output += `<a href="/detail/\${data.review.productId}" id="productName">`
+				output += `<h4 class="table-title text-content">\${data.review.productName}</h4>` 
 				output += `</a>`
 				output += `</td>`
 				output += `<td class="name">`
 				output += `<h4 class="table-title text-content">`
-				let rating = `\${data.rating}`
 				output += `<i class="fa-regular fa-star" id="rating1" style="color: #0DA487;" onclick="reviewRating('rating1')" value="1"></i>`					
 				output += `<i class="fa-regular fa-star" id="rating2" style="color: #0DA487;" onclick="reviewRating('rating2')" value="2"></i>`					
 				output += `<i class="fa-regular fa-star" id="rating3" style="color: #0DA487;" onclick="reviewRating('rating3')" value="3"></i>`					
@@ -1000,27 +999,94 @@
 				output += `</tbody>`
 				output += `</table>`
 				output += `<div class="form-floating mb-4 theme-form-floating">`
-				output += `<textarea rows="7" cols="62" value="">\${data.content}</textarea>`
+				output += `<textarea rows="7" cols="62" value="">\${data.review.content}</textarea>`
 				output += `<div>`
 				output += `<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>`
 				output += `몇글자까지 가능?`
 				output += `</div>`
 				output += `</div>`
-				output += `<div class="form-floating mb-4 theme-form-floating">`
-				output += `사진첨부`
-				output += `<div>`
-				output += `<div>`
-				output += `<input type="file" id="uploadReviewImg" /> <input type="button" value="등록" onclick="uploadReviewImg();" />`
+				output += `<div class="mb-3">`
+				output += `<label for="upFile" class="form-label">첨부파일</label>`
+				output += `<div class="upFileArea">업로드할 파일을 드래그앤 드랍 하세요.`
 				output += `</div>`
-				output += `<div class="uploadFile">`
-				output += `</div>`
-				output += `</div>`
-					
+				
+				let output2 = ''
+						
+				$.each(data.reviewUf, function(i, elt) {
+					let name = elt.newFileName.replace("\\", "/");
+					if(elt.thumbnailFileName != null){ //이미지
+						let thumb = elt.thumbnailFileName.replace("\\", "/");
+						output2 += `<img src = '/resources/assets/images/review\${thumb}'  id="\${elt.originalFileName}" class='upImg'/>
+						<i class="fa-regular fa-square-minus" onclick ='remFile(this);'></i>`;
+					}else{
+						output2 += `<a href='/resources/assets/images/review\${name}' id="\${elt.originalFileName}" >\${elt.originalFileName}</a>
+						<i class="fa-regular fa-square-minus" onclick ='remFile(this);'></i>`;
+					}
+				})
+				$('.uploadFile').html(output2);
+				
 				$('.modal-body.modifyReview').html(output);
+				
+				$('.upFileArea').on("dragenter dragover", function(evt) {
+					evt.preventDefault();
+				});
+					
+				$('.upFileArea').on("drop", function(evt) {
+					evt.preventDefault();
+					//이 경로를 타고 보면 올린 파일이 배열로 나온다.
+					console.log(evt.originalEvent.dataTransfer.files);
+					
+					let files = evt.originalEvent.dataTransfer.files;
+					//서버에서 파일은 한번에 하나씩 올릴 수 있다. 그래서 여러개의 파일은 컨트롤을 통해서 여러개 보낸다..? 그래서 아작스 사용..?
+					for(let i = 0; i < files.length; i++){ 
+			            let form = new FormData() //자바스크립트에서 만들었다. form태그를 객체처럼 만들었다.
+			            form.append("uploadFile", files[i]); //파일의 이름을 컨트롤러 단의 MultipartFile 매개변수명과 동일하도록 한다.
+			            console.log(files[i]);
+						
+			            modifyReview(form);
+					}
+				});
 			},
 			error : function() {
 			}
 		});
+	}
+
+	
+	function modifyReview(form) {
+		$.ajax({
+			url : 'modifyReview', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
+			data : form, 
+			dataType : 'json',
+			async : false,
+			processData : false, //text데이터에 대해 쿼리스트링 처리를 하지 않겠다
+			contentType : false, // 파일은 2진수로 되어있어서 인코딩 처리를 안 함. 디폴트는 인코딩 처리해서 서버로 보냄.x-www-form-urlencoded 처리 안 함(인코딩 하지 않음)
+			success : function(data) {
+				console.log(data);
+				
+				if(data != null){
+					showUploadedFile(data);
+				}
+			},
+		});
+	}
+	function showUploadedFile(file) {
+		let output = "";
+		
+		$.each(file, function(i, elt) {
+				let name = elt.newFileName.replace("\\", "/");
+			if(elt.thumbnailFileName != null){ //이미지
+				let thumb = elt.thumbnailFileName.replace("\\", "/");
+				output += `<img src = '/resources/assets/images/review\${thumb}'  id="\${elt.originalFileName}" class='upImg'/>
+					<i class="fa-regular fa-square-minus" onclick ='remFile(this);'></i>`;
+			}else{
+				output += `<a href='/resources/assets/images/review\${name}' id="\${elt.originalFileName}" >\${elt.originalFileName}</a>
+					<i class="fa-regular fa-square-minus" onclick ='remFile(this);'></i>`;
+			}
+
+		})
+		$('.uploadFile').append(output);
 	}
 
 	function reviewRating(id) {
@@ -1034,8 +1100,37 @@
 		}
 	}
 	
-	function uploadReviewImg() {
+	function remFile(fileId) {
+		let removeFile = $(fileId).prev().attr('id'); //삭제 될 파일의 originalFileName
 		
+		$.ajax({
+			url : 'remFile', // 데이터를 수신받을 서버 주소
+			type : 'GET', // 통신방식(GET, POST, PUT, DELETE)
+			data : {
+					"removeFile" : removeFile
+			}, 
+			dataType : 'text',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data == "success"){
+					$(fileId).prev().remove();
+					$(fileId).remove();
+				}
+			},
+		});
+	}
+	
+	function btnCancel() {
+		$.ajax({
+			url : 'remAllFile', // 데이터를 수신받을 서버 주소
+			type : 'GET', // 통신방식(GET, POST, PUT, DELETE)
+			dataType : 'text',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				}
+		});
 	}
 
 </script>
@@ -2592,18 +2687,11 @@
 							상품에 하자가 있는 경우에만 교환이 가능합니다.
 						</div>
 					</div>-->
-					<div class="form-floating mb-4 theme-form-floating">
-						사진첨부<input type="text" class="form-control" id="exchangeReason"
-							value="상품 하자" name="reason" readonly="readonly" />
-						<div class="deliverMsg">
-							<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>
-							상품에 하자가 있는 경우에만 교환이 가능합니다.
-						</div>
-					</div>
 				</div>
+				<div class="uploadFile"></div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary btn-md"
-						data-bs-dismiss="modal">닫기</button>
+						data-bs-dismiss="modal" onclick="btnCancel();">닫기</button>
 					<button type="button" class="btn theme-bg-color btn-md text-white"
 						onclick="">수정</button>
 				</div>

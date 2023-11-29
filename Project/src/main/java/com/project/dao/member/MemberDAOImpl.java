@@ -691,6 +691,15 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectOne(ns + ".selectMyReview", params);
 	}
 
+	@Override
+	public List<UploadFiles> selectMyReviewUf(String memberId, int postNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("postNo", postNo);
+		
+		return ses.selectList(ns + ".selectMyReviewUf", params);
+	}
+
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
@@ -733,6 +742,7 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".insertShipping", shipping);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
 
 
 

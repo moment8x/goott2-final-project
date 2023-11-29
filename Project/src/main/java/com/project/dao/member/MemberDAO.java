@@ -245,6 +245,9 @@ public interface MemberDAO {
 	
 	//작성한 리뷰 한개 가져오기
 	MyPageReview selectMyReview(String memberId, int postNo) throws SQLException, NamingException;
+	
+	//작성한 리뷰 업로드 파일 가져오기
+	List<UploadFiles> selectMyReviewUf(String memberId, int postNo) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -258,9 +261,6 @@ public interface MemberDAO {
 	// 기본 배송지 설정
 	int insertShipping(ShippingAddrDTO shipping) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
-
-	
-	
 
 	
 }

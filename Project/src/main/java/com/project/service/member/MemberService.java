@@ -120,7 +120,7 @@ public interface MemberService {
 	boolean addShoppingCart(String memberId, String productId) throws SQLException, NamingException;
 	
 	//리뷰 한개 가져오기
-	MyPageReview selectMyReview(String memberId, int postNo) throws SQLException, NamingException;
+	Map<String, Object> selectMyReview(String memberId, int postNo) throws SQLException, NamingException;
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회

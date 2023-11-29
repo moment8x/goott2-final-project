@@ -457,17 +457,24 @@
 	<select id="selectMyreview" resultType="com.project.vodto.jmj.MyPageReview">
 		select rb.post_no, rb.created_date, rb.content, rb.rating, rb.product_id, rb.is_delete, pi.product_image, p.product_name
 		from review_board rb, (SELECT * FROM product_images GROUP BY product_id) pi, products p
-		where rb.author = #{memberId}
+		where rb.author = #{memberId} and rb.is_delete='N'
 		and rb.product_id = pi.product_id
-		and pi.product_id = p.product_id
+		and pi.product_id = p.product_id order by rb.created_date desc
 	</select>
 	
 	<select id="selectMyReview" resultType="com.project.vodto.jmj.MyPageReview">
 		select rb.post_no, rb.created_date, rb.content, rb.rating, rb.product_id, rb.is_delete, pi.product_image, p.product_name
 		from review_board rb, (SELECT * FROM product_images GROUP BY product_id) pi, products p
-		where rb.author = #{memberId} and post_no = #{postNo}
+		where rb.author = #{memberId} and post_no = #{postNo} and rb.is_delete='N'
 		and rb.product_id = pi.product_id
 		and pi.product_id = p.product_id
+	</select>
+	
+	<select id="selectMyReviewUf" resultType="com.project.vodto.UploadFiles">
+		select uf.* from upload_files uf, review_uf ru, review_board rb
+		where rb.author = #{memberId} and rb.is_delete = 'N' and rb.post_no = #{postNo}
+		and uf.upload_files_seq = ru.upload_files_seq
+		and ru.post_no = rb.post_no
 	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">

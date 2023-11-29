@@ -624,10 +624,18 @@ public class MemberServiceImpl implements MemberService {
 	}
 	
 	@Override
-	public MyPageReview selectMyReview(String memberId, int postNo) throws SQLException, NamingException {
+	public Map<String, Object> selectMyReview(String memberId, int postNo) throws SQLException, NamingException {
+		Map<String, Object> result = new HashMap<String, Object>();
+		
 		MyPageReview review = mDao.selectMyReview(memberId, postNo);
-		 review.setContent(review.getContent().replace("<br/>", ""));
-		return review;
+		review.setContent(review.getContent().replace("<br/>", ""));
+		List<UploadFiles> reviewUf = mDao.selectMyReviewUf(memberId, postNo);
+		
+		 
+		 result.put("review", review);
+		 result.put("reviewUf", reviewUf);
+		 
+		return result;
 	}
 
 	// --------------------------------------- 장민정 끝
