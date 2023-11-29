@@ -2,18 +2,21 @@ package com.project.service.kkb.admin;
 
 import com.project.vodto.kkb.DepositProductResponse;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
-@AllArgsConstructor
 public class DepositProduct {
 	private String productOrderNo;
 	private String productName;
 	private String productId;
 	private int productQuantity;
+	
+	private DepositProduct(String productOrderNo, String productName, String productId, int productQuantity) {
+		this.productOrderNo = productOrderNo;
+		this.productName = productName;
+		this.productId = productId;
+		this.productQuantity = productQuantity;
+	}
 	
 	public static DepositProduct from(DepositProductResponse order) {
 		return new DepositProduct(

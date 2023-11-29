@@ -19,7 +19,7 @@ public class AdminPointServiceImpl implements AdminPointService {
 	private final AdminPointDAO adminPointRepository;
 	
 	@Override
-	public Map<String, Object> getPointInfo(String memberId) throws Exception {
+	public Map<String, Object> getPointInfo(String memberId) {
 	
 		PointInfoResponse pointInfo = adminPointRepository.findPointInfoById(memberId);
 		List<PointListResponse> pointList = adminPointRepository.findPointListById(memberId);

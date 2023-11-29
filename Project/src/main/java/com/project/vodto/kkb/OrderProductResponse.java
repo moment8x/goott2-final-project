@@ -22,6 +22,6 @@ public class OrderProductResponse {
 	private String paymentMethod;
 	private String paymentStatus;
 	private String productStatus;
-	private String invoiceNumber;
+	private String productInvoiceNumber;
 	private String deliveryMessage;
 }

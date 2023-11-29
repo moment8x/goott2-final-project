@@ -5,5 +5,5 @@ import java.util.Map;
 public interface AdminRewardService {
 
 	/* 적립금 정보 및 내역 */
-	Map<String, Object> getRewardInfo(String memberId) throws Exception;
+	Map<String, Object> getRewardInfo(String memberId);
 }

@@ -18,7 +18,7 @@ public class AdminBoardDAOImpl implements AdminBoardDAO {
 	private final SqlSession ses;
 
 	@Override
-	public List<PostResponse> findPostByInfo(PostCondition postCond) throws Exception {		
+	public List<PostResponse> findPostByInfo(PostCondition postCond) {		
 		return ses.selectList(ns + ".selectPostInfo", postCond);
 	}
 

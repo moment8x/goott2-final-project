@@ -7,5 +7,5 @@ import com.project.vodto.kkb.CartResponse;
 public interface AdminShoppingCartDAO {
 	
 	/* 장바구니 정보 */
-	List<CartResponse> findCartInfoById(String memberId) throws Exception;
+	List<CartResponse> findCartInfoById(String memberId);
 }

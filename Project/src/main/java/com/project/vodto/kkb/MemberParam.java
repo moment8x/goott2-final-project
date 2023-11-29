@@ -26,7 +26,6 @@ public class MemberParam {
 	private String refundBank;
 	private String refundAccount;
 	private String dormantAccout; 
-	private String memberToken;
 	private String permission; 
 	private String withdraw; 
 	private String accountHolder;

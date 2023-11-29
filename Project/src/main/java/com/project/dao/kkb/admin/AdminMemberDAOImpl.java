@@ -23,42 +23,42 @@ public class AdminMemberDAOImpl implements AdminMemberDAO {
 	private final SqlSession ses;
 
 	@Override
-	public int countAll() throws Exception {
+	public int countAll() {
 		return ses.selectOne(ns + ".selectAllMemberCount");
 	}
 	
 	@Override
-	public List<MemberResponse> findByInfo(MemberCondition memberCond) throws Exception {
+	public List<MemberResponse> findByInfo(MemberCondition memberCond) {
 		return ses.selectList(ns + ".selectMemberInfo", memberCond);
 	}
 
 	@Override
-	public MemberBasicInfo findBasicInfoById(String memberId) throws Exception {
+	public MemberBasicInfo findBasicInfoById(String memberId) {
 		return ses.selectOne(ns + ".selectBasicInfo", memberId);
 	}
 
 	@Override
-	public List<MemberRecentOrder> findRecentOrderById(String memberId) throws Exception {
+	public List<MemberRecentOrder> findRecentOrderById(String memberId) {
 		return ses.selectList(ns + ".selectRecentOrder", memberId);
 	}
 
 	@Override
-	public List<MemberRecentPost> findRecentPostById(String memberId) throws Exception {
+	public List<MemberRecentPost> findRecentPostById(String memberId) {
 		return ses.selectList(ns + ".selectRecentPost", memberId);
 	}
 
 	@Override
-	public List<MemberRecentInquiry> findRecentInquiryById(String memberId) throws Exception {
+	public List<MemberRecentInquiry> findRecentInquiryById(String memberId) {
 		return ses.selectList(ns + ".selectRecentInquiry", memberId);
 	}
 
 	@Override
-	public MemberParam findDetailInfoById(String memberId) throws Exception {
+	public MemberParam findDetailInfoById(String memberId) {
 		return ses.selectOne(ns + ".selectMemberDetailInfo", memberId);
 	}
 
 	@Override
-	public int changeMemberDetailInfo(MemberParam member) throws Exception {
+	public int changeMemberDetailInfo(MemberParam member) {
 		return ses.update(ns + ".updateMemberDetailInfo", member);
 	}
 

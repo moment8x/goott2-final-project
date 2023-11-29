@@ -20,7 +20,7 @@ public class AdminCouponServiceImpl implements AdminCouponService {
 	private final AdminCouponDAO adminCouponRepository;
 	
 	@Override
-	public Map<String, Object> getCouponInfo(String memberId) throws Exception {
+	public Map<String, Object> getCouponInfo(String memberId) {
 		
 		CouponInfoResponse couponInfo = adminCouponRepository.findCouponInfoById(memberId);
 		List<CouponListResponse> couponList = adminCouponRepository.findCouponListById(memberId);
@@ -33,7 +33,7 @@ public class AdminCouponServiceImpl implements AdminCouponService {
 	}
 
 	@Override
-	public Map<String, Object> getCategoryByCouponNo(String couponNumber) throws Exception {
+	public Map<String, Object> getCategoryByCouponNo(String couponNumber) {
 		
 		CouponAppliedCategory categories = adminCouponRepository.findCategoryByCouponNo(couponNumber);
 		

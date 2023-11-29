@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @RestController
-public class ExceptionController {
+public class AdminExceptionController {
 	
 	@GetMapping("/api/members/{id}")
 	public MemberDto getMember(@PathVariable("id") String id) {
@@ -22,7 +24,7 @@ public class ExceptionController {
         }
         
 		return new MemberDto(id, "hello " + id);
-	}
+	}	
 	
 	@Data
     @AllArgsConstructor
