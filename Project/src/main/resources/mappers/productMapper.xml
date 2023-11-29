@@ -4,16 +4,17 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.project.mappers.productMapper">
-	<select id="selectProduct" resultType="com.project.vodto.kjs.DisPlayedProductDTO">
-		SELECT p.*, prod_img.product_image product_image
-		FROM products p INNER JOIN product_images prod_img on p.product_id = prod_img.product_id
-		WHERE p.product_id = #{productId}
-		ORDER BY prod_img.product_images_seq LIMIT 1;
-	</select>
-	<select id="getProductInfo" resultType="com.project.vodto.Product">
+	<select id="getProductInfo" resultType="com.project.vodto.kjs.DisPlayedProductDTO">
 		SELECT * FROM products WHERE product_id = #{productId}
 	</select>
 	<select id="getProductImages" resultType="com.project.vodto.kjs.ProductImage">
 		SELECT product_id, product_image FROM product_images WHERE product_id = #{productId}
+	</select>
+	<select id="getProductCategory" resultType="String">
+		SELECT c.name
+		FROM categories c
+		INNER JOIN category_paths p
+		ON c.id = p.ancestor
+		WHERE p.descendant = #{categoryKey}
 	</select>
 </mapper>

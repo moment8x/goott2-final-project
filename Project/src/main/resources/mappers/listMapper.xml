@@ -58,8 +58,11 @@
   		select count(*) from products where category_key like CONCAT(#{key}, "%")
   	</select>
   	
-  	<select id="selectBsetSeller" resultMap="productsResultMap">
+  	<select id="selectBestSellerFromId" resultMap="productsResultMap">
   		select p.*, (SELECT i.product_image FROM product_images i WHERE i.product_id = p.product_id LIMIT 1) AS product_image from products p where p.best_seller_status = 1 and p.category_key like CONCAT(#{key}, "%")
+  	</select>
+  	<select id="selectBestSeller" resultMap="productsResultMap">
+  		select p.*, (SELECT i.product_image FROM product_images i WHERE i.product_id = p.product_id LIMIT 1) AS product_image from products p where p.best_seller_status = 1
   	</select>
   	
   	<select id="selectProductById" resultMap="productsResultMap">
@@ -119,4 +122,29 @@
   			</if>
   	</select>
   	
+  	<select id="selectNewPrducts" resultMap="productsResultMap">
+  		select p.*, (select i.product_image from product_images i where i.product_id = p.product_id limit 1) as product_image from products p order by publication_date desc limit 20
+  	</select>
+  	
+  	<resultMap type="com.project.vodto.kjy.ProductsForList" id="ProductsForList">
+ 		<result property="product_id" column="product_id"/>
+ 		<result property="product_image" column="product_image"/>
+ 		<result property="product_name" column="product_name"/>
+ 		<result property="consumer_price" column="consumer_price"/>
+ 		<result property="selling_price" column="selling_price"/>
+ 		<result property="rating" column="rating"/>
+ 		<result property="participation_count" column="participation_count"/>
+ 		<result property="counts" column="counts"/>
+ 		<result property="publisher" column="publisher"/>
+ 	</resultMap>
+  	
+  	<select id="selectProductsOrderBySellings" resultMap="ProductsForList">
+  		select (select i.product_image from product_images i where i.product_id = p.product_id limit 1)as product_image, (select p.product_id from products p where p.product_id = d.product_id)as product_id, p.product_name,p.publisher ,p.consumer_price ,p.selling_price,(select r.rating from ratings r where p.product_id = r.product_id) as rating, (select r.participation_count from ratings r where p.product_id = r.product_id) as participation_count  ,count(d.product_id) as counts from detailed_order_items d left join products p on d.product_id = p.product_id group by d.product_id order by counts desc limit 5
+  	</select>
+  	<select id="selectProductsOrderByCart" resultMap="ProductsForList">
+  		select (select i.product_image from product_images i where i.product_id = s.product_id limit 1)as product_image,s.product_id, p.product_name,p.publisher, p.consumer_price ,p.selling_price, (select r.rating from ratings r where r.product_id = s.product_id) as rating, (select r.participation_count from ratings r where s.product_id = r.product_id) as participation_count, count(s.product_id)as counts from shopping_cart s left join products p on s.product_id = p.product_id group by s.product_id order by counts limit 5
+  	</select>
+  	<select id="selectProductsOrderByRating" resultMap="ProductsForList">
+  		select r.product_id, r.rating, r.participation_count, p.product_name,p.publisher, p.selling_price, p.consumer_price, (select i.product_image from product_images i where i.product_id = p.product_id limit 1)as product_image from ratings r left join products p on r.product_id = p.product_id order by rating desc limit 5
+  	</select>
   </mapper>

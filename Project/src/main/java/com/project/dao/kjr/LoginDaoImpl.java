@@ -58,4 +58,14 @@ public class LoginDaoImpl implements LoginDao {
 		return ses.selectOne(ns+".selectMemberById", id);
 	}
 
+	@Override
+	public Memberkjy selectMemberByNameAndEmail(String email, String userName) throws Exception {
+		Map<String,String> params = new HashMap<String, String>();
+		params.put("userName", userName);
+		params.put("email", email);
+		Memberkjy member = ses.selectOne(ns+".selectMemberByNameAndEmail", params);
+		System.out.println("멤버 : " + member);
+		return member;
+	}
+
 }

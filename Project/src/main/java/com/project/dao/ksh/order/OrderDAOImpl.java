@@ -42,6 +42,9 @@ public class OrderDAOImpl implements OrderDAO {
 		int count = 0;
 		Map<String, Object> map = new HashMap<>();
 		map.put("list", itemList);
+		if(itemList.get(0).getNonOrderNo() != null) {
+			map.put("nonOrderNo", itemList.get(0).getNonOrderNo());
+		}
 
 		// 실행 결과 row 갯수를 리턴합니다.
 		System.out.println(itemList.toString());
@@ -63,7 +66,13 @@ public class OrderDAOImpl implements OrderDAO {
 
 	@Override
 	public CompleteOrder getPaymentHistory(String orderNo) {
-		return ses.selectOne(ns + ".getPaymentDetail", orderNo);
+		Map<String, Object> map = new HashMap<>();
+		if(orderNo.contains("O")) {
+			map.put("orderNo", orderNo);
+		} else {
+			map.put("nonOrderNo", orderNo);
+		}
+		return ses.selectOne(ns + ".getPaymentDetail", map);
 	}
 
 	@Override
@@ -114,7 +123,11 @@ public class OrderDAOImpl implements OrderDAO {
 	public List<CompleteOrderItem> getDetailOrderItem(String orderNo, List<String> productId) throws Exception {
 		List<CompleteOrderItem> orderItems = new ArrayList<CompleteOrderItem>();
 		Map<String, Object> map = new HashMap<>();
-		map.put("orderNo", orderNo);
+		if(orderNo.contains("O")) {
+			map.put("orderNo", orderNo);
+		} else {
+			map.put("nonOrderNo", orderNo);
+		}
 		for(String s : productId) {
 			map.put("productId", s);
 			orderItems.add(ses.selectOne(ns+".getDetailOrderItem", map));

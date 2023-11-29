@@ -47,7 +47,7 @@ public class OrderServiceImpl implements OrderService {
 		// 무통장 입금
 		if (pd.getPaymentNumber().contains("bkt")) {
 			pd.setPaymentTime(new Timestamp(System.currentTimeMillis())); // 결제 시간 null이어서 set
-
+			pd.setPaymentStatus("입금전");
 			if (od.insertNewPayment(pd) > 0) { // 결제
 				System.out.println("결제 테이블 저장");
 				if (od.saveDetailItems(itemList) > 0) { // 주문 상세
@@ -56,13 +56,14 @@ public class OrderServiceImpl implements OrderService {
 						System.out.println("무통장 입금 테이블 저장");
 						if (updateDiscountMethod(pd, itemList)) {
 							result = true;
+							System.out.println("여기까지 오나?");
 						}
 					}
 				}
 			}
 
 		} else { // 카드 및 간편결제
-
+			pd.setPaymentStatus("결제완료");
 			if (od.insertNewPayment(pd) > 0) { // 결제
 				System.out.println("결제완료!" + pd.toString());
 				System.out.println(itemList.toString());
@@ -79,10 +80,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public List<DetailOrderItem> compareAmount(PaymentDTO pd, List<DetailOrderItem> itemList, Memberkjy memberInfo) {
-		
-		System.out.println("아이템리스트"+itemList.toString());
-		System.out.println("페이먼트디티오"+pd.toString());
-		
+
 		boolean result = false;
 		int realAmount = 0;
 		int totalAmount = 0;
@@ -93,15 +91,21 @@ public class OrderServiceImpl implements OrderService {
 		List<DetailOrderItem> renewaledList = null;
 		List<String> productId = new ArrayList<String>();
 		List<Integer> productQuantity = new ArrayList<Integer>();
-		
+
 		try {
+
 			for (DetailOrderItem item : itemList) {
 				productId.add(item.getProductId());
 				productQuantity.add(item.getProductQuantity());
+				if (pd.getPaymentMethod().equals("bkt")) {
+					item.setProductStatus("입금전");
+				} else {
+					item.setProductStatus("결제완료");
+				}
 				item.setCouponDiscount(0);
 			}
 			List<OrderInfo> products = od.getProductInfo(productId);
-			System.out.println("도대체 어디가 문젭니까! products : " + products.toString());
+			System.out.println("products : " + products.toString());
 			for (OrderInfo product : products) {
 				int i = 0;
 				product.setProductQuantity(productQuantity.get(i));
@@ -109,62 +113,70 @@ public class OrderServiceImpl implements OrderService {
 				totalAmount += product.getCalculatedPrice();
 				i++;
 			}
-			// 넘어온 쿠폰넘버를 이 회원이 가지고 있는지 조회
-			if (pd.getCouponNumbers().get(0) != "N") {
-				// 쿠폰 사용
-				int i = 0;
+			if (memberInfo != null) {
+				// 넘어온 쿠폰넘버를 이 회원이 가지고 있는지 조회
+				if (pd.getCouponNumbers().get(0) != "N") {
+					// 쿠폰 사용
+					int i = 0;
 
-				List<CouponInfos> couponInfos = od.getCouponInfos(memberInfo.getMemberId());
-				couponInfos = od.addCategoryKey(couponInfos);
+					List<CouponInfos> couponInfos = od.getCouponInfos(memberInfo.getMemberId());
+					couponInfos = od.addCategoryKey(couponInfos);
 
-				for (CouponInfos couponInfo : couponInfos) {
+					for (CouponInfos couponInfo : couponInfos) {
 
-					// 넘어온 쿠폰번호와 멤버가 가지고 있는 쿠폰번호가 일치하는지
-					if (pd.getCouponNumbers().get(i).equals(couponInfo.getCouponNumber())) {
-						System.out.println("넘어온 쿠폰번호랑 멤버가 가지고 있는 쿠폰번호랑 같음!");
-						for (int j = 0; j < products.size(); j++) { // 상품 종류만큼 반복
-							// 쿠폰적용카테고리와 상품카테고리가 일치하는지
-							
-							if (couponInfo.getCategoryKey().contains(products.get(j).getCategoryKey())
-									|| couponInfo.getCategoryKey().contains("ALL")) {
-								System.out.println("ALL 카테고리 적용쿠폰이거나 쿠폰 카테고리 일치!");
-								System.out.println("couponDiscount!" + couponDiscount);
-								System.out.println("검증 다 통과한 쿠폰! : " + couponInfo.toString());
-								System.out.println(products.get(j).getCalculatedPrice());
-								if (couponInfo.getCategoryKey().contains(products.get(j).getCategoryKey())) {
-									
-									int calcAmount = (int) Math.round((products.get(j).getCalculatedPrice()
-											* (double) couponInfo.getDiscountAmount() / 100) / 10) * 10;
-									
-									// 주문 상세 상품의 쿠폰 할인 금액을 위한 코드를 짜야함
-									if(itemList.get(j).getCouponDiscount() > 0) {
-										
-										itemList.get(j).setCouponDiscount(itemList.get(j).getCouponDiscount() + calcAmount);
-										
-									} else {
-										itemList.get(j).setCouponDiscount(calcAmount);
+						// 넘어온 쿠폰번호와 멤버가 가지고 있는 쿠폰번호가 일치하는지
+						if (pd.getCouponNumbers().get(i).equals(couponInfo.getCouponNumber())) {
+							System.out.println("넘어온 쿠폰번호랑 멤버가 가지고 있는 쿠폰번호랑 같음!");
+							for (int j = 0; j < products.size(); j++) { // 상품 종류만큼 반복
+								// 쿠폰적용카테고리와 상품카테고리가 일치하는지
+
+								if (couponInfo.getCategoryKey().contains(products.get(j).getCategoryKey())
+										|| couponInfo.getCategoryKey().contains("ALL")) {
+									System.out.println("ALL 카테고리 적용쿠폰이거나 쿠폰 카테고리 일치!");
+									System.out.println("couponDiscount!" + couponDiscount);
+									System.out.println("검증 다 통과한 쿠폰! : " + couponInfo.toString());
+									System.out.println(products.get(j).getCalculatedPrice());
+									if (couponInfo.getCategoryKey().contains(products.get(j).getCategoryKey())) {
+
+										int calcAmount = (int) Math.round((products.get(j).getCalculatedPrice()
+												* (double) couponInfo.getDiscountAmount() / 100) / 10) * 10;
+
+										// 주문 상세 상품의 쿠폰 할인 금액을 위한 코드를 짜야함
+										if (itemList.get(j).getCouponDiscount() > 0) {
+
+											itemList.get(j).setCouponDiscount(
+													itemList.get(j).getCouponDiscount() + calcAmount);
+
+										} else {
+											itemList.get(j).setCouponDiscount(calcAmount);
+										}
+
+										System.out.println(products.get(j).getProductName() + "의 쿠폰 할인 금액은 : "
+												+ itemList.get(j).getCouponDiscount());
+
+										couponDiscount += calcAmount;// 테스트땜에 주석처리함 다시 풀어야해!!!!!!!!!!!!!!!!!!!!!!!!!!!
+										// couponDiscount = 0;
 									}
-									
-									System.out.println(products.get(j).getProductName() + "의 쿠폰 할인 금액은 : " + itemList.get(j).getCouponDiscount());
-									
-									couponDiscount += calcAmount;//테스트땜에 주석처리함 다시 풀어야해!!!!!!!!!!!!!!!!!!!!!!!!!!!
-									//couponDiscount = 0;
+
+									// couponDiscount += (int)Math.round((totalAmount *
+									// (double)couponInfo.getDiscountAmount()/100) / 10) * 10;
+
+									// System.out.println("" + totalAmount + "," + couponInfo.getDiscountAmount() /
+									// 100 + "," + (totalAmount * (couponInfo.getDiscountAmount() / 100)));
+									// couponDiscount += (totalAmount * (couponInfo.getDiscountAmount() / 100));
+									System.out.println("couponDiscount!" + couponDiscount);
+
 								}
-
-								// couponDiscount += (int)Math.round((totalAmount *
-								// (double)couponInfo.getDiscountAmount()/100) / 10) * 10;
-
-								// System.out.println("" + totalAmount + "," + couponInfo.getDiscountAmount() /
-								// 100 + "," + (totalAmount * (couponInfo.getDiscountAmount() / 100)));
-								// couponDiscount += (totalAmount * (couponInfo.getDiscountAmount() / 100));
-								System.out.println("couponDiscount!" + couponDiscount);
-
 							}
 						}
 					}
 				}
-			}
 
+			} else { // 비회원일 때
+				pd.setUsedPoints(0);
+				pd.setUsedReward(0);
+				couponDiscount = 0;
+			}
 			// 배송비 설정
 			if (totalAmount >= 10000) {
 				pd.setShippingFee(0);
@@ -201,7 +213,7 @@ public class OrderServiceImpl implements OrderService {
 				} else {
 					if (pd.getActualPaymentAmount() == realAmount) {
 						result = true;
-						
+
 					}
 					System.out.println("결제 한 금액! : " + pd.getActualPaymentAmount() + ", 검증 된 금액! : " + realAmount);
 				}
@@ -234,6 +246,29 @@ public class OrderServiceImpl implements OrderService {
 
 		System.out.println("result 값 : " + result);
 		return result;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> getPaymentDetail(NonOrderHistory noh, List<String> productId) throws Exception {
+		// 비회원 결제 가져오기
+		Map<String, Object> paymentDetail = new HashMap<String, Object>();
+		CompleteOrder completeOrder = null;
+		completeOrder = od.getPaymentHistory(noh.getNonOrderNo());
+		completeOrder.setNonRecipientName(noh.getNonRecipientName());
+		completeOrder.setNonRecipientPhoneNumber(noh.getNonRecipientPhoneNumber());
+		completeOrder.setNonShippingAddress(noh.getNonShippingAddress());
+		completeOrder.setNonDetailedShippingAddress(noh.getNonDetailedShippingAddress());
+		if (completeOrder != null) {
+			System.out.println(completeOrder.toString());
+			List<CompleteOrderItem> itemDetail = od.getDetailOrderItem(noh.getNonOrderNo(), productId);
+			paymentDetail.put("detailOrderItem", itemDetail);
+			paymentDetail.put("paymentHistory", completeOrder);
+			System.out.println(paymentDetail.toString());
+		}
+		;
+		return paymentDetail;
+
 	}
 
 	@Override
@@ -307,13 +342,15 @@ public class OrderServiceImpl implements OrderService {
 	public boolean updateDiscountMethod(PaymentDTO pd, List<DetailOrderItem> itemList) throws Exception {
 		// 쿠폰, 포인트, 적립금, 멤버, 재고
 		boolean result = false;
-		for (String coupon : pd.getCouponNumbers()) {
-			// ex) coupon : C0001
-			if (coupon != "N") {
-				if (od.updateCouponLogs(pd) > 0) { // 쿠폰로그 update
-					System.out.println("쿠폰" + pd.getCouponNumbers().size() + "개 사용해서 update 완료");
-					od.updateMemberCoupon(pd); // 멤버 쿠폰 갯수 update
+		if (pd.getCouponNumbers() != null) {
+			for (String coupon : pd.getCouponNumbers()) {
+				// ex) coupon : C0001
+				if (coupon != "N") {
+					if (od.updateCouponLogs(pd) > 0) { // 쿠폰로그 update
+						System.out.println("쿠폰" + pd.getCouponNumbers().size() + "개 사용해서 update 완료");
+						od.updateMemberCoupon(pd); // 멤버 쿠폰 갯수 update
 
+					}
 				}
 			}
 		}
@@ -341,8 +378,13 @@ public class OrderServiceImpl implements OrderService {
 
 		if (od.updateProducts(itemList) > 0) { // 상품 재고 update
 			System.out.println("재고 업데이트 완료");
-			if (od.updateMemberAcumPayment(pd.getActualPaymentAmount(), pd.getMemberId()) > 0) {
-
+			if(pd.getMemberId() != null) {
+				
+				if (od.updateMemberAcumPayment(pd.getActualPaymentAmount(), pd.getMemberId()) > 0) {
+					
+					result = true;
+				} 
+			} else {
 				result = true;
 			}
 		}
@@ -354,12 +396,6 @@ public class OrderServiceImpl implements OrderService {
 	public Memberkjy getMemberInfo(String memberId) throws Exception {
 
 		return od.getMemberInfo(memberId);
-	}
-
-	@Override
-	public Map<String, Object> getPaymentDetail(NonOrderHistory noh) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 //	@Override

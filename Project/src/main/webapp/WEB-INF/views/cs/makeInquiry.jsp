@@ -62,9 +62,13 @@
 	let saveFile = false;
 	let maximumFile = 0;
 	let update = false;
+	let postNo = new URLSearchParams(location.search).get('postNo');
+	let content = ("${requestScope.inquiry.content}");
 	
 	$(function() {
-		
+		convertedContent = content.replaceAll("<br />","\r\n");
+		console.log(convertedContent);
+		$('#inquiryContent').text(convertedContent);
 		if('${requestScope.uploadFiles}' != null && '${requestScope.uploadFiles}' != "") {
 			
 		files = '${requestScope.uploadFilesSeq}';
@@ -75,7 +79,6 @@
 		
 		if('${requestScope.inquiry}' != null && '${requestScope.inquiry}' != "") {
 			console.log("상세 문의 보기")
-			let postNo = new URLSearchParams(location.search).get('postNo');
 			$('#postNo').val(postNo);
 			$('#selectState').val("${requestScope.inquiry.inquiryType }").prop("selected",true);
 			$('#selectState').attr('disabled', true);
@@ -92,9 +95,9 @@
 			e.preventDefault();
 		});
 		
+
 		$(".upFileArea").on("drop", function(e) {
 			e.preventDefault();
-
 			console.log(e.originalEvent.dataTransfer.files);
 
 			let files = e.originalEvent.dataTransfer.files;
@@ -142,11 +145,19 @@
 		for(let data of json){
 			let name = data.thumbnailFileName.replaceAll("\\", "/");
 			//output += "<img src='../resources/uploads" + name + "'/>";
-			output += `<div id="\${name}" class="imgList"><img style="pointer-events:none" src='../resources/inquiryUploads\${name}'/>`;
-			output += `<button id='\${name}\${index}' class="removeImgBtn" type="button" onclick="removeSpecificImg(this.id);"><img width="16" height="16" src="https://img.icons8.com/tiny-glyph/16/cancel.png" alt="cancel"/></button></div>`;
+			output += `<div id="\${name}"><img style="pointer-events:none" src='../resources/inquiryUploads\${name}'/>`;
+			output += `<button id='\${name}\${index}' class="removeImgBtn" type="button" onclick="removeSpecificImg(this.id, '\${update}');"><img width="16" height="16" src="https://img.icons8.com/tiny-glyph/16/cancel.png" alt="cancel"/></button></div>`;
 			index++;
 		}
-		$('.uploadFiles').html(output);
+
+		$('.insertFiles').html(output);
+	}
+	
+	function enlargeImg(id) {
+		console.log(id);
+		$('#newFile'+id).parent().addClass('active');
+		$('#newFile'+id).parent().attr('id','mainEnlargeImg');
+		$('#imgModal').show();
 	}
 
 	function isValidInquiry(purpose) {
@@ -168,8 +179,9 @@
 		
 		if(isValidTitle && isValidContent && isValidState) {
 			console.log("유효성 검사 통과");
-			saveFile = true;
+			
 			if(purpose == 'save') {
+				saveFile = true;
 			$('#saveInquiry').submit();
 			} else if (purpose == 'change') { // 수정하려 할 때
 				 $('input').prop('readonly', false);
@@ -186,7 +198,7 @@
 				if(!isValidTitle && !isValidContent && !isValidState){
 					alert("변경 사항이 없습니다.");
 				} else {
-					
+					saveFile = true;
 					$('#updateInquiry').submit();
 				}
 			}
@@ -220,6 +232,7 @@
 			
 		console.log("beforeunload 실행");
  		window.navigator.sendBeacon('/cs/refreshFile');
+ 		
 		}
 	};
 	
@@ -231,7 +244,8 @@
 			url : "/cs/removeSpecificImg",
 			type : "GET",
 			data : {
-				"fileName" : fileName
+				"fileName" : fileName,
+				"purpose" : update,
 			},
 			dataType : "text",
 			async : false,
@@ -253,9 +267,8 @@
 	
 	function confirmModal(purpose) {
 		if(purpose == 'cancel') {
-			
-		$('#modalPurpose').text('작성을 취소하시겠습니까?');
-		$('#confirmPurpose').attr('id', 'confirmCancel');
+			$('#modalPurpose').text('작성을 취소하시겠습니까?');
+			$('#confirmPurpose').attr('id', 'confirmCancel');
 		} else if (purpose == 'change') {
 			if(!update) {
 			$('#modalPurpose').text('수정하시겠습니까?');
@@ -264,11 +277,15 @@
 			} else {
 				$('#modalPurpose').text('수정 완료하시겠습니까?');
 				$('#confirmChange').attr('id', 'confirmUpdate');
-				
 			}
 		} else if(purpose == 'updateCancel') {
-			$('#modalPurpose').text('작성을 취소하시겠습니까?');
+			if(!update) {
+				$('#modalPurpose').text('삭제하시겠습니까?');
+				$('#confirmPurpose').attr('id', 'confirmDelete');
+			} else {
+			$('#modalPurpose').text('수정을 취소하시겠습니까?');
 			$('#confirmChange').attr('id', 'confirmCancel');
+			}
 		}
 		$('#confirmModal').show();
 	}
@@ -276,23 +293,41 @@
 	function returnPath(purpose) {
 		console.log(purpose);
 		if(purpose == 'confirmCancel') {
+			if(!update) {
+				location.href="/cs/serviceCenter";
+			} else {
+				
 			console.log("헐????????????")
+			saveFile = false;
 			location.reload(true);
-		}
+			}
+		}else
 		if(purpose == 'confirmChange') {
 			isValidInquiry('change');
 			 $('input').css('color','black');	
 			 $('textarea').css('color','black');
 			 $('#phoneNumber').attr('placeholder', "-빼고 입력해주세요");
-			 $('.detailUpFileArea').attr('class', 'upFileArea');
+			 $('#detailUpfile').css('display', 'none');
+			 $('#selectState').removeAttr('disabled');
+			 $('#updateUpfileArea').css('display', '');
 			$('#confirmModal').hide();
 		} else if(purpose == 'confirmUpdate') {
-			isValidInquiry('update');
-		} 
+				isValidInquiry('update');
+			
+		} else {
+			// 삭제
+			location.href="/cs/delete?postNo="+postNo;
+		}
 	}
 	
 	function closeConfirmModal() {
+		$('#confirmDelete').attr('id', 'confirmPurpose');
 		$('#confirmModal').hide();
+	}
+	function closeBigImgModal() {
+		$('#mainEnlargeImg').removeClass('active');
+		$('#mainEnlargeImg').removeAttr('id', 'mainEnlargeImg');
+		$('#imgModal').hide();
 	}
 </script>
 <style>
@@ -300,15 +335,12 @@
 	border: none;
 }
 
-.imgList {
+/* .imgList {
 display:flex;
-	width: 80px;
-}
-
-.uploadFiles {
+} */
+.uploadFiles, .insertFiles {
 	display: flex;
 }
-
 </style>
 </head>
 <body>
@@ -480,8 +512,8 @@ display:flex;
 													onclick="confirmModal('change');">
 													<span>수정</span>
 												</button>
-												<button onclick="confirmModal('updateCancel');" class="btn theme-bg-color text-white m-0"
-													type="button" 
+												<button onclick="confirmModal('updateCancel');"
+													class="btn theme-bg-color text-white m-0" type="button"
 													style="float: right; margin-right: 10px !important; color: #fff !important; background-color: #6c757d !important;">
 													<span id="cancelButton">삭제</span>
 												</button>

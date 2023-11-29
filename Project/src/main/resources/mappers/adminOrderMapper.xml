@@ -4,9 +4,184 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.project.mappers.adminOrderMapper">
+	<select id="selectDepositProductInfo" resultType="DepositProductResponse">
+		SELECT 	 h.order_time,
+				 p.order_no,
+		         d.product_order_no,
+		         m.name,
+		         h.member_id,
+		         pr.product_name,
+		         pr.product_id,
+		         d.product_quantity,
+		         d.product_price,
+		         b.deposit_amount,
+                 b.bank_name,
+		         h.delivery_message
+		FROM payments p
+		INNER JOIN order_history h 
+			ON p.order_no = h.order_no
+		INNER JOIN member m 
+			ON h.member_id = m.member_id 
+		INNER JOIN detailed_order_items d
+			ON p.order_no = d.order_no
+		INNER JOIN products pr
+			ON d.product_id = pr.product_id
+		LEFT JOIN bank_transfers b 
+			ON p.payment_number = b.payment_number
+		<where> 
+			p.payment_method = 'bkt' AND (b.deposit_amount = 0 OR b.deposit_amount is null)
+			<if test='orderNo != null and !orderNo.equals("")' >
+				AND h.order_no = #{orderNo}
+			</if>
+			<if test='productOrderNo != null and !productOrderNo.equals("")' >
+				AND d.product_order_no = #{productOrderNo}
+			</if>
+			<if test='invoiceNumber != null and !invoiceNumber.equals("")' >
+				AND h.invoice_number = #{invoiceNumber}
+			</if>
+			<if test='name != null and !name.equals("")' >
+				AND m.name = #{name}
+			</if>
+			<if test='memberId != null and !memberId.equals("")' >
+				AND h.member_id = #{memberId}
+			</if>
+			<if test='email != null and !email.equals("")' >
+				AND m.email = #{email}
+			</if>
+			<if test='cellPhoneNumber != null and !cellPhoneNumber.equals("")' >
+				AND m.cell_phone_number = #{cellPhoneNumber}
+			</if>
+			<if test='phoneNumber != null and !phoneNumber.equals("")' >
+				AND m.phone_number = #{phoneNumber}
+			</if>
+			<if test='payerName != null and !payerName.equals("")' >
+				AND b.payer_name = #{payerName}
+			</if>
+			<if test='recipientName != null and !recipientName.equals("")' >
+				AND h.recipient_name = #{recipientName}
+			</if>
+			<if test='recipientPhoneNumber != null and !recipientPhoneNumber.equals("")' >
+				AND h.recipient_phone_number = #{recipientPhoneNumber}
+			</if>
+			<if test='shippingAddress != null and !shippingAddress.equals("")' >
+				AND h.shipping_address = #{shippingAddress}
+			</if>
+			<if test='productName != null and !productName.equals("")' >
+				AND product_count.product_name like CO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
+			</if>
+			<if test='productId != null and !productId.equals("")' >
+				AND d.product_id = #{productId}
+			</if>
+			<if test='categoryKey != null and !categoryKey.equals("")' >
+				AND product_count.category_key = #{categoryKey}
+			</if>
+			<if test='(orderTimeStart != null and !orderTimeStart.equals("")) and 
+	         		(orderTimeEnd != null and !orderTimeEnd.equals(""))'>
+	         		AND order_time BETWEEN #{orderTimeStart} AND #{orderTimeEnd}
+         	</if>
+         	<if test='(confirmDateStart != null and !confirmDateStart.equals("")) and 
+	         		(confirmDateEnd != null and !confirmDateEnd.equals(""))'>
+	         		AND confirm_date BETWEEN #{confirmDateStart} AND #{confirmDateEnd}
+         	</if>
+		</where>
+		ORDER BY h.order_time DESC, d.product_order_no DESC;
+	</select>
+	
+	<select id="selectDepositNoInfo" resultType="DepositNoResponse">
+		SELECT 	 h.order_time,
+			     h.order_no,
+		  CASE   WHEN product_count.count = 1 THEN product_count.product_name
+			     ELSE CONCAT(product_count.product_name, ' 외 ', product_count.count - 1, '건')
+		         END product_name,  
+		         m.name,
+		         h.member_id,
+                 b.payer_name,
+                 b.deposit_amount,
+                 b.bank_name,
+                 if(b.deposit_amount != 0 AND b.deposit_amount is not null, '입금완료', '입금전') status,
+		         h.delivery_message
+  		  FROM 	 payments p
+		INNER JOIN order_history h 
+			ON p.order_no = h.order_no
+		INNER JOIN member m 
+			ON h.member_id = m.member_id 
+		LEFT JOIN bank_transfers b 
+			ON p.payment_number = b.payment_number
+		LEFT JOIN (
+				SELECT  d.order_no, p.product_name, p.category_key, count(distinct d.product_id) count
+				FROM detailed_order_items d
+				INNER JOIN products p
+					ON d.product_id = p.product_id
+				GROUP BY d.order_no
+            ) product_count
+			ON h.order_no = product_count.order_no
+		<where> 
+			p.payment_method = 'bkt' AND (b.deposit_amount = 0 OR b.deposit_amount is null)
+			
+			<if test='orderNo != null and !orderNo.equals("")' >
+				AND h.order_no = #{orderNo}
+			</if>
+			<if test='productOrderNo != null and !productOrderNo.equals("")' >
+				AND d.product_order_no = #{productOrderNo}
+			</if>
+			<if test='invoiceNumber != null and !invoiceNumber.equals("")' >
+				AND h.invoice_number = #{invoiceNumber}
+			</if>
+			<if test='name != null and !name.equals("")' >
+				AND m.name = #{name}
+			</if>
+			<if test='memberId != null and !memberId.equals("")' >
+				AND h.member_id = #{memberId}
+			</if>
+			<if test='email != null and !email.equals("")' >
+				AND m.email = #{email}
+			</if>
+			<if test='cellPhoneNumber != null and !cellPhoneNumber.equals("")' >
+				AND m.cell_phone_number = #{cellPhoneNumber}
+			</if>
+			<if test='phoneNumber != null and !phoneNumber.equals("")' >
+				AND m.phone_number = #{phoneNumber}
+			</if>
+			<if test='payerName != null and !payerName.equals("")' >
+				AND b.payer_name = #{payerName}
+			</if>
+			<if test='recipientName != null and !recipientName.equals("")' >
+				AND h.recipient_name = #{recipientName}
+			</if>
+			<if test='recipientPhoneNumber != null and !recipientPhoneNumber.equals("")' >
+				AND h.recipient_phone_number = #{recipientPhoneNumber}
+			</if>
+			<if test='shippingAddress != null and !shippingAddress.equals("")' >
+				AND h.shipping_address = #{shippingAddress}
+			</if>
+			<if test='productName != null and !productName.equals("")' >
+				AND product_count.product_name like CO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
+			</if>
+			<if test='productId != null and !productId.equals("")' >
+				AND d.product_id = #{productId}
+			</if>
+			<if test='categoryKey != null and !categoryKey.equals("")' >
+				AND product_count.category_key = #{categoryKey}
+			</if>
+			<if test='(orderTimeStart != null and !orderTimeStart.equals("")) and 
+	         		(orderTimeEnd != null and !dorderTimeEnd.equals(""))'>
+	         		AND order_time BETWEEN #{orderTimeStart} AND #{orderTimeEnd}
+         	</if>
+         	<if test='(confirmDateStart != null and !confirmDateStart.equals("")) and 
+	         		(confirmDateEnd != null and !confirmDateEnd.equals(""))'>
+	         		AND confirm_date BETWEEN #{confirmDateStart} AND #{confirmDateEnd}
+         	</if>
+		</where>
+		
+		
+		ORDER BY h.order_time DESC;
+	</select>
+	
+	
 	<select id="selectOrderProductInfo" resultType="OrderProductResponse">
 		SELECT 	 h.order_time,
 				 p.payment_time,
+				 p.order_no,
 		         d.product_order_no,
 		         m.name,
 		         h.member_id,
@@ -76,15 +251,15 @@
 				AND product_count.category_key = #{categoryKey}
 			</if>
 			<if test='(orderTimeStart != null and !orderTimeStart.equals("")) and 
-	         		(orderTimeEnd != null and !dorderTimeEnd.equals(""))'>
+	         		(orderTimeEnd != null and !orderTimeEnd.equals(""))'>
 	         		AND order_time BETWEEN #{orderTimeStart} AND #{orderTimeEnd}
          	</if>
          	<if test='(paymentTimeStart != null and !paymentTimeStart.equals("")) and 
-	         		(paymentTimeEnd != null and !dpaymentTimeEnd.equals(""))'>
+	         		(paymentTimeEnd != null and !paymentTimeEnd.equals(""))'>
 	         		AND payment_time BETWEEN #{paymentTimeStart} AND #{paymentTimeEnd}
          	</if>
 		</where>
-		ORDER BY h.order_time DESC
+		ORDER BY h.order_time DESC, d.product_order_no DESC
 	</select>
 	
 	<select id="selectOrderNoInfo" resultType="OrderNoResponse">
@@ -180,11 +355,11 @@
 				AND product_count.category_key = #{categoryKey}
 			</if>
 			<if test='(orderTimeStart != null and !orderTimeStart.equals("")) and 
-	         		(orderTimeEnd != null and !dorderTimeEnd.equals(""))'>
+	         		(orderTimeEnd != null and !orderTimeEnd.equals(""))'>
 	         		AND order_time BETWEEN #{orderTimeStart} AND #{orderTimeEnd}
          	</if>
          	<if test='(paymentTimeStart != null and !paymentTimeStart.equals("")) and 
-	         		(paymentTimeEnd != null and !dpaymentTimeEnd.equals(""))'>
+	         		(paymentTimeEnd != null and !paymentTimeEnd.equals(""))'>
 	         		AND payment_time BETWEEN #{paymentTimeStart} AND #{paymentTimeEnd}
          	</if>
 		</where>

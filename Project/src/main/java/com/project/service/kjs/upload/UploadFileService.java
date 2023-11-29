@@ -11,12 +11,11 @@ import com.project.vodto.UploadFiles;
 public interface UploadFileService {
 	// 실제 파일 업로드
 	List<UploadFiles> uploadFile(String originalFileName, long size, String contentType, byte[] data,
-			String realPath, List<UploadFiles> fileList) throws IOException, SQLException, NamingException;
-	// 실제 파일 업로드
-//	UploadFiles uploadFile(String originalFileName, long size, String contentType, byte[] data,
-//			String realPath) throws IOException;
+			String realPath, List<UploadFiles> fileList) throws IOException;
 	// 실제 파일 삭제
 	int deleteFile(UploadFiles uf, String realPath);
 	// 기존 파일이 DB에 존재하는지 확인
 	boolean isExist(UploadFiles uf) throws SQLException, NamingException;
+	// 특정 파일 삭제
+	List<UploadFiles> deleteUploadedFile(List<UploadFiles> fileList, String realPath, String thumbFileName) throws IOException;
 }

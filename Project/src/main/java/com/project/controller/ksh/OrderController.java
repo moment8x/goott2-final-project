@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.WebUtils;
 
 import com.project.service.ksh.payment.OrderService;
 import com.project.vodto.CouponInfos;
@@ -22,6 +24,7 @@ import com.project.vodto.OrderHistory;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.kjy.Memberkjy;
 import com.project.vodto.ksh.OrderInfo;
+import com.project.vodto.ksh.CompleteOrder;
 import com.project.vodto.ksh.OrderIdAndQty;
 import com.project.vodto.ksh.PaymentDTO;
 
@@ -32,21 +35,15 @@ public class OrderController {
 	@Inject
 	private OrderService os;
 
-	// 회원인지 비회원인지 조회
-	public void identifyMember() {
-		// 회원 주문 페이지 or 비회원 주문 페이지 or 로그인 창 띄우기
-
-	}
-
-//	@RequestMapping(value = "requestOrder", method = RequestMethod.GET)
-//	public String memberOrder(@RequestParam String orderId,
-//			@RequestParam String nonOrder) {
-//	}
+	int nonOrderCount = 0;
+	int orderCount = 0;
 
 	// 리스트, 상세 -> 결제 페이지
 	@RequestMapping(value = "requestOrder")
 	public String getRequestOrder(@RequestParam("productId") String productId, @RequestParam("qty") int qty,
 			Model model, HttpServletRequest request) {
+		orderCount = 0;
+		nonOrderCount = 0;
 		String path = "/order/requestOrder";
 		String orderId = (String) request.getAttribute("orderId");
 		model = this.returnPath(orderId, model, new OrderIdAndQty(), request, productId, qty);
@@ -59,6 +56,8 @@ public class OrderController {
 	// 장바구니 -> 결제 페이지
 	@RequestMapping(value = "requestOrder", method = RequestMethod.POST)
 	public String postRequestOrder(Model model, OrderIdAndQty items, HttpServletRequest request) {
+		orderCount = 0;
+		nonOrderCount = 0;
 		String path = "/order/requestOrder";
 		String orderId = (String) request.getAttribute("orderId");
 		model = this.returnPath(orderId, model, items, request, "", 0);
@@ -164,20 +163,38 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "nonOrderComplete", method = RequestMethod.POST)
-	public void orderComplete(NonOrderHistory noh, Model model) {
-
+	public void orderComplete(HttpServletRequest request, NonOrderHistory noh, Model model, @RequestParam("products") List<String> productId) {
 		// 비회원 주문 결제 완료하고 주문 내역 창 띄우기
 
 		System.out.println("결제 완료하고 주문 내역 저장하기");
 		System.out.println(noh.toString());
-
+		Map<String, Object> paymentDetail = new HashMap<String, Object>();
+		
+		// 비회원 회원 아이디 set
+		Cookie cookie = WebUtils.getCookie(request, "nom");
+		System.out.println(cookie.getValue());
+		noh.setNonMemberId(cookie.getValue());
+		
 		try {
-			// 주문내역 테이블 저장
-			if (os.saveNonOrderHistory(noh)) {
-//				 결제랑 주문상세 조회
-				Map<String, Object> paymentDetail = os.getPaymentDetail(noh);
-				System.out.println("paymentDetail 조회 - " + paymentDetail.toString());
+//			 결제랑 주문상세 조회
+			paymentDetail = os.getPaymentDetail(noh, productId);
+			CompleteOrder co =((CompleteOrder)paymentDetail.get("paymentHistory"));
+			System.out.println("paymentDetail 조회 - " + paymentDetail.toString());
+			if(co.getPaymentMethod().equals("bkt")) {
+				noh.setNonDeliveryStatus("입금전");
+			} else {
+				noh.setNonDeliveryStatus("결제완료");
 			}
+			// 주문내역 테이블 저장
+			if(nonOrderCount == 0) {
+			if (os.saveNonOrderHistory(noh)) {
+				nonOrderCount++;
+				System.out.println("결제랑 주문 상세 정보 가져오고 주문 내역 테이블까지 저장 성공");
+				
+			}
+			}
+			model.addAttribute("paymentDetail", paymentDetail);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -192,19 +209,29 @@ public class OrderController {
 
 	@RequestMapping(value = "orderComplete", method = RequestMethod.POST)
 	public void orderComplete(OrderHistory oh, Model model, @RequestParam("products") List<String> productId) {
-
 		// 주문 결제 완료하고 주문 내역 창 띄우기
 
 		System.out.println("결제 완료하고 주문 내역 저장하기");
 		System.out.println(oh.toString());
 
 		Map<String, Object> paymentDetail = new HashMap<String, Object>();
+		
 		try {
+//			 결제랑 주문상세 조회
+			paymentDetail = os.getPaymentDetail(oh, productId);
+			System.out.println("paymentDetail 조회 - " + paymentDetail.toString());
+			if(((CompleteOrder)paymentDetail.get("paymentHistory")).getPaymentMethod().equals("bkt")) {
+				oh.setDeliveryStatus("입금전");
+			} else {
+				oh.setDeliveryStatus("결제완료");
+			}
 			// 주문내역 테이블 저장
-			if (os.saveOrderHistory(oh)) {
-//				 결제랑 주문상세 조회
-				paymentDetail = os.getPaymentDetail(oh, productId);
-				System.out.println("paymentDetail 조회 - " + paymentDetail.toString());
+			if(orderCount == 0) {
+				
+				if (os.saveOrderHistory(oh)) {
+					orderCount++;
+					System.out.println("결제랑 주문 상세 정보 가져오고 주문 내역 테이블까지 저장 성공");
+				}
 			}
 
 		} catch (Exception e) {

@@ -75,13 +75,13 @@
 		non_delivery_message,
 		non_password, non_email, non_delivery_status)
 		VALUES(#{nonOrderNo},
-		#{nonMemberId}, #{recipientName},
-		#{recipientPhoneNumber},
-		#{zipCode}, #{shippingAddress},
-		#{detailedShippingAddress},
-		#{deliveryMessage}, #{nonPassword},
+		#{nonMemberId}, #{nonRecipientName},
+		#{nonRecipientPhoneNumber},
+		#{nonZipCode}, #{nonShippingAddress},
+		#{nonDetailedShippingAddress},
+		#{nonDeliveryMessage}, #{nonPassword},
 		#{nonEmail},
-		#{deliveryStatus})
+		#{nonDeliveryStatus})
 	</insert>
 
 	<insert id="insertNewOrderHistory">
@@ -104,10 +104,20 @@
 
 	<select id="getPaymentDetail"
 		resultType="com.project.vodto.ksh.CompleteOrder">
-		select order_no, payment_method, card_name,
-		total_amount,
-		actual_payment_amount from
-		payments where order_no = #{orderNo};
+		<choose>
+		<when test="orderNo != null">
+		select p.order_no, p.payment_method, p.card_name,
+		p.total_amount, b.amount_to_pay,
+		p.actual_payment_amount from
+		payments p inner join bank_transfers b on p.order_no = b.order_no where p.order_no = #{orderNo};
+		</when>
+		<otherwise>
+		select p.non_order_no, p.payment_method, p.card_name,
+		p.total_amount, b.amount_to_pay,
+		p.actual_payment_amount from
+		payments p inner join bank_transfers b on p.non_order_no = b.non_order_no where p.non_order_no = #{nonOrderNo};
+		</otherwise>
+		</choose>
 	</select>
 
 
@@ -189,13 +199,24 @@
 	<select id="getDetailOrderItem"
 		resultType="com.project.vodto.ksh.CompleteOrderItem"
 		resultMap="completeOrderItem">
-
+		<choose>
+		<when test="orderNo != null">
 		select
 		d.product_price, d.product_quantity, p.product_name, i.product_image from
 		detailed_order_items d inner join products p on d.product_id =
 		p.product_id inner join product_images i on d.product_id =
 		i.product_id where d.order_no = #{orderNo} and d.product_id =
 		#{productId} limit 1;
+		</when>
+		<otherwise>
+		select
+		d.product_price, d.product_quantity, p.product_name, i.product_image from
+		detailed_order_items d inner join products p on d.product_id =
+		p.product_id inner join product_images i on d.product_id =
+		i.product_id where d.non_order_no = #{nonOrderNo} and d.product_id =
+		#{productId} limit 1;
+		</otherwise>
+		</choose>
 
 	</select>
 

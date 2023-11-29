@@ -20,8 +20,6 @@ public class ReviewUploadDAOImpl implements ReviewUploadDAO {
 	
 	@Override
 	public int insertImage(ReviewUf reviewUf) throws SQLException, NamingException {
-		System.out.println("======= 리뷰 게시판 파일 업로드 DAO - 게시판 파일 정보 저장 =======");
-		
 		return session.insert(ns + ".insertImage", reviewUf);
 	}
 }

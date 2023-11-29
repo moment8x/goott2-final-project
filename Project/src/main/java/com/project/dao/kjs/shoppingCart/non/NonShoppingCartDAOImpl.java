@@ -19,8 +19,6 @@ public class NonShoppingCartDAOImpl implements NonShoppingCartDAO {
 	
 	@Override
 	public int insertNonMember(NonShoppingCart nsc) throws SQLException, NamingException {
-		System.out.println("비회원 장바구니 dao단 - 비회원 정보 insert");
-		
 		return session.insert(ns + ".insertNonMember", nsc);
 	}
 }

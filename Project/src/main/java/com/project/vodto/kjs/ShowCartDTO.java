@@ -18,4 +18,5 @@ public class ShowCartDTO {
 	private String productImage;
 	private String productName;
 	private int sellingPrice;
+	private int quantity;
 }

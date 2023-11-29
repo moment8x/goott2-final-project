@@ -42,7 +42,11 @@
 	<select id="getInquiries"
 		resultType="com.project.vodto.CustomerInquiry">
 		select * from customer_inquiries_board where author =
-		#{memberId}
+		#{memberId} order by post_no desc limit #{pi.startRowIndex}, #{pi.viewPostCntPerPage}
+	</select>
+	
+	<select id="getInquiryCnt" resultType="int">
+		select count(*) as totalPostCnt from customer_inquiries_board where author = #{memberId}
 	</select>
 
 	<select id="getDetailInquiry"
@@ -54,19 +58,73 @@
 		#{postNo};
 	</select>
 
+	<resultMap id="filesResult"
+		type="com.project.vodto.UploadFiles">
+
+		<result property="uploadFilesSeq" column="upload_files_seq" />
+		<result property="thumbnailFileName"
+			column="thumbnail_file_name" />
+		<result property="extension" column="extension" />
+		<result property="originalFileName" column="original_file_name" />
+		<result property="newFileName" column="new_file_name" />
+		<result property="fileSize" column="file_size" />
+		<result property="uploadFilesSeq" column="existingFile" />
+
+	</resultMap>
+
 	<select id="getInquiryFiles"
-		resultType="com.project.vodto.UploadFiles">
-		select * from upload_files u inner join
-		customer_inquiries_uf c on u.upload_files_seq = c.upload_files_seq
-		inner join customer_inquiries_board b on b.post_no = c.post_no and
-		b.author = #{author} and b.post_no = #{postNo};
+		parameterType="com.project.vodto.UploadFiles" resultMap="filesResult">
+		<!-- select * from upload_files u inner join customer_inquiries_uf c on 
+			u.upload_files_seq = c.upload_files_seq inner join customer_inquiries_board 
+			b on b.post_no = c.post_no and b.author = #{author} and b.post_no = #{postNo}; -->
+		select u.*, IFNULL(u.upload_files_seq, 0) AS existingFile from
+		upload_files u inner join
+		customer_inquiries_uf c on u.upload_files_seq
+		= c.upload_files_seq
+		inner join customer_inquiries_board b on b.post_no
+		= c.post_no RIGHT OUTER JOIN (SELECT '') AS m_dual
+		ON b.author =
+		#{author} and b.post_no = #{postNo};
+
 	</select>
 
 	<select id="checkValidation" resultType="int">
 		SELECT IFNULL(post_no,
 		0) AS post_no
 		FROM customer_inquiries_board
-		RIGHT OUTER JOIN (SELECT '') AS m_dual
+		RIGHT OUTER JOIN (SELECT '')
+		AS m_dual
 		ON post_no = #{postNo} and author = #{author};
 	</select>
+
+	<insert id="insertDetailOrderItem" parameterType="java.util.Map">
+
+
+		INSERT INTO detailed_order_items
+		(non_order_no, product_id,
+		product_price, product_quantity, product_status, product_order_no)
+		VALUES
+		<foreach item="item" index="index" collection="list"
+			separator=",">
+			(#{item.nonOrderNo}, #{item.productId},
+			#{item.productPrice},#{item.productQuantity},#{item.productStatus},#{item.productOrderNo})
+		</foreach>
+
+
+	</insert>
+	<delete id="deleteFiles">
+		DELETE FROM upload_files
+		WHERE new_file_name =
+		#{newFileName}
+
+
+	</delete>
+	<update id="updateInquiry">
+		UPDATE customer_inquiries_board
+		SET title = #{title}, content = #{content}, inquiry_type = #{inquiryType}, phone_number = #{phoneNumber}
+		WHERE post_no = #{postNo} and author = #{author};
+	</update>
+	<delete id="deleteInquiry">
+		delete from customer_inquiries_board where author = #{author} and post_no = #{postNo}
+	</delete>
 </mapper>

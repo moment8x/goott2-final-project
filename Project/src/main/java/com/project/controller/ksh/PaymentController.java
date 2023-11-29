@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.WebUtils;
 
 import com.project.service.ksh.payment.OrderService;
 import com.project.service.ksh.sms.SmsService;
@@ -75,9 +77,9 @@ public class PaymentController {
 	}
 
 	@RequestMapping(value = "output", method = RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> nonPaymentOutput(@RequestBody PaymentDTO pd, HttpServletRequest request)
+	public ResponseEntity<Map<String, Object>> paymentOutput(@RequestBody PaymentDTO pd, HttpServletRequest request)
 			throws IamportResponseException, IOException {
-
+		String memberId = "";
 		if (pd.getImpUid() != null) {
 
 			IamportResponse<Payment> importResponse = api.paymentByImpUid(pd.getImpUid());
@@ -94,6 +96,8 @@ public class PaymentController {
 		// 주문 상세 리스트 생성
 		List<DetailOrderItem> itemList = pd.getProducts();
 
+		Map<String, Object> paymentDetail = new HashMap<String, Object>();
+		Memberkjy memberInfo = null;
 		System.out.println(itemList.toString());
 
 		// ajax로 받은 PaymentDTO에서 주문 상세 상품만 getter로 뽑아 주문 상세 vo 생성 후 리스트 추가
@@ -102,30 +106,40 @@ public class PaymentController {
 //					new DetailOrderItem(pd.getNon_order_no(), pd.getProduct_id().get(i), pd.getProduct_price().get(i)));
 //		}
 		HttpSession session = request.getSession();
-		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		System.out.println(member.getMemberId());
-
-		Map<String, Object> paymentDetail = new HashMap<String, Object>();
-		pd.setMemberId(member.getMemberId());
 		try {
 			// member 다시 조회
-			Memberkjy memberInfo = os.getMemberInfo(member.getMemberId());
+		if(session.getAttribute("loginMember") != null) {
+			memberId = ((Memberkjy) session.getAttribute("loginMember")).getMemberId();
+			pd.setMemberId(memberId);
+			memberInfo = os.getMemberInfo(memberId);
+		} 
+		
+		// 주문 내역 저장할 때 필요한것!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 여기 말고 오더컨트롤러!!
+//		else {
+//			Cookie cookie = WebUtils.getCookie(request, "nom");
+//			System.out.println(cookie.getValue());
+//			pd.setMemberId(cookie.getValue());
+//		}
+			
 			itemList = os.compareAmount(pd, itemList, memberInfo);
 			if (itemList != null) { // 검증 성공
 				
 				// 결제 테이블, 주문 상세 테이블, 무통장입금일 시 무통장입금 또한 저장
 				// 포인트, 적립금, 쿠폰, 멤버, 상품 재고 update
 				if (os.savePayment(pd, itemList, memberInfo)) {
-					result = new ResponseEntity<Map<String, Object>>(paymentDetail, HttpStatus.OK); // 아작스로 돌아가서 쓸모없음
+					System.out.println("여기까지 오나효?");
 					paymentDetail.put("itemList", itemList);
 					paymentDetail.put("pd", pd);
-					if (pd.getPaymentNumber().contains("bkt")) {
-						MessageDTO messageDto = new MessageDTO();
-						messageDto.setTo(pd.getPhoneNumber());
-						SmsResponseDto responseDto = smsService.sendSms(messageDto);
-						System.out.println(responseDto.getStatusCode());
-					}
+					result = new ResponseEntity<Map<String, Object>>(paymentDetail, HttpStatus.OK); // 아작스로 돌아가서 쓸모없음
+					// 문자
+//					if (pd.getPaymentNumber().contains("bkt")) {
+//						MessageDTO messageDto = new MessageDTO();
+//						messageDto.setTo(pd.getPhoneNumber());
+//						SmsResponseDto responseDto = smsService.sendSms(messageDto);
+//						System.out.println(responseDto.getStatusCode());
+//					}
 				} else { // 검증은 성공했지만 테이블 저장 실패
+					System.out.println("몰까요?");
 					result = new ResponseEntity<>(HttpStatus.CONFLICT);
 				}
 			} else {

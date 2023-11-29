@@ -56,6 +56,7 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script>
 	function detailInquiry(id) {
+		console.log(id);
 		location.href="/cs/detailInquiry?postNo=" + id;
 	}
 	
@@ -224,18 +225,20 @@
 
 									<div class="dashboard-title">
 										<jsp:include page="./viewInquiry2.jsp"></jsp:include>
-										
+
 									</div>
 
 
 								</div>
 							</div>
 						</div>
+						
 					</div>
 				</div>
 			</div>
+			
 		</div>
-
+		
 	</section>
 	<jsp:include page="../footer.jsp"></jsp:include>
 </body>

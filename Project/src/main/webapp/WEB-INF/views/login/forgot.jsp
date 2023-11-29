@@ -7,6 +7,44 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Forgot Password</title>
+<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<script>
+
+let resultName = false; let resultPhone = false;
+let regTypePd = /^(?=.*[0-9]+).{8,15}$/; 
+
+$(function () {
+	$("#userName").on("keyup", function() {
+		let val = $(this).val();
+		delayTime(function() {
+			if(val.length > 2) {
+				resultName = true;
+			} else {
+				resultName = false;
+				$(".nameError").html("성함을 입력해주세요");
+			} 
+		}, 1000);
+	});
+	
+});
+
+let delayTime = (function() {
+	let timer = 0;
+	
+	return function (callback, ms) {
+		clearTimeout(timer);
+		timer = setTimeout(callback, ms);
+	};
+})();
+
+</script>
+<style>
+	.nameError{
+		color: red;
+	}
+</style>
 </head>
 
 <body>
@@ -76,7 +114,7 @@
         </div>
     </section>
     <!-- Breadcrumb Section End -->
-    
+    <button id="test">버튼확인용</button>
     <c:choose>
 	<c:when test="${status == 'id' }">
     <!-- log in section start -->
@@ -85,7 +123,7 @@
             <div class="row">
                 <div class="col-xxl-6 col-xl-5 col-lg-6 d-lg-block d-none ms-auto">
                     <div class="image-contain">
-                        <img src="../assets/images/inner-page/forgot.png" class="img-fluid" alt="">
+                        <img src="/resources/assets/images/inner-page/forgot.png" class="img-fluid" alt="">
                     </div>
                 </div>
 
@@ -97,18 +135,21 @@
                             </div>
 
                             <div class="input-box">
-                                <form class="row g-4">
+                                <form class="row g-4" onsubmit="return validate();" method="POST" action="/login/auth" >
                                     <div class="col-12">
                                         <div class="form-floating theme-form-floating log-in-form">
+                                       성함을 입력하세요 : 
+                                            <input type="text" class="form-control" id="userName"
+                                                placeholder="성함을 입력하세요" name="userName">
+                                                <div class="nameError"></div>
+                                       이메일을 입력하세요
                                             <input type="email" class="form-control" id="email"
-                                                placeholder="Email Address">
-                                            <label for="email">Email Address</label>
+                                                placeholder="이메일을 입력하세요" name="email">
                                         </div>
                                     </div>
 
                                     <div class="col-12">
-                                        <button class="btn btn-animation w-100" type="submit">Forgot
-                                            Password</button>
+                                        <button class="btn btn-animation w-100" type="submit">아이디 찾기</button>
                                     </div>
                                 </form>
                             </div>
@@ -128,7 +169,7 @@
             <div class="row">
                 <div class="col-xxl-6 col-xl-5 col-lg-6 d-lg-block d-none ms-auto">
                     <div class="image-contain">
-                        <img src="../assets/images/inner-page/forgot.png" class="img-fluid" alt="">
+                        <img src="/resources/assets/images/inner-page/forgot.png" class="img-fluid" alt="">
                     </div>
                 </div>
 

@@ -33,7 +33,7 @@
 		GROUP BY product_id;
 	</select>
 	<select id="getMemberShoppingCart" resultType="com.project.vodto.kjs.ShowCartDTO">
-		SELECT sc.member_id, sc.product_id, prod_img.product_image, p.product_name, p.selling_price 
+		SELECT sc.member_id, sc.product_id, prod_img.product_image, p.product_name, p.selling_price, sc.quantity
 		FROM products p 
 		INNER JOIN shopping_cart sc 
 		ON sc.product_id = p.product_id 
@@ -54,4 +54,33 @@
 	<update id="updateQTYNon">
 		UPDATE shopping_cart SET quantity = #{quantity} WHERE non_member_id = #{nonMemberId} AND product_id = #{productId}
 	</update>
+	<select id="getCurrentQTY" resultType="Integer">
+		SELECT current_quantity FROM products WHERE product_id = #{productId} 
+	</select>
+	<select id="selectProduct" resultType="com.project.vodto.kjs.DisPlayedProductDTO">
+		<choose>
+			<when test="loginCheck">
+				SELECT p.*, prod_img.product_image product_image, s.quantity
+				FROM products p
+				LEFT OUTER JOIN product_images prod_img
+				ON p.product_id = prod_img.product_id
+				INNER JOIN shopping_cart s
+				ON p.product_id = s.product_id
+				WHERE p.product_id = #{productId}
+				AND s.member_id = #{memberId}
+				ORDER BY prod_img.product_images_seq LIMIT 1;
+			</when>
+			<otherwise>
+				SELECT p.*, prod_img.product_image product_image, s.quantity
+				FROM products p
+				LEFT OUTER JOIN product_images prod_img
+				ON p.product_id = prod_img.product_id
+				INNER JOIN shopping_cart s
+				ON p.product_id = s.product_id
+				WHERE p.product_id = #{productId}
+				AND s.non_member_id = #{memberId}
+				ORDER BY prod_img.product_images_seq LIMIT 1;
+			</otherwise>
+		</choose>
+	</select>
 </mapper>

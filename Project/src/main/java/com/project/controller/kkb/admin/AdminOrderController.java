@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.service.kkb.admin.AdminOrderService;
+import com.project.vodto.kkb.DepositCondition;
 import com.project.vodto.kkb.OrderCondition;
 
 import lombok.RequiredArgsConstructor;
@@ -25,5 +26,11 @@ public class AdminOrderController {
 		@PostMapping("/search")
 		public Map<String, Object> searchOrderInfo(@RequestBody OrderCondition orderCond) throws Exception {	
 			return adminOrderService.getOrderInfo(orderCond);
+		}
+		
+		/* 입금 전 관리 */
+		@PostMapping("/deposit")
+		public Map<String, Object> searchDepositInfo(@RequestBody DepositCondition depositCond) throws Exception {	
+			return adminOrderService.getDepositInfo(depositCond);
 		}
 }

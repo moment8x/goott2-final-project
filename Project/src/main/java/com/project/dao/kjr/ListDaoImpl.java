@@ -16,6 +16,7 @@ import com.project.vodto.PagingInfo;
 import com.project.vodto.ProductCategory;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
+import com.project.vodto.kjy.ProductsForList;
 import com.project.vodto.kjy.SearchVO;
 
 @Repository
@@ -86,8 +87,12 @@ public class ListDaoImpl implements ListDao {
 	@Override
 	public List<Products> selectBsetSeller(String key) throws Exception {
 		// TODO Auto-generated method stub
-		List<Products> lst = ses.selectList(ns+".selectBsetSeller", key);
-		System.out.println("lst : " + lst);
+		List<Products> lst = null;
+		if (key != null) {
+			 lst = ses.selectList(ns+".selectBestSellerFromId", key);
+		} else {
+			 lst = ses.selectList(ns+".selectBestSeller");
+		}
 		return lst;
 	}
 
@@ -177,6 +182,31 @@ public class ListDaoImpl implements ListDao {
 		params.put("checkedList", checkedList);
 		params.put("checkedLang", checkedLang);
 		return ses.selectOne(ns+".selectSearchProductCount", params);
+	}
+
+	@Override
+	public List<ProductsForList> selectNewProducts() throws Exception {
+		
+		return ses.selectList(ns+".selectNewPrducts");
+	}
+
+	@Override
+	public List<ProductsForList> selectProductOrderBySellings() throws Exception {
+		List<ProductsForList> lst = ses.selectList(ns+".selectProductsOrderBySellings");
+		System.out.println("리스?트 : " + lst);
+		return lst;
+	}
+
+	@Override
+	public List<ProductsForList> selectProductOrderByCart() throws Exception {
+		
+		return ses.selectList(ns+".selectProductsOrderByCart");
+	}
+
+	@Override
+	public List<ProductsForList> selectProductOrderByRating() throws Exception {
+	
+		return ses.selectList(ns+".selectProductsOrderByRating");
 	}
 
 	

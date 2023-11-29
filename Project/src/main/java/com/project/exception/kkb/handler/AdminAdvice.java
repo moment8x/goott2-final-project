@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.project.controller.kkb")
 public class AdminAdvice {
 	
 	@ExceptionHandler
@@ -20,7 +20,6 @@ public class AdminAdvice {
 	
 //	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 //    @ExceptionHandler
-	
 //    public ErrorResult exHandler(Exception e) {
 //        log.error("[exceptionHandler] ex", e);
 //        return new ErrorResult("EX", "내부 오류");

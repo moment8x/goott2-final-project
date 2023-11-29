@@ -137,7 +137,41 @@
 			$('.link'+i).attr("href",($(".link"+i).attr("href")+"&active="+activeClass));
 		}
 	}
+	function shoppingcart(pId) {
+		$.ajax({
+			url : '/shoppingCart/insert',
+			type : 'POST',
+			data:{
+				"productId" : pId,
+			},
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				// 전송에 성공하면 이 콜백 함수를 실행 (data 에는 응답받은 데이터가 저장된다)
+				openShoppingModal(data);
+			},
+			error : function() {
+				// 전송에 실패하면 이 콜백 함수를 실행
+			}
+		});
+	}
 	
+	function openShoppingModal(data) {
+		if(data.status == 'success'){
+			$(".modal-body").html("저장에 성공하셨습니다.");
+			$("#shoppingCartModal").show();
+		}else if(data.status == 'exist'){
+			$(".modal-body").html("이미 저장된 상품입니다.");
+			$("#shoppingCartModal").show();
+		}else if(data.status == "fails"){
+			$(".modal-body").html("저장에 실패하셨습니다.");
+			$("#shoppingCartModal").show();
+		}
+	}
+	
+	function shoppingClose() {
+		$("#shoppingCartModal").hide();
+	}
 </script>
 </head>
 <body>
@@ -297,7 +331,7 @@
 														
 
 														<li  data-bs-toggle="tooltip" data-bs-placement="top"
-															title="장바구니" ><a href="/shoppingCart/insert?product_id=${product.product_id }"><i data-feather="shopping-cart"></i></a>
+															title="장바구니" ><a href="javascript:void(0)" onclick="shoppingcart('${product.product_id}');"><i data-feather="shopping-cart"></i></a>
 														</li>
 
 														<li data-bs-toggle="tooltip" data-bs-placement="top"
@@ -427,6 +461,31 @@
 		</div>
 	</div>
 	<!-- Quick View Modal Box End -->
+	
+<div class="modal" id="shoppingCartModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Modal Heading</h4>
+        <button type="button" class="btn-close" onclick="shoppingClose()"></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        Modal body..
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="shoppingClose()">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+	
 
 	<!-- Price Range Js -->
 	<script src="/resources/assets/js/ion.rangeSlider.min.js"></script>

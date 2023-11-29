@@ -1,7 +1,9 @@
 package com.project.service.kjs.review;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
@@ -13,9 +15,12 @@ import com.project.dao.kjs.review.ReviewDAO;
 import com.project.dao.kjs.upload.ReviewUploadDAO;
 import com.project.dao.kjs.upload.UploadDAO;
 import com.project.etc.kjs.ImgMimeType;
+import com.project.vodto.PagingInfo;
+import com.project.vodto.Ratings;
 import com.project.vodto.ReviewBoard;
 import com.project.vodto.ReviewUf;
 import com.project.vodto.UploadFiles;
+import com.project.vodto.kjs.ReviewBoardDTO;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -30,7 +35,6 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean saveReview(ReviewBoard review, List<UploadFiles> fileList) throws SQLException, NamingException {
-		System.out.println("======= 리뷰게시판 서비스 - 리뷰 등록 =======");
 		boolean result = false;
 		int point = -1;
 		// 1) 리뷰 등록
@@ -57,21 +61,33 @@ public class ReviewServiceImpl implements ReviewService {
 			if (point != -1) {
 				if (rDao.insertPointLog(review.getAuthor(), point) == 0) {
 					if (rDao.updatePoint(review.getAuthor(), point) > 0) {
-						result = true;
+						// Ratings 테이블에 넣을 값 정리하기
+						Ratings ratings = rDao.getCalcRatingData(review.getProductId());
+						if (ratings.getHighestRating() < review.getRating()) {
+							ratings.setHighestRating(review.getRating());
+						} else if (ratings.getLowestRating() > review.getRating()) {
+							ratings.setLowestRating(review.getRating());
+						}
+						ratings.setProductId(review.getProductId());
+						// 연산 시작
+						float totalRating = Math.round(ratings.getRating() * 10) / 10f;
+						ratings.setParticipationCount(ratings.getParticipationCount() + 1);
+						totalRating /= ratings.getParticipationCount();
+						ratings.setRating(totalRating);
+						// 연산 결과 DB에 저장
+						if (rDao.insertRatings(ratings) == 1) {
+							result = true;
+						}
 					}
 				}
 			}
 		}
-		
-		System.out.println("======= 리뷰게시판 서비스 종료 =======");
 		return result;
 	}
 
 	@Override
 	public boolean haveARecord(String memberId, String productId) throws SQLException, NamingException {
-		System.out.println("======= 리뷰게시판 서비스 - 리뷰 작성 권한 확인 =======");
 		boolean result = false;
-		
 		// 1. 물품을 구매했고 상태가 배송완료인가 확인
 			// 1-1) order_history에서 회원ID와 배송상태-배송완료로 조회
 			// 1-2) 상품ID와 조회된 row의 주문번호로 detailed_order_items에 데이터(row)가 존재하는지 확인.
@@ -88,7 +104,104 @@ public class ReviewServiceImpl implements ReviewService {
 			}
 		}
 		
-		System.out.println("======= 리뷰게시판 서비스 종료 =======");
+		return result;
+	}
+	
+	@Override
+	public Map<String, Object> getReviewList(String productId, int page) throws SQLException, NamingException {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<ReviewBoardDTO> reviewList = null;
+		PagingInfo pagingInfo = getPagingInfo(productId, page);
+		reviewList = rDao.getReviewList(productId, pagingInfo);
+		
+		if (reviewList != null) {
+			
+			for (ReviewBoardDTO review : reviewList) {
+				// review가 이미지를 몇개 가지고 있는지 확인
+				int getCountImage = rDao.getCountImages(review.getPostNo());
+				if (getCountImage > 0) {
+					List<String> imagesAddr = null;
+					for (int i = 0; i < getCountImage; i++) {
+						imagesAddr = rDao.getImagesAddr(review.getPostNo());
+					}
+					review.setImagesAddr(imagesAddr);
+				}
+			}
+		}
+		map.put("reviewList", reviewList);
+		map.put("pagingInfo", pagingInfo);
+		
+		return map;
+	}
+	
+	private PagingInfo getPagingInfo(String productId, int page) throws SQLException, NamingException {		
+		// 전체 글의 개수
+		int ProductCounts = rDao.selectProductCount(productId);
+		
+		PagingInfo pagingInfo = new PagingInfo(ProductCounts, 2, page, 10);
+		System.out.println(pagingInfo.getStartRowIndex() + "start");
+		return pagingInfo;
+	}
+
+	@Override
+	public ReviewBoardDTO getReview(int postNo, String memberId) throws SQLException, NamingException {
+		ReviewBoardDTO result = null;
+		ReviewBoardDTO review = null;
+		
+		int max = rDao.getMaxPostNo();
+		
+		if (max < postNo) {
+			result = new ReviewBoardDTO();
+		} else {
+			review = rDao.getReview(postNo);
+			
+			if (review.getAuthor().equals(memberId)) {
+				// 이미지 세팅
+				int getCountImage = rDao.getCountImages(review.getPostNo());
+				if (getCountImage > 0) {
+					List<UploadFiles> images = null;
+					for (int i = 0; i < getCountImage; i++) {
+						images = rDao.getImages(review.getPostNo());
+					}
+					review.setImages(images);
+				}
+				
+				result = review;
+			} else {
+				result = new ReviewBoardDTO();
+			}
+		}
+		
+		return result;
+	}
+
+	@Override
+	public boolean updateReview(int postNo, String content, int rating, List<UploadFiles> fileList)
+			throws SQLException, NamingException {
+		System.out.println("서비스 - 리뷰 수정");
+		boolean result = false;
+		
+		if (rDao.updateReview(postNo, content, rating) == 1) {
+			// 업데이트 성공
+			// fileList에 값이 있으면 이미지도 수정!
+			if (fileList.size() > 0) {
+				// 기존에 존재하는 파일인지 확인
+				
+				
+				for (UploadFiles file : fileList) {
+					if (ImgMimeType.extIsImage(file.getExtension())) {
+						if (uDao.insertUploadImage(file) == 1) {
+							// 3) insert 성공 시 board_uf 테이블에도 insert
+							ReviewUf reviewUf = new ReviewUf();
+							reviewUf.setUploadFilesSeq(uDao.selectUploadFile(file));
+//							reviewUf.setPostNo(boardNo);
+							ruDao.insertImage(reviewUf);
+						}
+					}
+				}
+			}
+		}
+		
 		return result;
 	}
 }

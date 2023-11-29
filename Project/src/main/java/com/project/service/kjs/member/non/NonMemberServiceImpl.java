@@ -18,13 +18,11 @@ public class NonMemberServiceImpl implements NonMemberService {
 	
 	@Override
 	public Boolean saveNonMemberId(String nonMemberId, Timestamp sessionLimit) throws SQLException, NamingException {
-		System.out.println("======= 비회원 서비스단 - 비회원 정보 저장 =======");
 		Boolean result = false;
 		NonShoppingCart nsc = new NonShoppingCart(nonMemberId, sessionLimit);
 		
 		if (nscDao.insertNonMember(nsc) == 1)	result = true;
 		
-		System.out.println("======= 비회원 서비스단 종료 =======");
 		return result;
 	}
 }

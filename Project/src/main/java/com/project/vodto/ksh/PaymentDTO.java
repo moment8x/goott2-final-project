@@ -28,8 +28,6 @@ public class PaymentDTO {
 	private int actualPaymentAmount;
 	private Timestamp paymentTime;
 	private int amountToPay;
-//	private List<String> product_id;
-//	private List<Integer> product_price;// quantity
 	private List<DetailOrderItem> products;
 	private String cardName;
 	private String cardNumber;
@@ -41,6 +39,8 @@ public class PaymentDTO {
 	private String rewardReason;
 	private String impUid;
 	private String phoneNumber;
+	private String nonRecipientPhoneNumber;
+	private String nonRecipientName;
 	
 	
 }
