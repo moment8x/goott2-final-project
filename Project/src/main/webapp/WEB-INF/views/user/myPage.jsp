@@ -1114,7 +1114,7 @@
 		
 		$.ajax({
 			url : 'deleteUploadFile', // 데이터를 수신받을 서버 주소
-			type : 'GET', // 통신방식(GET, POST, PUT, DELETE)
+			type : 'GET', // 통신방식(GET, POST, PUT, DELETE) 
 			data : {
 					"thumbFileName" : thumbFileName
 			}, 
