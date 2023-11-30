@@ -5,33 +5,35 @@
 
 <mapper namespace="com.project.mappers.adminMemoMapper">
 	<select id="selectMemoInfo" resultType="MemoListResponse">
-		SELECT s.no, s.created_date, s.admin_id, s.important, s.content
-		FROM (SELECT @ROWN:=@ROWN+1 no, 
-					 m.created_date, 
-					 m.admin_id, 
-					 m.important, 
-					 m.content
-				FROM admin_memo m
-				INNER JOIN (SELECT @ROWN:=0) INIT 
-				<where>
-					m.member_id = #{memberId} 
-					<if test='(createdDateStart != null and !createdDateStart.equals("")) and 
-		         		(createdDateEnd != null and !createdDateEnd.equals(""))'>
-		         		AND m.created_date BETWEEN #{createdDateStart} AND #{createdDateEnd}
-	         		</if>
-	         		<if test='important == 0 or important == 1'>
-						AND m.important = #{important}
-					</if> 
-					<if test='content != null and !content.equals("")'>
-						AND m.content LIKE CONCAT('%',#{content},'%')
-					</if>
-				</where>
-				ORDER BY m.created_date ASC) s
+		SELECT   s.no, s.created_date, s.admin_id, s.important, s.content
+		FROM     (
+				 	SELECT  	@ROWN:=@ROWN+1 no, 
+								m.created_date, 
+						 		m.admin_id, 
+						 		m.important, 
+						 		m.content
+					FROM 		admin_memo m
+					INNER JOIN  (SELECT @ROWN:=0) INIT 
+					<where>
+						m.member_id = #{memberId} 
+						<if test='(createdDateStart != null and !createdDateStart.equals("")) and 
+			         		(createdDateEnd != null and !createdDateEnd.equals(""))'>
+			         		AND m.created_date BETWEEN #{createdDateStart} AND #{createdDateEnd}
+		         		</if>
+		         		<if test='important == 0 or important == 1'>
+							AND m.important = #{important}
+						</if> 
+						<if test='content != null and !content.equals("")'>
+							AND m.content LIKE CONCAT('%',#{content},'%')
+						</if>
+					</where>
+					ORDER BY m.created_date ASC
+			     ) s
 		ORDER BY s.no DESC
 	</select>	
 	
 	<insert id="insertMemberMemo">
 		INSERT INTO admin_memo(member_id, admin_id, content, important) 
-		VALUES(#{memberId},#{adminId},#{content},#{important}) 
+		VALUES		(#{memberId},#{adminId},#{content},#{important}) 
 	</insert>
 </mapper>

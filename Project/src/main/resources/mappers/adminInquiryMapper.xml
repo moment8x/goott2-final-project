@@ -5,23 +5,25 @@
 
 <mapper namespace="com.project.mappers.adminInquiryMapper">
 	<select id="selectInquiryInfo" resultType="InquiryResponse">
-		SELECT c.inquiry_type, 
-			   c.title, 
-			   c.order_no, 
-		       c.email, 
-		       m.name, 
-		       c.author, 
-		       c.created_date, 
-		       c.answer_status,
-		       (SELECT author FROM customer_inquiries_board 
-		       WHERE ref = c.ref AND step = c.step + 1 AND ref_order > c.ref_order
-		       AND answer_status = 'a') answer,
-		       c.answer_date
-		FROM   customer_inquiries_board c
-		INNER JOIN member m
-			ON c.author = m.member_id
-		LEFT JOIN customer_inquiries_uf f
-			ON c.post_no = f.post_no
+		SELECT 		c.inquiry_type, 
+			   		c.title, 
+			   		c.order_no, 
+		       		c.email, 
+		       		m.name, 
+		       		c.author, 
+		       		c.created_date, 
+		       		c.answer_status,
+		       		(
+		       			SELECT author FROM customer_inquiries_board 
+		       		 	WHERE  ref = c.ref AND step = c.step + 1 AND ref_order > c.ref_order
+		       		 	AND    answer_status = 'a'
+		       		 ) answer,
+		       		c.answer_date
+		FROM   		customer_inquiries_board c
+		INNER JOIN  member m
+		ON 			c.author = m.member_id
+		LEFT JOIN   customer_inquiries_uf f
+		ON 			c.post_no = f.post_no
 		<where>
 			<if test='(createdDateStart != null and !createdDateStart.equals("")) and 
 	         		(createdDateEnd != null and !createdDateEnd.equals(""))'>

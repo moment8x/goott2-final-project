@@ -62,18 +62,18 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	}
 
 	@Override
-	public int changeDepositProductCancel(List<DepositProductCancelRequest> productOrderNoList) {
-		return ses.update(ns + ".updateDepositProductCancel", productOrderNoList);
+	public int changeDepositProductCancel(List<String> productNoList) {
+		return ses.update(ns + ".updateDepositProductCancel", productNoList);
 	}
 
 	@Override
-	public int changeDepositProductCancelHistory(List<DepositProductCancelRequest> convertedNoList) {
-		return ses.update(ns + ".updateDepositProductCancelHistory", convertedNoList);
+	public int changeDepositProductCancelHistory(List<String> orderNoList) {
+		return ses.update(ns + ".updateDepositProductCancelHistory", orderNoList);
 	}
 
 	@Override
-	public int changeDepositProductCancelPayments(List<DepositProductCancelRequest> productOrderNoList) {
-		return ses.update(ns + ".updateDepositProductCancelPayments", productOrderNoList);
+	public int changeDepositProductCancelPayments(List<String> orderNoList) {
+		return ses.update(ns + ".updateDepositProductCancelPayments", orderNoList);
 	}
 
 	@Override

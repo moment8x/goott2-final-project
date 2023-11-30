@@ -19,33 +19,33 @@
 	</update>
 	
 	<select id="selectReadyProductInfo" resultType="ReadyProductResponse">
-		SELECT 	 i.product_image,
-				 p.order_no,
-		         pr.category_key,
-                 pr.publisher,
-		         pr.product_name,
-		         pr.product_id,
-                 pr.supply_price,
-		         d.product_quantity,
-		         pr.current_quantity
-		FROM payments p
-		INNER JOIN order_history h 
-			ON p.order_no = h.order_no
-		INNER JOIN member m 
-			ON h.member_id = m.member_id 
-		INNER JOIN detailed_order_items d
-			ON p.order_no = d.order_no
-		INNER JOIN products pr
-			ON d.product_id = pr.product_id
-		LEFT JOIN bank_transfers b 
-			ON p.payment_number = b.payment_number
-		Left JOIN (
-			SELECT product_id, 
-				   product_image
-            FROM product_images
-            GROUP BY product_id
-        ) i
-			ON pr.product_id = i.product_id
+		SELECT 	 	i.product_image,
+				 	p.order_no,
+		         	pr.category_key,
+                 	pr.publisher,
+		         	pr.product_name,
+		         	pr.product_id,
+                 	pr.supply_price,
+		         	d.product_quantity,
+		         	pr.current_quantity
+		FROM 		payments p
+		INNER JOIN  order_history h 
+		ON 			p.order_no = h.order_no
+		INNER JOIN  member m 
+		ON 			h.member_id = m.member_id 
+		INNER JOIN  detailed_order_items d
+		ON 			p.order_no = d.order_no
+		INNER JOIN  products pr
+		ON 			d.product_id = pr.product_id
+		LEFT JOIN 	bank_transfers b 
+		ON 			p.payment_number = b.payment_number
+		Left JOIN 	(
+						SELECT product_id, 
+							   product_image
+			            FROM product_images
+			            GROUP BY product_id
+			        ) i
+		ON 			pr.product_id = i.product_id
 		<where> 
 			d.product_status = '출고전' or d.product_status = '출고완료'
 			<if test='orderNo != null and !orderNo.equals("")' >
@@ -106,32 +106,32 @@
 	</select>
 	
 	<select id="selectReadyNoInfo" resultType="ReadyNoResponse">
-		SELECT 	 h.order_time,
-				 p.payment_time,
-				 p.order_no,
-		         m.name,
-		         h.member_id,
-		         d.product_status,
-		         d.product_order_no,
-                 d.product_invoice_number,
-		         pr.product_name,
-		         pr.product_id,
-		         d.product_quantity,
-		         d.product_price,
-		         p.actual_payment_amount,
-		         p.payment_method,
-		         h.delivery_message
-		FROM payments p
-		INNER JOIN order_history h 
-			ON p.order_no = h.order_no
-		INNER JOIN member m 
-			ON h.member_id = m.member_id 
-		INNER JOIN detailed_order_items d
-			ON p.order_no = d.order_no
-		INNER JOIN products pr
-			ON d.product_id = pr.product_id
-		LEFT JOIN bank_transfers b 
-			ON p.payment_number = b.payment_number
+		SELECT 	 	h.order_time,
+				 	p.payment_time,
+				 	p.order_no,
+		         	m.name,
+		         	h.member_id,
+		         	d.product_status,
+		         	d.product_order_no,
+                 	d.product_invoice_number,
+		         	pr.product_name,
+		         	pr.product_id,
+		         	d.product_quantity,
+		         	d.product_price,
+		         	p.actual_payment_amount,
+		         	p.payment_method,
+		         	h.delivery_message
+		FROM 		payments p
+		INNER JOIN  order_history h 
+		ON 			p.order_no = h.order_no
+		INNER JOIN  member m 
+		ON 			h.member_id = m.member_id 
+		INNER JOIN  detailed_order_items d
+		ON 			p.order_no = d.order_no
+		INNER JOIN  products pr
+		ON 			d.product_id = pr.product_id
+		LEFT JOIN  bank_transfers b 
+		ON 			p.payment_number = b.payment_number
 		<where> 
 			d.product_status = '출고전' or d.product_status = '출고완료'
 			<if test='orderNo != null and !orderNo.equals("")' >
@@ -192,32 +192,39 @@
 	</select>
 	
 	<update id="updateDepositProductCancel" parameterType="java.util.List">
-	        UPDATE detailed_order_items 
-	        SET product_status = '주문취소', coupon_discount = 0
-	        WHERE product_order_no IN
+	        UPDATE  detailed_order_items 
+	        SET 	product_status = '주문취소', coupon_discount = 0
+	        WHERE   product_order_no IN
 	        <foreach collection="list" item="productOrderNo" open="(" close=")" separator=",">
         		#{productOrderNo}
     		</foreach>
 	</update>
 	
 	<update id="updateDepositProductCancelHistory" parameterType="java.util.List">
-		<foreach collection="list" item="item" index="index" separator=";">
 			UPDATE 		order_history h
 			LEFT JOIN 	(
 							SELECT count(detailed_order_id) count, order_no
 							FROM   detailed_order_items 
-							WHERE  order_no = #{item.OrderNo} AND product_status REGEXP '^((?!취소|교환|환불).)*$'
+							WHERE  order_no IN 
+							<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+								#{orderNo} 
+							</foreach>
+							AND product_status = '입금전'
 						) d
 			ON 			h.order_no = d.order_no
 			SET    		h.delivery_status = if(if(d.count is null, 0, d.count) = 0 ,'주문취소', '부분취소') 
-			WHERE  		h.order_no = #{item.OrderNo}
-		</foreach>
+			WHERE  		h.order_no IN 
+			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+				#{orderNo}
+			</foreach>
 	</update>
 	
 	<update id="updateDepositProductCancelPayments" parameterType="java.util.List">
-			UPDATE payments
-			SET    payment_status = '주문취소' 
-			WHERE  order_no IN
+			UPDATE 		payments p
+			INNER JOIN  order_history o
+			ON 			p.order_no = o.order_no
+			SET 		p.payment_status = o.delivery_status
+			WHERE 		p.order_no IN
 			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
 	        	#{orderNo}
 	    	</foreach>
@@ -267,10 +274,12 @@
 			ON  		 m.member_id = o.member_id
 			INNER JOIN	 payments p
 			ON 			 o.order_no = p.order_no
-			LEFT JOIN    (SELECT COUNT(detailed_order_id) count, order_no
-						  FROM   detailed_order_items
-						  WHERE  order_no = #{orderNo} AND 
-								(coupon_discount is not null AND coupon_discount != 0)) s
+			LEFT JOIN    (
+							SELECT COUNT(detailed_order_id) count, order_no
+						  	FROM   detailed_order_items
+						  	WHERE  order_no = #{orderNo} AND 
+								(coupon_discount is not null AND coupon_discount != 0)
+						 ) s
 			ON           o.order_no = s.order_no
 			SET 		 m.coupon_count = m.coupon_count + COALESCE(s.count, 0),
 						 m.total_points = m.total_points + p.used_points,
@@ -282,9 +291,9 @@
 	</update>
 	
 	<update id="updateDepositOrderCancel" parameterType="java.util.List">
-	        UPDATE detailed_order_items 
-	        SET product_status = '주문취소', coupon_discount = 0
-	        WHERE order_no IN
+	        UPDATE  detailed_order_items 
+	        SET 	product_status = '주문취소', coupon_discount = 0
+	        WHERE 	order_no IN
 	        <foreach collection="list" item="orderNo" open="(" close=")" separator=",">
         		#{orderNo}
     		</foreach>
@@ -379,7 +388,7 @@
 		<foreach collection="list" item="item" index="index" separator=";">
 			INSERT INTO cancellations(product_id, reason, amount, processing_status, 
 									  refund_status, request_time, completion_time, detailed_order_id) 
-			VALUES     (#{item.productId},'관리자',0,'취소완료','Y',NOW(),NOW(),#{item.detailedOrderId}) 
+			VALUES     	(#{item.productId},'관리자',0,'취소완료','Y',NOW(),NOW(),#{item.detailedOrderId}) 
 		</foreach>
 	</insert>
 	
@@ -411,33 +420,33 @@
 	</update>
 	
 	<select id="selectDepositProductInfo" resultType="DepositProductResponse">
-		SELECT 	 h.order_time,
-				 p.order_no,
-		         d.product_order_no,
-		         m.name,
-		         h.member_id,
-		         pr.product_name,
-		         pr.product_id,
-		         d.product_quantity,
-		         d.product_price,
-		         b.deposit_amount,
-                 b.bank_name,
-		         h.delivery_message
-		FROM payments p
-		INNER JOIN order_history h 
-			ON p.order_no = h.order_no
-		INNER JOIN member m 
-			ON h.member_id = m.member_id 
-		INNER JOIN detailed_order_items d
-			ON p.order_no = d.order_no
-		INNER JOIN products pr
-			ON d.product_id = pr.product_id
-		LEFT JOIN bank_transfers b 
-			ON p.payment_number = b.payment_number
+		SELECT 	 	h.order_time,
+					p.order_no,
+		         	d.product_order_no,
+		         	m.name,
+		         	h.member_id,
+		        	 pr.product_name,
+		         	pr.product_id,
+		         	d.product_quantity,
+		         	d.product_price,
+		         	b.deposit_amount,
+                 	b.bank_name,
+		         	h.delivery_message
+		FROM 		payments p
+		INNER JOIN  order_history h 
+		ON 			p.order_no = h.order_no
+		INNER JOIN  member m 
+		ON 			h.member_id = m.member_id 
+		INNER JOIN  detailed_order_items d
+		ON 			p.order_no = d.order_no
+		INNER JOIN  products pr
+		ON 			d.product_id = pr.product_id
+		LEFT JOIN   bank_transfers b 
+		ON 			p.payment_number = b.payment_number
 		<where> 
 			p.payment_method = 'bkt' 
-			AND (b.deposit_amount = 0 OR b.deposit_amount is null)
-			AND h.delivery_status = '입금전'
+				AND (b.deposit_amount = 0 OR b.deposit_amount is null)
+				AND h.delivery_status = '입금전'
 			<if test='orderNo != null and !orderNo.equals("")' >
 				AND h.order_no = #{orderNo}
 			</if>
@@ -496,38 +505,37 @@
 	</select>
 	
 	<select id="selectDepositNoInfo" resultType="DepositNoResponse">
-		SELECT 	 h.order_time,
-			     h.order_no,
-		  CASE   WHEN product_count.count = 1 THEN product_count.product_name
-			     ELSE CONCAT(product_count.product_name, ' 외 ', product_count.count - 1, '건')
-		         END product_name,  
-		         m.name,
-		         h.member_id,
-                 b.payer_name,
-                 b.deposit_amount,
-                 b.bank_name,
-                 if(b.deposit_amount != 0 AND b.deposit_amount is not null, '입금완료', '입금전') status,
-		         h.delivery_message
-  		  FROM 	 payments p
-		INNER JOIN order_history h 
-			ON p.order_no = h.order_no
-		INNER JOIN member m 
-			ON h.member_id = m.member_id 
-		LEFT JOIN bank_transfers b 
-			ON p.payment_number = b.payment_number
-		LEFT JOIN (
-				SELECT  d.order_no, p.product_name, p.category_key, count(distinct d.product_id) count
-				FROM detailed_order_items d
-				INNER JOIN products p
-					ON d.product_id = p.product_id
-				GROUP BY d.order_no
-            ) product_count
-			ON h.order_no = product_count.order_no
+		SELECT 	 	h.order_time,
+			     	h.order_no,
+		CASE   WHEN product_count.count = 1  THEN product_count.product_name
+			   ELSE CONCAT(product_count.product_name, ' 외 ', product_count.count - 1, '건')
+		        END product_name,  
+		         	m.name,
+		         	h.member_id,
+                 	b.payer_name,
+                 	b.deposit_amount,
+                 	b.bank_name,
+                	if(b.deposit_amount != 0 AND b.deposit_amount is not null, '입금완료', '입금전') status,
+		         	h.delivery_message
+  		FROM 	    payments p
+		INNER JOIN  order_history h 
+		ON 			p.order_no = h.order_no
+		INNER JOIN  member m 
+		ON 			h.member_id = m.member_id 
+		LEFT JOIN   bank_transfers b 
+		ON 			p.payment_number = b.payment_number
+		LEFT JOIN   (
+						SELECT  	d.order_no, p.product_name, p.category_key, count(distinct d.product_id) count
+						FROM 		detailed_order_items d
+						INNER JOIN  products p
+						ON 			d.product_id = p.product_id
+						GROUP BY 	d.order_no
+		            ) product_count
+		ON 			h.order_no = product_count.order_no
 		<where> 
 			p.payment_method = 'bkt' 
-			AND (b.deposit_amount = 0 OR b.deposit_amount is null)
-			AND h.delivery_status = '입금전'
-			
+				AND (b.deposit_amount = 0 OR b.deposit_amount is null)
+				AND h.delivery_status = '입금전'
 			<if test='orderNo != null and !orderNo.equals("")' >
 				AND h.order_no = #{orderNo}
 			</if>
@@ -587,31 +595,31 @@
 	
 	
 	<select id="selectOrderProductInfo" resultType="OrderProductResponse">
-		SELECT 	 h.order_time,
-				 p.payment_time,
-				 p.order_no,
-		         d.product_order_no,
-		         m.name,
-		         h.member_id,
-		         pr.product_name,
-		         pr.product_id,
-		         d.product_quantity,
-		         d.product_price,
-		         p.actual_payment_amount,
-		         p.payment_method,
-		         p.payment_status,
-		         d.product_status,
-		         d.product_invoice_number,
-		         h.delivery_message
-		FROM payments p
-		INNER JOIN order_history h 
-			ON p.order_no = h.order_no
-		INNER JOIN member m 
-			ON h.member_id = m.member_id 
-		INNER JOIN detailed_order_items d
-			ON p.order_no = d.order_no
-		INNER JOIN products pr
-			ON d.product_id = pr.product_id
+		SELECT 	 	h.order_time,
+				 	p.payment_time,
+				 	p.order_no,
+		        	d.product_order_no,
+		         	m.name,
+		         	h.member_id,
+		         	pr.product_name,
+		         	pr.product_id,
+		         	d.product_quantity,
+		         	d.product_price,
+		        	p.actual_payment_amount,
+		         	p.payment_method,
+		         	p.payment_status,
+		         	d.product_status,
+		         	d.product_invoice_number,
+		         	h.delivery_message
+		FROM 		payments p
+		INNER JOIN  order_history h 
+		ON 			p.order_no = h.order_no
+		INNER JOIN  member m 
+		ON 			h.member_id = m.member_id 
+		INNER JOIN  detailed_order_items d
+		ON 			p.order_no = d.order_no
+		INNER JOIN  products pr
+		ON 			d.product_id = pr.product_id
 		<where> 
 			<if test='orderNo != null and !orderNo.equals("")' >
 				AND h.order_no = #{orderNo}
@@ -671,51 +679,67 @@
 	</select>
 	
 	<select id="selectOrderNoInfo" resultType="OrderNoResponse">
-		SELECT 	 h.order_time,
-				 p.payment_time,
-			     h.order_no,
-		         m.name,
-		         h.member_id,
-		  CASE   WHEN product_count.count = 1 THEN product_count.product_name
-			     ELSE CONCAT(product_count.product_name, ' 외 ', product_count.count - 1, '건')
-		         END product_name,  
-			     p.total_amount,
-		         p.actual_payment_amount,
-			     p.payment_method,
-			     p.payment_status,
-		         status.undelivered,
-		         status.inTransit,
-		         status.delivered,
-		         status.cancels,
-		         status.exchanges,
-		         status.returns,
-		         h.delivery_message
-  		  FROM 	 payments p
-		INNER JOIN order_history h 
-			ON p.order_no = h.order_no
-		INNER JOIN member m 
-			ON h.member_id = m.member_id 
-		LEFT JOIN bank_transfers b 
-			ON p.payment_number = b.payment_number
-		LEFT JOIN (
-			SELECT d.order_no,
-		    (SELECT count(*) FROM detailed_order_items WHERE product_status in ('입금완료', '출고전', '출고완료', '주문취소') and order_no = d.order_no) 'Undelivered',
-		    (SELECT count(*) FROM detailed_order_items WHERE product_status = '배송중' and order_no = d.order_no) 'intransit',
-		    (SELECT count(*) FROM detailed_order_items WHERE product_status in ('배송완료','반품','교환') and order_no = d.order_no) 'Delivered',
-		    (SELECT count(*) FROM detailed_order_items WHERE product_status = '주문취소' and order_no = d.order_no) 'cancels',
-		    (SELECT count(*) FROM detailed_order_items WHERE product_status = '교환' and order_no = d.order_no) 'exchanges',
-		    (SELECT count(*) FROM detailed_order_items WHERE product_status = '반품' and order_no = d.order_no) 'returns'
-		    FROM detailed_order_items d
-			GROUP BY d.order_no 
-		) status
-			ON h.order_no = status.order_no
-		LEFT JOIN (
-			SELECT  d.order_no, p.product_name, p.category_key, count(distinct d.product_id) count
-			FROM detailed_order_items d
-			INNER JOIN products p
-				ON d.product_id = p.product_id
-			GROUP BY d.order_no) product_count
-				ON h.order_no = product_count.order_no
+		SELECT 	 	h.order_time,
+				 	p.payment_time,
+			     	h.order_no,
+		         	m.name,
+		         	h.member_id,
+		CASE   WHEN product_count.count = 1 THEN product_count.product_name
+			   ELSE CONCAT(product_count.product_name, ' 외 ', product_count.count - 1, '건')
+		       END  product_name,  
+			     	p.total_amount,
+		         	p.actual_payment_amount,
+			     	p.payment_method,
+			     	p.payment_status,
+		         	status.undelivered,
+		         	status.inTransit,
+		         	status.delivered,
+		         	status.cancels,
+		         	status.exchanges,
+		         	status.returns,
+		         	h.delivery_message
+  		FROM 	 	payments p
+		INNER JOIN  order_history h 
+		ON 			p.order_no = h.order_no
+		INNER JOIN  member m 
+		ON 			h.member_id = m.member_id 
+		LEFT JOIN   bank_transfers b 
+		ON 			p.payment_number = b.payment_number
+		LEFT JOIN 	(
+						SELECT   d.order_no,
+							     (SELECT count(*) FROM detailed_order_items 
+							      WHERE  product_status in ('입금완료', '출고전', '출고완료', '주문취소') 
+							      and    order_no = d.order_no) 'Undelivered',
+							     (SELECT count(*) FROM detailed_order_items 
+							      WHERE  product_status = '배송중' 
+							      and    order_no = d.order_no) 'intransit',
+							     (SELECT count(*) FROM detailed_order_items 
+							      WHERE  product_status in ('배송완료','반품','교환') 
+							      and    order_no = d.order_no) 'Delivered',
+							     (SELECT count(*) FROM detailed_order_items 
+							      WHERE  product_status = '주문취소' 
+							      and    order_no = d.order_no) 'cancels',
+							     (SELECT count(*) FROM detailed_order_items 
+							      WHERE  product_status = '교환' 
+							      and    order_no = d.order_no) 'exchanges',
+							     (SELECT count(*) FROM detailed_order_items 
+							      WHERE  product_status = '반품' 
+							      and    order_no = d.order_no) 'returns'
+					    FROM 	 detailed_order_items d
+						GROUP BY d.order_no 
+					) status
+		ON 			h.order_no = status.order_no
+		LEFT JOIN   (
+						SELECT  	d.order_no, 
+									p.product_name, 
+									p.category_key, 
+									count(distinct d.product_id) count
+						FROM 		detailed_order_items d
+						INNER JOIN  products p
+						ON 			d.product_id = p.product_id
+						GROUP BY 	d.order_no
+					) product_count
+		ON 			h.order_no = product_count.order_no
 		<where> 
 			<if test='orderNo != null and !orderNo.equals("")' >
 				AND h.order_no = #{orderNo}

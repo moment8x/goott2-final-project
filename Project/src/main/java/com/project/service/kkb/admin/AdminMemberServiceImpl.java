@@ -19,7 +19,9 @@ import com.project.vodto.kkb.MemberRecentPost;
 import com.project.vodto.kkb.MemberResponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminMemberServiceImpl implements AdminMemberService {
@@ -33,14 +35,13 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		
 		int totalCount = 0;
 		
-		if(memberCount.getCurrentCount() > 0) {
-			/* MemberCountListener에 저장해둔 값 가져옴 */
-			System.out.println("저장해둔 전체 회원 수 조회");
-			totalCount = memberCount.getCurrentCount(); 
-		} else {
-			System.out.println("DB에서 전체 회원 수 조회");
+		if(memberCount.getCurrentCount() == 0) {
+			log.info("DB에서 전체 회원 수 조회");
 			updateMemberCount();
-		}
+			totalCount = memberCount.getCurrentCount();
+		} 		
+		/* DB에 접근 x, MemberCountListener에 저장해둔 값 가져옴 */
+		totalCount = memberCount.getCurrentCount(); 
 		Map<String, Object> result = new HashMap<>();
 		result.put("total", totalCount);
 		
@@ -51,7 +52,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	public void updateMemberCount(){
 		
 		int memberCount = adminMemberRepository.countAll();	
-		System.out.println("회원 수 갱신");
+		log.info("회원 수 갱신");
 		/* 이벤트 발행 */
 		publisher.publishEvent(new TotalMemberCountEvent(memberCount));
 	}	

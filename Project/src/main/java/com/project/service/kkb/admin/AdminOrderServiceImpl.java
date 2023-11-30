@@ -84,24 +84,26 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		
 		int result = -1;
 		
-		List<DepositProductCancelRequest> convertedNoList = 
-				productOrderNoList.stream()
-					.map(info -> {
-							info.setConvertedOrderNo();
-							return info;
-						})
-					.collect(Collectors.toList());
+		List<String> orderNoList = productOrderNoList.stream()
+    			.collect(Collectors.groupingBy(DepositProductCancelRequest::getConvertedOrderNo))
+	            .entrySet().stream()
+	            .map(order -> order.getKey())
+	            .collect(Collectors.toList());
+		
+		List<String> productNoList = productOrderNoList.stream()
+				.map(DepositProductCancelRequest::getProductOrderNo)	
+				.collect(Collectors.toList());
 	
 		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
-		if(adminOrderRepository.changeDepositProductCancel(productOrderNoList) <= 0 ) {
+		if(adminOrderRepository.changeDepositProductCancel(productNoList) <= 0 ) {
 			return result;
 		}
 		/* 주문 내역 테이블 update(column : delivery_status) */
-		if(adminOrderRepository.changeDepositProductCancelHistory(convertedNoList) <= 0) {
+		if(adminOrderRepository.changeDepositProductCancelHistory(orderNoList) <= 0) {
 			return result;
 		}
 		/* 결제 테이블 update(column : payment_status) */
-		if(adminOrderRepository.changeDepositProductCancelPayments(productOrderNoList) <= 0) {
+		if(adminOrderRepository.changeDepositProductCancelPayments(orderNoList) <= 0) {
 			return result;
 		}
 		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
@@ -120,10 +122,6 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		 * accumulated_reward, accumulated_use_reward, accumulated_pointm, accumulated_use_point ) */
 		if(adminOrderRepository.changeDepositProductCancelMember(productOrderNoList) > 0) {
 			
-			List<String> orderNoList = productOrderNoList.stream()
-					.map(DepositProductCancelRequest::getConvertedOrderNo)	
-					.collect(Collectors.toList());
-							
 			List<DepositCancelInfoResponse> cancelInfoList = 
 					adminOrderRepository.findDepositCancelInfo(orderNoList);
 			

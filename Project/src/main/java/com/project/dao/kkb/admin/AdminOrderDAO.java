@@ -70,13 +70,13 @@ public interface AdminOrderDAO {
 	
 	
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
-	int changeDepositProductCancel(List<DepositProductCancelRequest> productOrderNoList);
+	int changeDepositProductCancel(List<String> productOrderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 주문 내역 테이블 update(column : delivery_status)) */
-	int changeDepositProductCancelHistory(List<DepositProductCancelRequest> productOrderNoList);
+	int changeDepositProductCancelHistory(List<String> productOrderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 결제 테이블 update(column : payment_status)) */
-	int changeDepositProductCancelPayments(List<DepositProductCancelRequest> productOrderNoList);
+	int changeDepositProductCancelPayments(List<String> productOrderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) */
 	int changeDepositProductCancelCoupon(List<DepositProductCancelRequest> productOrderNoList);
