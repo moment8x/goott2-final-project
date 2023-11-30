@@ -951,6 +951,7 @@
 		});
 	}
 	
+	//리뷰랑 리뷰uf가져오기
 	function selectReview(postNo) {
 		$.ajax({
 			url : '/user/selectModifyReview', // 데이터를 수신받을 서버 주소
@@ -1010,22 +1011,25 @@
 				output += `<div class="upFileArea">업로드할 파일을 드래그앤 드랍 하세요.`
 				output += `</div>`
 				
+				//let postNo = data.review.postNo
+				//let thumbnailFileName = `\${data.reviewUf.thumbnailFileName}`
+				
 				let output2 = ''
-						
+				//DB에 있는 uf출력
 				$.each(data.reviewUf, function(i, elt) {
 					let name = elt.newFileName.replace("\\", "/");
 					if(elt.thumbnailFileName != null){ //이미지
 						let thumb = elt.thumbnailFileName.replace("\\", "/");
-						output2 += `<img src = '/resources/assets/images/review\${thumb}'  id="\${elt.originalFileName}" class='upImg'/>
-						<i class="fa-regular fa-square-minus" onclick ='remFile(this);'></i>`;
+						output2 += `<img src = '/resources/uploads/\${thumb}'  id="\${elt.originalFileName}" class='upImg'/>
+						<i class="fa-regular fa-square-minus" onclick ='remFile(this, "\${elt.thumbnailFileName}");'></i>`;
 					}else{
-						output2 += `<a href='/resources/assets/images/review\${name}' id="\${elt.originalFileName}" >\${elt.originalFileName}</a>
-						<i class="fa-regular fa-square-minus" onclick ='remFile(this);'></i>`;
+						output2 += `<a href='/resources/uploads/\${name}' id="\${elt.originalFileName}" >\${elt.originalFileName}</a>
+						<i class="fa-regular fa-square-minus" onclick ='remFile(this, "\${elt.thumbnailFileName}");'></i>`;
 					}
 				})
-				$('.uploadFile').html(output2);
 				
 				$('.modal-body.modifyReview').html(output);
+				$('.uploadFile').html(output2);
 				
 				$('.upFileArea').on("dragenter dragover", function(evt) {
 					evt.preventDefault();
@@ -1033,16 +1037,15 @@
 					
 				$('.upFileArea').on("drop", function(evt) {
 					evt.preventDefault();
-					//이 경로를 타고 보면 올린 파일이 배열로 나온다.
-					console.log(evt.originalEvent.dataTransfer.files);
 					
 					let files = evt.originalEvent.dataTransfer.files;
-					//서버에서 파일은 한번에 하나씩 올릴 수 있다. 그래서 여러개의 파일은 컨트롤을 통해서 여러개 보낸다..? 그래서 아작스 사용..?
+					
 					for(let i = 0; i < files.length; i++){ 
 			            let form = new FormData() //자바스크립트에서 만들었다. form태그를 객체처럼 만들었다.
 			            form.append("uploadFile", files[i]); //파일의 이름을 컨트롤러 단의 MultipartFile 매개변수명과 동일하도록 한다.
 			            console.log(files[i]);
-						
+			         
+			            //업로드한 파일이있다면 추가
 			            modifyReview(form);
 					}
 				});
@@ -1071,6 +1074,8 @@
 			},
 		});
 	}
+	
+	//업로드한 파일이있다면 추가
 	function showUploadedFile(file) {
 		let output = "";
 		
@@ -1078,11 +1083,11 @@
 				let name = elt.newFileName.replace("\\", "/");
 			if(elt.thumbnailFileName != null){ //이미지
 				let thumb = elt.thumbnailFileName.replace("\\", "/");
-				output += `<img src = '/resources/assets/images/review\${thumb}'  id="\${elt.originalFileName}" class='upImg'/>
-					<i class="fa-regular fa-square-minus" onclick ='remFile(this);'></i>`;
+				output += `<img src = '/resources/uploads/\${thumb}'  id="\${elt.originalFileName}" class='upImg'/>
+					<i class="fa-regular fa-square-minus" onclick ='remFile(this, "\${elt.thumbnailFileName}");'></i>`;
 			}else{
-				output += `<a href='/resources/assets/images/review\${name}' id="\${elt.originalFileName}" >\${elt.originalFileName}</a>
-					<i class="fa-regular fa-square-minus" onclick ='remFile(this);'></i>`;
+				output += `<a href='/resources/uploads/\${name}' id="\${elt.originalFileName}" >\${elt.originalFileName}</a>
+					<i class="fa-regular fa-square-minus" onclick ='remFile(this, "\${elt.thumbnailFileName}");'></i>`;
 			}
 
 		})
@@ -1102,12 +1107,16 @@
 	
 	function remFile(fileId) {
 		let removeFile = $(fileId).prev().attr('id'); //삭제 될 파일의 originalFileName
+		//alert(postNo + "번 파일")
+		//console.log(thumbFileName + "썸네일 이름!!")
+		let thumbFileName = $(this).prev().attr("src")
+		console.log(thumbFileName)
 		
 		$.ajax({
-			url : 'remFile', // 데이터를 수신받을 서버 주소
+			url : 'deleteUploadFile', // 데이터를 수신받을 서버 주소
 			type : 'GET', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
-					"removeFile" : removeFile
+					"thumbFileName" : thumbFileName
 			}, 
 			dataType : 'text',
 			async : false,

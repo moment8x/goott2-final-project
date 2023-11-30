@@ -628,7 +628,7 @@ public class MemberServiceImpl implements MemberService {
 		Map<String, Object> result = new HashMap<String, Object>();
 		
 		MyPageReview review = mDao.selectMyReview(memberId, postNo);
-		review.setContent(review.getContent().replace("<br/>", ""));
+		review.setContent(review.getContent().replace("<br/>", "\r\n"));
 		List<UploadFiles> reviewUf = mDao.selectMyReviewUf(memberId, postNo);
 		
 		 

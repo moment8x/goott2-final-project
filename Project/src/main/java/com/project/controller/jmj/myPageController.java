@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.project.etc.jmj.UploadProfileFileProcess;
+import com.project.service.kjs.review.ReviewService;
 import com.project.service.kjy.ListService;
 import com.project.service.member.MemberService;
 import com.project.vodto.CouponLog;
@@ -68,9 +69,14 @@ public class myPageController {
 	@Inject 
 	private ListService lService;
 	
+	@Inject
+	ReviewService rService;
+	
 	private UploadFiles uf;
 
 	private List<UploadFiles> fileList = new ArrayList<UploadFiles>();
+
+	private List<String> deleteFileList = new ArrayList<String>();
 	
 	@RequestMapping(value = "myPage")
 	public void myPage(Model model, HttpServletRequest request, @RequestParam(value = "pageNo", defaultValue = "1")int pageNo) {
@@ -700,16 +706,8 @@ public class myPageController {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
-		System.out.println(member.toString());
-		
-		System.out.println("프로필 업로드 시작");
-		System.out.println("파일의 오리지널 이름 : " + uploadFile.getOriginalFilename());
-		System.out.println("파일의 사이즈 : " + uploadFile.getSize());
-		System.out.println("파일의 contentType : " + uploadFile.getContentType());
-		
-		String realPath = request.getSession().getServletContext().getRealPath("resources/assets/images/profile");
-		
-		System.out.println(realPath);
+
+		String realPath = request.getSession().getServletContext().getRealPath("resources/profileUpload");
 		
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
@@ -731,18 +729,38 @@ public class myPageController {
 		return result;
 	}
 	
+	@RequestMapping(value = "selectModifyReview", method = RequestMethod.POST)
+	public ResponseEntity<Map<String, Object>> selectModifyReview(@RequestParam("postNo") int postNo, HttpServletRequest request){
+		System.out.println(postNo + "번 리뷰수정");
+		
+		HttpSession session = request.getSession();
+		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		String memberId = member.getMemberId();
+		
+		ResponseEntity<Map<String, Object>> result = null;
+		
+		HttpHeaders header = new HttpHeaders();
+		header.add("Content-Type", "application/json; charset=UTF-8");
+		try {
+			Map<String, Object> map = mService.selectMyReview(memberId, postNo);
+			
+			result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);
+		} catch (SQLException | NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
+		
+	}
+	
 	@RequestMapping(value = "modifyReview", method = RequestMethod.POST)
 	public @ResponseBody List<UploadFiles> modifyReview(MultipartFile uploadFile, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
-		
-		System.out.println("파일의 오리지널 이름 : " + uploadFile.getOriginalFilename());
-		System.out.println("파일의 사이즈 : " + uploadFile.getSize());
-		System.out.println("파일의 contentType : " + uploadFile.getContentType()); //mime-type 이다. server에 web.xml에 정의되어있다. 실제 어떤 형식의 파일인지 컴퓨터끼리 아는것.
-		//파일이 저장될 물리적 경로(realPath)
-		String realPath = request.getSession().getServletContext().getRealPath("resources/assets/images/review"); //java파일이랑 webapp 까지는 경로가 같아서 경로를 이렇게 지정한다.
-		System.out.println(realPath);
+
+		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
 	
 		UploadFiles uf = null;
 		
@@ -765,18 +783,45 @@ public class myPageController {
 		return this.fileList;
 	}
 	
+	@RequestMapping(value="deleteUploadFile", method=RequestMethod.POST)
+	public @ResponseBody List<UploadFiles> deleteUploadedFile(HttpServletRequest request, @RequestParam("thumbFileName") String thumbFileName) {
+		List<UploadFiles> result = null;
+		thumbFileName = thumbFileName.replace("/", "\\");
+		// 1. deleteFileList에 삭제할 파일 등록
+		String newFileName = thumbFileName.replace("thumb_", "");
+		deleteFileList.add(newFileName);
+		// 2. fileList - deleteFileList 해서 남은 값만 return
+		result = calcFileList();
+		
+		return result;
+	}
+	
+	private List<UploadFiles> calcFileList() {
+		List<UploadFiles> result = fileList;
+		for (int i = 0; i < fileList.size(); i++) {
+			for (String deleteFile : deleteFileList) {
+				if (fileList.get(i).getNewFileName().equals(deleteFile)) {
+					result.remove(i);
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+
 	@RequestMapping("remFile")
 	public ResponseEntity<String> removeFile(@RequestParam("removeFile") String remFile, HttpServletRequest request) {
 		System.out.println(remFile + "파일을 삭제하자");
 		
 		//this.fileList[remInd] 번째의 파일을 하드디스크에서 먼저 삭제 한 뒤
 		//this.fileList[remInd] 번째 this.fileList에서 삭제
-		String realPath = request.getSession().getServletContext().getRealPath("resources/assets/images/review");
+		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
 		
 		ResponseEntity<String> result = null;
 		
+//		Map<String, Object> map = mService.selectMyReview(memberId, postNo);
 		UploadProfileFileProcess.deleteFile(this.fileList, remFile, realPath);
-			
 		int ind = 0;
 		for(UploadFiles uf : fileList) {
 			if(!remFile.equals(uf.getOriginalFileName())) {
@@ -795,7 +840,7 @@ public class myPageController {
 	
 	@RequestMapping("remAllFile")
 	public ResponseEntity<String> remAllFile(HttpServletRequest request) {
-		String realPath = request.getSession().getServletContext().getRealPath("resources/assets/images/review");
+		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
 		UploadProfileFileProcess.deleteAllFile(this.fileList, realPath);
 		
 		this.fileList.clear();
@@ -845,30 +890,7 @@ public class myPageController {
 		return result;
 	}
 	
-	@RequestMapping(value = "selectModifyReview", method = RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> selectModifyReview(@RequestParam("postNo") int postNo, HttpServletRequest request){
-		System.out.println(postNo + "번 리뷰수정");
-		
-		HttpSession session = request.getSession();
-		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
-		
-		ResponseEntity<Map<String, Object>> result = null;
-		
-		HttpHeaders header = new HttpHeaders();
-		header.add("Content-Type", "application/json; charset=UTF-8");
-		try {
-			Map<String, Object> map = mService.selectMyReview(memberId, postNo);
-			
-			result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);
-		} catch (SQLException | NamingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return result;
-		
-	}
+
 	
 	
 	
