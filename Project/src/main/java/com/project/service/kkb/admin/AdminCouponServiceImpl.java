@@ -17,13 +17,13 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class AdminCouponServiceImpl implements AdminCouponService {
 
-	private final AdminCouponDAO adminCouponRepository;
+	private final AdminCouponDAO adminCouponDao;
 	
 	@Override
 	public Map<String, Object> getCouponInfo(String memberId) {
 		
-		CouponInfoResponse couponInfo = adminCouponRepository.findCouponInfoById(memberId);
-		List<CouponListResponse> couponList = adminCouponRepository.findCouponListById(memberId);
+		CouponInfoResponse couponInfo = adminCouponDao.findCouponInfoById(memberId);
+		List<CouponListResponse> couponList = adminCouponDao.findCouponListById(memberId);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("couponInfo", couponInfo);
@@ -35,7 +35,7 @@ public class AdminCouponServiceImpl implements AdminCouponService {
 	@Override
 	public Map<String, Object> getCategoryByCouponNo(String couponNumber) {
 		
-		CouponAppliedCategory categories = adminCouponRepository.findCategoryByCouponNo(couponNumber);
+		CouponAppliedCategory categories = adminCouponDao.findCategoryByCouponNo(couponNumber);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("categories", categories);

@@ -4,6 +4,311 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.project.mappers.adminOrderMapper">
+	
+	<select id="selectShippingProductInfo" resultType="ShippingProductResponse">
+		SELECT 	 	i.product_image,
+				 	p.order_no,
+		         	pr.category_key,
+                 	pr.publisher,
+		         	pr.product_name,
+		         	pr.product_id,
+                 	pr.supply_price,
+		         	d.product_quantity,
+		         	pr.current_quantity
+		FROM 		payments p
+		INNER JOIN  order_history h 
+		ON 			p.order_no = h.order_no
+		INNER JOIN  member m 
+		ON 			h.member_id = m.member_id 
+		INNER JOIN  detailed_order_items d
+		ON 			p.order_no = d.order_no
+		INNER JOIN  products pr
+		ON 			d.product_id = pr.product_id
+		LEFT JOIN 	bank_transfers b 
+		ON 			p.payment_number = b.payment_number
+		Left JOIN 	(
+						SELECT product_id, 
+							   product_image
+			            FROM product_images
+			            GROUP BY product_id
+			        ) i
+		ON 			pr.product_id = i.product_id
+		<where> 
+			d.product_status = '배송중'
+			<if test='orderNo != null and !orderNo.equals("")' >
+				AND h.order_no = #{orderNo}
+			</if>
+			<if test='productOrderNo != null and !productOrderNo.equals("")' >
+				AND d.product_order_no = #{productOrderNo}
+			</if>
+			<if test='invoiceNumber != null and !invoiceNumber.equals("")' >
+				AND h.invoice_number = #{invoiceNumber}
+			</if>
+			<if test='name != null and !name.equals("")' >
+				AND m.name = #{name}
+			</if>
+			<if test='memberId != null and !memberId.equals("")' >
+				AND h.member_id = #{memberId}
+			</if>
+			<if test='email != null and !email.equals("")' >
+				AND m.email = #{email}
+			</if>
+			<if test='cellPhoneNumber != null and !cellPhoneNumber.equals("")' >
+				AND m.cell_phone_number = #{cellPhoneNumber}
+			</if>
+			<if test='phoneNumber != null and !phoneNumber.equals("")' >
+				AND m.phone_number = #{phoneNumber}
+			</if>
+			<if test='payerName != null and !payerName.equals("")' >
+				AND b.payer_name = #{payerName}
+			</if>
+			<if test='recipientName != null and !recipientName.equals("")' >
+				AND h.recipient_name = #{recipientName}
+			</if>
+			<if test='recipientPhoneNumber != null and !recipientPhoneNumber.equals("")' >
+				AND h.recipient_phone_number = #{recipientPhoneNumber}
+			</if>
+			<if test='shippingAddress != null and !shippingAddress.equals("")' >
+				AND h.shipping_address = #{shippingAddress}
+			</if>
+			<if test='productName != null and !productName.equals("")' >
+				AND pr.product_name like CONCAT('%',#{productName},'%')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
+			</if>
+			<if test='productId != null and !productId.equals("")' >
+				AND d.product_id = #{productId}
+			</if>
+			<if test='categoryKey != null and !categoryKey.equals("")' >
+				AND pr.category_key = #{categoryKey}
+			</if>
+			<if test='(orderTimeStart != null and !orderTimeStart.equals("")) and 
+	         		(orderTimeEnd != null and !orderTimeEnd.equals(""))'>
+	         		AND h.order_time BETWEEN #{orderTimeStart} AND #{orderTimeEnd}
+         	</if>
+         	<if test='(paymentTimeStart != null and !paymentTimeStart.equals("")) and 
+	         		(paymentTimeEnd != null and !paymentTimeEnd.equals(""))'>
+	         		AND p.payment_time BETWEEN #{paymentTimeStart} AND #{paymentTimeEnd}
+         	</if>
+		</where>
+		ORDER BY h.order_time DESC, d.product_order_no DESC
+	</select>
+	
+	<select id="selectShippingProductNoInfo" resultType="ShippingProductNoResponse">
+		SELECT 	 	d.product_order_no,
+		         	m.name,
+		         	h.member_id,
+                 	d.product_invoice_number,
+                 	d.invoice _input_date,
+		         	pr.product_name,
+		         	pr.product_id,
+		         	d.product_quantity,
+		         	h.delivery_message
+		FROM 		payments p
+		INNER JOIN  order_history h 
+		ON 			p.order_no = h.order_no
+		INNER JOIN  member m 
+		ON 			h.member_id = m.member_id 
+		INNER JOIN  detailed_order_items d
+		ON 			p.order_no = d.order_no
+		INNER JOIN  products pr
+		ON 			d.product_id = pr.product_id
+		LEFT JOIN   bank_transfers b 
+		ON 			p.payment_number = b.payment_number
+		<where> 
+			d.product_status = '배송중'
+			<if test='orderNo != null and !orderNo.equals("")' >
+				AND h.order_no = #{orderNo}
+			</if>
+			<if test='productOrderNo != null and !productOrderNo.equals("")' >
+				AND d.product_order_no = #{productOrderNo}
+			</if>
+			<if test='invoiceNumber != null and !invoiceNumber.equals("")' >
+				AND h.invoice_number = #{invoiceNumber}
+			</if>
+			<if test='name != null and !name.equals("")' >
+				AND m.name = #{name}
+			</if>
+			<if test='memberId != null and !memberId.equals("")' >
+				AND h.member_id = #{memberId}
+			</if>
+			<if test='email != null and !email.equals("")' >
+				AND m.email = #{email}
+			</if>
+			<if test='cellPhoneNumber != null and !cellPhoneNumber.equals("")' >
+				AND m.cell_phone_number = #{cellPhoneNumber}
+			</if>
+			<if test='phoneNumber != null and !phoneNumber.equals("")' >
+				AND m.phone_number = #{phoneNumber}
+			</if>
+			<if test='payerName != null and !payerName.equals("")' >
+				AND b.payer_name = #{payerName}
+			</if>
+			<if test='recipientName != null and !recipientName.equals("")' >
+				AND h.recipient_name = #{recipientName}
+			</if>
+			<if test='recipientPhoneNumber != null and !recipientPhoneNumber.equals("")' >
+				AND h.recipient_phone_number = #{recipientPhoneNumber}
+			</if>
+			<if test='shippingAddress != null and !shippingAddress.equals("")' >
+				AND h.shipping_address = #{shippingAddress}
+			</if>
+			<if test='productName != null and !productName.equals("")' >
+				AND pr.product_name like CONCAT('%',#{productName},'%')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
+			</if>
+			<if test='productId != null and !productId.equals("")' >
+				AND d.product_id = #{productId}
+			</if>
+			<if test='categoryKey != null and !categoryKey.equals("")' >
+				AND pr.category_key = #{categoryKey}
+			</if>
+			<if test='(orderTimeStart != null and !orderTimeStart.equals("")) and 
+	         		(orderTimeEnd != null and !orderTimeEnd.equals(""))'>
+	         		AND h.order_time BETWEEN #{orderTimeStart} AND #{orderTimeEnd}
+         	</if>
+         	<if test='(paymentTimeStart != null and !paymentTimeStart.equals("")) and 
+	         		(paymentTimeEnd != null and !paymentTimeEnd.equals(""))'>
+	         		AND p.payment_time BETWEEN #{paymentTimeStart} AND #{paymentTimeEnd}
+         	</if>
+		</where>
+		ORDER BY h.order_time DESC, d.product_order_no DESC
+	</select>
+	
+	<select id="selectShippingNoInfo" resultType="ShippingNoResponse">
+		SELECT 	 	h.order_time,
+				 	h.order_no,
+		         	m.name,
+		         	h.member_id,
+		         	d.product_order_no,
+                 	d.product_invoice_number,
+                 	d.invoice_input_date,
+		         	pr.product_name,
+		         	pr.product_id,
+		         	d.product_quantity,
+		         	h.delivery_message
+		FROM 		payments p
+		INNER JOIN  order_history h 
+		ON 			p.order_no = h.order_no
+		INNER JOIN  member m 
+		ON 			h.member_id = m.member_id 
+		INNER JOIN  detailed_order_items d
+		ON 			p.order_no = d.order_no
+		INNER JOIN  products pr
+		ON 			d.product_id = pr.product_id
+		LEFT JOIN  bank_transfers b 
+		ON 			p.payment_number = b.payment_number
+		<where> 
+			d.product_status = '배송중'
+			<if test='orderNo != null and !orderNo.equals("")' >
+				AND h.order_no = #{orderNo}
+			</if>
+			<if test='productOrderNo != null and !productOrderNo.equals("")' >
+				AND d.product_order_no = #{productOrderNo}
+			</if>
+			<if test='invoiceNumber != null and !invoiceNumber.equals("")' >
+				AND h.invoice_number = #{invoiceNumber}
+			</if>
+			<if test='name != null and !name.equals("")' >
+				AND m.name = #{name}
+			</if>
+			<if test='memberId != null and !memberId.equals("")' >
+				AND h.member_id = #{memberId}
+			</if>
+			<if test='email != null and !email.equals("")' >
+				AND m.email = #{email}
+			</if>
+			<if test='cellPhoneNumber != null and !cellPhoneNumber.equals("")' >
+				AND m.cell_phone_number = #{cellPhoneNumber}
+			</if>
+			<if test='phoneNumber != null and !phoneNumber.equals("")' >
+				AND m.phone_number = #{phoneNumber}
+			</if>
+			<if test='payerName != null and !payerName.equals("")' >
+				AND b.payer_name = #{payerName}
+			</if>
+			<if test='recipientName != null and !recipientName.equals("")' >
+				AND h.recipient_name = #{recipientName}
+			</if>
+			<if test='recipientPhoneNumber != null and !recipientPhoneNumber.equals("")' >
+				AND h.recipient_phone_number = #{recipientPhoneNumber}
+			</if>
+			<if test='shippingAddress != null and !shippingAddress.equals("")' >
+				AND h.shipping_address = #{shippingAddress}
+			</if>
+			<if test='productName != null and !productName.equals("")' >
+				AND pr.product_name like CONCAT('%',#{productName},'%')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
+			</if>
+			<if test='productId != null and !productId.equals("")' >
+				AND d.product_id = #{productId}
+			</if>
+			<if test='categoryKey != null and !categoryKey.equals("")' >
+				AND pr.category_key = #{categoryKey}
+			</if>
+			<if test='(orderTimeStart != null and !orderTimeStart.equals("")) and 
+	         		(orderTimeEnd != null and !orderTimeEnd.equals(""))'>
+	         		AND h.order_time BETWEEN #{orderTimeStart} AND #{orderTimeEnd}
+         	</if>
+         	<if test='(paymentTimeStart != null and !paymentTimeStart.equals("")) and 
+	         		(paymentTimeEnd != null and !paymentTimeEnd.equals(""))'>
+	         		AND p.payment_time BETWEEN #{paymentTimeStart} AND #{paymentTimeEnd}
+         	</if>
+		</where>
+		ORDER BY h.order_time DESC, d.product_order_no DESC
+	</select>
+	
+	<update id="updateShipped">
+		UPDATE 		order_history h 
+		INNER JOIN  payments p
+		ON 			h.order_no = p.order_no
+		INNER JOIN  detailed_order_items d
+		ON 			h.order_no = d.order_no
+		SET 		h.delivery_status = 
+						CASE WHEN h.delivery_status = '출고완료' 
+							 THEN '배송중' 
+							 ELSE h.delivery_status 
+						END,
+					d.product_status = 
+						CASE WHEN d.product_status = '출고완료' 
+							 THEN '배송중' 
+							 ELSE d.product_status 
+						END,
+		            p.payment_status = 
+	            		CASE WHEN p.payment_status = '출고완료' 
+	            			 THEN '배송중' 
+	            			 ELSE p.payment_status 
+            			END
+		WHERE		d.product_invoice_number is not null AND 
+					d.product_order_no IN 
+					<foreach collection="list" item="productOrderNo" open="(" close=")" separator=",">
+						#{productOrderNo}
+					</foreach>
+	</update>
+	
+	<update id="updateCompleteShipment">
+		UPDATE 		order_history h 
+		INNER JOIN  payments p
+		ON 			h.order_no = p.order_no
+		INNER JOIN  detailed_order_items d
+		ON 			h.order_no = d.order_no
+		SET 		h.delivery_status = 
+						CASE WHEN h.delivery_status = '출고전' 
+							 THEN '출고완료' 
+							 ELSE h.delivery_status 
+						END,
+					d.product_status = 
+						CASE WHEN d.product_status = '출고전' 
+							 THEN '출고완료' 
+							 ELSE d.product_status 
+						END,
+		            p.payment_status = 
+	            		CASE WHEN p.payment_status = '출고전' 
+	            			 THEN '출고완료' 
+	            			 ELSE p.payment_status 
+            			END
+		WHERE		d.product_order_no IN 
+					<foreach collection="list" item="productOrderNo" open="(" close=")" separator=",">
+						#{productOrderNo}
+					</foreach>
+	</update>
+	
 	<update id="updateInvoiceProduct" parameterType="java.util.List">
 		<foreach collection="list" item="item" index="index" separator=";">
 			UPDATE detailed_order_items 
@@ -85,13 +390,13 @@
 				AND h.shipping_address = #{shippingAddress}
 			</if>
 			<if test='productName != null and !productName.equals("")' >
-				AND product_count.product_name like CO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
+				AND pr.product_name like CONCAT('%',#{productName},'%')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
 			</if>
 			<if test='productId != null and !productId.equals("")' >
 				AND d.product_id = #{productId}
 			</if>
 			<if test='categoryKey != null and !categoryKey.equals("")' >
-				AND product_count.category_key = #{categoryKey}
+				AND pr.category_key = #{categoryKey}
 			</if>
 			<if test='(orderTimeStart != null and !orderTimeStart.equals("")) and 
 	         		(orderTimeEnd != null and !orderTimeEnd.equals(""))'>
@@ -171,13 +476,13 @@
 				AND h.shipping_address = #{shippingAddress}
 			</if>
 			<if test='productName != null and !productName.equals("")' >
-				AND product_count.product_name like CO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
+				AND pr.product_name like CONCAT('%',#{productName},'%')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
 			</if>
 			<if test='productId != null and !productId.equals("")' >
 				AND d.product_id = #{productId}
 			</if>
 			<if test='categoryKey != null and !categoryKey.equals("")' >
-				AND product_count.category_key = #{categoryKey}
+				AND pr.category_key = #{categoryKey}
 			</if>
 			<if test='(orderTimeStart != null and !orderTimeStart.equals("")) and 
 	         		(orderTimeEnd != null and !orderTimeEnd.equals(""))'>
@@ -191,35 +496,173 @@
 		ORDER BY h.order_time DESC, d.product_order_no DESC
 	</select>
 	
-	<update id="updateDepositProductCancel" parameterType="java.util.List">
-	        UPDATE  detailed_order_items 
-	        SET 	product_status = '주문취소', coupon_discount = 0
-	        WHERE   product_order_no IN
-	        <foreach collection="list" item="productOrderNo" open="(" close=")" separator=",">
-        		#{productOrderNo}
-    		</foreach>
-	</update>
-	
 	<update id="updateDepositProductCancelHistory" parameterType="java.util.List">
 			UPDATE 		order_history h
 			LEFT JOIN 	(
 							SELECT count(detailed_order_id) count, order_no
 							FROM   detailed_order_items 
-							WHERE  order_no IN 
+							WHERE  product_status = '입금전' AND order_no IN 
 							<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
 								#{orderNo} 
 							</foreach>
-							AND product_status = '입금전'
 						) d
 			ON 			h.order_no = d.order_no
-			SET    		h.delivery_status = if(if(d.count is null, 0, d.count) = 0 ,'주문취소', '부분취소') 
+			SET    		h.delivery_status = if(COALESCE(d.count, 0) = 0 ,'주문취소', '부분취소') 
 			WHERE  		h.order_no IN 
 			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
 				#{orderNo}
 			</foreach>
 	</update>
 	
-	<update id="updateDepositProductCancelPayments" parameterType="java.util.List">
+	<resultMap id="CouponsResultMap" type="CheckedCoupons">
+	    <id column="related_order" property="orderNo"/>
+	    <collection property="coupons" resultMap="couponCountResultMap"/>
+	</resultMap>
+	
+	<resultMap id="couponCountResultMap" type="CouponCount">
+	    <result column="coupon_number" property="couponNumber"/>
+	    <result column="count" property="count"/>
+	</resultMap>
+	
+	<select id="selectDepositProductCancelCoupon" parameterType="java.util.List" resultMap="CouponsResultMap">
+		<foreach collection="list" item="orderNo" index="index" separator="UNION">
+	        SELECT		log.coupon_number,
+			            COALESCE(ssq.count, 0) count,
+			            log.related_order
+			FROM		coupon_logs log
+			LEFT JOIN (
+			                SELECT		cc.coupon_number,
+										count(cc.coupon_number) count
+			                FROM		coupon_categories cc
+			                INNER JOIN (
+											SELECT		d.order_no,
+														d.product_order_no,
+														p.category_key
+											FROM		detailed_order_items d
+											INNER JOIN 	products p 
+			                                ON 			d.product_id = p.product_id
+											WHERE		d.product_status = '입금전' AND d.order_no = #{orderNo}
+										) s 
+							ON 			s.category_key = cc.category_key
+			                INNER JOIN (
+											SELECT		coupon_number
+											FROM		coupon_logs
+											WHERE		used_date IS NOT NULL AND related_order = #{orderNo}
+											GROUP BY	coupon_number
+										) sq 
+							ON 			cc.coupon_number = sq.coupon_number
+			                WHERE		cc.category_key = s.category_key
+			                GROUP BY	cc.coupon_number
+			            ) ssq 
+			ON 			log.coupon_number = ssq.coupon_number
+			WHERE		log.related_order = #{orderNo}
+			GROUP BY	coupon_number
+    	</foreach>
+	</select>
+	
+	<update id="updateDepositProductCancelCoupon" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
+	        UPDATE  coupon_logs
+	        SET 	used_date = NULL, related_order = NULL
+	        WHERE   related_order = #{item.orderNo}
+			        AND (
+				            <foreach collection="item.coupons" item="coupon" index="couponIndex" separator=" OR ">
+				                (coupon_number = #{coupon.couponNumber} AND #{coupon.count} = 0)
+				            </foreach>
+			        	)
+	    </foreach>
+	</update>
+	
+	<update id="updateDepositProductCancelReward" parameterType="java.util.List">
+			UPDATE		 reward_logs r
+			INNER JOIN	 payments p
+			ON 			 r.related_order = p.order_no
+			INNER JOIN   detailed_order_items d
+			ON			 p.order_no = d.order_no
+			INNER JOIN   member m
+			ON 			 r.member_id = m.member_id
+			SET 	 	 r.reason = '주문취소',
+						 r.reward = 
+							 CASE WHEN (d.product_price - d.coupon_discount) >= p.used_reward
+				 				  THEN p.used_reward
+				 				  ELSE d.product_price - d.coupon_discount
+				 			 END,
+			 			 r.balance = 
+			 			 	CASE WHEN (d.product_price - d.coupon_discount) >= p.used_reward
+				                 THEN m.total_rewards + p.used_reward
+				                 ELSE m.total_rewards + (d.product_price - d.coupon_discount)
+				            END,
+			 			 p.used_reward =
+			 				CASE WHEN (d.product_price - d.coupon_discount) >= p.used_reward
+	                             THEN 0
+	                             ELSE p.used_reward - (d.product_price - d.coupon_discount)
+	                        END,
+                         m.total_rewards = m.total_rewards + p.used_reward,
+                         m.accumulated_use_reward = m.accumulated_use_reward - p.used_points
+			WHERE 		 r.reason != '주문취소' AND 
+						 p.payment_status = '입금전' AND 
+						 p.used_reward > 0 AND 
+						 d.product_order_no IN
+						 <foreach collection="list" item="productOrderNo" open="(" close=")" separator=",">
+						  	#{productOrderNo}
+						 </foreach>
+	</update>
+	
+	<update id="updateDepositProductCancelPoint" parameterType="java.util.List">
+			UPDATE		 point_logs l
+			INNER JOIN	 payments p
+			ON 			 l.related_order = p.order_no
+			INNER JOIN   detailed_order_items d
+			ON			 p.order_no = d.order_no
+			INNER JOIN   member m
+			ON 			 l.member_id = m.member_id
+			SET 	 	 l.reason = '주문취소',
+						 l.point = 
+							 CASE WHEN (d.product_price - d.coupon_discount - p.used_reward) >= p.used_points
+				 				  THEN p.used_points
+				 				  ELSE d.product_price - d.coupon_discount
+				 			 END,
+			 			 l.balance = 
+			 			 	CASE WHEN (d.product_price - d.coupon_discount - p.used_reward) >= p.used_points
+				                 THEN m.total_points + p.used_points
+				                 ELSE m.total_points + (d.product_price - d.coupon_discount - p.used_reward)
+				            END,
+			 			 p.used_points =
+			 				CASE WHEN (d.product_price - d.coupon_discount - p.used_reward) >= p.used_points
+	                             THEN 0
+	                             ELSE p.used_points - (d.product_price - d.coupon_discount - p.used_reward)
+	                        END,
+                         m.total_points = m.total_points + p.used_points,
+                         m.accumulated_use_point = m.accumulated_use_point - p.used_reward
+			WHERE 		 l.reason != '주문취소' AND 
+						 p.payment_status = '입금전' AND 
+						 p.used_points > 0 AND 
+						 d.product_order_no IN
+						 <foreach collection="list" item="productOrderNo" open="(" close=")" separator=",">
+						  	#{productOrderNo}
+						 </foreach>
+	</update>
+	
+	<update id="updateDepositProductCancelMember" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
+			UPDATE		 member m
+			INNER JOIN	 order_history o
+			ON  		 m.member_id = o.member_id
+			SET 		 m.coupon_count = m.coupon_count + #{item.couponCount}
+			WHERE 		 o.order_no = #{item.orderNo}
+		</foreach>
+	</update>
+	
+	<update id="updateDepositProductCancel" parameterType="java.util.List">
+	        UPDATE  detailed_order_items 
+	        SET 	product_status = '주문취소', coupon_discount = 0
+	        WHERE   product_status = '입금전' AND product_order_no IN
+	        <foreach collection="list" item="productOrderNo" open="(" close=")" separator=",">
+        		#{productOrderNo}
+    		</foreach>
+	</update>
+	
+	<update id="updateDepositProductCancelPayments" parameterType="java.util.List"> 
 			UPDATE 		payments p
 			INNER JOIN  order_history o
 			ON 			p.order_no = o.order_no
@@ -230,88 +673,19 @@
 	    	</foreach>
 	</update>
 	
-	<update id="updateDepositProductCancelCoupon" parameterType="java.util.List">
-			UPDATE coupon_logs
-			SET    used_date = NULL,related_order = NULL
-			WHERE  related_order IN
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-	        	#{orderNo}
-	    	</foreach>
-	</update>
-	
-	<update id="updateDepositProductCancelReward" parameterType="java.util.List">
-		<foreach collection="list" item="orderNo" index="index" separator=";">			
-			UPDATE		 reward_logs r
-			INNER JOIN	 payments p
-			ON 			 r.related_order = p.order_no
-			INNER JOIN   member m
-			ON 			 r.member_id = m.member_id
-			SET 		 r.reason = '주문취소', 
-						 r.reward = p.used_reward,
-			             r.balance = total_rewards + p.used_reward
-			WHERE 		 r.related_order = #{orderNo} AND r.reason != '주문취소'
-		</foreach>
-	</update>
-	
-	<update id="updateDepositProductCancelPoint" parameterType="java.util.List">
-		<foreach collection="list" item="orderNo" index="index" separator=";">
-			UPDATE		 point_logs l
-			INNER JOIN	 payments p
-			ON 			 l.related_order = p.order_no
-			INNER JOIN   member m
-			ON 			 l.member_id = m.member_id
-			SET 		 l.reason = '주문취소', 
-						 l.point = p.used_points,
-			             l.balance = total_points + p.used_points
-			WHERE 		 l.related_order = #{orderNo}
-		</foreach>
-	</update>
-	
-	<update id="updateDepositProductCancelMember" parameterType="java.util.List">
-		<foreach collection="list" item="orderNo" index="index" separator=";">
-			UPDATE		 member m
-			INNER JOIN	 order_history o
-			ON  		 m.member_id = o.member_id
-			INNER JOIN	 payments p
-			ON 			 o.order_no = p.order_no
-			LEFT JOIN    (
-							SELECT COUNT(detailed_order_id) count, order_no
-						  	FROM   detailed_order_items
-						  	WHERE  order_no = #{orderNo} AND 
-								(coupon_discount is not null AND coupon_discount != 0)
-						 ) s
-			ON           o.order_no = s.order_no
-			SET 		 m.coupon_count = m.coupon_count + COALESCE(s.count, 0),
-						 m.total_points = m.total_points + p.used_points,
-			             m.total_rewards = m.total_rewards + p.used_reward,
-			             m.accumulated_use_reward = m.accumulated_use_reward - p.used_points,
-			             m.accumulated_use_point = m.accumulated_use_point - p.used_reward
-			WHERE 		 o.order_no = #{orderNo}
-		</foreach>
-	</update>
-	
-	<update id="updateDepositOrderCancel" parameterType="java.util.List">
-	        UPDATE  detailed_order_items 
-	        SET 	product_status = '주문취소', coupon_discount = 0
-	        WHERE 	order_no IN
-	        <foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-        		#{orderNo}
-    		</foreach>
-	</update>
+	<select id="selectDepositProductCancelInfo" resultType="DepositCancelInfoResponse">
+		SELECT  detailed_order_id, product_id, product_order_no 
+		FROM    detailed_order_items
+		WHERE   product_status = '주문취소' AND order_no IN
+		<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+        	#{orderNo}
+    	</foreach>
+	</select>
 	
 	<update id="updateDepositOrderCancelHistory" parameterType="java.util.List">
 			UPDATE order_history
 			SET    delivery_status = '주문취소' 
-			WHERE  order_no IN
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-	        	#{orderNo}
-	    	</foreach>
-	</update>
-	
-	<update id="updateDepositOrderCancelPayments" parameterType="java.util.List">
-			UPDATE payments
-			SET    payment_status = '주문취소' 
-			WHERE  order_no IN
+			WHERE  delivery_status = '입금전' AND order_no IN
 			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
 	        	#{orderNo}
 	    	</foreach>
@@ -326,8 +700,7 @@
 	    	</foreach>
 	</update>
 	
-	<update id="updateDepositOrderCancelReward" parameterType="java.util.List">
-		<foreach collection="list" item="orderNo" index="index" separator=";">			
+	<update id="updateDepositOrderCancelReward" parameterType="java.util.List">			
 			UPDATE		 reward_logs r
 			INNER JOIN	 payments p
 			ON 			 r.related_order = p.order_no
@@ -336,12 +709,15 @@
 			SET 		 r.reason = '주문취소', 
 						 r.reward = p.used_reward,
 			             r.balance = total_rewards + p.used_reward
-			WHERE 		 r.related_order = #{orderNo} AND r.reason != '주문취소'
-		</foreach>
+			WHERE 		 r.reason != '주문취소' AND  
+						 p.payment_status = '입금전' AND 
+						 r.related_order IN
+			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+			 	#{orderNo} 
+			</foreach>
 	</update>
 	
 	<update id="updateDepositOrderCancelPoint" parameterType="java.util.List">
-		<foreach collection="list" item="orderNo" index="index" separator=";">
 			UPDATE		 point_logs l
 			INNER JOIN	 payments p
 			ON 			 l.related_order = p.order_no
@@ -349,9 +725,13 @@
 			ON 			 l.member_id = m.member_id
 			SET 		 l.reason = '주문취소', 
 						 l.point = p.used_points,
-			             l.balance = total_points + p.used_points
-			WHERE 		 l.related_order = #{orderNo}
-		</foreach>
+			             l.balance = m.total_points + p.used_points
+			WHERE 		 l.reason != '주문취소' AND 
+						 p.payment_status = '입금전' AND 
+						 l.related_order IN 
+			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+				#{orderNo}
+			</foreach>
 	</update>
 	
 	<update id="updateDepositOrderCancelMember" parameterType="java.util.List">
@@ -361,10 +741,12 @@
 			ON  		 m.member_id = o.member_id
 			INNER JOIN	 payments p
 			ON 			 o.order_no = p.order_no
-			LEFT JOIN    (SELECT COUNT(detailed_order_id) count, order_no
-						  FROM   detailed_order_items
-						  WHERE  order_no = #{orderNo} AND 
-								(coupon_discount is not null AND coupon_discount != 0)) s
+			LEFT JOIN    (
+							SELECT COUNT(detailed_order_id) count, order_no
+						  	FROM   detailed_order_items
+						  	WHERE  order_no = #{orderNo} AND 
+								   (coupon_discount is not null AND coupon_discount != 0)
+					     ) s
 			ON           o.order_no = s.order_no
 			SET 		 m.coupon_count = m.coupon_count + COALESCE(s.count, 0),
 						 m.total_points = m.total_points + p.used_points,
@@ -373,6 +755,26 @@
 			             m.accumulated_use_point = m.accumulated_use_point - p.used_reward
 			WHERE 		 o.order_no = #{orderNo}
 		</foreach>
+	</update>
+	
+	<update id="updateDepositOrderCancel" parameterType="java.util.List">
+	        UPDATE  detailed_order_items 
+	        SET 	product_status = '주문취소', coupon_discount = 0
+	        WHERE 	product_status = '입금전' AND order_no IN
+	        <foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+        		#{orderNo}
+    		</foreach>
+	</update>
+	
+	<update id="updateDepositOrderCancelPayments" parameterType="java.util.List">
+			UPDATE payments
+			SET    payment_status = '주문취소', 
+				   used_points = 0,
+				   used_reward = 0
+			WHERE  payment_status = '입금전' AND order_no IN
+			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+	        	#{orderNo}
+	    	</foreach>
 	</update>
 	
 	<select id="selectDepositCancelInfo" resultType="DepositCancelInfoResponse">
@@ -385,11 +787,12 @@
 	</select>
 	
 	<insert id="insertDepositOrderCancel" parameterType="java.util.List">
-		<foreach collection="list" item="item" index="index" separator=";">
 			INSERT INTO cancellations(product_id, reason, amount, processing_status, 
 									  refund_status, request_time, completion_time, detailed_order_id) 
-			VALUES     	(#{item.productId},'관리자',0,'취소완료','Y',NOW(),NOW(),#{item.detailedOrderId}) 
-		</foreach>
+			VALUES     	
+			 <foreach collection="list" item="item" index="index" separator=",">
+				(#{item.productId},'관리자',0,'취소완료','Y',NOW(),NOW(),#{item.detailedOrderId}) 
+			</foreach>
 	</insert>
 	
 	<update id="updateDepositConfirmNo" parameterType="java.util.List">
@@ -484,13 +887,13 @@
 				AND h.shipping_address = #{shippingAddress}
 			</if>
 			<if test='productName != null and !productName.equals("")' >
-				AND product_count.product_name like CO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
+				AND pr.product_name like CONCAT('%',#{productName},'%')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
 			</if>
 			<if test='productId != null and !productId.equals("")' >
 				AND d.product_id = #{productId}
 			</if>
 			<if test='categoryKey != null and !categoryKey.equals("")' >
-				AND product_count.category_key = #{categoryKey}
+				AND pr.category_key = #{categoryKey}
 			</if>
 			<if test='(orderTimeStart != null and !orderTimeStart.equals("")) and 
 	         		(orderTimeEnd != null and !orderTimeEnd.equals(""))'>
@@ -573,7 +976,7 @@
 				AND h.shipping_address = #{shippingAddress}
 			</if>
 			<if test='productName != null and !productName.equals("")' >
-				AND product_count.product_name like CO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
+				AND product_count.product_name like CONCAT('%',#{productName},'%')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
 			</if>
 			<if test='productId != null and !productId.equals("")' >
 				AND d.product_id = #{productId}
@@ -658,7 +1061,7 @@
 				AND h.shipping_address = #{shippingAddress}
 			</if>
 			<if test='productName != null and !productName.equals("")' >
-				AND product_count.product_name like CO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
+				AND product_count.product_name like CONCAT('%',#{productName},'%')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
 			</if>
 			<if test='productId != null and !productId.equals("")' >
 				AND d.product_id = #{productId}
@@ -778,7 +1181,7 @@
 				AND h.shipping_address = #{shippingAddress}
 			</if>
 			<if test='productName != null and !productName.equals("")' >
-				AND product_count.product_name like CO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
+				AND product_count.product_name like CONCAT('%',#{productName},'%')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NCAT('%',#{productName},'%') 
 			</if>
 			<if test='productId != null and !productId.equals("")' >
 				AND d.product_id = #{productId}

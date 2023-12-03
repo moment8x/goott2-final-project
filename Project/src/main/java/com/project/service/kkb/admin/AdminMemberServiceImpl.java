@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AdminMemberServiceImpl implements AdminMemberService {
 
-	private final AdminMemberDAO adminMemberRepository;
+	private final AdminMemberDAO adminMemberDao;
 	private final MemberCountListener memberCount;
 	private final ApplicationEventPublisher publisher;
 	
@@ -51,7 +51,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	@Override
 	public void updateMemberCount(){
 		
-		int memberCount = adminMemberRepository.countAll();	
+		int memberCount = adminMemberDao.countAll();	
 		log.info("회원 수 갱신");
 		/* 이벤트 발행 */
 		publisher.publishEvent(new TotalMemberCountEvent(memberCount));
@@ -59,13 +59,13 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	
 	@Override
 	public int editMemberDetailInfo(MemberParam member) {		
-		return adminMemberRepository.changeMemberDetailInfo(member);
+		return adminMemberDao.changeMemberDetailInfo(member);
 	}
 	
 	@Override
 	public Map<String, Object> getMemberDetailInfo(String memberId) {
 		
-		MemberParam detailInfo = adminMemberRepository.findDetailInfoById(memberId);
+		MemberParam detailInfo = adminMemberDao.findDetailInfoById(memberId);
 		Map<String, Object> result = new HashMap<>();
 		result.put("detailInfo", detailInfo);
 		
@@ -75,10 +75,10 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	@Override
 	public Map<String, Object> getHomeDetailInfo(String memberId) {
 		
-		MemberBasicInfo basicInfo = adminMemberRepository.findBasicInfoById(memberId);
-		List<MemberRecentOrder> recentOrder = adminMemberRepository.findRecentOrderById(memberId);
-		List<MemberRecentPost> recentPost = adminMemberRepository.findRecentPostById(memberId);
-		List<MemberRecentInquiry> recentInquiry = adminMemberRepository.findRecentInquiryById(memberId);
+		MemberBasicInfo basicInfo = adminMemberDao.findBasicInfoById(memberId);
+		List<MemberRecentOrder> recentOrder = adminMemberDao.findRecentOrderById(memberId);
+		List<MemberRecentPost> recentPost = adminMemberDao.findRecentPostById(memberId);
+		List<MemberRecentInquiry> recentInquiry = adminMemberDao.findRecentInquiryById(memberId);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("basicInfo", basicInfo);
@@ -97,7 +97,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		memberCond.setCellPhoneNumber(memberCond.getCellPhoneNumber().replace("-", "")); 
 		memberCond.setPhoneNumber(memberCond.getPhoneNumber().replace("-", ""));
 		
-		List<MemberResponse> responseList = adminMemberRepository.findByInfo(memberCond);
+		List<MemberResponse> responseList = adminMemberDao.findByInfo(memberCond);
 		
 		for ( MemberResponse responseParam : responseList ) {
 			

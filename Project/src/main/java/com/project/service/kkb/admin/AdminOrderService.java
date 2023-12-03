@@ -13,7 +13,7 @@ public interface AdminOrderService {
 	/* 전체 주문 조회 */
 	Map<String, Object> getOrderInfo(OrderCondition orderCond);
 
-	/* 입금 전 관리 */
+	/* 입금 전 관리 (조회) */
 	Map<String, Object> getDepositInfo(DepositCondition depositCond);
 
 	/* 입금 전 관리 (입금 확인 버튼) */
@@ -25,10 +25,20 @@ public interface AdminOrderService {
 	/* 입금 전 관리 (주문 취소 버튼 - 품목주문별) */
 	int editDepositProductCancel(List<DepositProductCancelRequest> productOrderNoList);
 	
-	/* 배송 준비중 관리 */
+	/* 배송 준비중 관리 (조회) */
 	Map<String, Object> getReadyInfo(OrderCondition readyCond);
 	
 	/* 배송 준비중 관리 (송장번호 저장) */
 	int editInvoiceNumber(List<InvoiceCondition> invoiceCondList);
+
+	/* 배송 준비중 관리 (출고 완료 처리) */
+	int editCompleteShipment(List<String> productNoList);
+	
+	/* 배송 준비중 관리 (배송중 처리) */
+	int editShipped(List<String> productNoList);
+
+	/* 배송 중 관리 (조회) */
+	Map<String, Object> getShippingInfo(OrderCondition shippingCond);
+
 	
 }

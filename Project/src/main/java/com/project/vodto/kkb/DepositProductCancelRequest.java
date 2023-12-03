@@ -7,14 +7,10 @@ import lombok.Setter;
 @Setter
 public class DepositProductCancelRequest {
 	private String productOrderNo;
-    private String OrderNo;
+    private String orderNo;
     
     public String getConvertedOrderNo() {
-    	OrderNo = productOrderNo.split("-")[0];
-		return OrderNo;
-    }
-    
-    public void setConvertedOrderNo() {
-    	OrderNo = productOrderNo.split("-")[0];
+    	orderNo = productOrderNo.split("-")[0];
+		return orderNo;
     }
 }

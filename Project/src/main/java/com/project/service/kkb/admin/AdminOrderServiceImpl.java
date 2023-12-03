@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.project.dao.kkb.admin.AdminOrderDAO;
+import com.project.vodto.kkb.CanceledCoupons;
+import com.project.vodto.kkb.CheckedCoupons;
 import com.project.vodto.kkb.DepositByProduct;
 import com.project.vodto.kkb.DepositCancelInfoResponse;
 import com.project.vodto.kkb.DepositCondition;
@@ -21,8 +23,14 @@ import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
 import com.project.vodto.kkb.ReadyInfoByProduct;
+import com.project.vodto.kkb.ReadyInfoProduct;
 import com.project.vodto.kkb.ReadyNoResponse;
 import com.project.vodto.kkb.ReadyProductResponse;
+import com.project.vodto.kkb.ShippingInfoByProduct;
+import com.project.vodto.kkb.ShippingInfoProduct;
+import com.project.vodto.kkb.ShippingNoResponse;
+import com.project.vodto.kkb.ShippingProductNoResponse;
+import com.project.vodto.kkb.ShippingProductResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,9 +38,37 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminOrderServiceImpl implements AdminOrderService {
 	
-	private final AdminOrderDAO adminOrderRepository;
+	private final AdminOrderDAO adminOrderDao;
 	
-	/* 송장 번호 업데이트 */
+	/* 배송 중 관리(조회) */
+	@Override
+	public Map<String, Object> getShippingInfo(OrderCondition shippingCond) {
+		
+		List<ShippingInfoByProduct> shippingOrderList = getShippingByProduct(shippingCond);
+		List<ShippingProductNoResponse> shippingProductNoList = adminOrderDao.findShippingProductNoByInfo(shippingCond);
+		List<ShippingProductResponse> shippingProductList = adminOrderDao.findShippingProductByInfo(shippingCond);
+		
+		Map<String, Object> result = new HashMap<>();
+		result.put("shippingOrderList", shippingOrderList);
+		result.put("shippingProductNoList", shippingProductNoList);
+		result.put("shippingProductList", shippingProductList);
+		
+		return result;
+	}
+
+	/* 배송 준비중 관리(배송중 처리) */
+	@Override
+	public int editShipped(List<String> productNoList) {
+		return adminOrderDao.changeShipped(productNoList);
+	}
+
+	/* 배송 준비중 관리(출고 완료 처리) */
+	@Override
+	public int editCompleteShipment(List<String> productNoList) {
+		return adminOrderDao.changeCompleteShipment(productNoList);
+	}
+	
+	/* 배송 준비중 관리(송장 번호 업데이트) */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public int editInvoiceNumber(List<InvoiceCondition> invoiceCondList) {
@@ -43,36 +79,24 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 			
 			InvoiceCondition invoiceCond = invoiceCondList.get(0);
 			/* 주문 상세 상품 및 주문내역 테이블 송장 번호 업데이트 */
-			if(adminOrderRepository.changeInvoiceProduct(invoiceCondList) > 0) {
-				adminOrderRepository.changeInvoiceHistory(invoiceCond);
+			if(adminOrderDao.changeInvoiceProduct(invoiceCondList) > 0) {
+				adminOrderDao.changeInvoiceHistory(invoiceCond);
 				result = invoiceCondList.size();
 			}
 		}
 		return result;
 	}
 	
+	/* 배송 준비중 관리 (조회) */
 	@Override
-	public Map<String, Object> getOrderInfo(OrderCondition orderCond) {
+	public Map<String, Object> getReadyInfo(OrderCondition readyCond) {
 		
-		List<OrderNoResponse> orderList = adminOrderRepository.findOrderByInfo(orderCond);
-		List<OrderByProduct> productList = getOrderByProduct(orderCond);
+		List<ReadyInfoByProduct> readyOrderList = getReadyByProduct(readyCond);
+		List<ReadyProductResponse> readyProductList = adminOrderDao.findReadyProductByInfo(readyCond);
 	
 		Map<String, Object> result = new HashMap<>();
-		result.put("orderNoList", orderList);
-		result.put("productList", productList);
-		
-		return result;
-	}
-	
-	@Override
-	public Map<String, Object> getDepositInfo(DepositCondition depositCond) {
-		
-		List<DepositNoResponse> depositOrderList = adminOrderRepository.findDepositByInfo(depositCond);
-		List<DepositByProduct> depositProductList = getDepositByProduct(depositCond);
-	
-		Map<String, Object> result = new HashMap<>();
-		result.put("depositOrderList", depositOrderList);
-		result.put("depositProductList", depositProductList);
+		result.put("readyOrderList", readyOrderList);
+		result.put("readyProductList", readyProductList);
 		
 		return result;
 	}
@@ -94,38 +118,49 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 				.map(DepositProductCancelRequest::getProductOrderNo)	
 				.collect(Collectors.toList());
 	
-		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
-		if(adminOrderRepository.changeDepositProductCancel(productNoList) <= 0 ) {
-			return result;
-		}
 		/* 주문 내역 테이블 update(column : delivery_status) */
-		if(adminOrderRepository.changeDepositProductCancelHistory(orderNoList) <= 0) {
+		if(adminOrderDao.changeDepositProductCancelHistory(orderNoList) <= 0) {
 			return result;
 		}
-		/* 결제 테이블 update(column : payment_status) */
-		if(adminOrderRepository.changeDepositProductCancelPayments(orderNoList) <= 0) {
-			return result;
-		}
+		
+		/* 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) 확인하기 위해 select) */
+		List<CheckedCoupons> couponList = adminOrderDao.findDepositProductCancelCoupon(orderNoList);
+		
+		
 		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
-		if(adminOrderRepository.changeDepositProductCancelCoupon(productOrderNoList) <= 0) {
+		adminOrderDao.changeDepositProductCancelCoupon(couponList); // 적용 쿠폰 수가 0일 때만 돌려줌
+		
+		
+		/* 적립금 로그 테이블 update(column : reason, balance, reward) 
+		 * 회원 테이블 update(column : total_rewards, accumulated_use_reward) */
+		if(adminOrderDao.changeDepositProductCancelReward(productNoList) <= 0) {
 			return result;
 		}
-		/* 적립금 로그 테이블 update(column : reason, balance, reward) */
-		if(adminOrderRepository.changeDepositProductCancelReward(productOrderNoList) <= 0) {
+		
+		/* 포인트 로그 테이블 update(column : reason, balance, point) 
+		 * 회원 테이블 update(column : total_points, accumulated_use_point) */
+		if(adminOrderDao.changeDepositProductCancelPoint(productNoList) <= 0) {
 			return result;
 		}
-		/* 포인트 로그 테이블 update(column : reason, balance, point) */
-		if(adminOrderRepository.changeDepositProductCancelPoint(productOrderNoList) <= 0) {
-			return result;
-		}
+		
 		/* 회원 테이블 update(column : total_points, total_rewards, coupon_count,
-		 * accumulated_reward, accumulated_use_reward, accumulated_pointm, accumulated_use_point ) */
-		if(adminOrderRepository.changeDepositProductCancelMember(productOrderNoList) > 0) {
-			
+		 * 							accumulated_use_reward, accumulated_use_point ) */
+		List<CanceledCoupons> canceledCoupons = CanceledCoupons.convert(couponList);
+		if(adminOrderDao.changeDepositProductCancelMember(canceledCoupons) <= 0) {
+			return result;
+		}
+		
+		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
+		if(adminOrderDao.changeDepositProductCancel(productNoList) <= 0 ) {
+			return result;
+		}
+		
+		/* 결제 테이블 update(column : payment_status) */
+		if(adminOrderDao.changeDepositProductCancelPayments(orderNoList) > 0) {
 			List<DepositCancelInfoResponse> cancelInfoList = 
-					adminOrderRepository.findDepositCancelInfo(orderNoList);
+					adminOrderDao.findDepositProductCancelInfo(orderNoList);
 			
-			result = adminOrderRepository.saveDepositOrderCancel(cancelInfoList);
+			result = adminOrderDao.saveDepositOrderCancel(cancelInfoList);
 		}
 		
 		return result;
@@ -138,44 +173,49 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		
 		int result = -1;
 		
-		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
-		if(adminOrderRepository.changeDepositOrderCancel(orderNoList) <= 0 ) {
-			return result;
-		}
 		/* 주문 내역 테이블 update(column : delivery_status) */
-		if(adminOrderRepository.changeDepositOrderCancelHistory(orderNoList) <= 0) {
+		if(adminOrderDao.changeDepositOrderCancelHistory(orderNoList) <= 0) {
 			return result;
 		}
-		/* 결제 테이블 update(column : payment_status) */
-		if(adminOrderRepository.changeDepositOrderCancelPayments(orderNoList) <= 0) {
-			return result;
-		}
+		
 		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
-		if(adminOrderRepository.changeDepositOrderCancelCoupon(orderNoList) <= 0) {
+		if(adminOrderDao.changeDepositOrderCancelCoupon(orderNoList) <= 0) {
 			return result;
 		}
+		
 		/* 적립금 로그 테이블 update(column : reason, balance, reward) */
-		if(adminOrderRepository.changeDepositOrderCancelReward(orderNoList) <= 0) {
+		if(adminOrderDao.changeDepositOrderCancelReward(orderNoList) <= 0) {
 			return result;
 		}
+		
 		/* 포인트 로그 테이블 update(column : reason, balance, point) */
-		if(adminOrderRepository.changeDepositOrderCancelPoint(orderNoList) <= 0) {
+		if(adminOrderDao.changeDepositOrderCancelPoint(orderNoList) <= 0) {
+			return result ;
+		}
+		
+		/* 회원 테이블 update(column : total_points, total_rewards, coupon_count,
+		 * 							accumulated_use_reward,accumulated_use_point ) */
+		if(adminOrderDao.changeDepositOrderCancelMember(orderNoList) <= 0) {
 			return result;
 		}
-		/* 회원 테이블 update(column : total_points, total_rewards, coupon_count,
-		 * accumulated_reward, accumulated_use_reward, accumulated_pointm, accumulated_use_point ) */
-		if(adminOrderRepository.changeDepositOrderCancelMember(orderNoList) > 0) {
-			
+		
+		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
+		if(adminOrderDao.changeDepositOrderCancel(orderNoList) <= 0 ) {
+			return result;
+		}
+		
+		/* 결제 테이블 update(column : payment_status) */
+		if(adminOrderDao.changeDepositOrderCancelPayments(orderNoList) > 0) {
 			List<DepositCancelInfoResponse> cancelInfoList = 
-					adminOrderRepository.findDepositCancelInfo(orderNoList);
+					adminOrderDao.findDepositCancelInfo(orderNoList);
 			
-			result = adminOrderRepository.saveDepositOrderCancel(cancelInfoList);
+			result = adminOrderDao.saveDepositOrderCancel(cancelInfoList);
 		}
 		
 		return result;
 	}
 
-	/* 입금전 관리 - 입금 확인 */
+	/* 입금전 관리 (입금 확인 버튼) */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public int editDepositConfirm(List<String> orderNoList) {
@@ -183,35 +223,78 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		int result = -1;
 		
 		/* 주문 상세 상품, 주문내역 테이블 상태 업데이트 */
-		if(adminOrderRepository.changeDepositConfirm(orderNoList) <= 0 ) {
+		if(adminOrderDao.changeDepositConfirm(orderNoList) <= 0 ) {
 			return result;
 		}
 		
-		if(adminOrderRepository.changeDepositConfirmHistory(orderNoList) > 0) {
+		if(adminOrderDao.changeDepositConfirmHistory(orderNoList) > 0) {
 			/* 주문 상세 상품 테이블에 송장 번호 입력일 업데이트 */
-			result = adminOrderRepository.changeDepositConfirmDate(orderNoList);
+			result = adminOrderDao.changeDepositConfirmDate(orderNoList);
 		}
 		
 		return result;
-	}
+	}	
 	
+	/* 입금전 관리 (조회) */
 	@Override
-	public Map<String, Object> getReadyInfo(OrderCondition readyCond) {
+	public Map<String, Object> getDepositInfo(DepositCondition depositCond) {
 		
-		List<ReadyInfoByProduct> readyOrderList = getReadyByProduct(readyCond);
-		List<ReadyProductResponse> readyProductList = adminOrderRepository.findReadyProductByInfo(readyCond);
+		List<DepositNoResponse> depositOrderList = adminOrderDao.findDepositByInfo(depositCond);
+		List<DepositByProduct> depositProductList = getDepositByProduct(depositCond);
 	
 		Map<String, Object> result = new HashMap<>();
-		result.put("readyOrderList", readyOrderList);
-		result.put("readyProductList", readyProductList);
+		result.put("depositOrderList", depositOrderList);
+		result.put("depositProductList", depositProductList);
 		
 		return result;
 	}
 	
+	/* 전체 주문 조회 */
+	@Override
+	public Map<String, Object> getOrderInfo(OrderCondition orderCond) {
+		
+		List<OrderNoResponse> orderList = adminOrderDao.findOrderByInfo(orderCond);
+		List<OrderByProduct> productList = getOrderByProduct(orderCond);
+	
+		Map<String, Object> result = new HashMap<>();
+		result.put("orderNoList", orderList);
+		result.put("productList", productList);
+		
+		return result;
+	}
+	
+	private List<ShippingInfoByProduct> getShippingByProduct(OrderCondition shippingCond) {
+		
+		List<ShippingNoResponse> list = adminOrderDao.findShippingByInfo(shippingCond);
+
+	    return list.stream()
+	            .collect(Collectors.groupingBy(ShippingNoResponse::getOrderNo))
+	            .entrySet().stream()
+	            .map(order -> {
+	                String orderNo = order.getKey();
+	                List<ShippingInfoProduct> orders = order.getValue()
+	                        .stream()
+	                        .map(ShippingInfoProduct::from)
+	                        .collect(Collectors.toList());
+
+	                ShippingNoResponse info = order.getValue().get(0);
+
+	                return new ShippingInfoByProduct(
+	                        info.getOrderTime(),
+	                        orderNo,
+	                        info.getName(),
+	                        info.getMemberId(),
+	                        info.getInvoiceNumber(),
+	                        info.getDeliveryMessage(),
+	                        orders
+	                );
+	            })
+	            .collect(Collectors.toList());
+	}
 		
 	private List<OrderByProduct> getOrderByProduct(OrderCondition orderCond) {
 	    
-		List<OrderProductResponse> list = adminOrderRepository.findProductByInfo(orderCond);
+		List<OrderProductResponse> list = adminOrderDao.findProductByInfo(orderCond);
 
 	    return list.stream()
 	            .collect(Collectors.groupingBy(OrderProductResponse::getOrderNo))
@@ -243,7 +326,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 
 	private List<DepositByProduct> getDepositByProduct(DepositCondition depositCond) {
 		    
-			List<DepositProductResponse> list = adminOrderRepository.findDepositProductByInfo(depositCond);
+			List<DepositProductResponse> list = adminOrderDao.findDepositProductByInfo(depositCond);
 	
 		    return list.stream()
 		            .collect(Collectors.groupingBy(DepositProductResponse::getOrderNo))
@@ -273,7 +356,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	
 	private List<ReadyInfoByProduct> getReadyByProduct(OrderCondition readyCond) {
 	    
-		List<ReadyNoResponse> list = adminOrderRepository.findReadyByInfo(readyCond);
+		List<ReadyNoResponse> list = adminOrderDao.findReadyByInfo(readyCond);
 
 	    return list.stream()
 	            .collect(Collectors.groupingBy(ReadyNoResponse::getOrderNo))

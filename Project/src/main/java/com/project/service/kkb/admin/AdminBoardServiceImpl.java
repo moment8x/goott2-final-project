@@ -16,11 +16,11 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class AdminBoardServiceImpl implements AdminBoardService {
 	
-	private final AdminBoardDAO adminBoardRepository;
+	private final AdminBoardDAO adminBoardDao;
 	
 	@Override
 	public Map<String, Object> getPostInfo(PostCondition postCond) {
-		List<PostResponse> postList = adminBoardRepository.findPostByInfo(postCond);
+		List<PostResponse> postList = adminBoardDao.findPostByInfo(postCond);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("postList", postList);

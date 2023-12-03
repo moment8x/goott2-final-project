@@ -1,6 +1,4 @@
-package com.project.service.kkb.admin;
-
-import com.project.vodto.kkb.ReadyNoResponse;
+package com.project.vodto.kkb;
 
 import lombok.Getter;
 

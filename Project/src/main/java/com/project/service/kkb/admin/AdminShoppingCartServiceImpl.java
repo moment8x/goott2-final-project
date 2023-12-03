@@ -15,12 +15,12 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class AdminShoppingCartServiceImpl implements AdminShoppingCartService {
 	
-	private final AdminShoppingCartDAO adminShoppingCartDAO;
+	private final AdminShoppingCartDAO adminShoppingCartDao;
 
 	@Override
 	public Map<String, Object> getCartInfoById(String memberId) {
 		
-		List<CartResponse> cartList = adminShoppingCartDAO.findCartInfoById(memberId);
+		List<CartResponse> cartList = adminShoppingCartDao.findCartInfoById(memberId);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("cartList", cartList);

@@ -61,7 +61,7 @@ public class AdminOrderController {
 			return adminOrderService.getOrderInfo(orderCond);
 		}
 		
-		/* 입금 전 관리 */
+		/* 입금 전 관리 (조회) */
 		@GetMapping("/deposit")
 		public Map<String, Object> searchDepositInfo(
 				@RequestParam String orderNo,
@@ -133,7 +133,7 @@ public class AdminOrderController {
 		    }
 		} 
 		
-		/* 배송 준비중 관리 */
+		/* 배송 준비중 관리 (조회) */
 		@GetMapping("/ready")
 		public Map<String, Object> searchReadyInfo(
 				@RequestParam String orderNo,
@@ -165,7 +165,7 @@ public class AdminOrderController {
 			return adminOrderService.getReadyInfo(readyCond);
 		}
 		
-		/* 배송 준비중 관리 (송장번호 저장)*/
+		/* 배송 준비중 관리 (송장번호 저장) */
 		@PutMapping("/invoice")
 		public ResponseEntity<String> setInvoiceNumber(@RequestBody List<InvoiceCondition> invoiceCondList) {	
 			int result = adminOrderService.editInvoiceNumber(invoiceCondList);
@@ -175,5 +175,61 @@ public class AdminOrderController {
 		    } else {
 		    	return new ResponseEntity<>("No orders were found to update", HttpStatus.NOT_FOUND);
 		    }
+		}
+		
+		/* 배송 준비중 관리 (출고완료 처리) */
+		@PutMapping("/shipment")
+		public ResponseEntity<String> setCompleteShipment(@RequestBody List<String> productNoList) {	
+			int result = adminOrderService.editCompleteShipment(productNoList);
+			
+			if (result > 0) {
+		        return new ResponseEntity<>("Shipment Processing Successful", HttpStatus.CREATED);
+		    } else {
+		    	return new ResponseEntity<>("No orders were found to update", HttpStatus.NOT_FOUND);
+		    }
+		}
+		
+		/* 배송 준비중 관리 (배송중 처리) */
+		@PutMapping("/shipping")
+		public ResponseEntity<String> setShipped(@RequestBody List<String> productNoList) {	
+			int result = adminOrderService.editShipped(productNoList);
+			
+			if (result > 0) {
+		        return new ResponseEntity<>("Shipment Processing Successful", HttpStatus.CREATED);
+		    } else {
+		    	return new ResponseEntity<>("No orders were found to update", HttpStatus.NOT_FOUND);
+		    }
+		}
+		
+		/* 배송 중 관리 (조회) */
+		@GetMapping("/shipping")
+		public Map<String, Object> searchShippingInfo(
+				@RequestParam String orderNo,
+				@RequestParam String productOrderNo,
+				@RequestParam String invoiceNumber,
+				@RequestParam String name,
+				@RequestParam String memberId,
+				@RequestParam String email,
+				@RequestParam String cellPhoneNumber,
+				@RequestParam String phoneNumber,
+				@RequestParam String payerName,
+				@RequestParam String recipientName,
+				@RequestParam String recipientPhoneNumber,
+				@RequestParam String shippingAddress,
+				@RequestParam String productName,
+				@RequestParam String productId,
+				@RequestParam String categoryKey,
+				@RequestParam String orderTimeStart,
+				@RequestParam String orderTimeEnd,
+				@RequestParam String paymentTimeStart,
+				@RequestParam String paymentTimeEnd) {	
+			
+			OrderCondition shippingCond = OrderCondition.create(
+					orderNo,productOrderNo, invoiceNumber, name, memberId, 
+					email, cellPhoneNumber, phoneNumber, payerName, recipientName, 
+					recipientPhoneNumber, shippingAddress, productName, productId, categoryKey, 
+					orderTimeStart, orderTimeEnd, paymentTimeStart, paymentTimeEnd);
+			
+			return adminOrderService.getShippingInfo(shippingCond);
 		}
 }

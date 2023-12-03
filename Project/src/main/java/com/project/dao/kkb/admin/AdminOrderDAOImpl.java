@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.project.vodto.kkb.CanceledCoupons;
+import com.project.vodto.kkb.CheckedCoupons;
 import com.project.vodto.kkb.DepositCancelInfoResponse;
 import com.project.vodto.kkb.DepositCondition;
 import com.project.vodto.kkb.DepositNoResponse;
@@ -16,6 +18,9 @@ import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
 import com.project.vodto.kkb.ReadyNoResponse;
 import com.project.vodto.kkb.ReadyProductResponse;
+import com.project.vodto.kkb.ShippingNoResponse;
+import com.project.vodto.kkb.ShippingProductNoResponse;
+import com.project.vodto.kkb.ShippingProductResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -75,25 +80,35 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	public int changeDepositProductCancelPayments(List<String> orderNoList) {
 		return ses.update(ns + ".updateDepositProductCancelPayments", orderNoList);
 	}
-
+	
 	@Override
-	public int changeDepositProductCancelCoupon(List<DepositProductCancelRequest> productOrderNoList) {
-		return ses.update(ns + ".updateDepositProductCancelCoupon", productOrderNoList);
+	public List<CheckedCoupons> findDepositProductCancelCoupon(List<String> orderNoList) {
+		return ses.selectList(ns + ".selectDepositProductCancelCoupon", orderNoList);
 	}
 
 	@Override
-	public int changeDepositProductCancelReward(List<DepositProductCancelRequest> productOrderNoList) {
-		return ses.update(ns + ".updateDepositProductCancelReward", productOrderNoList);
+	public int changeDepositProductCancelCoupon(List<CheckedCoupons> couponList) {
+		return ses.update(ns + ".updateDepositProductCancelCoupon", couponList);
+	}
+	
+	@Override
+	public int changeDepositProductCancelReward(List<String> productNoList) {
+		return ses.update(ns + ".updateDepositProductCancelReward", productNoList);
 	}
 
 	@Override
-	public int changeDepositProductCancelPoint(List<DepositProductCancelRequest> productOrderNoList) {
-		return ses.update(ns + ".updateDepositProductCancelPoint", productOrderNoList);
+	public int changeDepositProductCancelPoint(List<String> productNoList) {
+		return ses.update(ns + ".updateDepositProductCancelPoint", productNoList);
 	}
 
 	@Override
-	public int changeDepositProductCancelMember(List<DepositProductCancelRequest> productOrderNoList) {
-		return ses.update(ns + ".updateDepositProductCancelMember", productOrderNoList);
+	public int changeDepositProductCancelMember(List<CanceledCoupons> canceledCoupons) {
+		return ses.update(ns + ".updateDepositProductCancelMember", canceledCoupons);
+	}
+
+	@Override
+	public List<DepositCancelInfoResponse> findDepositProductCancelInfo(List<String> orderNoList) {
+		return ses.selectList(ns + ".selectDepositProductCancelInfo", orderNoList);
 	}
 	
 	@Override
@@ -159,5 +174,30 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	@Override
 	public int changeInvoiceHistory(InvoiceCondition invoiceCond) {
 		return ses.update(ns + ".updateInvoiceHistory", invoiceCond);
+	}
+
+	@Override
+	public int changeCompleteShipment(List<String> productNoList) {
+		return ses.update(ns + ".updateCompleteShipment", productNoList);
+	}
+
+	@Override
+	public int changeShipped(List<String> productNoList) {
+		return ses.update(ns + ".updateShipped", productNoList);
+	}
+
+	@Override
+	public List<ShippingNoResponse> findShippingByInfo(OrderCondition shippingCond) {
+		return ses.selectList(ns + ".selectShippingNoInfo", shippingCond);
+	}
+
+	@Override
+	public List<ShippingProductResponse> findShippingProductByInfo(OrderCondition shippingCond) {
+		return ses.selectList(ns + ".selectShippingProductInfo", shippingCond);
+	}
+
+	@Override
+	public List<ShippingProductNoResponse> findShippingProductNoByInfo(OrderCondition shippingCond) {
+		return ses.selectList(ns + ".selectShippingProductNoInfo", shippingCond);
 	}
 }

@@ -3,8 +3,6 @@ package com.project.vodto.kkb;
 import java.sql.Timestamp;
 import java.util.List;
 
-import com.project.service.kkb.admin.ReadyInfoProduct;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

@@ -36,6 +36,10 @@
 		<typeAlias type="com.project.vodto.kkb.DepositCancelInfoResponse" alias="DepositCancelInfoResponse" />
 		<typeAlias type="com.project.vodto.kkb.ReadyNoResponse" alias="ReadyNoResponse" />
 		<typeAlias type="com.project.vodto.kkb.ReadyProductResponse" alias="ReadyProductResponse" />
+		<typeAlias type="com.project.vodto.kkb.ShippingNoResponse" alias="ShippingNoResponse" />
+		<typeAlias type="com.project.vodto.kkb.ShippingProductNoResponse" alias="ShippingProductNoResponse" />
+		<typeAlias type="com.project.vodto.kkb.CouponCount" alias="CouponCount" />
+		<typeAlias type="com.project.vodto.kkb.CheckedCoupons" alias="CheckedCoupons" />
 		<typeAlias type="com.project.vodto.Product" alias="product" />
 		<typeAlias type="com.project.vodto.Board" alias="Board" />
 	</typeAliases>
