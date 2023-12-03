@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.project.etc.jmj.UploadProfileFileProcess;
 import com.project.service.kjs.review.ReviewService;
+import com.project.service.kjs.upload.UploadFileService;
 import com.project.service.kjy.ListService;
 import com.project.service.member.MemberService;
 import com.project.vodto.CouponLog;
@@ -56,6 +58,7 @@ import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
+import com.project.vodto.kjs.ReviewBoardDTO;
 import com.project.vodto.jmj.MyPageReview;
 import com.project.vodto.kjy.Memberkjy;
 
@@ -72,6 +75,9 @@ public class myPageController {
 	@Inject
 	ReviewService rService;
 	
+	@Inject
+	UploadFileService ufService;
+	
 	private UploadFiles uf;
 
 	private List<UploadFiles> fileList = new ArrayList<UploadFiles>();
@@ -87,7 +93,7 @@ public class myPageController {
 			String memberId = member.getMemberId();
 			System.out.println("@@@@@@@@@@@@@페이지번호 : " + pageNo);
 			try {
-				// 주문내역
+				//마이페이지 정보
 				Map<String, Object> map = mService.memberInfo(memberId, pageNo);
 				
 				List<MyPageOrderList> lst = (List<MyPageOrderList>) map.get("orderHistory");
@@ -763,9 +769,9 @@ public class myPageController {
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
 	
 		UploadFiles uf = null;
-		
+
 		try {
-			uf = UploadProfileFileProcess.fileUpload(uploadFile.getOriginalFilename(),  uploadFile.getSize(), uploadFile.getContentType(),
+			uf = UploadProfileFileProcess.fileUpload(uploadFile.getOriginalFilename(), uploadFile.getSize(), uploadFile.getContentType(),
 					 uploadFile.getBytes(), realPath, memberId);
 			System.out.println(uf.toString());
 			if(uf != null) {
@@ -780,23 +786,27 @@ public class myPageController {
 		for(UploadFiles f : this.fileList) {
 			System.out.println("현재 파일 업로드 리스트 : " + f.toString());
 		}
-		return this.fileList;
+		return fileList;
 	}
 	
 	@RequestMapping(value="deleteUploadFile", method=RequestMethod.POST)
-	public @ResponseBody List<UploadFiles> deleteUploadedFile(HttpServletRequest request, @RequestParam("thumbFileName") String thumbFileName) {
+	public @ResponseBody List<UploadFiles> deleteUploadedFile(HttpServletRequest request, @RequestParam ("postNo") int postNo,
+			@RequestParam ("thumbFileName") String thumbFileName) {
 		List<UploadFiles> result = null;
-		thumbFileName = thumbFileName.replace("/", "\\");
+//		thumbFileName = thumbFileName.replace("/", "\\");
 		// 1. deleteFileList에 삭제할 파일 등록
+		thumbFileName = thumbFileName.replace("//", "\\");
 		String newFileName = thumbFileName.replace("thumb_", "");
 		deleteFileList.add(newFileName);
+		System.out.println(deleteFileList);
 		// 2. fileList - deleteFileList 해서 남은 값만 return
 		result = calcFileList();
-		
+
 		return result;
 	}
 	
 	private List<UploadFiles> calcFileList() {
+
 		List<UploadFiles> result = fileList;
 		for (int i = 0; i < fileList.size(); i++) {
 			for (String deleteFile : deleteFileList) {
@@ -805,6 +815,78 @@ public class myPageController {
 					break;
 				}
 			}
+		}
+		
+		return result;
+	}
+	
+	@RequestMapping("updateReview")
+	public ResponseEntity<Map<String, Object>> updateReview(HttpServletRequest request, @RequestParam("productId") String productId, @RequestParam("postNo") int postNo,
+			@RequestParam("rating") int rating, @RequestParam("content") String content) {
+		ResponseEntity<Map<String, Object>> result = null;
+		Map<String, Object> map = new HashMap<String, Object>();
+		ReviewBoardDTO review = null;
+		
+		HttpSession session = request.getSession();
+		String memberId = ((Memberkjy)session.getAttribute("loginMember")).getMemberId();
+		
+		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
+		
+		try {
+			review = rService.getReview(postNo, memberId);
+			if (review.getAuthor() != null) {
+				// 등록된 파일이 있는가 확인하고 있으면 fileList에 put
+				for (UploadFiles uf : review.getImages()) {
+					fileList.add(uf);
+					rService.updateReview(postNo, content, rating, calcFileList(), deleteFileList, realPath, productId);
+				}
+				
+				map.put("review", review);
+				map.put("status", "success");
+			} 
+			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.OK);
+		} catch (SQLException | NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			map.put("status", "error");
+			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.BAD_REQUEST);
+		}
+		
+		return result;
+	}
+	
+	@RequestMapping(value = "deleteReview", method = RequestMethod.POST)
+	public ResponseEntity<Map<String, Object>> deleteReview(HttpServletRequest request, @RequestParam("postNo") int postNo,@RequestParam("productId") String productId){
+		ResponseEntity<Map<String, Object>> result = null;
+		Map<String, Object> data = new HashMap<String, Object>();
+		HttpSession session = request.getSession();
+		String memberId = ((Memberkjy)session.getAttribute("loginMember")).getMemberId();
+		int pageNo = 1;
+		
+		try {
+			if (rService.deleteCheck(postNo, memberId, productId)) {
+				// 삭제가 가능함이 확인되었으면 삭제
+				if (rService.deleteReview(postNo)) {
+					data.put("status", "OK");
+					Map<String, Object> map = mService.memberInfo(memberId, pageNo);
+					
+					@SuppressWarnings("unchecked")
+					List<MyPageReview> reviewList = (List<MyPageReview>)map.get("myReview");
+					if (reviewList != null) {
+						data.put("reviewList", reviewList);
+						result = new ResponseEntity<Map<String,Object>>(data, HttpStatus.OK);
+					} else {
+						result = new ResponseEntity<Map<String,Object>>(HttpStatus.BAD_REQUEST);
+					}
+				}
+			} else {
+				data.put("status", "denied");
+				result = new ResponseEntity<Map<String,Object>>(data, HttpStatus.OK);
+			}
+		} catch (SQLException | NamingException e) {
+			e.printStackTrace();
+			data.put("status", "error");
+			result = new ResponseEntity<Map<String,Object>>(data, HttpStatus.BAD_REQUEST);
 		}
 		
 		return result;
