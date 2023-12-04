@@ -3,26 +3,29 @@ package com.project.vodto.kkb;
 import lombok.Getter;
 
 @Getter
-public class ShippingInfoProduct {
+public class PendingCancelInfoProduct {
 	private String productOrderNo;
 	private String productName;
 	private String productId;
 	private int productQuantity;
+	private String reason;
 	
-	public ShippingInfoProduct(String productOrderNo, String productName, String productId, int productQuantity) {
-		super();
+	public PendingCancelInfoProduct(String productOrderNo, String productName, String productId, 
+			int productQuantity, String reason) {
 		this.productOrderNo = productOrderNo;
 		this.productName = productName;
 		this.productId = productId;
 		this.productQuantity = productQuantity;
+		this.reason = reason;
 	}
 	
-	public static ShippingInfoProduct from(ShippingNoResponse order) {
-		return new ShippingInfoProduct(
+	public static PendingCancelInfoProduct from(PendingCancelResponse order) {
+		return new PendingCancelInfoProduct(
 				order.getProductOrderNo(),
 				order.getProductName(),
 				order.getProductId(),
-				order.getProductQuantity());
+				order.getProductQuantity(),
+				order.getReason());
 	}
 
 }

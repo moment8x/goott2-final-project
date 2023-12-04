@@ -2,22 +2,28 @@ package com.project.dao.kkb.admin;
 
 import java.util.List;
 
+import com.project.vodto.kkb.CancelCondition;
+import com.project.vodto.kkb.CancelResponse;
 import com.project.vodto.kkb.CanceledCoupons;
 import com.project.vodto.kkb.CheckedCoupons;
-import com.project.vodto.kkb.DepositCancelInfoResponse;
-import com.project.vodto.kkb.DepositCondition;
-import com.project.vodto.kkb.DepositNoResponse;
-import com.project.vodto.kkb.DepositProductCancelRequest;
-import com.project.vodto.kkb.DepositProductResponse;
+import com.project.vodto.kkb.DeliveredNoResponse;
+import com.project.vodto.kkb.DeliveredProductNoResponse;
+import com.project.vodto.kkb.DeliveredProductResponse;
+import com.project.vodto.kkb.InTransitNoResponse;
+import com.project.vodto.kkb.InTransitProductNoResponse;
+import com.project.vodto.kkb.InTransitProductResponse;
 import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
-import com.project.vodto.kkb.ReadyNoResponse;
-import com.project.vodto.kkb.ReadyProductResponse;
-import com.project.vodto.kkb.ShippingNoResponse;
-import com.project.vodto.kkb.ShippingProductNoResponse;
-import com.project.vodto.kkb.ShippingProductResponse;
+import com.project.vodto.kkb.PendingCancelCondition;
+import com.project.vodto.kkb.PendingCancelInfoResponse;
+import com.project.vodto.kkb.PendingCancelResponse;
+import com.project.vodto.kkb.PendingCondition;
+import com.project.vodto.kkb.PendingNoResponse;
+import com.project.vodto.kkb.PendingProductResponse;
+import com.project.vodto.kkb.PreparationNoResponse;
+import com.project.vodto.kkb.PreparationProductResponse;
 
 public interface AdminOrderDAO {
 	
@@ -26,88 +32,91 @@ public interface AdminOrderDAO {
 	
 	/* 전체 주문 조회 (품목주문별) */
 	List<OrderProductResponse> findProductByInfo(OrderCondition orderCond);
-
+	
+	/* 주문 상세 정보 (입금전 처리 [결제완료 -> 입금전] ) 
+	 * 배송 준비중 관리 (입금전 처리[결제완료 -> 입금전] 주문번호 기준으로만 */
+	int changePendingPayment(List<String> orderNoList);
+	
+/*------------------------------------------------------------------------------------------------------*/
 	
 	/* 입금 전 관리 (조회[주문번호별]) */
-	List<DepositNoResponse> findDepositByInfo(DepositCondition depositCond);
+	List<PendingNoResponse> findPendingByInfo(PendingCondition pendingCond);
 
 	/* 입금 전 관리 (조회[품목주문별]) */
-	List<DepositProductResponse> findDepositProductByInfo(DepositCondition depositCond);
+	List<PendingProductResponse> findPendingProductByInfo(PendingCondition pendingCond);
 	
 	
 	/* 입금 전 관리 (입금 확인 버튼 - 주문 상세 상품 상태) */
-	int changeDepositConfirm(List<String> orderNoList);
+	int changePreShipped(List<String> orderNoList);
 	
 	/* 입금 전 관리 (입금 확인 버튼 - 입금 확인 날짜 입력) */
-	int changeDepositConfirmDate(List<String> orderNoList);
-	
-	/* 입금 전 관리 (입금 확인 버튼 - 주문 내역 상태) */
-	int changeDepositConfirmHistory(List<String> orderNoList);
+	int changePreShippedDate(List<String> orderNoList);
 	
 
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
-	int changeDepositOrderCancel(List<String> orderNoList);
+	int changePendingOrderCancel(List<String> orderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 주문 내역 테이블 update(column : delivery_status)) */
-	int changeDepositOrderCancelHistory(List<String> orderNoList);
+	int changePendingOrderCancelHistory(List<String> orderNoList);
 	
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 결제 테이블 update(column : payment_status)) */
-	int changeDepositOrderCancelPayments(List<String> orderNoList);
+	int changePendingOrderCancelPayments(List<String> orderNoList);
 	
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) */
-	int changeDepositOrderCancelCoupon(List<String> orderNoList);
+	int changePendingOrderCancelCoupon(List<String> orderNoList);
 	
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 적립금 로그 테이블 update(column : reason, balance, reward)) */
-	int changeDepositOrderCancelReward(List<String> orderNoList);
+	int changePendingOrderCancelReward(List<String> orderNoList);
 	
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 포인트 로그 테이블 update(column : reason, balance, point)) */
-	int changeDepositOrderCancelPoint(List<String> orderNoList);
+	int changePendingOrderCancelPoint(List<String> orderNoList);
 	
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 회원 테이블 update(column : coupon_count, total_points, 
 	 * 							total_rewards, accumulated_use_reward,accumulated_use_point)) */
-	int changeDepositOrderCancelMember(List<String> orderNoList);
+	int changePendingOrderCancelMember(List<String> orderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 취소용 추가 정보 조회) */
-	List<DepositCancelInfoResponse> findDepositCancelInfo(List<String> orderNoList);
+	List<PendingCancelInfoResponse> findPendingCancelInfo(List<String> orderNoList);
 	
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 취소 테이블에 추가) */
-	int saveDepositOrderCancel(List<DepositCancelInfoResponse> cancelInfoList);
+	int savePendingOrderCancel(List<PendingCancelInfoResponse> cancelInfoList);
 	
 	
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
-	int changeDepositProductCancel(List<String> productOrderNoList);
+	int changePendingProductCancel(List<String> productOrderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 주문 내역 테이블 update(column : delivery_status)) */
-	int changeDepositProductCancelHistory(List<String> productOrderNoList);
+	int changePendingProductCancelHistory(List<String> productOrderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 결제 테이블 update(column : payment_status)) */
-	int changeDepositProductCancelPayments(List<String> productOrderNoList);
+	int changePendingProductCancelPayments(List<String> productOrderNoList);
 	
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) select) */
-	List<CheckedCoupons> findDepositProductCancelCoupon(List<String> orderNoList);
+	List<CheckedCoupons> findPendingProductCancelCoupon(List<String> orderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) */
-	int changeDepositProductCancelCoupon(List<CheckedCoupons> couponList);
+	int changePendingProductCancelCoupon(List<CheckedCoupons> couponList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 적립금 로그 테이블 update(column : reason, balance, reward)) */
-	int changeDepositProductCancelReward(List<String> productNoList);
+	int changePendingProductCancelReward(List<String> productNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 포인트 로그 테이블 update(column : reason, balance, point)) */
-	int changeDepositProductCancelPoint(List<String> productNoList);
+	int changePendingProductCancelPoint(List<String> productNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 회원 테이블 update(column : coupon_count, total_points, 
 	 * 							total_rewards, accumulated_use_reward,accumulated_use_point)) */
-	int changeDepositProductCancelMember(List<CanceledCoupons> canceledCoupons);
+	int changePendingProductCancelMember(List<CanceledCoupons> canceledCoupons);
 	
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 취소용 추가 정보 조회) */
-	List<DepositCancelInfoResponse> findDepositProductCancelInfo(List<String> orderNoList);
+	List<PendingCancelInfoResponse> findPendingProductCancelInfo(List<String> orderNoList);
 	
+/*------------------------------------------------------------------------------------------------------*/
 	
 	/* 배송 준비중 관리 (조회[주문번호별]) */
-	List<ReadyNoResponse> findReadyByInfo(OrderCondition readyCond);
+	List<PreparationNoResponse> findPreparationByInfo(OrderCondition preparationCond);
 	
 	/* 배송 준비중 관리 (조회[상품별]) */
-	List<ReadyProductResponse> findReadyProductByInfo(OrderCondition readyCond);
+	List<PreparationProductResponse> findPreparationProductByInfo(OrderCondition preparationCond);
 
 	/* 배송 준비중 관리 (상품 송장번호 저장) */
 	int changeInvoiceProduct(List<InvoiceCondition> invoiceCondList);
@@ -116,21 +125,47 @@ public interface AdminOrderDAO {
 	int changeInvoiceHistory(InvoiceCondition invoiceCond);
 	
 	/* 배송 준비중 관리 (출고 완료 처리) */
-	int changeCompleteShipment(List<String> productNoList);
-	
-	/* 배송 준비중 관리 (배송중 처리) */
-	int changeShipped(List<String> productNoList);
+	int changeShippedByNo(List<String> orderNoList);
+	int changeShippedByProductNo(List<String> productNoList);
 
+	/* 배송 준비중 관리 (배송중 처리) */
+	int changeInTransitByNo(List<String> orderNoList);
+	int changeInTransitByProductNo(List<String> productNoList);
+
+/*------------------------------------------------------------------------------------------------------*/
 	
 	/* 배송 중 관리 (조회[주문번호별]) */
-	List<ShippingNoResponse> findShippingByInfo(OrderCondition shippingCond);
+	List<InTransitNoResponse> findInTransitByInfo(OrderCondition inTransitCond);
 	
 	/* 배송 중 관리 (조회[품목 주문번호별]) */
-	List<ShippingProductNoResponse> findShippingProductNoByInfo(OrderCondition shippingCond);
+	List<InTransitProductNoResponse> findInTransitProductNoByInfo(OrderCondition inTransitCond);
 	
 	/* 배송 중 관리 (조회[상품별]) */
-	List<ShippingProductResponse> findShippingProductByInfo(OrderCondition shippingCond);
+	List<InTransitProductResponse> findInTransitProductByInfo(OrderCondition inTransitCond);
 
-
+	/* 배송 중 관리 (배송완료 처리[배송중 -> 배송완료]) */
+	int changeDeliveredByNo(List<String> orderNoList);
+	int changeDeliveredByProductNo(List<String> productNoList);
 	
+/*------------------------------------------------------------------------------------------------------*/
+	
+	/* 배송 완료 조회 (조회[주문번호별]) */
+	List<DeliveredProductResponse> findDeliveredProductByInfo(OrderCondition deliveredCond);
+
+	/* 배송 완료 조회 (조회[품목 주문번호별]) */
+	List<DeliveredProductNoResponse> findDeliveredProductNoByInfo(OrderCondition deliveredCond);
+
+	/* 배송 완료 조회 (조회[상품별]) */
+	List<DeliveredNoResponse> findDeliveredByInfo(OrderCondition deliveredCond);
+
+/*------------------------------------------------------------------------------------------------------*/
+	
+	/* 입금 전 취소 관리 (조회) */
+	List<PendingCancelResponse> findPendingCancelByInfo(PendingCancelCondition pendingCancelCond);
+	
+/*------------------------------------------------------------------------------------------------------*/
+	
+	/* 취소 관리 (조회) */
+	List<CancelResponse> findCanceledProduct(CancelCondition cancelCond);
+
 }

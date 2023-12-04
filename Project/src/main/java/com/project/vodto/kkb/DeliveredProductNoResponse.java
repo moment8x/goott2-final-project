@@ -7,20 +7,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ReadyNoResponse {
+public class DeliveredProductNoResponse {
 	private Timestamp orderTime;
-	private Timestamp paymentTime;
-	private String orderNo;
-	private String name;
-	private String memberId;	
-	private String productStatus;
 	private String productOrderNo;
+	private String name;
+	private String memberId;
 	private String productInvoiceNumber;
+	private Timestamp invoiceInputDate;
 	private String productName;
 	private String productId;
 	private int productQuantity;
-	private int productPrice;
-	private int actualPaymentAmount;
-	private String paymentMethod;
 	private String deliveryMessage;
 }

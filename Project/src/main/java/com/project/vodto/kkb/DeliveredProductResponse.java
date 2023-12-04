@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ShippingProductResponse {
+public class DeliveredProductResponse {
 	private String productImage;
 	private String orderNo;
 	private String categoryKey;

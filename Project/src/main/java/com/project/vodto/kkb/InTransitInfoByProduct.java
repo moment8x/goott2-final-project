@@ -8,17 +8,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-public class ShippingInfoByProduct {
+public class InTransitInfoByProduct {
 	private Timestamp orderTime;
 	private String orderNo;
 	private String name;
 	private String memberId;
 	private String invoiceNumber;
 	private String deliveryMessage;
-	private List<ShippingInfoProduct> orders;
+	private List<InTransitInfoProduct> orders;
 	
-	public ShippingInfoByProduct(Timestamp orderTime, String orderNo, String name, String memberId,
-			String invoiceNumber, String deliveryMessage, List<ShippingInfoProduct> orders) {
+	public InTransitInfoByProduct(Timestamp orderTime, String orderNo, String name, String memberId,
+			String invoiceNumber, String deliveryMessage, List<InTransitInfoProduct> orders) {
 		this.orderTime = orderTime;
 		this.orderNo = orderNo;
 		this.name = name;

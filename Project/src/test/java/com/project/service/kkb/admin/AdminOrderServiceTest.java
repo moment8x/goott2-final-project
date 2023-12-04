@@ -21,7 +21,7 @@ import com.project.dao.kkb.admin.AdminOrderDAO;
 import com.project.vodto.kkb.CanceledCoupons;
 import com.project.vodto.kkb.CheckedCoupons;
 import com.project.vodto.kkb.CouponCount;
-import com.project.vodto.kkb.DepositProductCancelRequest;
+import com.project.vodto.kkb.PendingProductCancelRequest;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = DataSourceConfig.class)
@@ -46,13 +46,13 @@ public class AdminOrderServiceTest {
 
     @Test
     @Transactional
-    public void testEditDepositOrderCancel() {
+    public void testEditPendingOrderCancel() {
     	
     	//Given
         List<String> orderNoList = Arrays.asList("O1701466461394","O1701335516842");
         
         //When
-        int result = adminOrderService.editDepositOrderCancel(orderNoList);
+        int result = adminOrderService.editPendingOrderCancel(orderNoList);
         
         //Then
         System.out.println("result : " + result);
@@ -61,13 +61,13 @@ public class AdminOrderServiceTest {
     
     @Test
     @Transactional
-    public void testEditDepositConfirm() {
+    public void testEditPreShipped() {
 		
     	//Given
     	List<String> orderNoList = Arrays.asList("O1700034153645", "O1700034426708");
     	
     	//When
-    	int result = adminOrderService.editDepositConfirm(orderNoList);
+    	int result = adminOrderService.editPreShipped(orderNoList);
 		
     	//Then
 		System.out.println("result : " + result);
@@ -77,13 +77,13 @@ public class AdminOrderServiceTest {
     
     @Test
     @Transactional
-    public void testChangeDepositOrderCancelReward() {
+    public void testChangePendingOrderCancelReward() {
 		
     	//Given
     	List<String> orderNoList = Arrays.asList("O1700034153645", "O1700034426708");
     	
     	//When
-    	int result = adminOrderDao.changeDepositOrderCancelReward(orderNoList);
+    	int result = adminOrderDao.changePendingOrderCancelReward(orderNoList);
 		
     	//Then
 		System.out.println("result : " + result);
@@ -96,23 +96,23 @@ public class AdminOrderServiceTest {
 //    public void testConvert() {
 //    	
 //    	//Given
-//    	DepositProductCancelRequest product1 = new DepositProductCancelRequest();
+//    	PendingProductCancelRequest product1 = new PendingProductCancelRequest();
 //    	product1.setProductOrderNo("O1700034153645-1");
 //    	
-//    	DepositProductCancelRequest product2 = new DepositProductCancelRequest();
+//    	PendingProductCancelRequest product2 = new PendingProductCancelRequest();
 //    	product2.setProductOrderNo("O1700034153645-2");
 //    	
-//    	DepositProductCancelRequest product3 = new DepositProductCancelRequest();
+//    	PendingProductCancelRequest product3 = new PendingProductCancelRequest();
 //    	product3.setProductOrderNo("O1700034153645-3");
 //    	
-//    	DepositProductCancelRequest product4 = new DepositProductCancelRequest();
+//    	PendingProductCancelRequest product4 = new PendingProductCancelRequest();
 //    	product4.setProductOrderNo("O1700034426708-1");
 //    	
-//    	DepositProductCancelRequest product5 = new DepositProductCancelRequest();
+//    	PendingProductCancelRequest product5 = new PendingProductCancelRequest();
 //    	product5.setProductOrderNo("O1700034426708-2");
 //    	
 //    	
-//    	List<DepositProductCancelRequest> productOrderNoList = new ArrayList<>();
+//    	List<PendingProductCancelRequest> productOrderNoList = new ArrayList<>();
 //    	productOrderNoList.add(product1);
 //    	productOrderNoList.add(product2);
 //    	productOrderNoList.add(product3);
@@ -122,7 +122,7 @@ public class AdminOrderServiceTest {
 //    	//When    	
 //    	List<String> orderNoList = productOrderNoList
 //    			.stream()
-//    			.collect(Collectors.groupingBy(DepositProductCancelRequest::getConvertedOrderNo))
+//    			.collect(Collectors.groupingBy(PendingProductCancelRequest::getConvertedOrderNo))
 //	            .entrySet().stream()
 //	            .map(order -> order.getKey())
 //	            .collect(Collectors.toList());
@@ -132,26 +132,26 @@ public class AdminOrderServiceTest {
     
 //    @Test
 //    @Transactional
-//    public void testChangeDepositProductCancelHistory() {
+//    public void testChangePendingProductCancelHistory() {
 //
 //	    // Given
-//    	DepositProductCancelRequest product1 = new DepositProductCancelRequest();
+//    	PendingProductCancelRequest product1 = new PendingProductCancelRequest();
 //    	product1.setProductOrderNo("O1701466461394-1");
 //    	
-//    	DepositProductCancelRequest product2 = new DepositProductCancelRequest();
+//    	PendingProductCancelRequest product2 = new PendingProductCancelRequest();
 //    	product2.setProductOrderNo("O1701466461394-2");
 //    	
-//    	DepositProductCancelRequest product3 = new DepositProductCancelRequest();
+//    	PendingProductCancelRequest product3 = new PendingProductCancelRequest();
 //    	product3.setProductOrderNo("O1701466461394-3");
 //    	
-//    	DepositProductCancelRequest product4 = new DepositProductCancelRequest();
+//    	PendingProductCancelRequest product4 = new PendingProductCancelRequest();
 //    	product4.setProductOrderNo("O1701338658628-1");
 //    	
-//    	DepositProductCancelRequest product5 = new DepositProductCancelRequest();
+//    	PendingProductCancelRequest product5 = new PendingProductCancelRequest();
 //    	product5.setProductOrderNo("O1701338658628-2");
 //    	
 //    	
-//    	List<DepositProductCancelRequest> productOrderNoList = new ArrayList<>();
+//    	List<PendingProductCancelRequest> productOrderNoList = new ArrayList<>();
 //    	productOrderNoList.add(product1);
 //    	productOrderNoList.add(product2);
 //    	productOrderNoList.add(product3);
@@ -160,13 +160,13 @@ public class AdminOrderServiceTest {
 //
 //	    List<String> orderNoList = productOrderNoList
 //    			.stream()
-//    			.collect(Collectors.groupingBy(DepositProductCancelRequest::getConvertedOrderNo))
+//    			.collect(Collectors.groupingBy(PendingProductCancelRequest::getConvertedOrderNo))
 //	            .entrySet().stream()
 //	            .map(order -> order.getKey())
 //	            .collect(Collectors.toList());
 //
 //	    // When
-//	    int result = adminOrderDao.changeDepositProductCancelHistory(orderNoList);
+//	    int result = adminOrderDao.changePendingProductCancelHistory(orderNoList);
 //
 //	    // Then
 //	    assertThat(result).isGreaterThan(0);
@@ -175,12 +175,12 @@ public class AdminOrderServiceTest {
     
     @Test
 	@Transactional
-	public void testFindDepositProductCancelCoupon(){
+	public void testFindPendingProductCancelCoupon(){
 		//given
     	List<String> orderNoList = Arrays.asList("O1701466461394","O1701335516842");
     	
 		//when
-    	List<CheckedCoupons> checkedCouponsList = adminOrderDao.findDepositProductCancelCoupon(orderNoList);
+    	List<CheckedCoupons> checkedCouponsList = adminOrderDao.findPendingProductCancelCoupon(orderNoList);
     	
 		//then
     	System.out.println("CheckedCoupons:");
@@ -200,16 +200,16 @@ public class AdminOrderServiceTest {
     
     @Test
 	@Transactional
-	public void testChangeDepositProductCancelCoupon(){
+	public void testChangePendingProductCancelCoupon(){
 		//given
     	List<String> orderNoList = Arrays.asList("O1701466461394","O1701335516842");
     	
     	/* 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) select) */
-		List<CheckedCoupons> couponList = adminOrderDao.findDepositProductCancelCoupon(orderNoList);
+		List<CheckedCoupons> couponList = adminOrderDao.findPendingProductCancelCoupon(orderNoList);
 		
 		//when
 		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
-		int result = adminOrderDao.changeDepositProductCancelCoupon(couponList);
+		int result = adminOrderDao.changePendingProductCancelCoupon(couponList);
 		
 		//then
 		System.out.println("result : " + result);
@@ -217,12 +217,12 @@ public class AdminOrderServiceTest {
     
     @Test
 	@Transactional
-	public void testChangeDepositProductCancelReward(){
+	public void testChangePendingProductCancelReward(){
 		//given
     	List<String> productNoList = Arrays.asList("O1701466461394-1","O1701335516842-1");
 		
 		//when
-    	int result = adminOrderDao.changeDepositProductCancelReward(productNoList);
+    	int result = adminOrderDao.changePendingProductCancelReward(productNoList);
 		
 		//then
     	System.out.println("result : " + result);
@@ -231,12 +231,12 @@ public class AdminOrderServiceTest {
     
     @Test
 	@Transactional
-	public void testChangeDepositProductCancelPoint(){
+	public void testChangePendingProductCancelPoint(){
 		//given
     	List<String> productNoList = Arrays.asList("O1701466461394-1","O1701335516842-1");
 		
 		//when
-    	int result = adminOrderDao.changeDepositProductCancelPoint(productNoList);
+    	int result = adminOrderDao.changePendingProductCancelPoint(productNoList);
 		
 		//then
     	System.out.println("result : " + result);
@@ -245,12 +245,12 @@ public class AdminOrderServiceTest {
     
     @Test
 	@Transactional
-	public void testChangeDepositProductCancelMember(){
+	public void testChangePendingProductCancelMember(){
 		//given
 		List<String> orderNoList = Arrays.asList("O1701466461394","O1701335516842");
     	
     	/* 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) select) */
-		List<CheckedCoupons> couponList = adminOrderDao.findDepositProductCancelCoupon(orderNoList);
+		List<CheckedCoupons> couponList = adminOrderDao.findPendingProductCancelCoupon(orderNoList);
     	List<CanceledCoupons> canceledCoupons = CanceledCoupons.convert(couponList);
 		
     	for(CanceledCoupons coupon : canceledCoupons) {
@@ -259,7 +259,7 @@ public class AdminOrderServiceTest {
     	}
     	//when
     	
-		int result = adminOrderDao.changeDepositProductCancelMember(canceledCoupons);
+		int result = adminOrderDao.changePendingProductCancelMember(canceledCoupons);
 		
 		//then
 		System.out.println("result : " + result);
@@ -268,19 +268,19 @@ public class AdminOrderServiceTest {
     
     @Test
 	@Transactional
-	public void testEditDepositProductCancel(){
+	public void testEditPendingProductCancel(){
 		//given
-    	List<DepositProductCancelRequest> productOrderNoList = new ArrayList<DepositProductCancelRequest>();
-    	DepositProductCancelRequest cancel1 = new DepositProductCancelRequest();
+    	List<PendingProductCancelRequest> productOrderNoList = new ArrayList<PendingProductCancelRequest>();
+    	PendingProductCancelRequest cancel1 = new PendingProductCancelRequest();
     	cancel1.setProductOrderNo("O1701466461394-1");
-    	DepositProductCancelRequest cancel2 = new DepositProductCancelRequest();
+    	PendingProductCancelRequest cancel2 = new PendingProductCancelRequest();
     	cancel2.setProductOrderNo("O1701335516842-1");
     	
     	productOrderNoList.add(cancel1);
     	productOrderNoList.add(cancel2);
 		
 		//when
-		int result = adminOrderService.editDepositProductCancel(productOrderNoList);
+		int result = adminOrderService.editPendingProductCancel(productOrderNoList);
 		
 		//then
 		System.out.println("result : " + result);
@@ -289,12 +289,14 @@ public class AdminOrderServiceTest {
     
     @Test
 	@Transactional
-	public void testEditCompleteShipment(){
+	public void testEditShipped(){
 		//given
-    	List<String> productNoList = Arrays.asList("O1701466461394-1","O1701335516842-1");
+    	List<String> orderNoList = Arrays.asList("O1701466461394-1","O1701335516842-1");
 		
 		//when
-    	int result = adminOrderDao.changeCompleteShipment(productNoList);
+    	int result = orderNoList.get(0).contains("-") 
+				? adminOrderService.editShippedByProductNo(orderNoList)
+				: adminOrderService.editShippedByNo(orderNoList);
 		
 		//then
     	System.out.println("result : " + result);
@@ -303,12 +305,14 @@ public class AdminOrderServiceTest {
     
     @Test
 	@Transactional
-	public void testEditShipped(){
+	public void testEditInTransit(){
 		//given
-    	List<String> productNoList = Arrays.asList("O1701466461394-1", "O1701335516842-1");
+    	List<String> orderNoList = Arrays.asList("O1701466461394-1", "O1701335516842-1");
 		
 		//when
-    	int result = adminOrderDao.changeShipped(productNoList);
+    	int result = orderNoList.get(0).contains("-") 
+				? adminOrderService.editInTransitByProductNo(orderNoList)
+				: adminOrderService.editInTransitByNo(orderNoList);
 		
 		//then
     	System.out.println("result : " + result);

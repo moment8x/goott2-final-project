@@ -5,7 +5,7 @@ import java.sql.Date;
 import lombok.Getter;
 
 @Getter
-public class DepositCondition {
+public class PendingCancelCondition {
 	private String orderNo;
 	private String productOrderNo;
 	private String invoiceNumber;
@@ -23,13 +23,11 @@ public class DepositCondition {
 	private String categoryKey;
 	private Date orderTimeStart;
 	private Date orderTimeEnd;
-	private Date confirmDateStart;
-	private Date confirmDateEnd;
 	
-	private DepositCondition(String orderNo, String productOrderNo, String invoiceNumber, String name, String memberId,
+	private PendingCancelCondition(String orderNo, String productOrderNo, String invoiceNumber, String name, String memberId,
 			String email, String cellPhoneNumber, String phoneNumber, String payerName, String recipientName,
 			String recipientPhoneNumber, String shippingAddress, String productName, String productId,
-			String categoryKey, Date orderTimeStart, Date orderTimeEnd, Date confirmDateStart, Date confirmDateEnd) {
+			String categoryKey, Date orderTimeStart, Date orderTimeEnd) {
 		this.orderNo = orderNo;
 		this.productOrderNo = productOrderNo;
 		this.invoiceNumber = invoiceNumber;
@@ -47,21 +45,17 @@ public class DepositCondition {
 		this.categoryKey = categoryKey;
 		this.orderTimeStart = orderTimeStart;
 		this.orderTimeEnd = orderTimeEnd;
-		this.confirmDateStart = confirmDateStart;
-		this.confirmDateEnd = confirmDateEnd;
 	}
 	
-	public static DepositCondition create(String orderNo, String productOrderNo, String invoiceNumber, String name, String memberId,
+	public static PendingCancelCondition create(String orderNo, String productOrderNo, String invoiceNumber, String name, String memberId,
 			String email, String cellPhoneNumber, String phoneNumber, String payerName, String recipientName,
 			String recipientPhoneNumber, String shippingAddress, String productName, String productId,
-			String categoryKey, String orderTimeStart, String orderTimeEnd, String confirmDateStart, String confirmDateEnd) {
+			String categoryKey, String orderTimeStart, String orderTimeEnd) {
 		
 		orderTimeStart = orderTimeStart.equals("") ? "0000-01-01" : orderTimeStart;
 		orderTimeEnd = orderTimeEnd.equals("") ? "9999-12-31" : orderTimeEnd;
-		confirmDateStart = confirmDateStart.equals("") ? "0000-01-01" : confirmDateStart;
-		confirmDateEnd = confirmDateEnd.equals("") ? "9999-12-31" : confirmDateEnd;
 		
-		return new DepositCondition(
+		return new PendingCancelCondition(
 				orderNo, 
 				productOrderNo, 
 				invoiceNumber, 
@@ -78,8 +72,6 @@ public class DepositCondition {
 				productId,
 				categoryKey, 
 				Date.valueOf(orderTimeStart), 
-				Date.valueOf(orderTimeEnd), 
-				Date.valueOf(confirmDateStart), 
-				Date.valueOf(confirmDateEnd));
+				Date.valueOf(orderTimeEnd)); 
 	}
 }

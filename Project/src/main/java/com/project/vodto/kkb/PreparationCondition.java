@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ReadyCondition {
+public class PreparationCondition {
 	private String orderNo;
 	private String productOrderNo;
 	private String invoiceNumber;

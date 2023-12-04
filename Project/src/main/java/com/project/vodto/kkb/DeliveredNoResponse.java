@@ -7,11 +7,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ShippingProductNoResponse {
-	private String productOrderNo;
+public class DeliveredNoResponse {
+	private Timestamp orderTime;
+	private String orderNo;
 	private String name;
-	private String memberId;
-	private String productInvoiceNumber;
+	private String memberId;	
+	private String productOrderNo;
+	private String invoiceNumber;
 	private Timestamp invoiceInputDate;
 	private String productName;
 	private String productId;

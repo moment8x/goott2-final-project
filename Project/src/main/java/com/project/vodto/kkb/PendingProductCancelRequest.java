@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DepositProductCancelRequest {
+public class PendingProductCancelRequest {
 	private String productOrderNo;
     private String orderNo;
     

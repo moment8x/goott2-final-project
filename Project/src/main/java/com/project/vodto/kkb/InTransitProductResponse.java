@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ReadyProductResponse {
+public class InTransitProductResponse {
 	private String productImage;
 	private String orderNo;
 	private String categoryKey;

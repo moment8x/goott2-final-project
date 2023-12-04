@@ -5,22 +5,28 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.project.vodto.kkb.CancelCondition;
+import com.project.vodto.kkb.CancelResponse;
 import com.project.vodto.kkb.CanceledCoupons;
 import com.project.vodto.kkb.CheckedCoupons;
-import com.project.vodto.kkb.DepositCancelInfoResponse;
-import com.project.vodto.kkb.DepositCondition;
-import com.project.vodto.kkb.DepositNoResponse;
-import com.project.vodto.kkb.DepositProductCancelRequest;
-import com.project.vodto.kkb.DepositProductResponse;
+import com.project.vodto.kkb.DeliveredNoResponse;
+import com.project.vodto.kkb.DeliveredProductNoResponse;
+import com.project.vodto.kkb.DeliveredProductResponse;
+import com.project.vodto.kkb.InTransitNoResponse;
+import com.project.vodto.kkb.InTransitProductNoResponse;
+import com.project.vodto.kkb.InTransitProductResponse;
 import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
-import com.project.vodto.kkb.ReadyNoResponse;
-import com.project.vodto.kkb.ReadyProductResponse;
-import com.project.vodto.kkb.ShippingNoResponse;
-import com.project.vodto.kkb.ShippingProductNoResponse;
-import com.project.vodto.kkb.ShippingProductResponse;
+import com.project.vodto.kkb.PendingCancelCondition;
+import com.project.vodto.kkb.PendingCancelInfoResponse;
+import com.project.vodto.kkb.PendingCancelResponse;
+import com.project.vodto.kkb.PendingCondition;
+import com.project.vodto.kkb.PendingNoResponse;
+import com.project.vodto.kkb.PendingProductResponse;
+import com.project.vodto.kkb.PreparationNoResponse;
+import com.project.vodto.kkb.PreparationProductResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,130 +46,130 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	public List<OrderProductResponse> findProductByInfo(OrderCondition orderCond) {
 		return ses.selectList(ns + ".selectOrderProductInfo", orderCond);
 	}
-
+	
 	@Override
-	public List<DepositNoResponse> findDepositByInfo(DepositCondition depositCond) {
-		return ses.selectList(ns + ".selectDepositNoInfo", depositCond);
+	public int changePendingPayment(List<String> orderNoList) {
+		return ses.update(ns + ".updatePendingPayment", orderNoList);
 	}
 
 	@Override
-	public List<DepositProductResponse> findDepositProductByInfo(DepositCondition depositCond) {
-		return ses.selectList(ns + ".selectDepositProductInfo", depositCond);
+	public List<PendingNoResponse> findPendingByInfo(PendingCondition pendingCond) {
+		return ses.selectList(ns + ".selectPendingNoInfo", pendingCond);
 	}
 
 	@Override
-	public int changeDepositConfirm(List<String> orderNoList) {
-		return ses.update(ns + ".updateDepositConfirmNo", orderNoList);
+	public List<PendingProductResponse> findPendingProductByInfo(PendingCondition pendingCond) {
+		return ses.selectList(ns + ".selectPendingProductInfo", pendingCond);
 	}
 
 	@Override
-	public int changeDepositConfirmDate(List<String> orderNoList) {
-		return ses.update(ns + ".updateDepositConfirmDate", orderNoList);
+	public int changePreShipped(List<String> orderNoList) {
+		return ses.update(ns + ".updatePreShipped", orderNoList);
 	}
 
 	@Override
-	public int changeDepositConfirmHistory(List<String> orderNoList) {
-		return ses.update(ns + ".updateDepositConfirmHistory", orderNoList);
+	public int changePreShippedDate(List<String> orderNoList) {
+		return ses.update(ns + ".updatePreShippedDate", orderNoList);
 	}
 
 	@Override
-	public int changeDepositProductCancel(List<String> productNoList) {
-		return ses.update(ns + ".updateDepositProductCancel", productNoList);
+	public int changePendingProductCancel(List<String> productNoList) {
+		return ses.update(ns + ".updatePendingProductCancel", productNoList);
 	}
 
 	@Override
-	public int changeDepositProductCancelHistory(List<String> orderNoList) {
-		return ses.update(ns + ".updateDepositProductCancelHistory", orderNoList);
+	public int changePendingProductCancelHistory(List<String> orderNoList) {
+		return ses.update(ns + ".updatePendingProductCancelHistory", orderNoList);
 	}
 
 	@Override
-	public int changeDepositProductCancelPayments(List<String> orderNoList) {
-		return ses.update(ns + ".updateDepositProductCancelPayments", orderNoList);
+	public int changePendingProductCancelPayments(List<String> orderNoList) {
+		return ses.update(ns + ".updatePendingProductCancelPayments", orderNoList);
 	}
 	
 	@Override
-	public List<CheckedCoupons> findDepositProductCancelCoupon(List<String> orderNoList) {
-		return ses.selectList(ns + ".selectDepositProductCancelCoupon", orderNoList);
+	public List<CheckedCoupons> findPendingProductCancelCoupon(List<String> orderNoList) {
+		return ses.selectList(ns + ".selectPendingProductCancelCoupon", orderNoList);
 	}
 
 	@Override
-	public int changeDepositProductCancelCoupon(List<CheckedCoupons> couponList) {
-		return ses.update(ns + ".updateDepositProductCancelCoupon", couponList);
+	public int changePendingProductCancelCoupon(List<CheckedCoupons> couponList) {
+		return ses.update(ns + ".updatePendingProductCancelCoupon", couponList);
 	}
 	
 	@Override
-	public int changeDepositProductCancelReward(List<String> productNoList) {
-		return ses.update(ns + ".updateDepositProductCancelReward", productNoList);
+	public int changePendingProductCancelReward(List<String> productNoList) {
+		return ses.update(ns + ".updatePendingProductCancelReward", productNoList);
 	}
 
 	@Override
-	public int changeDepositProductCancelPoint(List<String> productNoList) {
-		return ses.update(ns + ".updateDepositProductCancelPoint", productNoList);
+	public int changePendingProductCancelPoint(List<String> productNoList) {
+		return ses.update(ns + ".updatePendingProductCancelPoint", productNoList);
 	}
 
 	@Override
-	public int changeDepositProductCancelMember(List<CanceledCoupons> canceledCoupons) {
-		return ses.update(ns + ".updateDepositProductCancelMember", canceledCoupons);
+	public int changePendingProductCancelMember(List<CanceledCoupons> canceledCoupons) {
+		return ses.update(ns + ".updatePendingProductCancelMember", canceledCoupons);
 	}
 
 	@Override
-	public List<DepositCancelInfoResponse> findDepositProductCancelInfo(List<String> orderNoList) {
-		return ses.selectList(ns + ".selectDepositProductCancelInfo", orderNoList);
+	public List<PendingCancelInfoResponse> findPendingProductCancelInfo(List<String> orderNoList) {
+		return ses.selectList(ns + ".selectPendingProductCancelInfo", orderNoList);
 	}
 	
 	@Override
-	public int changeDepositOrderCancel(List<String> orderNoList) {
-		return ses.update(ns + ".updateDepositOrderCancel", orderNoList);
+	public int changePendingOrderCancel(List<String> orderNoList) {
+		return ses.update(ns + ".updatePendingOrderCancel", orderNoList);
 	}
 
 	@Override
-	public int changeDepositOrderCancelHistory(List<String> orderNoList) {
-		return ses.update(ns + ".updateDepositOrderCancelHistory", orderNoList);
+	public int changePendingOrderCancelHistory(List<String> orderNoList) {
+		return ses.update(ns + ".updatePendingOrderCancelHistory", orderNoList);
 	}
 	
 	@Override
-	public int changeDepositOrderCancelPayments(List<String> orderNoList) {
-		return ses.update(ns + ".updateDepositOrderCancelPayments", orderNoList);
+	public int changePendingOrderCancelPayments(List<String> orderNoList) {
+		return ses.update(ns + ".updatePendingOrderCancelPayments", orderNoList);
 	}
 	
 	@Override
-	public int changeDepositOrderCancelCoupon(List<String> orderNoList) {
-		return ses.update(ns + ".updateDepositOrderCancelCoupon", orderNoList);
+	public int changePendingOrderCancelCoupon(List<String> orderNoList) {
+		return ses.update(ns + ".updatePendingOrderCancelCoupon", orderNoList);
 	}
 
 	@Override
-	public int changeDepositOrderCancelReward(List<String> orderNoList) {
-		return ses.update(ns + ".updateDepositOrderCancelReward", orderNoList);
+	public int changePendingOrderCancelReward(List<String> orderNoList) {
+		return ses.update(ns + ".updatePendingOrderCancelReward", orderNoList);
 	}
 
 	@Override
-	public int changeDepositOrderCancelPoint(List<String> orderNoList) {
-		return ses.update(ns + ".updateDepositOrderCancelPoint", orderNoList);
+	public int changePendingOrderCancelPoint(List<String> orderNoList) {
+		return ses.update(ns + ".updatePendingOrderCancelPoint", orderNoList);
 	}
 
 	@Override
-	public int changeDepositOrderCancelMember(List<String> orderNoList) {
-		return ses.update(ns + ".updateDepositOrderCancelMember", orderNoList);
+	public int changePendingOrderCancelMember(List<String> orderNoList) {
+		return ses.update(ns + ".updatePendingOrderCancelMember", orderNoList);
 	}
 	
 	@Override
-	public List<DepositCancelInfoResponse> findDepositCancelInfo(List<String> orderNoList) {
-		return ses.selectList(ns + ".selectDepositCancelInfo", orderNoList);
+	public List<PendingCancelInfoResponse> findPendingCancelInfo(List<String> orderNoList) {
+		return ses.selectList(ns + ".selectPendingCancelInfo", orderNoList);
 	}
 	
 	@Override
-	public int saveDepositOrderCancel(List<DepositCancelInfoResponse> cancelInfoList) {
-		return ses.insert(ns + ".insertDepositOrderCancel", cancelInfoList);
+	public int savePendingOrderCancel(List<PendingCancelInfoResponse> cancelInfoList) {
+		return ses.insert(ns + ".insertPendingOrderCancel", cancelInfoList);
 	}
 
 	@Override
-	public List<ReadyNoResponse> findReadyByInfo(OrderCondition readyCond) {
-		return ses.selectList(ns + ".selectReadyNoInfo", readyCond);
+	public List<PreparationNoResponse> findPreparationByInfo(OrderCondition preparationCond) {
+		return ses.selectList(ns + ".selectPreparationNoInfo", preparationCond);
 	}
 
 	@Override
-	public List<ReadyProductResponse> findReadyProductByInfo(OrderCondition readyCond) {
-		return ses.selectList(ns + ".selectReadyProductInfo", readyCond);
+	public List<PreparationProductResponse> findPreparationProductByInfo(OrderCondition preparationCond) {
+		return ses.selectList(ns + ".selectPreparationProductInfo", preparationCond);
 	}
 
 	@Override
@@ -177,27 +183,72 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	}
 
 	@Override
-	public int changeCompleteShipment(List<String> productNoList) {
-		return ses.update(ns + ".updateCompleteShipment", productNoList);
+	public int changeShippedByNo(List<String> orderNoList) {
+		return ses.update(ns + ".updateShippedByNo", orderNoList);
+	}
+	
+	@Override
+	public int changeShippedByProductNo(List<String> productNoList) {
+		return ses.update(ns + ".updateShippedByProductNo", productNoList);
 	}
 
 	@Override
-	public int changeShipped(List<String> productNoList) {
-		return ses.update(ns + ".updateShipped", productNoList);
+	public int changeInTransitByNo(List<String> orderNoList) {
+		return ses.update(ns + ".updateInTransitByNo", orderNoList);
+	}
+	
+	@Override
+	public int changeInTransitByProductNo(List<String> productNoList) {
+		return ses.update(ns + ".updateInTransitByProductNo", productNoList);
 	}
 
 	@Override
-	public List<ShippingNoResponse> findShippingByInfo(OrderCondition shippingCond) {
-		return ses.selectList(ns + ".selectShippingNoInfo", shippingCond);
+	public List<InTransitNoResponse> findInTransitByInfo(OrderCondition inTransitCond) {
+		return ses.selectList(ns + ".selectInTransitNoInfo", inTransitCond);
 	}
 
 	@Override
-	public List<ShippingProductResponse> findShippingProductByInfo(OrderCondition shippingCond) {
-		return ses.selectList(ns + ".selectShippingProductInfo", shippingCond);
+	public List<InTransitProductResponse> findInTransitProductByInfo(OrderCondition inTransitCond) {
+		return ses.selectList(ns + ".selectInTransitProductInfo", inTransitCond);
 	}
 
 	@Override
-	public List<ShippingProductNoResponse> findShippingProductNoByInfo(OrderCondition shippingCond) {
-		return ses.selectList(ns + ".selectShippingProductNoInfo", shippingCond);
+	public List<InTransitProductNoResponse> findInTransitProductNoByInfo(OrderCondition inTransitCond) {
+		return ses.selectList(ns + ".selectInTransitProductNoInfo", inTransitCond);
+	}
+	
+	@Override
+	public int changeDeliveredByNo(List<String> orderNoList) {
+		return ses.update(ns + ".updateDeliveredByNo", orderNoList);
+	}
+
+	@Override
+	public int changeDeliveredByProductNo(List<String> productNoList) {
+		return ses.update(ns + ".updateDeliveredByProductNo", productNoList);
+	}
+
+	@Override
+	public List<DeliveredNoResponse> findDeliveredByInfo(OrderCondition deliveredCond) {
+		return ses.selectList(ns + ".selectDeliveredByInfo", deliveredCond);
+	}
+	
+	@Override
+	public List<DeliveredProductNoResponse> findDeliveredProductNoByInfo(OrderCondition deliveredCond) {
+		return ses.selectList(ns + ".selectDeliveredProductNoByInfo", deliveredCond);
+	}
+	
+	@Override
+	public List<DeliveredProductResponse> findDeliveredProductByInfo(OrderCondition deliveredCond) {
+		return ses.selectList(ns + ".selectDeliveredProductByInfo", deliveredCond);
+	}
+
+	@Override
+	public List<PendingCancelResponse> findPendingCancelByInfo(PendingCancelCondition pendingCancelCond) {
+		return ses.selectList(ns + ".selectPendingCancelByInfo", pendingCancelCond);
+	}
+
+	@Override
+	public List<CancelResponse> findCanceledProduct(CancelCondition cancelCond) {
+		return ses.selectList(ns + ".selectCancelByInfo", cancelCond);
 	}
 }
