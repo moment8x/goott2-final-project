@@ -118,7 +118,7 @@ public interface MemberDAO {
 	int updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId) throws SQLException, NamingException;
 	
 	//주문상세 쿠폰내역
-	List<CouponHistory> getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException;
+	CouponHistory getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException;
 	
 	// 무통장 주문 내역 가져오기
 	GetBankTransfer getBankTransfer(String orderNo, String memberId) throws SQLException, NamingException;
@@ -248,6 +248,9 @@ public interface MemberDAO {
 	
 	//작성한 리뷰 업로드 파일 가져오기
 	List<UploadFiles> selectMyReviewUf(String memberId, int postNo) throws SQLException, NamingException;
+	
+	//주문에 적용한 쿠폰 카테고리 가져오기
+	List<String> selectCouponCategoryKey(String orderNo, String memberId) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -261,6 +264,7 @@ public interface MemberDAO {
 	// 기본 배송지 설정
 	int insertShipping(ShippingAddrDTO shipping) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+
 
 	
 }

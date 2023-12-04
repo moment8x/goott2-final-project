@@ -297,12 +297,12 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	
 	@Override
-	public List<CouponHistory> getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException {
+	public CouponHistory getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("memberId", memberId);
 		params.put("orderNo", orderNo);
 		
-		return ses.selectList(ns + ".getCouponsHistory", params);
+		return ses.selectOne(ns + ".getCouponsHistory", params);
 	}
 	
 	@Override
@@ -700,6 +700,14 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectList(ns + ".selectMyReviewUf", params);
 	}
 
+	@Override
+	public List<String> selectCouponCategoryKey(String orderNo, String memberId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.selectList(ns + ".selectCouponCategoryKey", params);
+	}
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
@@ -742,6 +750,8 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".insertShipping", shipping);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+
 
 
 

@@ -39,8 +39,10 @@ import com.project.etc.jmj.UploadProfileFileProcess;
 import com.project.service.kjs.review.ReviewService;
 import com.project.service.kjs.upload.UploadFileService;
 import com.project.service.kjy.ListService;
+import com.project.service.ksh.inquiry.InquiryService;
 import com.project.service.member.MemberService;
 import com.project.vodto.CouponLog;
+import com.project.vodto.CustomerInquiry;
 import com.project.vodto.Member;
 import com.project.vodto.PointLog;
 import com.project.vodto.RewardLog;
@@ -77,6 +79,9 @@ public class myPageController {
 	
 	@Inject
 	UploadFileService ufService;
+	
+	@Inject
+	InquiryService inquiryService;
 	
 	private UploadFiles uf;
 
@@ -141,8 +146,13 @@ public class myPageController {
 				//작성한 리뷰
 				List<MyPageReview> reviewList = (List<MyPageReview>)map.get("myReview");
 				model.addAttribute("reviewList", reviewList);
+//				
+//				//1:1문의내역
+//				Map<String, Object> inquiryServiceMap = inquiryService.getInquiries(memberId,pageNo);
+//				List<CustomerInquiry> myInquiries = (List<CustomerInquiry>)inquiryServiceMap.get("myInquiries");
+//				model.addAttribute("myInquiries", myInquiries);
 				
-			} catch (SQLException | NamingException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -500,44 +510,45 @@ public class myPageController {
 		String memberId = member.getMemberId();
 
 		Map<String, Object> result = null;
+		if(member != null) {
+			try {
+				// 주문상품 상세정보
+				List<DetailOrder> detailOrder = mService.getDetailOrderInfo(memberId, orderNo);
+				model.addAttribute("detailOrderInfo", detailOrder);
+				System.out.println("주문상품상세정보!!!!!" + detailOrder.toString());
+				
+				Map<String, Object> map = mService.getOrderInfo(memberId, orderNo);
+				// 주문상세정보
+				DetailOrderInfo detailOrderInfo = (DetailOrderInfo) map.get("detailOrderInfo");
+				// 쿠폰사용내역
+				CouponHistory couponHistory = (CouponHistory) map.get("couponsHistory");
+				// 무통장 결제내역
+				GetBankTransfer bankTransfer = (GetBankTransfer) map.get("bankTransfer");
+				
+				//총 주문 수량
+				int orderQty = (int)map.get("orderQty");			
+				
+				// 회원정보
+				Member userInfo = mService.getMyInfo(memberId);
 
-		try {
-			// 주문상품 상세정보
-			List<DetailOrder> detailOrder = mService.getDetailOrderInfo(memberId, orderNo);
-			model.addAttribute("detailOrderInfo", detailOrder);
-			System.out.println("주문상품상세정보!!!!!" + detailOrder.toString());
-
-			Map<String, Object> map = mService.getOrderInfo(memberId, orderNo);
-			// 주문상세정보
-			DetailOrderInfo detailOrderInfo = (DetailOrderInfo) map.get("detailOrderInfo");
-			// 쿠폰사용내역
-			List<CouponHistory> couponHistory = (List<CouponHistory>) map.get("couponsHistory");
-			// 무통장 결제내역
-			GetBankTransfer bankTransfer = (GetBankTransfer) map.get("bankTransfer");
-			
-			//총 주문 수량
-			int orderQty = (int)map.get("orderQty");			
-			
-			// 회원정보
-			Member userInfo = mService.getMyInfo(memberId);
-			
-			model.addAttribute("userInfo", userInfo);
-			model.addAttribute("detailOrder", detailOrderInfo);
-			model.addAttribute("couponHistory", couponHistory);
-			model.addAttribute("bankTransfer", bankTransfer);
-			model.addAttribute("orderQty", orderQty);
-
-			// 배송주소록
-			List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
-			model.addAttribute("userAddrList", userAddrList);
-
-		} catch (SQLException | NamingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+				model.addAttribute("userInfo", userInfo);
+				model.addAttribute("detailOrder", detailOrderInfo);
+				model.addAttribute("couponHistory", couponHistory);
+				model.addAttribute("bankTransfer", bankTransfer);
+				model.addAttribute("orderQty", orderQty);
+				
+				// 배송주소록
+				List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);
+				model.addAttribute("userAddrList", userAddrList);
+				
+			} catch (SQLException | NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	@RequestMapping(value = "orderDetailWithJson", method = RequestMethod.POST)
+	@RequestMapping(value = "calcRefundAmount", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> orderDetailFromJson(@RequestParam("orderNo") String orderNo, @RequestParam("detailedOrderId") int detailedOrderId,
 			 HttpServletRequest request, Model model) {
 		HttpSession session = request.getSession();

@@ -275,7 +275,7 @@ function orderCancel(){
 	    let orderNo = '${detailOrder.orderNo}';
 	
 	    $.ajax({
-	      url: "/user/orderDetailWithJson", // 데이터를 수신받을 서버 주소
+	      url: "/user/calcRefundAmount", // 데이터를 수신받을 서버 주소
 	      type: "post", // 통신방식(GET, POST, PUT, DELETE)
 	      data: {
 	    	  detailedOrderId, 
@@ -294,8 +294,8 @@ function orderCancel(){
 	  		  let reward = ${detailOrder.usedReward} //결제 할 때 사용한 적립금
 	  		  let orderQty = ${orderQty} // 총 주문 수량
 	  		  let productPrice = data.selectCancelOrder.productPrice;
-			  let amount = ${detailOrder.actualPaymentAmount }
-			  let bktAmount = Number(${bankTransfer.amountToPay })
+			  let amount = ${detailOrder.actualPaymentAmount } // 카드 실 결제금액
+			  let bktAmount = Number(${bankTransfer.amountToPay }) // 무통장 실 결제금액
 	  		  let refundPoint = 0;
 	  		  let refundReward = 0;
 	  		 
@@ -307,6 +307,10 @@ function orderCancel(){
 	  		  console.log(couponWithP)
 	  		  
 	  		  console.log("총 주문 갯수 " + orderQty)
+	  		  
+	  		  if(data.couponsHistory != null){
+	  			  
+	  		  }
 	  		  
 	  		  if(totalQty > orderQty){
 	  			  totalQty = 0
@@ -814,7 +818,7 @@ function editRturnAccount() {
 												<h3>배송정보</h3>
 												<h5 class="ms-auto theme-color"></h5>
 											</div>
-											
+
 											<c:choose>
 												<c:when test="">
 													<c:otherwise>
@@ -860,8 +864,8 @@ function editRturnAccount() {
 												</c:choose>
 												<li class="deliverMsg"><i
 													class="fa-solid fa-circle-exclamation"
-													style="color: #ff0059;"></i> 출고전 / 입금전 / 결제완료 상품에 대해서만 배송지 변경이
-													가능합니다.</li>
+													style="color: #ff0059;"></i> 출고전 / 입금전 / 결제완료 상품에 대해서만 배송지
+													변경이 가능합니다.</li>
 												<c:forEach var="order" items="${detailOrderInfo }" begin="0"
 													end="0">
 													<c:if
@@ -926,28 +930,16 @@ function editRturnAccount() {
 														</h4>
 													</li>
 												</c:if>
-												<li class="pb-0"><c:if
-														test="${not empty couponHistory}">
+												<li class="pb-0"><c:if test="${couponHistory != null}">
 														<h4 class="infoTitle">사용한 쿠폰 :</h4>
-														<c:forEach var="coupons" items="${couponHistory }">
-															<div class="couponsHistory">
-																<h4 class="infoContent">${coupons.couponName }</h4>
-
-																<c:set var="discountAmount"
-																	value="${coupons.discountAmount * 0.01}" />
-
-
-																<h4 class="infoContent">${coupons.discountAmount }%</h4>
-																<h4 class="infoContent usedCouponWithP">
-																	<fmt:formatNumber
-																		value="${detailOrder.totalAmount*discountAmount }"
-																		type="NUMBER" />
-																	원
-																</h4>
-
-
-															</div>
-														</c:forEach>
+														<div class="couponsHistory">
+															<h4 class="infoContent">${couponHistory.couponName }</h4>
+															<h4 class="infoContent usedCouponWithP">
+																<fmt:formatNumber
+																	value="${couponHistory.couponDiscount}" type="NUMBER" />
+																원
+															</h4>
+														</div>
 													</c:if></li>
 
 											</ul>
@@ -1105,7 +1097,8 @@ function editRturnAccount() {
 
 					<div>
 						<button type="button" class="btn theme-bg-color btn-md text-white"
-							onclick="goPopup('#editZipNo', '#editAddr', '#editAddrDetail');">주소 검색</button>
+							onclick="goPopup('#editZipNo', '#editAddr', '#editAddrDetail');">주소
+							검색</button>
 					</div>
 
 					<div class="form-floating mb-4 theme-form-floating">
@@ -1438,13 +1431,13 @@ function editRturnAccount() {
 							</li>
 						</c:if>
 						<li class="pb-0 refundList"><c:if
-								test="${not empty couponHistory}">
+								test="${couponHistory != null}">
 								<h4>환불 예정 쿠폰</h4>
-								<c:forEach var="coupons" items="${couponHistory }">
+
 									<div class="couponsHistory">
-										<span>${coupons.couponName }</span> <span>${coupons.discountAmount }%</span>
+										<span>${couponHistory.couponName }</span> <span>${couponHistory.couponDiscount }원</span>
 									</div>
-								</c:forEach>
+								
 							</c:if></li>
 
 					</ul>
@@ -1477,8 +1470,8 @@ function editRturnAccount() {
 
 				<div class="modal-body">
 					<input class="checkbox_animated check-box" type="checkbox"
-						name="order" id="selectAllReturnOrder" onclick="selectAllReturn();"
-						onchange="selectOrderCancel();" /> <label
+						name="order" id="selectAllReturnOrder"
+						onclick="selectAllReturn();" onchange="selectOrderCancel();" /> <label
 						class="form-check-label" for="selectAllReturnOrder"><span>전체선택</span></label>
 					<c:forEach var="order" items="${detailOrderInfo }">
 						<table class="table mb-0 productInfo">
@@ -1573,24 +1566,18 @@ function editRturnAccount() {
 
 					<h4>회수 주소</h4>
 					<ul class="summery-contain pb-0 border-bottom-0">
-						<li class="pb-0 refundList">
-							<input type="text"
+						<li class="pb-0 refundList"><input type="text"
 							class="form-control" value="${detailOrder.zipCode }"
-							id="returnZipNo" name="zipCode" readonly/>
+							id="returnZipNo" name="zipCode" readonly /></li>
 
-						</li>
+						<li class="pb-0 refundList"><input type="text"
+							class="form-control" value="${detailOrder.shippingAddress }"
+							id="returnAddr" name="shippingAddress" readonly /></li>
 
-						<li class="pb-0 refundList">
-							<input type="text" class="form-control"
-							value="${detailOrder.shippingAddress }" id="returnAddr"
-							name="shippingAddress" readonly />
-						</li>
-
-						<li class="pb-0 refundList">
-							<input type="text" class="form-control"
-							value="${detailOrder.detailedShippingAddress }" id="returnDetailAddr"
-							name="detailedShippingAddress" />
-						</li>
+						<li class="pb-0 refundList"><input type="text"
+							class="form-control"
+							value="${detailOrder.detailedShippingAddress }"
+							id="returnDetailAddr" name="detailedShippingAddress" /></li>
 
 						<li class="pb-0 refundList"><input type="text"
 							class="form-control" value="${detailOrder.deliveryMessage }"
@@ -1639,22 +1626,25 @@ function editRturnAccount() {
 
 								<div class="col-12">
 									<div class="form-floating theme-form-floating">
-										<input type="text" class="form-control" id="changeReturnAccountHolder"
-											placeholder="예금주" /> <label for="changeReturnAccountHolder">예금주</label>
+										<input type="text" class="form-control"
+											id="changeReturnAccountHolder" placeholder="예금주" /> <label
+											for="changeReturnAccountHolder">예금주</label>
 									</div>
 								</div>
 
 								<div class="col-12">
 									<div class="form-floating theme-form-floating">
-										<input type="text" class="form-control" id="changeReturnAccount"
-											placeholder="환불계좌" /> <label for="changeReturnAccount">환불계좌</label>
+										<input type="text" class="form-control"
+											id="changeReturnAccount" placeholder="환불계좌" /> <label
+											for="changeReturnAccount">환불계좌</label>
 									</div>
 								</div>
 
 								<div class="col-12">
 									<div class="form-floating theme-form-floating">
 										<select class="form-select" id="floatingSelect2"
-											name="selectReturnBank" aria-label="Floating label select example">
+											name="selectReturnBank"
+											aria-label="Floating label select example">
 											<option>환불받으실 은행을 선택해주세요.</option>
 											<option value="KB국민은행">KB국민은행</option>
 											<option value="신한은행">신한은행</option>
@@ -1728,13 +1718,13 @@ function editRturnAccount() {
 							</li>
 						</c:if>
 						<li class="pb-0 refundList"><c:if
-								test="${not empty couponHistory}">
+								test="${couponHistory != null}">
 								<h4>환불 예정 쿠폰</h4>
-								<c:forEach var="coupons" items="${couponHistory }">
+								
 									<div class="couponsHistory">
-										<span>${coupons.couponName }</span> <span>${coupons.discountAmount }%</span>
+										<span>${couponsHistory.couponName }</span> <span>${couponsHistory.couponDiscount }원</span>
 									</div>
-								</c:forEach>
+								
 							</c:if></li>
 
 					</ul>
@@ -1749,8 +1739,8 @@ function editRturnAccount() {
 		</div>
 	</div>
 	<!--  반품 modal box end -->
-	
-		<!-- 교환 modal box start -->
+
+	<!-- 교환 modal box start -->
 	<div class="modal fade theme-modal" id="exchange-order" tabindex="-1"
 		aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div
@@ -1767,8 +1757,8 @@ function editRturnAccount() {
 
 				<div class="modal-body">
 					<input class="checkbox_animated check-box" type="checkbox"
-						name="order" id="selectAllReturnOrder" onclick="selectAllReturn();"
-						onchange="selectOrderCancel();" /> <label
+						name="order" id="selectAllReturnOrder"
+						onclick="selectAllReturn();" onchange="selectOrderCancel();" /> <label
 						class="form-check-label" for="selectAllReturnOrder"><span>전체선택</span></label>
 					<c:forEach var="order" items="${detailOrderInfo }">
 						<table class="table mb-0 productInfo">
@@ -1863,25 +1853,19 @@ function editRturnAccount() {
 
 					<h4>회수 주소</h4>
 					<ul class="summery-contain pb-0 border-bottom-0">
-						<li class="pb-0 refundList">
-							<input type="text"
+						<li class="pb-0 refundList"><input type="text"
 							class="form-control" value="${detailOrder.zipCode }"
-							id="collectZipNo" name="zipCode" readonly/>
+							id="collectZipNo" name="zipCode" readonly /></li>
 
-						</li>
+						<li class="pb-0 refundList"><input type="text"
+							class="form-control" value="${detailOrder.shippingAddress }"
+							id="collectAddr" name="shippingAddress" readonly /></li>
 
-						<li class="pb-0 refundList">
-							<input type="text" class="form-control"
-							value="${detailOrder.shippingAddress }" id="collectAddr"
-							name="shippingAddress" readonly />
-						</li>
+						<li class="pb-0 refundList"><input type="text"
+							class="form-control"
+							value="${detailOrder.detailedShippingAddress }"
+							id="collecDetailAddr" name="detailedShippingAddress" /></li>
 
-						<li class="pb-0 refundList">
-							<input type="text" class="form-control"
-							value="${detailOrder.detailedShippingAddress }" id="collecDetailAddr"
-							name="detailedShippingAddress" />
-						</li>
-						
 						<li class="pb-0 refundList"><input type="text"
 							class="form-control" value="${detailOrder.deliveryMessage }"
 							id="collecMsg" name="collecMsg" placeholder="메세지" /></li>
@@ -1894,27 +1878,21 @@ function editRturnAccount() {
 							</button>
 						</li>
 					</ul>
-					
+
 					<h4>교환 받을 주소</h4>
 					<ul class="summery-contain pb-0 border-bottom-0">
-						<li class="pb-0 refundList">
-							<input type="text"
+						<li class="pb-0 refundList"><input type="text"
 							class="form-control" value="${detailOrder.zipCode }"
-							id="exchangeZipNo" name="exchangeZipNo" readonly/>
+							id="exchangeZipNo" name="exchangeZipNo" readonly /></li>
 
-						</li>
+						<li class="pb-0 refundList"><input type="text"
+							class="form-control" value="${detailOrder.shippingAddress }"
+							id="exchangeAddr" name="exchangeAddr" readonly /></li>
 
-						<li class="pb-0 refundList">
-							<input type="text" class="form-control"
-							value="${detailOrder.shippingAddress }" id="exchangeAddr"
-							name="exchangeAddr" readonly />
-						</li>
-
-						<li class="pb-0 refundList">
-							<input type="text" class="form-control"
-							value="${detailOrder.detailedShippingAddress }" id="exchangeDetailAddr"
-							name="exchangeDetailAddr" />
-						</li>
+						<li class="pb-0 refundList"><input type="text"
+							class="form-control"
+							value="${detailOrder.detailedShippingAddress }"
+							id="exchangeDetailAddr" name="exchangeDetailAddr" /></li>
 
 						<li class="pb-0 refundList"><input type="text"
 							class="form-control" value="${detailOrder.deliveryMessage}"
@@ -1930,7 +1908,7 @@ function editRturnAccount() {
 					</ul>
 
 
-					
+
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary btn-md"

@@ -106,7 +106,7 @@ public class MemberServiceImpl implements MemberService {
 			// 탈퇴시킨다
 			if (mDao.updateWithdraw(memberId) == 1) {
 				result = true;
-				
+
 				// --------------- 김경배 ---------------
 				/* 전체 회원 수 갱신 이벤트 발행 */
 				adminMemberService.updateMemberCount();
@@ -155,7 +155,7 @@ public class MemberServiceImpl implements MemberService {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<MyPageReview> myReview = mDao.selectMyreview(memberId);
-		for(MyPageReview review : myReview) {
+		for (MyPageReview review : myReview) {
 			review.setContent(review.getContent().replace("\r\n", "<br/>"));
 		}
 
@@ -180,7 +180,7 @@ public class MemberServiceImpl implements MemberService {
 
 		// 전체 주문 갯수
 		result.setTotalPostCnt(mDao.getTotalOrderCnt(memberId));
-		
+
 		// 총 포인트로그 갯수
 		result.setTotalPointLogCnt(mDao.getTotalPointLogCnt(memberId));
 
@@ -323,13 +323,13 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public List<MyPageOrderList> getCurOrderHistory(String memberId) throws SQLException, NamingException {
 //		List<MyPageOrderList> sp = mDao.selectPaymentMethodAndOrderNo(memberId);
-		
+
 //		for(MyPageOrderList po: sp) {
 //			String paymentMethod = po.getPaymentMethod();
 //			String orderNo = po.getOrderNo();
-			List<MyPageOrderList> curOrder = mDao.selectCurOrderHistory(memberId);
+		List<MyPageOrderList> curOrder = mDao.selectCurOrderHistory(memberId);
 //		}
-		
+
 		return curOrder;
 	}
 
@@ -392,9 +392,43 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public Map<String, Object> selectCancelOrder(String memberId, String orderNo, int detailedOrderId)
 			throws SQLException, NamingException {
+	
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("couponsHistory", mDao.getCouponsHistory(memberId, orderNo));
-		result.put("selectCancelOrder", mDao.selectCancelOrder(memberId, orderNo, detailedOrderId));
+		List<DetailOrder> detailOrder =  mDao.selectDetailOrder(memberId, orderNo); //해당주문에서 주문한 상품 전체
+		CouponHistory couponsHistory = mDao.getCouponsHistory(memberId, orderNo); //해당주문에서 사용한 쿠폰내역
+		DetailOrder cancelOrder = mDao.selectCancelOrder(memberId, orderNo, detailedOrderId); //해당주문에서 취소하려고 선택한 상품
+		List<String> couponCategory = mDao.selectCouponCategoryKey(orderNo, memberId); // 해당주문에서 사용한 쿠폰카테고리 전부
+		System.out.println(couponCategory.toString());
+		
+		String lastItem = null;
+		
+		// 쿠폰을 사용했다면
+		if (couponsHistory != null) {
+			System.out.println(cancelOrder.getCategoryKey());
+			//for(String category : couponCategory) {
+				if (couponCategory.contains(cancelOrder.getCategoryKey())) { // 쿠폰카테고리에 상품 카테고리가 포함되어있다면
+					System.out.println("포함되어있다!");
+				} else {
+					System.out.println("이제 포함되어있지 않음. 뷰로 데이터 전송???????????????");
+				}
+//				else {
+//					result.put("contains", couponsHistory.getCouponName());
+//				}
+//			}	
+				for (String category : couponCategory) {
+		            if (category.equals(cancelOrder.getCategoryKey())) {
+		                lastItem = category;
+		            }
+		        }
+		        if (lastItem != null) {
+		            System.out.println("마지막으로 일치하는 값: " + lastItem);
+		            if(couponCategory.contains(lastItem)) {
+		            	System.out.println("아직도 존재한다.");
+		            }
+		        } else {
+		            System.out.println("찾는 값이 없습니다.");
+		        }
+		}
 
 		return result;
 	}
@@ -402,124 +436,124 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean cancelOrder(CancelDTO tmpCancel, String memberId) throws SQLException, NamingException {
-		boolean result = false;
-		boolean allCancel = true;
-
-		Map<String, Object> order = selectCancelOrder(memberId, tmpCancel.getOrderNo(), tmpCancel.getDetailedOrderId());
-		DetailOrder detailOrder = (DetailOrder) order.get("selectCancelOrder");
-		List<CouponHistory> coupons = (List<CouponHistory>) order.get("couponsHistory");
-		Member member = mDao.selectMyInfo(memberId);
-		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, tmpCancel.getOrderNo());
-
-		int amountAfterDiscount = 0; // 할인 후 금액
-		int amountBeforeDiscount = 0; // 할인 전 금액
-		int productPrice = detailOrder.getProductPrice();
-		float discountAmount = 0; // 금액에 곱할 %
-		int dcAmount = 0; // 할인 전 금액에서 할인받은 금액
-		int refundCouponAmount = 0; // 선택한 상품별 쿠폰 적용 금액
-
-		System.out.println("1");
-		System.out.println(coupons.size());
-		if (coupons.size() == 0) {// 쿠폰 적용 안 했다
-			amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - tmpCancel.getRefundRewardUsed();
-			amountBeforeDiscount = productPrice;
-		} else {// 쿠폰 적용 했다
-			for (CouponHistory coupon : coupons) {
-				// if(coupon.getDiscountMethod() == 'P') {
-				discountAmount = (float) (coupon.getDiscountAmount() * 0.01);
-				dcAmount = (int) (tmpCancel.getTotalRefundAmount() * discountAmount);
-				refundCouponAmount = (tmpCancel.getOrderQty() - tmpCancel.getTotalQty()) * dcAmount;
-				amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - tmpCancel.getRefundRewardUsed()
-						- refundCouponAmount;
-				amountBeforeDiscount = productPrice;
-				// }else {
-				refundCouponAmount = (tmpCancel.getOrderQty() - tmpCancel.getTotalQty()) * coupon.getDiscountAmount();
-				amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - tmpCancel.getRefundRewardUsed()
-						- refundCouponAmount;
-				amountBeforeDiscount = productPrice;
-				// }
-			}
-		}
-		System.out.println("2");
-		System.out.println("@@@@@@@@@@@@@@@@@@할인전금액" + amountBeforeDiscount);
-		System.out.println("@@@@@@@@@@@@@@@@@@할인후금액" + amountAfterDiscount);
-		System.out.println("@@@@@@@@@@@@@@@@@@상품금액금액" + productPrice);
-
-		// 취소테이블 인서트
-		if (mDao.insertCancelOrder(detailOrder.getProductId(), tmpCancel.getReason(), amountBeforeDiscount,
-				tmpCancel.getDetailedOrderId(), detailOrder.getPaymentMethod()) > 0) {
-			System.out.println("취소 저장 완");
-			// //환불테이블 인서트
-			if (mDao.insertRefund(detailOrder.getProductId(), tmpCancel, detailOrder.getPaymentMethod(),
-					amountAfterDiscount, amountBeforeDiscount) > 0) {
-				System.out.println("환불 저장 완");
-				// 디테일 프로덕트상태 업데이트
-				if (mDao.updateDetailProductStatus(tmpCancel.getDetailedOrderId()) > 0) {
-					System.out.println("디테일 상태 업데이트 완");
-					for (DetailOrder cancelDetail : detailOrders) {
-						// 모든 디테일 상품 상태가 취소라면 주문내역 배송상태 취소로 변경
-						if (!"주문취소".equals(cancelDetail.getProductStatus())) {
-							allCancel = false;
-							break;
-						} else {
-							mDao.updatedeliveryStatus(memberId, tmpCancel.getOrderNo());
-							System.out.println("주문내역 배송상태 변경 완");
-						}
-					}
-				}
-				// 환불계좌정보를 변경했다면
-				mDao.updateRefundAccount(memberId, tmpCancel);
-				System.out.println("환불 계좌 정보 변경 완");
-
-				// if(환불 적립금이 있다면)
-				if (tmpCancel.getRefundRewardUsed() != 0) {
-					// 적립금 로그 인서트
-					int totalReward = mDao.selectRewardBalance(memberId) + tmpCancel.getRefundRewardUsed();
-					if (mDao.insertRewardLog(memberId, tmpCancel, totalReward) > 0) {
-						System.out.println("적립금 로그 인서트 완");
-						// 멤버 총 적립금 업데이트
-						int addReward = member.getTotalRewards() + tmpCancel.getRefundRewardUsed();
-						mDao.updateMemberReward(addReward, memberId);
-						System.out.println("멤버 총 적립금 업데이트 완");
-					}
-					result = true;
-				}
-
-				if (tmpCancel.getRefundPointUsed() != 0) {
-					// -- if(환불 포인트가 있다면)
-					// 포인트 로그 인서트
-					int totalPoint = mDao.selectPointBalance(memberId) + tmpCancel.getRefundPointUsed();
-					if (mDao.insertPointLog(memberId, tmpCancel.getRefundPointUsed(), tmpCancel.getOrderNo(),
-							totalPoint) > 0) {
-						System.out.println("포인트로그 인서트 완");
-						// 멤버 총 포인트 업데이트
-						int addPoint = member.getTotalPoints() + tmpCancel.getRefundPointUsed();
-						mDao.updateMemberPoint(addPoint, memberId);
-						System.out.println("멤버 총 포인트 업데이트 완");
-					}
-					result = true;
-				}
-
-				if (coupons.size() != 0) {
-					for (CouponHistory coupon : coupons) {
-						// if(환불 쿠폰이 있다면)
-						// 쿠폰로그 사용일, 사용한 주문번호 null로 업데이트
-						if (mDao.updateCouponLog(coupon.getCouponLogsSeq()) > 0) {
-							System.out.println("쿠폰로그 업데이트 완");
-							// 멤버 총 쿠폰갯수 업데이트
-							int couponCnt = mDao.selectCouponCnt(memberId, tmpCancel.getOrderNo());
-							mDao.updateMemeberTotalCoupon(couponCnt, memberId);
-							System.out.println("멤버 총 쿠폰갯수 업데이트 완");
-						}
-					}
-					result = true;
-				}
-				result = true;
-			}
-
-			result = true;
-		}
-		return result;
+//		boolean result = false;
+//		boolean allCancel = true;
+//
+//		Map<String, Object> order = selectCancelOrder(memberId, tmpCancel.getOrderNo(), tmpCancel.getDetailedOrderId());
+//		DetailOrder detailOrder = (DetailOrder) order.get("selectCancelOrder");
+//		List<CouponHistory> coupons = (List<CouponHistory>) order.get("couponsHistory");
+//		Member member = mDao.selectMyInfo(memberId);
+//		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, tmpCancel.getOrderNo());
+//
+//		int amountAfterDiscount = 0; // 할인 후 금액
+//		int amountBeforeDiscount = 0; // 할인 전 금액
+//		int productPrice = detailOrder.getProductPrice();
+//		float discountAmount = 0; // 금액에 곱할 %
+//		int dcAmount = 0; // 할인 전 금액에서 할인받은 금액
+//		int refundCouponAmount = 0; // 선택한 상품별 쿠폰 적용 금액
+//
+//		System.out.println("1");
+//		System.out.println(coupons.size());
+//		if (coupons.size() == 0) {// 쿠폰 적용 안 했다
+//			amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - tmpCancel.getRefundRewardUsed();
+//			amountBeforeDiscount = productPrice;
+//		} else {// 쿠폰 적용 했다
+//			for (CouponHistory coupon : coupons) {
+//				// if(coupon.getDiscountMethod() == 'P') {
+//				discountAmount = (float) (coupon.getDiscountAmount() * 0.01);
+//				dcAmount = (int) (tmpCancel.getTotalRefundAmount() * discountAmount);
+//				refundCouponAmount = (tmpCancel.getOrderQty() - tmpCancel.getTotalQty()) * dcAmount;
+//				amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - tmpCancel.getRefundRewardUsed()
+//						- refundCouponAmount;
+//				amountBeforeDiscount = productPrice;
+//				// }else {
+//				refundCouponAmount = (tmpCancel.getOrderQty() - tmpCancel.getTotalQty()) * coupon.getDiscountAmount();
+//				amountAfterDiscount = productPrice - tmpCancel.getRefundPointUsed() - tmpCancel.getRefundRewardUsed()
+//						- refundCouponAmount;
+//				amountBeforeDiscount = productPrice;
+//				// }
+//			}
+//		}
+//		System.out.println("2");
+//		System.out.println("@@@@@@@@@@@@@@@@@@할인전금액" + amountBeforeDiscount);
+//		System.out.println("@@@@@@@@@@@@@@@@@@할인후금액" + amountAfterDiscount);
+//		System.out.println("@@@@@@@@@@@@@@@@@@상품금액금액" + productPrice);
+//
+//		// 취소테이블 인서트
+//		if (mDao.insertCancelOrder(detailOrder.getProductId(), tmpCancel.getReason(), amountBeforeDiscount,
+//				tmpCancel.getDetailedOrderId(), detailOrder.getPaymentMethod()) > 0) {
+//			System.out.println("취소 저장 완");
+//			// //환불테이블 인서트
+//			if (mDao.insertRefund(detailOrder.getProductId(), tmpCancel, detailOrder.getPaymentMethod(),
+//					amountAfterDiscount, amountBeforeDiscount) > 0) {
+//				System.out.println("환불 저장 완");
+//				// 디테일 프로덕트상태 업데이트
+//				if (mDao.updateDetailProductStatus(tmpCancel.getDetailedOrderId()) > 0) {
+//					System.out.println("디테일 상태 업데이트 완");
+//					for (DetailOrder cancelDetail : detailOrders) {
+//						// 모든 디테일 상품 상태가 취소라면 주문내역 배송상태 취소로 변경
+//						if (!"주문취소".equals(cancelDetail.getProductStatus())) {
+//							allCancel = false;
+//							break;
+//						} else {
+//							mDao.updatedeliveryStatus(memberId, tmpCancel.getOrderNo());
+//							System.out.println("주문내역 배송상태 변경 완");
+//						}
+//					}
+//				}
+//				// 환불계좌정보를 변경했다면
+//				mDao.updateRefundAccount(memberId, tmpCancel);
+//				System.out.println("환불 계좌 정보 변경 완");
+//
+//				// if(환불 적립금이 있다면)
+//				if (tmpCancel.getRefundRewardUsed() != 0) {
+//					// 적립금 로그 인서트
+//					int totalReward = mDao.selectRewardBalance(memberId) + tmpCancel.getRefundRewardUsed();
+//					if (mDao.insertRewardLog(memberId, tmpCancel, totalReward) > 0) {
+//						System.out.println("적립금 로그 인서트 완");
+//						// 멤버 총 적립금 업데이트
+//						int addReward = member.getTotalRewards() + tmpCancel.getRefundRewardUsed();
+//						mDao.updateMemberReward(addReward, memberId);
+//						System.out.println("멤버 총 적립금 업데이트 완");
+//					}
+//					result = true;
+//				}
+//
+//				if (tmpCancel.getRefundPointUsed() != 0) {
+//					// -- if(환불 포인트가 있다면)
+//					// 포인트 로그 인서트
+//					int totalPoint = mDao.selectPointBalance(memberId) + tmpCancel.getRefundPointUsed();
+//					if (mDao.insertPointLog(memberId, tmpCancel.getRefundPointUsed(), tmpCancel.getOrderNo(),
+//							totalPoint) > 0) {
+//						System.out.println("포인트로그 인서트 완");
+//						// 멤버 총 포인트 업데이트
+//						int addPoint = member.getTotalPoints() + tmpCancel.getRefundPointUsed();
+//						mDao.updateMemberPoint(addPoint, memberId);
+//						System.out.println("멤버 총 포인트 업데이트 완");
+//					}
+//					result = true;
+//				}
+//
+//				if (coupons.size() != 0) {
+//					for (CouponHistory coupon : coupons) {
+//						// if(환불 쿠폰이 있다면)
+//						// 쿠폰로그 사용일, 사용한 주문번호 null로 업데이트
+//						if (mDao.updateCouponLog(coupon.getCouponLogsSeq()) > 0) {
+//							System.out.println("쿠폰로그 업데이트 완");
+//							// 멤버 총 쿠폰갯수 업데이트
+//							int couponCnt = mDao.selectCouponCnt(memberId, tmpCancel.getOrderNo());
+//							mDao.updateMemeberTotalCoupon(couponCnt, memberId);
+//							System.out.println("멤버 총 쿠폰갯수 업데이트 완");
+//						}
+//					}
+//					result = true;
+//				}
+//				result = true;
+//			}
+//
+//			result = true;
+//		}
+		return false;
 	}
 
 	@Override
@@ -604,7 +638,7 @@ public class MemberServiceImpl implements MemberService {
 		if (mDao.insertUploadProfile(uf) == 1) {
 			System.out.println("멤버 프로필 이미지 업로드 완");
 			int uploadFilesSeq = mDao.selectuploadFilesSeq(uf.getNewFileName());
-			
+
 			System.out.println(uploadFilesSeq);
 			if (mDao.updateMemberProfile(uploadFilesSeq, memberId) == 1) {
 				System.out.println("멤버 프로필 이미지 업데이트 완");
@@ -613,28 +647,27 @@ public class MemberServiceImpl implements MemberService {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public boolean addShoppingCart(String memberId, String productId) throws SQLException, NamingException {
 		boolean result = false;
-		if(mDao.addShoppingCart(memberId, productId) == 1) {
+		if (mDao.addShoppingCart(memberId, productId) == 1) {
 			result = true;
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Map<String, Object> selectMyReview(String memberId, int postNo) throws SQLException, NamingException {
 		Map<String, Object> result = new HashMap<String, Object>();
-		
+
 		MyPageReview review = mDao.selectMyReview(memberId, postNo);
 		review.setContent(review.getContent().replace("<br/>", "\r\n"));
 		List<UploadFiles> reviewUf = mDao.selectMyReviewUf(memberId, postNo);
-		
-		 
-		 result.put("review", review);
-		 result.put("reviewUf", reviewUf);
-		 
+
+		result.put("review", review);
+		result.put("reviewUf", reviewUf);
+
 		return result;
 	}
 
@@ -658,10 +691,11 @@ public class MemberServiceImpl implements MemberService {
 	public boolean insertMember(SignUpDTO member, UploadFiles file) throws SQLException, NamingException {
 		boolean result = false;
 		String newFileName = "";
-		
+
 		member.setPhoneNumber(member.getPhoneNumber1() + member.getPhoneNumber2() + member.getPhoneNumber1());
-		member.setCellPhoneNumber(member.getCellPhoneNumber1() + member.getCellPhoneNumber2() + member.getCellPhoneNumber3());
-		
+		member.setCellPhoneNumber(
+				member.getCellPhoneNumber1() + member.getCellPhoneNumber2() + member.getCellPhoneNumber3());
+
 		// 회원 가입 - 프로필 사진 저장
 		if (file != null) {
 			if (ImgMimeType.contentTypeIsImage(file.getExtension())) {
@@ -709,20 +743,20 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public void sendEmail(String email, String code) throws MessagingException {
 		System.out.println("sendMail 서비스");
-		
+
 		String emailTo = email;
 		String emailFrom = "game046@naver.com";
 		String subject = "DeerBooks 이메일 인증";
 		String message = "코드 " + code + " 를 이용하여 홈페이지에서 인증을 마치십시오";
-		
+
 		MimeMessage mimeMsg = mailSender.createMimeMessage();
 		MimeMessageHelper mimeHelper = new MimeMessageHelper(mimeMsg);
-		
+
 		mimeHelper.setFrom(emailFrom);
 		mimeHelper.setTo(emailTo);
 		mimeHelper.setSubject(subject);
 		mimeHelper.setText(message);
-		
+
 		mailSender.send(mimeMsg);
 	}
 
@@ -730,14 +764,15 @@ public class MemberServiceImpl implements MemberService {
 	public boolean confirmCode(String sessionCode, String userCode) {
 		boolean result = false;
 		System.out.println("코드 검증");
-		
+
 		if (sessionCode.equals(userCode)) {
 			result = true;
 		}
-		
+
 		return result;
 	}
-	
-	// --------------------------------------- 김진솔 끝 ----------------------------------------
+
+	// --------------------------------------- 김진솔 끝
+	// ----------------------------------------
 
 }

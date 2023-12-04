@@ -908,7 +908,7 @@
 		$('.custome-pagination').html(output)
 	}
 	
-	//찜삭제
+	//찜 삭제
 	function delWishlist(productId) {
 		$.ajax({
 			url : '/user/delWishlist', // 데이터를 수신받을 서버 주소
@@ -932,7 +932,7 @@
 		});
 	}
 	
-	//찜목록에있는 상품 장바구니 추가
+	//찜 목록에있는 상품 장바구니 추가
 	function addShoppingCart(productId) {
 		$.ajax({
 			url : '/user/addShoppingCart', // 데이터를 수신받을 서버 주소
@@ -1117,6 +1117,7 @@
 	      });
 	}
 	
+	//업로드파일 추가
 	function modifyReview(form) {
 		$.ajax({
 			url : 'modifyReview', // 데이터를 수신받을 서버 주소
@@ -1155,6 +1156,7 @@
 		$('.uploadFile').append(output);
 	}
 
+	//별점 아이콘변경
 	function reviewRating(id) {
 		let reviewRatingId = $(`#\${id}`);
 		if (reviewRatingId.hasClass("fa-regular")) {
@@ -1164,6 +1166,7 @@
 		}
 	}
 	
+	//업로드파일 삭제버튼 눌렀을 때
 	function remFile(postNo, fileId) {
 		let removeFile = $(fileId).prev().attr('src')
 		let removeFileId = $(fileId).prev().attr('id')
@@ -1193,27 +1196,32 @@
 
 </script>
 <style>
-.reviewStar{
+#writeInquiry {
+	margin-left: 800px;
+}
+
+.reviewStar {
 	display: none;
 }
-.upFileArea{
+
+.upFileArea {
 	width: 100%;
 	height: 100px;
 	border: 1px dotted #333;
 	padding: 10px;
-		
 	font-weight: bold;
 	color: #d6d2d8;
 	font-size: 20px;
-		
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
-#reviewProductImg{
+
+#reviewProductImg {
 	height: 250px;
 	margin-left: 140px;
 }
+
 #deliveryStatus, #successPwd, #successPhoneNumber,
 	#successCellPhoneNumber, #successEmail, #successAddr, #successRefund,
 	#checkOrder {
@@ -1350,6 +1358,7 @@
 </head>
 
 <body>
+
 	<!-- Loader Start -->
 
 	<!-- Loader End -->
@@ -1503,10 +1512,11 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="pills-profile-tab"
-									data-bs-toggle="pill" data-bs-target="#pills-profile"
-									type="button" role="tab" aria-controls="pills-profile"
-									aria-selected="false">
+								<button class="nav-link" id="pills-inquiry-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-inquiry"
+									type="button" role="tab" aria-controls="pills-inquiry"
+									aria-selected="false"
+									onclick="location.href='/cs/viewInquiry';">
 									<i data-feather="help-circle"></i>1:1문의내역
 								</button>
 							</li>
@@ -2559,7 +2569,8 @@
 									<div class="row g-4">
 										<div class="container mt-3">
 											<c:forEach var="review" items="${reviewList }">
-												<table class="table table-borderless reviewTable" id="${review.productId}">
+												<table class="table table-borderless reviewTable"
+													id="${review.productId}">
 													<tbody>
 														<tr>
 															<td><a href="/detail/${review.productId }"> <c:choose>
@@ -2606,10 +2617,6 @@
 								</div>
 							</div>
 						</div>
-					</div>
-				</div>
-			</div>
-		</div>
 	</section>
 	<!-- User Dashboard Section End -->
 
@@ -2713,8 +2720,8 @@
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
-<div class="viewModifyReview"></div>
-			<!--  	<div class="modal-body modifyReview">
+				<div class="viewModifyReview"></div>
+				<!--  	<div class="modal-body modifyReview">
 					<table class="table mb-0 productInfo">
 						<tbody>
 							<tr>
