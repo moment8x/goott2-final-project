@@ -1,6 +1,7 @@
 package com.project.service.member;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,8 @@ import com.project.vodto.kjs.SignUpDTO;
 
 @Service
 public class MemberServiceImpl implements MemberService {
+	private List<String> orderList = new ArrayList<>();
+	private Map<String, List<String>> couponApplyProduct = new HashMap<>();
 
 	@Inject
 	private MemberDAO mDao;
@@ -392,43 +395,115 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public Map<String, Object> selectCancelOrder(String memberId, String orderNo, int detailedOrderId)
 			throws SQLException, NamingException {
-	
+
 		Map<String, Object> result = new HashMap<String, Object>();
-		List<DetailOrder> detailOrder =  mDao.selectDetailOrder(memberId, orderNo); //해당주문에서 주문한 상품 전체
-		CouponHistory couponsHistory = mDao.getCouponsHistory(memberId, orderNo); //해당주문에서 사용한 쿠폰내역
-		DetailOrder cancelOrder = mDao.selectCancelOrder(memberId, orderNo, detailedOrderId); //해당주문에서 취소하려고 선택한 상품
+		List<DetailOrder> detailOrder = mDao.selectDetailOrder(memberId, orderNo); // 해당주문에서 주문한 상품 전체
+		List<CouponHistory> couponsHistory = mDao.getOrderCouponsHistory(memberId, orderNo); // 해당주문에서 사용한 쿠폰내역
+		DetailOrder cancelOrder = mDao.selectCancelOrder(memberId, orderNo, detailedOrderId); // 해당주문에서 취소하려고 선택한 상품
 		List<String> couponCategory = mDao.selectCouponCategoryKey(orderNo, memberId); // 해당주문에서 사용한 쿠폰카테고리 전부
 		System.out.println(couponCategory.toString());
-		
+
 		String lastItem = null;
-		
-		// 쿠폰을 사용했다면
-		if (couponsHistory != null) {
-			System.out.println(cancelOrder.getCategoryKey());
-			//for(String category : couponCategory) {
-				if (couponCategory.contains(cancelOrder.getCategoryKey())) { // 쿠폰카테고리에 상품 카테고리가 포함되어있다면
-					System.out.println("포함되어있다!");
-				} else {
-					System.out.println("이제 포함되어있지 않음. 뷰로 데이터 전송???????????????");
-				}
-//				else {
-//					result.put("contains", couponsHistory.getCouponName());
-//				}
-//			}	
-				for (String category : couponCategory) {
-		            if (category.equals(cancelOrder.getCategoryKey())) {
-		                lastItem = category;
-		            }
-		        }
-		        if (lastItem != null) {
-		            System.out.println("마지막으로 일치하는 값: " + lastItem);
-		            if(couponCategory.contains(lastItem)) {
-		            	System.out.println("아직도 존재한다.");
-		            }
-		        } else {
-		            System.out.println("찾는 값이 없습니다.");
-		        }
+
+		for (String category : couponCategory) {
+//			if (category.equals(cancelOrder.getCategoryKey())) {
+				lastItem = category;
+//			}
 		}
+		int ind = 0;
+		for (CouponHistory ch : couponsHistory) {
+			// 해당 상품이 쿠폰사용주문에 있다면
+			if (ch.getProductId().equals(cancelOrder.getProductId())) {
+				// 해당 상품이 쿠폰 적용을 했다면
+				if (ch.getCouponDiscount() > 0) {
+					System.out.println("쿠폰적용을 했다");
+					for(String category : couponCategory) {
+						if (cancelOrder.getCategoryKey().equals(category)) {
+//						detailOrder.remove(cancelOrder);
+							System.out.println("일치한다 쿠폰 안 줌");
+							
+							for(int i = 0; i < detailOrder.size(); i++) {
+								if (cancelOrder.getCategoryKey().equals(category)) {
+									ind++;
+								}else if() {
+									System.out.println("없다");
+								}
+							}
+						}
+						
+					}
+				} else {
+					System.out.println("쿠폰적용을 안 했다");
+					result.put("status", "noCoupon");
+				}
+			}
+		}
+
+//		if (couponsHistory != null) {
+//			if(detailOrder.contains(cancelOrder)) {
+//				detailOrder.remove(cancelOrder);
+//		        // 쿠폰 적용 책이 남아있으면 쿠폰을 돌려주지 않음
+//		        for (Map.Entry<String, List<DetailOrder>> entry : cancelOrder.entrySet()) {
+//		                String 쿠폰 = entry.getKey();
+//		                List<String> 적용책목록 = entry.getValue();
+//
+//		                if (적용책목록.contains(취소할_책)) {
+//		                    적용책목록.remove(취소할_책);
+//
+//		                    if (적용책목록.isEmpty()) {
+//		                        // 쿠폰 적용 책이 없으면 쿠폰을 돌려줌
+//		                        쿠폰_돌려주기(쿠폰);
+//		                    }
+//		                }
+//		            }
+//		        
+//		    }
+//
+//			}
+		// for(String category : couponCategory) {
+//			for (DetailOrder order : detailOrder) {
+//				if (order.getCategoryKey().equals(lastItem)) { // 쿠폰카테고리에 상품 카테고리가 포함되어있다면
+//					System.out.println("쿠폰안줌");
+//					System.out.println("주문한 상품 전체 " + detailOrder.toString());
+//					System.out.println("주문 카테고리키 " + order.getCategoryKey());
+//					System.out.println("lastItem : " + lastItem);
+//				} else {
+//					System.out.println("이제 포함되어있지 않음. 뷰로 데이터 전송???????????????");
+//				}
+////			}
+////				else {
+////					result.put("contains", couponsHistory.getCouponName());
+////				}
+//			}
+//
+////		        // 일치하는 값의 인덱스 저장
+//			int index = -1;
+//			boolean additionalMatches = false;
+//			for (int i = 0; i < detailOrder.size(); i++) {
+//				DetailOrder order = detailOrder.get(i);
+//				System.out.println("인덱스저장" + order.toString());
+//				if (lastItem.equals(order.getCategoryKey())) {
+//					index = i;
+//					System.out.println("이건인덱스다" + index);
+//					for (int j = index + 1; j >= detailOrder.size(); j++) {
+//						order = detailOrder.get(j);
+//						System.out.println("추가값을찾는중" + order.toString());
+//						System.out.println("이건제이다" + j);
+//						if (lastItem.equals(order.getCategoryKey())) {
+//							additionalMatches = true;
+//						}
+//					}
+//				}
+//			}
+//
+//			// 일치하는 값의 인덱스 이후로 다시 일치하는 값이 있는지 확인
+//
+//			if (additionalMatches) {
+//				System.out.println("추가로 일치하는 값이 있음");
+//			} else {
+//				System.out.println("추가로 일치하는 값이 없음");
+//			}
+//		}
 
 		return result;
 	}

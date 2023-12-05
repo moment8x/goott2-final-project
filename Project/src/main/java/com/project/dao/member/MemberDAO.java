@@ -251,6 +251,9 @@ public interface MemberDAO {
 	
 	//주문에 적용한 쿠폰 카테고리 가져오기
 	List<String> selectCouponCategoryKey(String orderNo, String memberId) throws SQLException, NamingException;
+	
+	//쿠폰사용금액 합치지 않은 쿠폰내역
+	List<CouponHistory> getOrderCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -264,6 +267,7 @@ public interface MemberDAO {
 	// 기본 배송지 설정
 	int insertShipping(ShippingAddrDTO shipping) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+
 
 
 	

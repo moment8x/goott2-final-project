@@ -142,7 +142,7 @@
 	</update>
 
 	<select id="getCouponsHistory" resultType="com.project.vodto.jmj.CouponHistory">
-		select sum(d.coupon_discount) coupon_discount, c.coupon_name, cl.expiration_date, cl.coupon_logs_seq, d.order_no
+		select sum(coupon_discount) coupon_discount, c.coupon_name, cl.expiration_date, cl.coupon_logs_seq, d.order_no
 		from coupons c, coupon_logs cl, detailed_order_items d
 		where cl.member_id = #{memberId} and cl.related_order = #{orderNo}
 		and c.coupon_number = cl.coupon_number
@@ -482,6 +482,14 @@
 		select cc.category_key from coupon_logs cl, coupon_categories cc
 		where cl.member_id = #{memberId} and cl.related_order = #{orderNo}
 		and cl.coupon_number = cc.coupon_number
+	</select>
+	
+	<select id="getOrderCouponsHistory" resultType="com.project.vodto.jmj.CouponHistory">
+		select coupon_discount, c.coupon_name, cl.expiration_date, cl.coupon_logs_seq, d.order_no, d.product_id, d.detailed_order_id
+		from coupons c, coupon_logs cl, detailed_order_items d
+		where cl.member_id = #{memberId} and cl.related_order = #{orderNo}
+		and c.coupon_number = cl.coupon_number
+        and d.order_no = cl.related_order
 	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">

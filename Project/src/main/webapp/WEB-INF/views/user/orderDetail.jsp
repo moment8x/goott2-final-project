@@ -930,15 +930,17 @@ function editRturnAccount() {
 														</h4>
 													</li>
 												</c:if>
-												<li class="pb-0"><c:if test="${couponHistory != null}">
+												<li class="pb-0"><c:if test="${not empty couponHistory}">
 														<h4 class="infoTitle">사용한 쿠폰 :</h4>
 														<div class="couponsHistory">
+											
 															<h4 class="infoContent">${couponHistory.couponName }</h4>
 															<h4 class="infoContent usedCouponWithP">
 																<fmt:formatNumber
 																	value="${couponHistory.couponDiscount}" type="NUMBER" />
 																원
 															</h4>
+										
 														</div>
 													</c:if></li>
 

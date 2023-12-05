@@ -14,17 +14,15 @@ import lombok.ToString;
 @Setter
 @ToString
 public class CouponHistory {
-	//coupons
 	private int couponDiscount; // 상품당 쿠폰 할인 금액
 	private int termOfValidity; // 사용기한
 	private String couponName;
-	
-	//coupon_log
 	private Timestamp obtainedDate; //얻은 날짜
 	private Timestamp usedDate;
 	private Timestamp expirationDate; //만료일
 	private int couponLogsSeq;
-	
-	//coupon_categories
 	private String categoryKey; //적용가능한 상품 카테고리 키
+	private String orderNo;
+	private String productId;
+	private String detailedOrderId;
 }

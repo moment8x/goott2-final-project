@@ -1196,6 +1196,9 @@
 
 </script>
 <style>
+.wishItemName, .wishItemPrice{
+	text-align: center;
+}
 #writeInquiry {
 	margin-left: 800px;
 }
@@ -1778,11 +1781,11 @@
 													<div class="product-footer">
 														<div class="product-detail">
 															<a href="/detail/${item.productId }">
-																<h5 class="name">${item.productName }</h5>
+																<h5 class="name wishItemName">${item.productName }</h5>
 															</a>
 
 
-															<h5 class="price">
+															<h5 class="price wishItemPrice">
 																<span class="theme-color"> <fmt:formatNumber
 																		value="${item.sellingPrice }" type="NUMBER" /> 원
 																</span>
@@ -2495,7 +2498,7 @@
 																	type="date" /></td>
 															<td>${cl.couponName }</td>
 															<td>${cl.couponNumber }</td>
-															<td><fmt:formatDate value="${cl.obtainedDate }"
+															<td><fmt:formatDate value="${cl.expirationDate }"
 																	type="date" /></td>
 															<td><fmt:formatDate value="${cl.usedDate }"
 																	type="date" /></td>
