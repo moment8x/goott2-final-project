@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class PendingProductCancelRequest {
 	private String productOrderNo;
+	private int quantity;
     private String orderNo;
     
     public String getConvertedOrderNo() {

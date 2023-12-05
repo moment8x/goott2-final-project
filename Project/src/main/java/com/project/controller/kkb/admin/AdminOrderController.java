@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.service.kkb.admin.AdminOrderService;
 import com.project.vodto.kkb.CancelCondition;
+import com.project.vodto.kkb.CardCancelCondition;
 import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.PendingCancelCondition;
@@ -23,6 +24,7 @@ import com.project.vodto.kkb.PendingCondition;
 import com.project.vodto.kkb.PendingProductCancelRequest;
 
 import lombok.RequiredArgsConstructor;
+
 
 @CrossOrigin(origins = "*")  //http://localhost:5173
 @RequiredArgsConstructor
@@ -63,6 +65,13 @@ public class AdminOrderController {
 		
 		return adminOrderService.getOrderInfo(orderCond);
 	}
+	
+	/* 주문 상세 정보 */
+	@GetMapping("/{orderNo}")
+	public Map<String, Object> checkOrderDetail(@PathVariable("orderNo") String orderNo) {	
+		return adminOrderService.getOrderDetailInfo(orderNo);
+	}
+	
 	
 	/* 주문 상세 정보 (입금전 처리 [결제완료 -> 입금전] ) 
 	 * 배송 준비중 관리 (입금전 처리[결제완료 -> 입금전] */
@@ -123,7 +132,7 @@ public class AdminOrderController {
 	} 
 	
 	/* 입금 전 관리 (주문 취소 버튼 - 주문번호별) */
-	@PutMapping("/cancel")
+	@PutMapping("/PreShipped/o/cancel")
 	public ResponseEntity<String> setPendingOrderCancel(
 			@RequestBody List<String> orderNoList) {	
 		
@@ -137,7 +146,7 @@ public class AdminOrderController {
 	} 
 	
 	/* 입금 전 관리 (주문 취소 버튼 - 품목주문별) */
-	@PutMapping("/product/cancel")
+	@PutMapping("/PreShipped/p/cancel")
 	public ResponseEntity<String> setPendingProductCancel(
 			@RequestBody List<PendingProductCancelRequest> productOrderNoList) {	
 		
@@ -373,5 +382,160 @@ public class AdminOrderController {
 	@GetMapping("/cancel/{productOrderNo}")
 	public Map<String, Object> checkCancelDetail(@PathVariable("productOrderNo") String productOrderNo) {	
 		return adminOrderService.getCancelDetailInfo(productOrderNo);
+	}
+	
+	/* 주문 상세 정보(주문 취소) */
+	@PutMapping("/cancel")
+	public ResponseEntity<String> setProductCancel(
+			@RequestBody List<PendingProductCancelRequest> productOrderNoList) {	
+		
+		int result = adminOrderService.editProductCancel(productOrderNoList);
+		
+		if (result > 0) {
+	        return new ResponseEntity<>("Order cancellation by item update successful", HttpStatus.CREATED);
+	    } else {
+	        return new ResponseEntity<>("No orders were found to update", HttpStatus.NOT_FOUND);
+	    }
+	}  
+	
+	
+	/* 교환 관리 (조회) */
+	@GetMapping("/exchanges")
+	public Map<String, Object> searchExchangeInfo(
+			@RequestParam String orderNo,
+			@RequestParam String productOrderNo,
+			@RequestParam String invoiceNumber,
+			@RequestParam String name,
+			@RequestParam String memberId,
+			@RequestParam String email,
+			@RequestParam String cellPhoneNumber,
+			@RequestParam String phoneNumber,
+			@RequestParam String payerName,
+			@RequestParam String recipientName,
+			@RequestParam String recipientPhoneNumber,
+			@RequestParam String shippingAddress,
+			@RequestParam String productName,
+			@RequestParam String productId,
+			@RequestParam String categoryKey,
+			@RequestParam String orderTimeStart,
+			@RequestParam String orderTimeEnd,
+			@RequestParam String requestTimeStart,
+			@RequestParam String requestTimeEnd,
+			@RequestParam String completionTimeStart,
+			@RequestParam String completionTimeEnd) {	
+	
+		CancelCondition exchangeCond = CancelCondition.create(
+				orderNo,productOrderNo, invoiceNumber, name, memberId, 
+				email, cellPhoneNumber, phoneNumber, payerName, recipientName, 
+				recipientPhoneNumber, shippingAddress, productName, productId, categoryKey, 
+				orderTimeStart, orderTimeEnd, requestTimeStart, requestTimeEnd, 
+				completionTimeStart, completionTimeEnd);
+				
+		return adminOrderService.getExchangeInfo(exchangeCond);
+	}
+	
+	/* 반품 관리 (조회) */
+	@GetMapping("/returns")
+	public Map<String, Object> searchReturnInfo(
+			@RequestParam String orderNo,
+			@RequestParam String productOrderNo,
+			@RequestParam String invoiceNumber,
+			@RequestParam String name,
+			@RequestParam String memberId,
+			@RequestParam String email,
+			@RequestParam String cellPhoneNumber,
+			@RequestParam String phoneNumber,
+			@RequestParam String payerName,
+			@RequestParam String recipientName,
+			@RequestParam String recipientPhoneNumber,
+			@RequestParam String shippingAddress,
+			@RequestParam String productName,
+			@RequestParam String productId,
+			@RequestParam String categoryKey,
+			@RequestParam String orderTimeStart,
+			@RequestParam String orderTimeEnd,
+			@RequestParam String requestTimeStart,
+			@RequestParam String requestTimeEnd,
+			@RequestParam String completionTimeStart,
+			@RequestParam String completionTimeEnd) {	
+	
+		CancelCondition returnCond = CancelCondition.create(
+				orderNo,productOrderNo, invoiceNumber, name, memberId, 
+				email, cellPhoneNumber, phoneNumber, payerName, recipientName, 
+				recipientPhoneNumber, shippingAddress, productName, productId, categoryKey, 
+				orderTimeStart, orderTimeEnd, requestTimeStart, requestTimeEnd, 
+				completionTimeStart, completionTimeEnd);
+				
+		return adminOrderService.getReturnInfo(returnCond);
+	}
+	
+	/* 환불 관리 (조회) */
+	@GetMapping("/refunds")
+	public Map<String, Object> searchRefundInfo(
+			@RequestParam String orderNo,
+			@RequestParam String productOrderNo,
+			@RequestParam String invoiceNumber,
+			@RequestParam String name,
+			@RequestParam String memberId,
+			@RequestParam String email,
+			@RequestParam String cellPhoneNumber,
+			@RequestParam String phoneNumber,
+			@RequestParam String payerName,
+			@RequestParam String recipientName,
+			@RequestParam String recipientPhoneNumber,
+			@RequestParam String shippingAddress,
+			@RequestParam String productName,
+			@RequestParam String productId,
+			@RequestParam String categoryKey,
+			@RequestParam String orderTimeStart,
+			@RequestParam String orderTimeEnd,
+			@RequestParam String requestTimeStart,
+			@RequestParam String requestTimeEnd,
+			@RequestParam String completionTimeStart,
+			@RequestParam String completionTimeEnd) {	
+	
+		CancelCondition refundCond = CancelCondition.create(
+				orderNo,productOrderNo, invoiceNumber, name, memberId, 
+				email, cellPhoneNumber, phoneNumber, payerName, recipientName, 
+				recipientPhoneNumber, shippingAddress, productName, productId, categoryKey, 
+				orderTimeStart, orderTimeEnd, requestTimeStart, requestTimeEnd, 
+				completionTimeStart, completionTimeEnd);
+				
+		return adminOrderService.getRefundInfo(refundCond);
+	}
+	
+	/* 카드 취소 조회 (조회) */
+	@GetMapping("/card")
+	public Map<String, Object> searchCardCancelInfo(
+			@RequestParam String orderNo,
+			@RequestParam String productOrderNo,
+			@RequestParam String invoiceNumber,
+			@RequestParam String name,
+			@RequestParam String memberId,
+			@RequestParam String email,
+			@RequestParam String cellPhoneNumber,
+			@RequestParam String phoneNumber,
+			@RequestParam String payerName,
+			@RequestParam String recipientName,
+			@RequestParam String recipientPhoneNumber,
+			@RequestParam String shippingAddress,
+			@RequestParam String productName,
+			@RequestParam String productId,
+			@RequestParam String categoryKey,
+			@RequestParam String orderTimeStart,
+			@RequestParam String orderTimeEnd,
+			@RequestParam String requestTimeStart,
+			@RequestParam String requestTimeEnd,
+			@RequestParam String completionTimeStart,
+			@RequestParam String completionTimeEnd) {	
+	
+		CardCancelCondition cardCancelCond = CardCancelCondition.create(
+				orderNo,productOrderNo, invoiceNumber, name, memberId, 
+				email, cellPhoneNumber, phoneNumber, payerName, recipientName, 
+				recipientPhoneNumber, shippingAddress, productName, productId, categoryKey, 
+				orderTimeStart, orderTimeEnd, requestTimeStart, requestTimeEnd, 
+				completionTimeStart, completionTimeEnd);
+				
+		return adminOrderService.getCardCancelInfo(cardCancelCond);
 	}
 }

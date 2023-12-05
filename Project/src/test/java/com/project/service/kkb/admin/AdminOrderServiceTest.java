@@ -46,7 +46,7 @@ public class AdminOrderServiceTest {
 
     @Test
     @Transactional
-    public void testEditPendingOrderCancel() {
+    public void testEditPendingOrderCancel() { // 전체
     	
     	//Given
         List<String> orderNoList = Arrays.asList("O1701466461394","O1701335516842");
@@ -219,13 +219,24 @@ public class AdminOrderServiceTest {
 	@Transactional
 	public void testChangePendingProductCancelReward(){
 		//given
-    	List<String> productNoList = Arrays.asList("O1701466461394-1","O1701335516842-1");
+//    	("O1701466461394-1","O1701335516842-1");
+    	List<PendingProductCancelRequest> productNoList = new ArrayList<PendingProductCancelRequest>();
+    	PendingProductCancelRequest item1 = new PendingProductCancelRequest();
+    	item1.setProductOrderNo("O1701466461394-1");
+    	item1.setQuantity(1);
+    	PendingProductCancelRequest item2 = new PendingProductCancelRequest();
+    	item2.setProductOrderNo("O1701335516842-1");
+    	item2.setQuantity(1);
+    	productNoList.add(item1);
+    	productNoList.add(item2);
 		
 		//when
     	int result = adminOrderDao.changePendingProductCancelReward(productNoList);
+    	int result2 = adminOrderDao.changePendingProductCancelPoint(productNoList);
 		
 		//then
     	System.out.println("result : " + result);
+    	System.out.println("result2 : " + result2);
 //    	assertThat(result).isGreaterThan(0);
 	}
     
@@ -233,7 +244,15 @@ public class AdminOrderServiceTest {
 	@Transactional
 	public void testChangePendingProductCancelPoint(){
 		//given
-    	List<String> productNoList = Arrays.asList("O1701466461394-1","O1701335516842-1");
+    	List<PendingProductCancelRequest> productNoList = new ArrayList<PendingProductCancelRequest>();
+    	PendingProductCancelRequest item1 = new PendingProductCancelRequest();
+    	item1.setProductOrderNo("O1701466461394-1");
+    	item1.setQuantity(1);
+    	PendingProductCancelRequest item2 = new PendingProductCancelRequest();
+    	item2.setProductOrderNo("O1701335516842-1");
+    	item2.setQuantity(1);
+    	productNoList.add(item1);
+    	productNoList.add(item2);
 		
 		//when
     	int result = adminOrderDao.changePendingProductCancelPoint(productNoList);
@@ -313,6 +332,20 @@ public class AdminOrderServiceTest {
     	int result = orderNoList.get(0).contains("-") 
 				? adminOrderService.editInTransitByProductNo(orderNoList)
 				: adminOrderService.editInTransitByNo(orderNoList);
+		
+		//then
+    	System.out.println("result : " + result);
+//		assertThat(result).isGreaterThan(0);
+	}
+    
+    @Test
+	@Transactional
+	public void testChangePendingProductCancelPayments(){
+		//given
+    	List<String> orderNoList = Arrays.asList("O1701466461394-1", "O1701466461394-2");
+		
+		//when
+    	int result = adminOrderDao.changePendingProductCancelPayments(orderNoList);
 		
 		//then
     	System.out.println("result : " + result);

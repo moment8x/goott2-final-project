@@ -5,10 +5,13 @@ import java.util.List;
 import com.project.vodto.kkb.CancelCondition;
 import com.project.vodto.kkb.CancelResponse;
 import com.project.vodto.kkb.CanceledCoupons;
+import com.project.vodto.kkb.CardCancelCondition;
+import com.project.vodto.kkb.CardCancelResponse;
 import com.project.vodto.kkb.CheckedCoupons;
 import com.project.vodto.kkb.DeliveredNoResponse;
 import com.project.vodto.kkb.DeliveredProductNoResponse;
 import com.project.vodto.kkb.DeliveredProductResponse;
+import com.project.vodto.kkb.ExchangeResponse;
 import com.project.vodto.kkb.InTransitNoResponse;
 import com.project.vodto.kkb.InTransitProductNoResponse;
 import com.project.vodto.kkb.InTransitProductResponse;
@@ -21,9 +24,12 @@ import com.project.vodto.kkb.PendingCancelInfoResponse;
 import com.project.vodto.kkb.PendingCancelResponse;
 import com.project.vodto.kkb.PendingCondition;
 import com.project.vodto.kkb.PendingNoResponse;
+import com.project.vodto.kkb.PendingProductCancelRequest;
 import com.project.vodto.kkb.PendingProductResponse;
 import com.project.vodto.kkb.PreparationNoResponse;
 import com.project.vodto.kkb.PreparationProductResponse;
+import com.project.vodto.kkb.RefundResponse;
+import com.project.vodto.kkb.ReturnResponse;
 
 public interface AdminOrderDAO {
 	
@@ -36,6 +42,35 @@ public interface AdminOrderDAO {
 	/* 주문 상세 정보 (입금전 처리 [결제완료 -> 입금전] ) 
 	 * 배송 준비중 관리 (입금전 처리[결제완료 -> 입금전] 주문번호 기준으로만 */
 	int changePendingPayment(List<String> orderNoList);
+	
+	
+	/* 주문 상세 정보 (주문 취소 버튼 - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
+	int changeProductCancel(List<String> productNoList);
+
+	/* 주문 상세 정보 (주문 취소 버튼 - 주문 내역 테이블 update(column : delivery_status)) */
+	int changeProductCancelHistory(List<String> orderNoList);
+
+	/* 주문 상세 정보 (주문 취소 버튼 - 결제 테이블 update(column : payment_status)) */
+	int changeProductCancelPayments(List<String> productNoList);
+	
+	/* 주문 상세 정보 (주문 취소 버튼 - 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) select) */
+	List<CheckedCoupons> findProductCancelCoupon(List<String> orderNoList);
+
+	/* 주문 상세 정보 (주문 취소 버튼 - 쿠폰 로그 테이블 update(column : used_date, related_order)) */
+	int changeProductCancelCoupon(List<CheckedCoupons> couponList);
+
+	/* 주문 상세 정보 (주문 취소 버튼 - 적립금 로그 테이블 update(column : reason, balance, reward)) */
+	int changeProductCancelReward(List<PendingProductCancelRequest> productOrderNoList);
+
+	/* 주문 상세 정보 (주문 취소 버튼 - 포인트 로그 테이블 update(column : reason, balance, point)) */
+	int changeProductCancelPoint(List<PendingProductCancelRequest> productOrderNoList);
+
+	/* 주문 상세 정보 (주문 취소 버튼 - 회원 테이블 update(column : coupon_count, total_points, 
+	 * 							total_rewards, accumulated_use_reward,accumulated_use_point)) */
+	int changeProductCancelMember(List<CanceledCoupons> canceledCoupons);
+	
+	/* 주문 상세 정보 (주문 취소 버튼 - 취소용 추가 정보 조회) */
+	List<PendingCancelInfoResponse> findProductCancelInfo(List<String> orderNoList);
 	
 /*------------------------------------------------------------------------------------------------------*/
 	
@@ -83,13 +118,13 @@ public interface AdminOrderDAO {
 	
 	
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
-	int changePendingProductCancel(List<String> productOrderNoList);
+	int changePendingProductCancel(List<String> productNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 주문 내역 테이블 update(column : delivery_status)) */
-	int changePendingProductCancelHistory(List<String> productOrderNoList);
+	int changePendingProductCancelHistory(List<String> orderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 결제 테이블 update(column : payment_status)) */
-	int changePendingProductCancelPayments(List<String> productOrderNoList);
+	int changePendingProductCancelPayments(List<String> productNoList);
 	
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) select) */
 	List<CheckedCoupons> findPendingProductCancelCoupon(List<String> orderNoList);
@@ -98,10 +133,10 @@ public interface AdminOrderDAO {
 	int changePendingProductCancelCoupon(List<CheckedCoupons> couponList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 적립금 로그 테이블 update(column : reason, balance, reward)) */
-	int changePendingProductCancelReward(List<String> productNoList);
+	int changePendingProductCancelReward(List<PendingProductCancelRequest> productOrderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 포인트 로그 테이블 update(column : reason, balance, point)) */
-	int changePendingProductCancelPoint(List<String> productNoList);
+	int changePendingProductCancelPoint(List<PendingProductCancelRequest> productOrderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 회원 테이블 update(column : coupon_count, total_points, 
 	 * 							total_rewards, accumulated_use_reward,accumulated_use_point)) */
@@ -150,13 +185,13 @@ public interface AdminOrderDAO {
 /*------------------------------------------------------------------------------------------------------*/
 	
 	/* 배송 완료 조회 (조회[주문번호별]) */
-	List<DeliveredProductResponse> findDeliveredProductByInfo(OrderCondition deliveredCond);
-
+	List<DeliveredNoResponse> findDeliveredByInfo(OrderCondition deliveredCond);
+	
 	/* 배송 완료 조회 (조회[품목 주문번호별]) */
 	List<DeliveredProductNoResponse> findDeliveredProductNoByInfo(OrderCondition deliveredCond);
 
 	/* 배송 완료 조회 (조회[상품별]) */
-	List<DeliveredNoResponse> findDeliveredByInfo(OrderCondition deliveredCond);
+	List<DeliveredProductResponse> findDeliveredProductByInfo(OrderCondition deliveredCond);
 
 /*------------------------------------------------------------------------------------------------------*/
 	
@@ -166,6 +201,26 @@ public interface AdminOrderDAO {
 /*------------------------------------------------------------------------------------------------------*/
 	
 	/* 취소 관리 (조회) */
-	List<CancelResponse> findCanceledProduct(CancelCondition cancelCond);
+	List<CancelResponse> findCancelProduct(CancelCondition cancelCond);
+	
+/*------------------------------------------------------------------------------------------------------*/
+
+	/* 교환 관리 (조회) */
+	List<ExchangeResponse> findExchangeProduct(CancelCondition exchangeCond);
+	
+/*------------------------------------------------------------------------------------------------------*/
+	
+	/* 반품 관리 (조회) */
+	List<ReturnResponse> findReturnProduct(CancelCondition returnCond);
+	
+/*------------------------------------------------------------------------------------------------------*/
+	
+	/* 환불 관리 (조회) */
+	List<RefundResponse> findRefundProduct(CancelCondition refundCond);
+	
+/*------------------------------------------------------------------------------------------------------*/
+	
+	/* 카드 취소 조회 (조회) */
+	List<CardCancelResponse> findCardCancelProduct(CardCancelCondition cardCancelCond);
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.project.vodto.kkb.CancelCondition;
+import com.project.vodto.kkb.CardCancelCondition;
 import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.PendingCancelCondition;
@@ -15,9 +16,17 @@ public interface AdminOrderService {
 	/* 전체 주문 조회 */
 	Map<String, Object> getOrderInfo(OrderCondition orderCond);
 
+/*------------------------------------------------------------------------------------------------------*/
+	
+	/* 주문 상세 정보 */
+	Map<String, Object> getOrderDetailInfo(String orderNo);
+
 	/* 주문 상세 정보 (입금전 처리 [결제완료 -> 입금전] ) 
 	 * 배송 준비중 관리 (입금전 처리[결제완료 -> 입금전] */
 	int editPendingPayment(List<String> orderNoList);
+	
+	/* 주문 상세 정보 (주문 취소) */
+	int editProductCancel(List<PendingProductCancelRequest> productOrderNoList);
 	
 /*------------------------------------------------------------------------------------------------------*/
 	
@@ -76,5 +85,25 @@ public interface AdminOrderService {
 	/* 취소 처리 상세정보 */
 	Map<String, Object> getCancelDetailInfo(String productOrderNo);
 
+/*------------------------------------------------------------------------------------------------------*/
 	
+	/* 교환 관리 (조회) */
+	Map<String, Object> getExchangeInfo(CancelCondition exchangeCond);
+	
+/*------------------------------------------------------------------------------------------------------*/
+
+	/* 반품 관리 (조회) */
+	Map<String, Object> getReturnInfo(CancelCondition returnCond);
+	
+/*------------------------------------------------------------------------------------------------------*/
+
+	/* 환불 관리 (조회) */
+	Map<String, Object> getRefundInfo(CancelCondition refundCond);
+	
+/*------------------------------------------------------------------------------------------------------*/
+	
+	/* 카드 취소 조회 (조회) */
+	Map<String, Object> getCardCancelInfo(CardCancelCondition cardCancelCond);
+
+
 }
