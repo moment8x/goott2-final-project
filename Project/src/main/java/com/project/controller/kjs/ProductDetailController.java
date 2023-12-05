@@ -1,11 +1,16 @@
 package com.project.controller.kjs;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.project.service.kjs.detail.ProductDetailService;
 import com.project.service.kjs.review.ReviewService;
 import com.project.vodto.PagingInfo;
+import com.project.vodto.kjs.BestSellerVO;
 import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ProductImage;
 import com.project.vodto.kjs.ReviewBoardDTO;
@@ -51,5 +57,20 @@ public class ProductDetailController {
 		model.addAttribute("pagingInfo", pagingInfo);
 		
 		return "detail";
+    }
+    
+    @RequestMapping("bestSeller")
+    public ResponseEntity<List<BestSellerVO>> getBestSeller() {
+//    	ResponseEntity<Map<String, BestSellerVO>> result = null;
+    	ResponseEntity<List<BestSellerVO>> result = null;
+    	List<BestSellerVO> list = new ArrayList<BestSellerVO>();
+		try {
+			list = pdService.getBestSeller();
+		} catch (SQLException | NamingException e) {
+			e.printStackTrace();
+		}
+    	result = new ResponseEntity<List<BestSellerVO>>(list, HttpStatus.OK);
+    	
+    	return result;
     }
 }

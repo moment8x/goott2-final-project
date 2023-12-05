@@ -5,6 +5,7 @@ import javax.naming.NamingException;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.project.vodto.kjs.BestSellerVO;
 import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ProductImage;
 
@@ -15,4 +16,6 @@ public interface ProductDetailDAO {
 	List<ProductImage> selectProductImages(String productId) throws SQLException, NamingException;
 	// 카테고리 조회
 	List<String> selectProductCategory(String categoryKey) throws SQLException, NamingException;
+	// 베스트셀러 n개 조회
+	List<BestSellerVO> getBestSeller(int count) throws SQLException, NamingException;
 }

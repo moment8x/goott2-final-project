@@ -161,6 +161,8 @@ public class RegisterController {
 		SnsRegisterInfo snsInfo = (SnsRegisterInfo) model.asMap().get("snsInfo");
 		System.out.println("정보받음 " + snsInfo);
 		
+		
+		
 		System.out.println("================끝났음=================");
 	}
 }

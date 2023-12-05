@@ -39,4 +39,6 @@ public class DisPlayedProductDTO {
 	private String categoryKey;
 	private int currentQuantity;
 	private int quantity;
+	private int participationCount;
+	private float rating;
 }

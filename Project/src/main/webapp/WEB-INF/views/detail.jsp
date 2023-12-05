@@ -118,7 +118,39 @@
       });
       
       pagination();
+      getBestSeller();
    });
+	
+	// 베스트셀러 최신 4개
+	function getBestSeller() {
+		$.ajax({
+			url : "/detail/bestSeller",
+			type : "GET",
+			dataType : "JSON",
+			async : false,
+			success : function(data) {
+				console.log("BS success", data);
+				printBestSeller(data);
+			}, error : function(data) {
+				console.loog("BS error", data);
+			}
+		});
+	}
+	
+	function printBestSeller(items) {
+		output = '';
+		for (let item of items) {
+			output += '<li>';
+			output += '<div class="offer-product">';
+			output += '<a href="/detail/' + item.productId + '" class="offer-image">';
+			output += '<img src="' + item.productImage + '"></a>';
+			output += '<div class="offer-detail"><div>';
+			output += '<a href="/detail/' + item.productId + '">';
+			output += '<h6 class="name">' + item.productName + '</h6></a>';
+			output += '<h6 class="price theme-color">\\' + item.sellingPrice + '</h6></div></div></div></li>';
+		}
+		$('.best-seller').html(output);
+	}
 	
 	// 페이지 이동 버튼 클릭 시 이벤트 함수
 	function pagination() {
@@ -568,55 +600,33 @@
 </script>
    
 <style type="text/css">
-	.flip-card {
-	   background-color: transparent;
-	   width: 390px;
-	   height: 570px;
-	   perspective: 1000px;
-	   display: flex;
-	   margin: auto;
-	}
-	
-	.flip-card-inner {
-	   position: relative;
-	   width: 100%;
-	   height: 100%;
-	   text-align: center;
-	   transition: transform 0.6s;
-	   transform-style: preserve-3d;
-	   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-	   z-index: -1;
-	}
-	
-	.flip-card:hover .flip-card-inner {
-	   transform: rotateY(180deg);
-	}
-	
-	.flip-card-front, .flip-card-back {
-	   position: absolute;
-	   width: 100%;
-	   height: 100%;
-	   -webkit-backface-visibility: hidden;
-	   backface-visibility: hidden;
-	}
-	
-	.flip-card-front {
-	   background-color: #bbb;
-	   color: black;
-	}
-	
-	.flip-card-back {
-	   background-color: #2980b9;
-	   color: white;
-	   transform: rotateY(180deg);
-	}
-	
 	.upFileArea {
 	   width: 100%;
 	   height: 200px;
 	   border: 1px solid black;
 	}
-	
+	.rating {
+		position : relative;
+		width : 86.75px;
+		padding : 0;
+	}
+	.rating-fill {
+		position : absolute;
+		padding : 0;
+		z-index : 99;
+		display : flex;
+		top : 0;
+		left : 0;
+		overflow : hidden;
+	}
+	.rating-base {
+		z-index : 1;
+		padding : 0;
+		position : absolute;
+		top : 0;
+		left : 0;
+		display : flex;
+	}
 	.star-rating input{
 	   display: none;
 	}
@@ -632,48 +642,48 @@
 
 </head>
 <body>
-   <jsp:include page="./header.jsp"></jsp:include>
+	<jsp:include page="./header.jsp"></jsp:include>
    
-   <div class="container">
+   	<div class="container">
    
-   <!-- mobile fix menu start -->
-   <div class="mobile-menu d-md-none d-block mobile-cart">
-      <ul>
-         <li class="active">
-            <a href="index.html">
-               <i class="iconly-Home icli"></i>
-               <span>Home</span>
-            </a>
-         </li>
-         <li class="mobile-category">
-            <a href="javascript:void(0)">
-               <i class="iconly-Category icli js-link"></i>
-               <span>Category</span>
-               </a>
-            </li>
-            <li>
-               <a href="search.html" class="search-box">
-                  <i class="iconly-Search icli"></i>
-                  <span>Search</span>
-               </a>
-            </li>
-            <li>
-               <a href="wishlist.html" class="notifi-wishlist">
-                  <i class="iconly-Heart icli"></i>
-                  <span>My Wish</span>
-               </a>
-            </li>
-            <li>
-               <a href="cart.html">
-                  <i class="iconly-Bag-2 icli fly-cate"></i>
-                  <span>Cart</span>
-               </a>
-            </li>
-      </ul>
-   </div>
-   <!-- mobile fix menu end -->
-   <!-- Breadcrumb Section Start -->
-   <section class="breadscrumb-section pt-0">
+   	<!-- mobile fix menu start -->
+   	<div class="mobile-menu d-md-none d-block mobile-cart">
+      	<ul>
+         	<li class="active">
+	            <a href="index.html">
+               	<i class="iconly-Home icli"></i>
+               	<span>Home</span>
+            	</a>
+         	</li>
+         	<li class="mobile-category">
+				<a href="javascript:void(0)">
+					<i class="iconly-Category icli js-link"></i>
+					<span>Category</span>
+				</a>
+			</li>
+			<li>
+				<a href="search.html" class="search-box">
+					<i class="iconly-Search icli"></i>
+					<span>Search</span>
+				</a>
+			</li>
+			<li>
+				<a href="wishlist.html" class="notifi-wishlist">
+					<i class="iconly-Heart icli"></i>
+					<span>My Wish</span>
+				</a>
+			</li>
+			<li>
+				<a href="cart.html">
+					<i class="iconly-Bag-2 icli fly-cate"></i>
+					<span>Cart</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+	<!-- mobile fix menu end -->
+	<!-- Breadcrumb Section Start -->
+	<section class="breadscrumb-section pt-0">
       <div class="container-fluid-lg">
          <div class="row">
             <div class="col-12">
@@ -745,14 +755,23 @@
                                  <span class="offer theme-color">(10% off)</span>
                               </h3>
                               <div class="product-rating custom-rate">
-                                 <ul class="rating">
-                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                    <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
-                                 </ul>
-                                 <span class="review">23개 리뷰</span>
+								<div class="rating">
+									<ul class="rating-base">
+	                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+	                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+	                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+	                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+	                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+									</ul>
+									<ul class="rating-fill" style="width : ${product.rating * 20}%">
+	                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+	                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li> 
+	                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+	                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+										<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+	                                </ul>
+								</div>
+								<span class="review">${product.participationCount}개의 리뷰</span>
                               </div>
                            </div>
                            <div class="author">
@@ -947,20 +966,29 @@
                                              <div class="row g-4">
                                                 <div class="col-xl-6">
                                                    <div class="review-title">
-                                                      <h4 class="fw-500">Customer reviews</h4>
+                                                      <h4 class="fw-500">구매 후기</h4>
                                                    </div>
                                                    
                                                    <div class="d-flex">
                                                       <div class="product-rating">
-                                                         <ul class="rating">
-                                                            <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                                            <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                                            <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                                            <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
-                                                            <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
-                                                         </ul>
+                                                         <div class="rating">
+															<ul class="rating-base">
+							                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+							                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+							                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+							                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+							                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+															</ul>
+															<ul class="rating-fill" style="width : ${product.rating * 20}%">
+							                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+							                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li> 
+							                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+							                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+																<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+							                                </ul>
+														</div>
                                                       </div>
-                                                      <h6 class="ms-3">4.2 Out Of 5</h6>
+                                                      <h6 class="ms-3">${product.rating} / 5</h6>
                                                    </div>
                                                    
                                                    <div class="rating-box">
@@ -1054,13 +1082,6 @@
                                                               <label for="floatingTextarea2">Write Your Comment</label>
                                                            </div>
                                                         </div>
-                                                        <!-- 이미지 넣기 -->
-                                                        <!-- <div class="col-md-12">
-                                                           <div class="form-floating theme-form-floating">
-                                                              <input type="url" class="form-control" id="review1" placeholder="Give your review a title">
-                                                              <label for="review1">Review Title</label>
-                                                           </div>
-                                                         </div> -->
                                                          
                                                          <div class="col-md-12">
                                                            <div class="form-floating theme-form-floating">
@@ -1266,85 +1287,8 @@
                   <!-- Trending Product -->
                   <div class="pt-25">
                      <div class="category-menu">
-                        <h3>Trending Products</h3>
-                        
-                        <ul class="product-list product-right-sidebar border-0 p-0">
-                           <li>
-                              <div class="offer-product">
-                                 <a href="product-left-thumbnail.html" class="offer-image">
-                                    <img
-                                       src="/resources/assets/images/vegetable/product/23.png"
-                                       class="img-fluid blur-up lazyload" alt="">
-                                 </a>
-                                 
-                                 <div class="offer-detail">
-                                    <div>
-                                       <a href="product-left-thumbnail.html">
-                                          <h6 class="name">Meatigo Premium Goat Curry</h6>
-                                       </a>
-                                       <span>450 G</span>
-                                       <h6 class="price theme-color">$ 70.00</h6>
-                                    </div>
-                                 </div>
-                              </div>
-                           </li>
-                           <li>
-                              <div class="offer-product">
-                                 <a href="product-left-thumbnail.html" class="offer-image">
-                                    <img
-                                       src="/resources/assets/images/vegetable/product/24.png"
-                                       class="blur-up lazyload" alt="">
-                                 </a>
-                                 <div class="offer-detail">
-                                    <div>
-                                       <a href="product-left-thumbnail.html">
-                                          <h6 class="name">Dates Medjoul Premium Imported</h6>
-                                       </a>
-                                       <span>450 G</span>
-                                       <h6 class="price theme-color">$ 40.00</h6>
-                                    </div>
-                                 </div>
-                              </div>
-                           </li>
-                           <li>
-                              <div class="offer-product">
-                                 <a href="product-left-thumbnail.html" class="offer-image">
-                                    <img
-                                       src="/resources/assets/images/vegetable/product/25.png"
-                                       class="blur-up lazyload" alt="">
-                                 </a>
-                                 
-                                 <div class="offer-detail">
-                                    <div>
-                                       <a href="product-left-thumbnail.html">
-                                          <h6 class="name">Good Life Walnut Kernels</h6>
-                                       </a>
-                                       <span>200 G</span>
-                                       <h6 class="price theme-color">$ 52.00</h6>
-                                    </div>
-                                 </div>
-                              </div>
-                           </li>
-                           <li class="mb-0">
-                              <div class="offer-product">
-                                 <a href="product-left-thumbnail.html" class="offer-image">
-                                    <img
-                                       src="/resources/assets/images/vegetable/product/26.png"
-                                       class="blur-up lazyload" alt="">
-                                 </a>
-                                 
-                                 <div class="offer-detail">
-                                    <div>
-                                       <a href="product-left-thumbnail.html">
-                                          <h6 class="name">Apple Red Premium Imported</h6>
-                                       </a>
-                                       <span>1 KG</span>
-                                       <h6 class="price theme-color">$ 80.00</h6>
-                                    </div>
-                                 </div>
-                              </div>
-                           </li>
-                        </ul>
+                        <h3>베스트 셀러</h3>
+                        <ul class="product-list product-right-sidebar border-0 p-0 best-seller"></ul>
                      </div>
                   </div>
                

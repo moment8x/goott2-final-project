@@ -5,7 +5,11 @@
 
 <mapper namespace="com.project.mappers.productMapper">
 	<select id="getProductInfo" resultType="com.project.vodto.kjs.DisPlayedProductDTO">
-		SELECT * FROM products WHERE product_id = #{productId}
+		SELECT p.*, r.participation_count, r.rating
+		FROM products p
+		LEFT OUTER JOIN ratings r
+		ON p.product_id = r.product_id
+		WHERE p.product_id = #{productId}
 	</select>
 	<select id="getProductImages" resultType="com.project.vodto.kjs.ProductImage">
 		SELECT product_id, product_image FROM product_images WHERE product_id = #{productId}
@@ -16,5 +20,15 @@
 		INNER JOIN category_paths p
 		ON c.id = p.ancestor
 		WHERE p.descendant = #{categoryKey}
+	</select>
+	<select id="getBestSeller" resultType="com.project.vodto.kjs.BestSellerVO">
+		SELECT p.product_id, p.product_name, p.selling_price, i.product_image
+		FROM products p
+		INNER JOIN (
+				SELECT product_id, product_image FROM product_images GROUP BY product_id
+			) AS i
+		ON p.product_id = i.product_id
+		WHERE p.best_seller_status = 1
+		ORDER BY p.publication_date DESC LIMIT 4
 	</select>
 </mapper>

@@ -57,18 +57,6 @@ public class ReviewController {
 		return fileList;
 	}
 	
-//	@RequestMapping(value="deleteUploadFile", method=RequestMethod.POST)
-//	public @ResponseBody List<UploadFiles> deleteUploadedFile(HttpServletRequest request, @RequestParam("thumbFileName") String thumbFileName) {
-//		// 1. 파일이 저장된 경로 확인
-//		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
-//		// 2. 서비스단에 삭제할 파일 데이터 전송
-//		try {
-//			fileList = ufService.deleteUploadedFile(fileList, realPath, thumbFileName);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		return fileList;
-//	}
 	@RequestMapping(value="deleteUploadFile", method=RequestMethod.POST)
 	public @ResponseBody List<UploadFiles> deleteUploadedFile(HttpServletRequest request, @RequestParam("thumbFileName") String thumbFileName) {
 		List<UploadFiles> result = null;
@@ -97,7 +85,7 @@ public class ReviewController {
 		return result;
 	}
 	
-	@RequestMapping("saveReview")
+	@RequestMapping(value="saveReview", method=RequestMethod.POST)
 	public void saveReview(ReviewBoard review, HttpServletRequest request) {
 		// 회원 아이디 가져오기, 작성자 등록
 		HttpSession session = request.getSession();

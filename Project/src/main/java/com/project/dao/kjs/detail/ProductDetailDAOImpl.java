@@ -9,6 +9,7 @@ import javax.naming.NamingException;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.project.vodto.kjs.BestSellerVO;
 import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ProductImage;
 
@@ -33,5 +34,10 @@ public class ProductDetailDAOImpl implements ProductDetailDAO {
 	@Override
 	public List<String> selectProductCategory(String categoryKey) throws SQLException, NamingException {
 		return ses.selectList(ns + ".getProductCategory", categoryKey);
+	}
+
+	@Override
+	public List<BestSellerVO> getBestSeller(int count) throws SQLException, NamingException {
+		return ses.selectList(ns + ".getBestSeller", count);
 	}
 }

@@ -120,7 +120,6 @@ public class ReviewServiceImpl implements ReviewService {
 		reviewList = rDao.getReviewList(productId, pagingInfo);
 		
 		if (reviewList != null) {
-			
 			for (ReviewBoardDTO review : reviewList) {
 				// review가 이미지를 몇개 가지고 있는지 확인
 				int getCountImage = rDao.getCountImages(review.getPostNo());
