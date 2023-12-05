@@ -288,7 +288,18 @@ function orderCancel(){
 	        $('.form-control.cancelQty').change(function () {
 	  		  let totalQty = calculateTotalQuantity(); //입력한 총 수량
 	  		  console.log('총 수량:', totalQty);
-	  		  $('.totalCancelQty').text("총 수량 : " + totalQty)
+	  		  $('.totalCancelQty').text("취소 상품 수량 : " + totalQty)
+	  		  
+	  		 $.each(data.couponsHistory, function(i, elt){
+		  		 if(data.status == "okCoupon"){
+		  			  $('#refundCoupon').text(elt.couponName)
+		  		  }else if(data.status == "noCoupon"){
+		  			$('#refundCoupon').text("없음")
+		  			if($('.checkbox_animated.check-box.selectOrderCancel').is(':checked')){
+		  				$('#refundCoupon').text(elt.couponName)
+		  			}
+		  		  }
+	  		 })
 	  		  
 	  		  let point = ${detailOrder.usedPoints} //결제 할 때 사용한 포인트
 	  		  let reward = ${detailOrder.usedReward} //결제 할 때 사용한 적립금
@@ -1437,7 +1448,7 @@ function editRturnAccount() {
 								<h4>환불 예정 쿠폰</h4>
 
 									<div class="couponsHistory">
-										<span>${couponHistory.couponName }</span> <span>${couponHistory.couponDiscount }원</span>
+										<span id="refundCoupon"></span>
 									</div>
 								
 							</c:if></li>
