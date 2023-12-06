@@ -1856,7 +1856,6 @@
 									</div>
 									<div class="order-contain orderHistory">
 										<div class="order-box dashboard-bg-box">
-											${orderList }
 											<c:forEach var="order" items="${orderList }">
 												<div class="product-order-detail" id="productOrderDetail">
 													<c:choose>

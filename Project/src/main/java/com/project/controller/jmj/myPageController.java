@@ -518,24 +518,26 @@ public class myPageController {
 				System.out.println("주문상품상세정보!!!!!" + detailOrder.toString());
 				
 				Map<String, Object> map = mService.getOrderInfo(memberId, orderNo);
+				
 				// 주문상세정보
 				DetailOrderInfo detailOrderInfo = (DetailOrderInfo) map.get("detailOrderInfo");
+				model.addAttribute("detailOrder", detailOrderInfo);
+				
 				// 쿠폰사용내역
 				CouponHistory couponHistory = (CouponHistory) map.get("couponsHistory");
+				model.addAttribute("couponHistory", couponHistory);
+				
 				// 무통장 결제내역
 				GetBankTransfer bankTransfer = (GetBankTransfer) map.get("bankTransfer");
+				model.addAttribute("bankTransfer", bankTransfer);
 				
 				//총 주문 수량
-				int orderQty = (int)map.get("orderQty");			
+				int orderQty = (int)map.get("orderQty");
+				model.addAttribute("orderQty", orderQty);
 				
 				// 회원정보
 				Member userInfo = mService.getMyInfo(memberId);
-
-				model.addAttribute("userInfo", userInfo);
-				model.addAttribute("detailOrder", detailOrderInfo);
-				model.addAttribute("couponHistory", couponHistory);
-				model.addAttribute("bankTransfer", bankTransfer);
-				model.addAttribute("orderQty", orderQty);
+				model.addAttribute("userInfo", userInfo);	
 				
 				// 배송주소록
 				List<ShippingAddress> userAddrList = mService.getShippingAddress(memberId);

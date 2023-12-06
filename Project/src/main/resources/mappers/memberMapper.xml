@@ -255,7 +255,7 @@
 	</select>
 	
 	<select id="selectCancelOrder" resultType="com.project.vodto.jmj.DetailOrder">
-		select d.product_price,d.product_quantity, d.product_status, prod.product_id, d.detailed_order_id, pay.payment_method, prod.category_key,
+		select d.product_price,d.product_quantity, d.product_status, prod.product_id, d.detailed_order_id, pay.payment_method, prod.category_key, d.coupon_discount,
 		(SELECT p.product_image FROM product_images p WHERE p.product_id = prod.product_id limit 1) AS product_image, prod.product_name, d.product_invoice_number
 	    from detailed_order_items d, products prod, order_history o, (SELECT * FROM product_images GROUP BY product_id) p, payments pay
 	    where member_id = #{memberId} and d.order_no = #{orderNo} and d.detailed_order_id = #{detailedOrderId}

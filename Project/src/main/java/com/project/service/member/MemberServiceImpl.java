@@ -44,9 +44,6 @@ import com.project.vodto.kjs.SignUpDTO;
 
 @Service
 public class MemberServiceImpl implements MemberService {
-	private List<String> cancelProduct = new ArrayList<>();
-	private List<String> orderProduct = new ArrayList<>();
-	private Map<String, List<String>> couponApplyProduct = new HashMap<>();
 
 	@Inject
 	private MemberDAO mDao;
@@ -396,49 +393,135 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public Map<String, Object> selectCancelOrder(String memberId, String orderNo, int detailedOrderId)
 			throws SQLException, NamingException {
-
 		Map<String, Object> result = new HashMap<String, Object>();
+
 		List<DetailOrder> detailOrder = mDao.selectDetailOrder(memberId, orderNo); // 해당주문에서 주문한 상품 전체
 		List<CouponHistory> couponsHistory = mDao.getOrderCouponsHistory(memberId, orderNo); // 해당주문에서 사용한 쿠폰내역
 		DetailOrder cancelOrder = mDao.selectCancelOrder(memberId, orderNo, detailedOrderId); // 해당주문에서 취소하려고 선택한 상품
 		List<String> couponCategory = mDao.selectCouponCategoryKey(orderNo, memberId); // 해당주문에서 사용한 쿠폰카테고리 전부
-		
-		result.put("couponsHistory", couponsHistory);
+		DetailOrderInfo detailOrderInfo = mDao.selectDetailOrderInfo(memberId, orderNo); // 해당 주문 주문상세
 
-		for (CouponHistory ch : couponsHistory) {
-			// 해당 상품이 쿠폰사용주문에 있다면
-			if (ch.getProductId().equals(cancelOrder.getProductId())) {
-				// 해당 상품이 쿠폰 적용을 했다면
-				if (ch.getCouponDiscount() > 0) {
-					System.out.println("쿠폰적용을 했다");
-					for (String category : couponCategory) {
-						// 취소상품 카테고리키랑 쿠폰 카테고리키랑 일치한다면
-						if (cancelOrder.getCategoryKey().equals(category)) {
-							for (int i = 0; i < detailOrder.size(); i++) {
-								// 주문목록에 선택한상품이 있다면 삭제
-								if (detailOrder.get(i).getProductId().equals(cancelOrder.getProductId())) {
-									detailOrder.remove(i);
-									System.out.println("detailOrder" + detailOrder.toString());
-									// 삭제후에 주문목록에 상품이 존재한다면
-									if (detailOrder.size() > 0) {
-										System.out.println("쿠폰환불안됨");
-										result.put("status", "noCoupon");
-									} else {
-										System.out.println("쿠폰환불됨");
-										result.put("status", "okCoupon");
+		result.put("couponsHistory", couponsHistory);
+		result.put("cancelOrder", cancelOrder);
+		
+		
+		int updateReward = 0; // 취소시 적립금 비교해서 업데이트해줘야할 적립금 금액
+		int updatePoint = 0; // 취소시 포인트 비교해서 업데이트해줘야할 포인트 점수
+		int refundAmount = 0; // 취소시 환불 금액
+		int cancelProductPrice = cancelOrder.getProductPrice(); // 취소할 상품 금액
+		int couponDiscount = cancelOrder.getCouponDiscount(); // 상품당 적용한 쿠폰 할인 금액
+		int cancelPrice = cancelProductPrice - couponDiscount; // 취소할 상품금액에서 쿠폰할인
+
+		if (couponsHistory.size() > 0) {
+			for (CouponHistory ch : couponsHistory) {
+				// 해당 상품이 쿠폰사용주문에 있다면
+				if (ch.getProductId().equals(cancelOrder.getProductId())) {
+					// 해당 상품이 쿠폰 적용을 했다면
+					if (ch.getCouponDiscount() > 0) {
+						System.out.println("쿠폰적용을 했다");
+						// 부분취소의 경우
+//						취소할 상품금액 - 쿠폰 할인에서 시작
+						
+						result.put("calcRefund", calcRefund(cancelProductPrice, couponDiscount, cancelPrice, updateReward, updatePoint,
+								refundAmount, detailOrderInfo));
+//						
+//						사용한 포인트 = 0 이라면 // 사용한 포인트가 없다
+//						사용한 포인트도, 적립금도 없다면 상품금액만큼 돌려줌
+
+						// 전체취소의 경우
+//						적립금, 포인트 다 돌려줌 환불금액은 최종결제금액
+						for (String category : couponCategory) {
+							// 취소상품 카테고리키랑 쿠폰 카테고리키랑 일치한다면
+							if (cancelOrder.getCategoryKey().equals(category)) {
+								for (int i = 0; i < detailOrder.size(); i++) {
+									// 주문목록에 선택한상품이 있다면 삭제
+									if (detailOrder.get(i).getProductId().equals(cancelOrder.getProductId())) {
+										detailOrder.remove(i);
+										System.out.println("detailOrder" + detailOrder.toString());
+										// 삭제후에 주문목록에 상품이 존재한다면
+										if (detailOrder.size() > 0) {
+											System.out.println("쿠폰환불안됨");
+											result.put("status", "noCoupon");
+										} else {
+											System.out.println("쿠폰환불됨");
+											result.put("status", "okCoupon");
+										}
 									}
 								}
 							}
 						}
 					}
-				} else {
-					System.out.println("쿠폰적용을 안 했다");
-					result.put("status", "no");
 				}
 			}
+		} else {
+			// 쿠폰 적용을 안 한 주문이다
+			System.out.println("쿠폰환불안됨");
+			result.put("status", "noCoupon");
+			// 부분취소의 경우
+//			취소할 상품금액에서 시작
+			result.put("calcRefund", calcRefund(cancelProductPrice, couponDiscount, cancelPrice, updateReward, updatePoint,
+					refundAmount, detailOrderInfo));
 		}
 		return result;
 
+	}
+
+	//부분취소시 환불 포인트, 적립금, 금액 계산
+	private  Map<String, Object> calcRefund(int cancelProductPrice, int couponDiscount, int cancelPrice, int updateReward,
+			int updatePoint, int refundAmount, DetailOrderInfo detailOrderInfo) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		
+//		사용한 적립금 > 0 //적립금을 사용했다
+		if(detailOrderInfo.getUsedReward() > 0) {
+//			적립금이 취소할 상품 금액보다 크다면 
+			if(detailOrderInfo.getUsedReward() > cancelPrice) {
+//				적립금 - 취소상품금액 = 차액 
+//				>> usedReward 차액 업데이트, 환불금액 없음
+				updateReward = detailOrderInfo.getUsedReward() - cancelPrice;
+				result.put("updateReward", updateReward);
+				result.put("updatePoint", updatePoint);
+				result.put("refundAmount", refundAmount);
+			}else {
+//				적립금을 사용하지 않았다면
+//				취소상품금액 - 사용 적립금 = 차액 환불
+//				usedReward 0 업데이트
+				refundAmount = cancelPrice - detailOrderInfo.getUsedReward();
+				result.put("updateReward", updateReward);
+				result.put("updatePoint", updatePoint);
+				result.put("refundAmount", refundAmount);
+			}
+//		사용한 적립금 = 0 이라면 // 사용한 적립금이 없다
+		}else if(detailOrderInfo.getUsedReward() == 0) {
+			//적립금이 없으니까 포인트 체크
+			//사용한 포인트 > 0 // 포인트를 사용했다
+			if(detailOrderInfo.getUsedPoints() > 0) {
+				//취소할 상품 금액보다 포인트가 크다면 
+				if(detailOrderInfo.getUsedPoints() > cancelPrice) {
+					//포인트 - 취소상품금액 = 차액 
+					//>> usedPoint 차액 업데이트, 환불금액 없음
+					updatePoint = detailOrderInfo.getUsedPoints() - cancelPrice;
+					result.put("updateReward", updateReward);
+					result.put("updatePoint", updatePoint);
+					result.put("refundAmount", refundAmount);
+				}else {
+//					포인트를 사용하지 않았다면
+//					취소상품금액 - 사용 포인트 = 차액 환불
+//					usedPoint 0 업데이트
+					refundAmount = cancelPrice - detailOrderInfo.getUsedPoints();
+					result.put("updateReward", updateReward);
+					result.put("updatePoint", updatePoint);
+					result.put("refundAmount", refundAmount);
+				}
+			}else if(detailOrderInfo.getUsedPoints() == 0) {
+				//적립금도 포인트도 없다면 모두 0, 환불금액은 상품금액
+				refundAmount = cancelPrice;
+				result.put("updateReward", updateReward);
+				result.put("updatePoint", updatePoint);
+				result.put("refundAmount", refundAmount);
+			}
+		}
+		
+		return result;
 	}
 
 	@Override

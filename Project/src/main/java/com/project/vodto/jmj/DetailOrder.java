@@ -25,4 +25,5 @@ public class DetailOrder {
 	private String paymentMethod;
 	private String deliveryStatus;
 	private String categoryKey;
+	private int couponDiscount;
 }
