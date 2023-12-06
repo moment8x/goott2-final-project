@@ -14,9 +14,11 @@ import lombok.ToString;
 @Setter
 @ToString
 public class PointLog {
-	private int no;
-	private String member_id;
+	private int pointLogsSeq;
+	private String memberId;
 	private Timestamp date;
 	private String reason;
 	private int point;
+	private String relatedOrder;
+	private int balance;
 }

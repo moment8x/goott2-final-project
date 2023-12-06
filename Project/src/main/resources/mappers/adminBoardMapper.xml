@@ -31,7 +31,7 @@
 			ON b.post_no = r.post_no
 		<where>
 			<if test='(createdDateStart != null and !createdDateStart.equals("")) and 
-	         		(createdDateEnd != null and !dcreatedDateEnd.equals(""))'>
+	         		(createdDateEnd != null and !createdDateEnd.equals(""))'>
 	         		AND (b.created_date BETWEEN #{createdDateStart} AND #{createdDateEnd})
          	</if>
          	<if test='categoryId != null and !categoryId.equals("")' >

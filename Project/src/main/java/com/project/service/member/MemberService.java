@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.MessagingException;
 import javax.naming.NamingException;
 
 import com.project.vodto.Board;
@@ -18,8 +19,10 @@ import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
+import com.project.vodto.jmj.MyPageReview;
 import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.jmj.ReturnOrder;
+import com.project.vodto.jmj.exchangeDTO;
 
 public interface MemberService {
 	// ----------------------------------- 장민정 시작 -----------------------------------
@@ -47,8 +50,8 @@ public interface MemberService {
 
 	// 장바구니 목록 가져오기
 	
-	//주문건당 주문내역 가져오기 + 페이징
-	Map<String, Object> getOrderHistory(String memberId, int pageNo) throws SQLException, NamingException;
+	//마이페이지 정보 가져오기 + 페이징
+	Map<String, Object> memberInfo(String memberId, int pageNo) throws SQLException, NamingException;
 	
 	//주문건당 총 상품 갯수 가져오기
 	int getOrderProductCount(String orderNo) throws SQLException, NamingException;
@@ -106,16 +109,28 @@ public interface MemberService {
 	
 	//배송완료시 반품하기
 	boolean returnOrder(ReturnOrder ro, String memberId) throws SQLException, NamingException;
+	
+	//배송완료시 교환하기
+	boolean exchangeOrder(exchangeDTO ed, String memberId) throws SQLException, NamingException;
+	
+	//멤버 프로필 사진 업로드
+	boolean insertUploadProfile(UploadFiles uf, String memberId) throws SQLException, NamingException;
+	
+	//찜 목록에 있는 상품 장바구니 추가
+	boolean addShoppingCart(String memberId, String productId) throws SQLException, NamingException;
+	
+	//리뷰 한개 가져오기
+	MyPageReview selectMyReview(String memberId, int postNo) throws SQLException, NamingException;
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
 	boolean checkedDuplication(String memberId) throws SQLException, NamingException;
 	// 회원 가입
 	boolean insertMember(SignUpDTO member, UploadFiles file) throws SQLException, NamingException;
-	// 로그인 시도
-	Member login(String memberId, String password) throws SQLException, NamingException;
+	// 이메일 인증
+	void sendEmail(String email, String code) throws MessagingException;
+	// 코드 검증
+	boolean confirmCode(String sessionCode, String userCode);
 	// ------------------------------------ 김진솔 끝 -----------------------------------
-	
-	
 
 }

@@ -22,4 +22,9 @@ public class ReviewUploadDAOImpl implements ReviewUploadDAO {
 	public int insertImage(ReviewUf reviewUf) throws SQLException, NamingException {
 		return session.insert(ns + ".insertImage", reviewUf);
 	}
+
+	@Override
+	public int deleteImage(int uploadFilesSeq) throws SQLException, NamingException {
+		return session.delete(ns + ".deleteImage", uploadFilesSeq);
+	}
 }

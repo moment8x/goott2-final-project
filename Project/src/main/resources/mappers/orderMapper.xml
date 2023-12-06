@@ -55,12 +55,14 @@
 			<otherwise>
 				INSERT INTO detailed_order_items
 				(order_no, product_id,
-				product_price, product_quantity, product_status, product_order_no, coupon_discount)
+				product_price, product_quantity, product_status, product_order_no,
+				coupon_discount)
 				VALUES
 				<foreach item="item" index="index" collection="list"
 					separator=",">
 					(#{item.orderNo}, #{item.productId},
-					#{item.productPrice},#{item.productQuantity},#{item.productStatus},#{item.productOrderNo}, #{item.couponDiscount})
+					#{item.productPrice},#{item.productQuantity},#{item.productStatus},#{item.productOrderNo},
+					#{item.couponDiscount})
 				</foreach>
 			</otherwise>
 		</choose>
@@ -71,7 +73,7 @@
 		INSERT INTO non_order_history (non_order_no,
 		non_member_id, non_recipient_name, non_recipient_phone_number,
 		non_zip_code,
-		non_shipping_address, non_detailed_shipping_adress,
+		non_shipping_address, non_detailed_shipping_address,
 		non_delivery_message,
 		non_password, non_email, non_delivery_status)
 		VALUES(#{nonOrderNo},
@@ -105,18 +107,26 @@
 	<select id="getPaymentDetail"
 		resultType="com.project.vodto.ksh.CompleteOrder">
 		<choose>
-		<when test="orderNo != null">
-		select p.order_no, p.payment_method, p.card_name,
-		p.total_amount, b.amount_to_pay,
-		p.actual_payment_amount from
-		payments p inner join bank_transfers b on p.order_no = b.order_no where p.order_no = #{orderNo};
-		</when>
-		<otherwise>
-		select p.non_order_no, p.payment_method, p.card_name,
-		p.total_amount, b.amount_to_pay,
-		p.actual_payment_amount from
-		payments p inner join bank_transfers b on p.non_order_no = b.non_order_no where p.non_order_no = #{nonOrderNo};
-		</otherwise>
+			<when test="orderNo != null">
+				select o.recipient_name, o.recipient_phone_number, o.shipping_address,
+				o.detailed_shipping_address, p.order_no, p.payment_method,
+				p.card_name,
+				p.total_amount, IFNULL(b.amount_to_pay, 0) AS amount_to_pay,
+				p.actual_payment_amount, p.shipping_Fee from
+				payments p left outer join bank_transfers b on p.order_no = b.order_no inner
+				join order_history o on p.order_no = o.order_no where p.order_no =
+				#{orderNo};
+			</when>
+			<otherwise>
+				select n.non_recipient_name, n.non_recipient_phone_number,
+				n.non_shipping_address, n.non_detailed_shipping_address,
+				p.non_order_no, p.payment_method, p.card_name,
+				p.total_amount, IFNULL(b.amount_to_pay, 0) AS amount_to_pay,
+				p.actual_payment_amount, p.shipping_Fee from
+				payments p left outer join bank_transfers b on p.non_order_no =
+				b.non_order_no inner join non_order_history n on p.non_order_no =
+				n.non_order_no where p.non_order_no = #{nonOrderNo};
+			</otherwise>
 		</choose>
 	</select>
 
@@ -151,7 +161,8 @@
 				INSERT INTO bank_transfers (non_order_no,
 				payment_number, payer_name, amount_to_pay, payment_time)
 				VALUES(#{nonOrderNo},
-				#{paymentNumber}, #{recipientName}, #{amountToPay}, #{paymentTime})
+				#{paymentNumber}, #{recipientName},
+				#{amountToPay}, #{paymentTime})
 			</when>
 			<otherwise>
 				INSERT INTO bank_transfers (order_no,
@@ -175,10 +186,13 @@
 		select l.member_id, l.coupon_number, l.obtained_date,
 		l.used_date,
 		l.expiration_date, c.coupon_name, c.discount_amount
-		from coupon_logs l inner join coupons c on
+		from
+		coupon_logs l inner join coupons c on
 		l.coupon_number =
-		c.coupon_number where member_id = #{memberId} and
-		l.used_date is null
+		c.coupon_number
+		where member_id = #{memberId} and
+		l.used_date is null group by
+		c.coupon_number ORDER BY l.obtained_date;
 	</select>
 
 	<select id="getCategoryKey" resultType="String">
@@ -187,6 +201,10 @@
 		#{couponNumber};
 	</select>
 
+	<select id="getProductIds" resultType="String">
+		select product_id from
+		detailed_order_items where order_no = #{orderNo}
+	</select>
 
 	<resultMap id="completeOrderItem"
 		type="com.project.vodto.ksh.CompleteOrderItem">
@@ -200,22 +218,22 @@
 		resultType="com.project.vodto.ksh.CompleteOrderItem"
 		resultMap="completeOrderItem">
 		<choose>
-		<when test="orderNo != null">
-		select
-		d.product_price, d.product_quantity, p.product_name, i.product_image from
-		detailed_order_items d inner join products p on d.product_id =
-		p.product_id inner join product_images i on d.product_id =
-		i.product_id where d.order_no = #{orderNo} and d.product_id =
-		#{productId} limit 1;
-		</when>
-		<otherwise>
-		select
-		d.product_price, d.product_quantity, p.product_name, i.product_image from
-		detailed_order_items d inner join products p on d.product_id =
-		p.product_id inner join product_images i on d.product_id =
-		i.product_id where d.non_order_no = #{nonOrderNo} and d.product_id =
-		#{productId} limit 1;
-		</otherwise>
+			<when test="orderNo != null">
+				select
+				d.product_price, d.product_quantity, p.product_name, i.product_image from
+				detailed_order_items d inner join products p on d.product_id =
+				p.product_id inner join product_images i on d.product_id =
+				i.product_id where d.order_no = #{orderNo} and d.product_id =
+				#{productId} limit 1;
+			</when>
+			<otherwise>
+				select
+				d.product_price, d.product_quantity, p.product_name, i.product_image from
+				detailed_order_items d inner join products p on d.product_id =
+				p.product_id inner join product_images i on d.product_id =
+				i.product_id where d.non_order_no = #{nonOrderNo} and d.product_id =
+				#{productId} limit 1;
+			</otherwise>
 		</choose>
 
 	</select>
@@ -227,11 +245,12 @@
 		#{relatedOrder}
 		WHERE member_id = #{memberId} and
 		coupon_number =
-		#{coupon}
+		#{coupon} and used_date is null ORDER BY obtained_date
+		LIMIT 1;
 	</update>
 
 	<insert id="updatePointLogs">
-	
+
 		<selectKey keyProperty="total_points" resultType="int"
 			order="BEFORE">
 			select total_points from member where member_id = #{memberId}
@@ -243,11 +262,12 @@
 		VALUES(#{memberId},
 		#{pointReason},
 		#{relatedOrder},
-		#{point}, #{total_points})
+		#{point},
+		#{total_points})
 	</insert>
 
 	<insert id="updateRewardLogs">
-	
+
 		<selectKey keyProperty="total_rewards" resultType="int"
 			order="BEFORE">
 			select total_rewards from member where member_id = #{memberId}
@@ -255,11 +275,13 @@
 		INSERT INTO reward_logs (member_id,
 		reason,
 		related_order,
-		reward, balance)
+		reward,
+		balance)
 		VALUES(#{memberId},
 		#{rewardReason},
 		#{relatedOrder},
-		#{reward}, #{total_rewards})
+		#{reward},
+		#{total_rewards})
 
 	</insert>
 
@@ -271,13 +293,15 @@
 
 	<update id="updateMemberPoints">
 		update member set total_points = total_points -
-		#{usedPoints}, accumulated_use_point = accumulated_use_point + #{usedPoints} where member_id =
+		#{usedPoints}, accumulated_use_point = accumulated_use_point +
+		#{usedPoints} where member_id =
 		#{memberId}
 	</update>
 
 	<update id="updateMemberRewards">
 		update member set total_rewards = total_rewards -
-		#{usedRewards}, accumulated_use_reward = accumulated_use_reward + #{usedRewards} where member_id =
+		#{usedRewards}, accumulated_use_reward = accumulated_use_reward +
+		#{usedRewards} where member_id =
 		#{memberId}
 	</update>
 
@@ -306,9 +330,11 @@
 		resultType="com.project.vodto.kjy.Memberkjy">
 		select * from member where member_id = #{memberId}
 	</select>
-	
+
 	<update id="updateMeberAcumPayment">
-		update member set accumulated_payment = accumulated_payment + #{actualPaymentAmount} where member_id = #{memberId}
+		update member set accumulated_payment =
+		accumulated_payment + #{actualPaymentAmount} where member_id =
+		#{memberId}
 	</update>
 
 </mapper>

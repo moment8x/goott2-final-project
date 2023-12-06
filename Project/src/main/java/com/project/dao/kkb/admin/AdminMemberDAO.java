@@ -13,26 +13,26 @@ import com.project.vodto.kkb.MemberResponse;
 public interface AdminMemberDAO {
 	
 	/* 전체 회원 수 조회 */
-	int countAll() throws Exception;
+	int countAll();
 	
 	/* 회원 정보 조회 */
-	List<MemberResponse> findByInfo(MemberCondition memberCond) throws Exception;
+	List<MemberResponse> findByInfo(MemberCondition memberCond);
 
 	/* CRM 홈(기본 정보) */
-	MemberBasicInfo findBasicInfoById(String memberId) throws Exception;
+	MemberBasicInfo findBasicInfoById(String memberId);
 	
 	/* CRM 홈(최근 주문 정보) */
-	List<MemberRecentOrder> findRecentOrderById(String memberId) throws Exception;
+	List<MemberRecentOrder> findRecentOrderById(String memberId);
 	
 	/* CRM 홈(최근 게시글) */
-	List<MemberRecentPost> findRecentPostById(String memberId) throws Exception;
+	List<MemberRecentPost> findRecentPostById(String memberId);
 	
 	/* CRM 홈(최근 1:1 문의) */
-	List<MemberRecentInquiry> findRecentInquiryById(String memberId) throws Exception;
+	List<MemberRecentInquiry> findRecentInquiryById(String memberId);
 	
 	/* CRM 회원 상세정보 */
-	MemberParam findDetailInfoById(String memberId) throws Exception;
+	MemberParam findDetailInfoById(String memberId);
 	
 	/* CRM 회원 상세정보 수정 */
-	int changeMemberDetailInfo(MemberParam member) throws Exception;
+	int changeMemberDetailInfo(MemberParam member);
 }

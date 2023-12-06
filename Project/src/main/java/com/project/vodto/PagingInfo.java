@@ -16,7 +16,7 @@ public class PagingInfo {
 	private int totalProducts; // 전체 상품 갯수
 	private int viewProductPerPage; // 1 페이지당 보여줄 글의 갯수
 	private int totalPageCnt; // 총 페이지 수
-	private int pageNo; // 유저가 클릭한 현제 페이지 번호
+	private int pageNo; // 유저가 클릭한 현재 페이지 번호
 	private int startRowIndex; // 보여주기 시작할 글의 row index 번호
 	//-------------------------------------------------------------------------------------
 	

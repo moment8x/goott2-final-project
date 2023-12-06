@@ -64,6 +64,7 @@
 	let update = false;
 	let postNo = new URLSearchParams(location.search).get('postNo');
 	let content = ("${requestScope.inquiry.content}");
+	let files2 = [];
 	
 	$(function() {
 		convertedContent = content.replaceAll("<br />","\r\n");
@@ -110,7 +111,7 @@
 					
 						let form = new FormData();
 						form.append("uploadFile", files[i]); // 파일의 이름을 컨트롤러단의 MultipartFile 객체명과 맞춘다.
-		
+						form.append("files2", files2);
 						$.ajax({
 							url : "/cs/uploadFile",
 							type : "post",

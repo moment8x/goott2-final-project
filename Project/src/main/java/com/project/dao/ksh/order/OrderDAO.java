@@ -21,8 +21,6 @@ public interface OrderDAO {
 //	int insertNewOrder(NonOrderHistory noh) throws Exception;
 	int insertNewPayment(PaymentDTO pd) throws Exception;
 
-	int saveDetailItems(List<DetailOrderItem> itemList) throws Exception;
-
 	int insertNewNonOrderHistory(NonOrderHistory noh) throws Exception;
 
 	CompleteOrder getPaymentHistory(String orderNo) throws Exception;
@@ -59,9 +57,9 @@ public interface OrderDAO {
 
 	int updateMemberAcumPayment(int actualPaymentAmount, String memberId) throws Exception;
 
-	int getRealAmount(List<String> productId) throws Exception;
+	List<String> getProductIds(String orderNo) throws Exception;
 
-	
+	int saveDetailItems(List<DetailOrderItem> itemList) throws Exception;
 	
 	
 	

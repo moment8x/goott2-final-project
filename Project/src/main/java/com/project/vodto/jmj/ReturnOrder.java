@@ -22,4 +22,5 @@ public class ReturnOrder {
 	private String returnReason;
 	private int detailedOrderId;
 	private String orderNo;
+	private String returnMsg;
 }

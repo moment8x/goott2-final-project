@@ -4,8 +4,10 @@ package com.project.vodto.jmj;
 public class PagingInfo {
 	//1페이지당 보여줄 글의 갯수를 끊어 내기 위해 필요한 멤버들
 	private int totalPostCnt;  // 전체 게시판 글의 갯수
-	private int viewPostCntPerPage = 2; // 1페이당 보여줄 글의 갯수
+	private int totalPointLogCnt; // 총 포인트로그 갯수
+	private int viewPostCntPerPage = 5; // 1페이당 보여줄 글의 갯수
 	private int totalPageCnt; // 총 페이지 수
+	private int totalPointLogPageCnt; // 포인트로그 총 페이지 수
 	private int startRowIndex; // 보여주기 시작할 글의 row index 번호
 	private int pageNo;   // 유저가 클릭한 현재 페이지 번호
 	
@@ -15,6 +17,15 @@ public class PagingInfo {
 	private int pageBlockOfCurrentPage;  // 현재 페이지가 속한 페이징 블럭 번호
 	private int startNumOfCurrentPagingBlock;   // 현재 페이징 블럭에서의 출력 시작 페이지 번호
 	private int endNumOfCurrentPagingBlock;  // 현재 페이징 블럭에서의 출력 끝 페이지 번호
+	
+	public int getTotalPointLogCnt() {
+		return totalPointLogCnt;
+	}
+
+
+	public void setTotalPointLogCnt(int totalPointLogCnt) {
+		this.totalPointLogCnt = totalPointLogCnt;
+	}
 	
 	public int getEndNumOfCurrentPagingBlock() {
 		return endNumOfCurrentPagingBlock;

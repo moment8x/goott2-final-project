@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.mappers.adminProductsMapper">
+	<!-- ============================================ 상희 ============================================ -->
+	<select id="getProductsOnSaleCount">
+		select count(*) from products where current_quantity > 0;
+	</select>
+	<select id="getAllProducts" resultType="com.project.vodto.ksh.AdminProductsList">
+		SELECT @rownum:=@rownum+1 AS no, p.product_id, p.product_name, category.id
+		as category_key, category.name as category_name,
+		(SELECT product_image FROM product_images pi WHERE pi.product_id =
+		p.product_id LIMIT 1) as product_image,
+		p.consumer_price, p.selling_price,
+		CONCAT('/detail/', p.product_id) as url
+		FROM products p
+		INNER JOIN categories category
+		ON category.id = p.category_key
+		INNER JOIN (SELECT @rownum:=0) AS r
+		<if test='sellingProducts != null and !sellingProducts.equals("")'>
+		where current_quantity > 0
+		</if>
+		ORDER BY no DESC;
+	</select>
+	<!-- ============================================================================================== -->
+
+	<!-- ============================================ 재용 ============================================ -->
+
+	<!-- ============================================================================================== -->
+	<!-- ============================================ 진솔 ============================================ -->
+	<!-- ============================================ 진솔 ============================================ -->
+	<select id="getProductsList"
+		resultType="com.project.vodto.kjs.AdminProductsListVO">
+		SELECT @rownum:=@rownum+1 AS no, p.product_id, p.product_name,
+		p.current_quantity, p.consumer_price,
+		category.category_key, category.category_name,
+		(SELECT product_image FROM product_images pi WHERE pi.product_id =
+		p.product_id LIMIT 1),
+		(SELECT SUM(product_quantity) FROM detailed_order_items doi WHERE
+		doi.product_id = p.product_id) as sales_volume
+		FROM products p
+		INNER JOIN product_categories category
+		ON category.category_key = p.category_key
+		INNER JOIN (SELECT @rownum:=0) AS r
+		ORDER BY no DESC
+	</select>
+	<select id="totalProductsCount" resultType="int">
+		SELECT count(product_id) FROM products
+	</select>
+	<select id="getCategoryChild"
+		resultType="com.project.vodto.ProductCategory">
+		SELECT c.*
+		FROM categories c
+		INNER JOIN category_paths p
+		ON c.id = p.descendant
+		WHERE p.﻿ancestor = #{categoryKey} AND p.depth = 1 ;
+	</select>
+	<!-- ==============================================================================================
+	============================================================================================== -->
+</mapper>
+

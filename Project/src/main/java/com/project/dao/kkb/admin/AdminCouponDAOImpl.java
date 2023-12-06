@@ -19,17 +19,17 @@ public class AdminCouponDAOImpl implements AdminCouponDAO {
 	private final SqlSession ses;
 	
 	@Override
-	public CouponInfoResponse findCouponInfoById(String memberId) throws Exception {
+	public CouponInfoResponse findCouponInfoById(String memberId) {
 		return ses.selectOne(ns + ".selectCouponInfo", memberId);
 	}
 
 	@Override
-	public List<CouponListResponse> findCouponListById(String memberId) throws Exception {
+	public List<CouponListResponse> findCouponListById(String memberId) {
 		return ses.selectList(ns +".selectCouponList", memberId);
 	}
 
 	@Override
-	public CouponAppliedCategory findCategoryByCouponNo(String couponNumber) throws Exception {
+	public CouponAppliedCategory findCategoryByCouponNo(String couponNumber) {
 		return ses.selectOne(ns + ".selectAppliedCategory", couponNumber);
 	}
 

@@ -119,12 +119,16 @@ public class UploadFileServiceImpl implements UploadFileService {
 	}
 
 	@Override
-	public int deleteFile(UploadFiles uf, String realPath) {
+	public int deleteFile(String newFileName, String realPath) {
 		int result = -1;
-		File file = new File(realPath + uf.getNewFileName());
+		String contentType = newFileName.substring(newFileName.lastIndexOf(".") + 1);
+		File file = new File(realPath + newFileName);
 		if (file.exists()) {
-			if (uf.getThumbnailFileName() != null || uf.getThumbnailFileName().equals("")) {
-				new File(realPath + uf.getThumbnailFileName()).delete();
+			// 이미지 파일이면...
+			if (ImgMimeType.extIsImage(contentType)) {
+				// 섬네일파일도 삭제
+				String thumbFileName = newFileName.substring(0, newFileName.lastIndexOf("\\") + 1) + "thumb_" + newFileName.substring(newFileName.lastIndexOf("\\") + 1);;
+				new File(realPath + thumbFileName).delete();
 			}
 			file.delete();
 			result = 1;
@@ -134,34 +138,41 @@ public class UploadFileServiceImpl implements UploadFileService {
 		
 		return result;
 	}
+	
+	// 상희짱
+	@Override
+	   public int deleteFile(UploadFiles uf, String realPath) {
+	      int result = -1;
+	      File file = new File(realPath + uf.getNewFileName());
+	      if (file.exists()) {
+	         if (uf.getThumbnailFileName() != null || uf.getThumbnailFileName().equals("")) {
+	            new File(realPath + uf.getThumbnailFileName()).delete();
+	         }
+	         file.delete();
+	         result = 1;
+	      } else {
+	         result = 0;
+	      }
+	      
+	      return result;
+	   }
 
 	@Override
-	public List<UploadFiles> deleteUploadedFile(List<UploadFiles> fileList, String realPath, String thumbFileName) throws IOException {
-		String newFileName = thumbFileName.replace("thumb_", "");
-//		String separator = File.separator;
-		newFileName = newFileName.replace("/", "\\");
-		for (int i = 0; i < fileList.size(); i++) {
-			// 1. 파일리스트에서 원하는 파일 선택
-			if (fileList.get(i).getNewFileName().equals(newFileName)) {
-				// 2. 실제 파일 삭제
-				if (deleteFile(fileList.get(i), realPath) == 1) {
-					// 3. 리스트에서 제거
-					fileList.remove(i);
-					break;
-				}
-			}
+	public void deleteUploadedFile(List<String> deleteFileList, String realPath) throws IOException {
+		for (String deleteFile : deleteFileList) {
+			deleteFile(deleteFile, realPath);
 		}
-		return fileList;
 	}
 
 	@Override
-	public boolean isExist(UploadFiles uf) throws SQLException, NamingException {
+	public boolean isExist(String newFileName) throws SQLException, NamingException {
 		boolean result = false;
 		
-		if (uDao.selectUploadFile(uf) != null) {
+		if (uDao.selectUploadFile(newFileName) != null) {
 			result = true;
 		}
 		
 		return result;
 	}
+	
 }

@@ -8,6 +8,6 @@ import com.project.vodto.kkb.PostResponse;
 public interface AdminBoardDAO {
 
 	/* 게시글 정보 조회 */
-	List<PostResponse> findPostByInfo(PostCondition postCond) throws Exception;
+	List<PostResponse> findPostByInfo(PostCondition postCond);
 
 }

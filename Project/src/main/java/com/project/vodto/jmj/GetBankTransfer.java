@@ -15,6 +15,7 @@ import lombok.ToString;
 
 public class GetBankTransfer {
 	//bank_transfers
+	private String orderNo;
 	private String bankName;
 	private String payerName;
 	private String depositedAccount; //입금계좌

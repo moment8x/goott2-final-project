@@ -20,7 +20,7 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
 	
 	/* 1:1 문의 조회 */
 	@Override
-	public Map<String, Object> getInquiryInfo(InquiryCondition inquiryCond) throws Exception {
+	public Map<String, Object> getInquiryInfo(InquiryCondition inquiryCond) {
 		
 		List<InquiryResponse> inquiryList = adminInquiryRepository.findInquiryByInfo(inquiryCond);
 	

@@ -14,8 +14,8 @@ public class AdminAdvice {
 	@ExceptionHandler
 	public ResponseEntity<ErrorResult> exceptionHandler(Exception e) {
 		log.error("[exceptionHandler] ex", e);
-		ErrorResult errorResult = new ErrorResult("EX", e.getMessage());
-		return new ResponseEntity<ErrorResult>(errorResult, HttpStatus.INTERNAL_SERVER_ERROR);
+		ErrorResult errorResult = new ErrorResult(e.getClass().getName(), e.getMessage());
+		return new ResponseEntity<ErrorResult>(errorResult, HttpStatus.BAD_REQUEST);
 	}
 	
 //	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

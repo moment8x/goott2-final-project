@@ -18,12 +18,12 @@ public class AdminRewardDAOImpl implements AdminRewardDAO {
 	private final SqlSession ses;
 	
 	@Override
-	public RewardInfoResponse findRewardInfoById(String memberId) throws Exception {
+	public RewardInfoResponse findRewardInfoById(String memberId) {
 		return ses.selectOne(ns + ".selectRewardInfo", memberId);
 	}
 
 	@Override
-	public List<RewardListResponse> findRewardListById(String memberId) throws Exception {
+	public List<RewardListResponse> findRewardListById(String memberId) {
 		return ses.selectList(ns + ".selectRewardList", memberId);
 	}
 

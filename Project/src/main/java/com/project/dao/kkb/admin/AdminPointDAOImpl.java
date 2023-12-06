@@ -18,12 +18,12 @@ public class AdminPointDAOImpl implements AdminPointDAO {
 	private final SqlSession ses;
 	
 	@Override
-	public PointInfoResponse findPointInfoById(String memberId) throws Exception {
+	public PointInfoResponse findPointInfoById(String memberId) {
 		return ses.selectOne(ns + ".selectPointInfo", memberId);
 	}
 
 	@Override
-	public List<PointListResponse> findPointListById(String memberId) throws Exception {
+	public List<PointListResponse> findPointListById(String memberId) {
 		return ses.selectList(ns + ".selectPointList", memberId);
 	}
 

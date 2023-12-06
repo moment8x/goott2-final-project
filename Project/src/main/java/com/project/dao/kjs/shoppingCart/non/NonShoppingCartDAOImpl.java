@@ -21,4 +21,9 @@ public class NonShoppingCartDAOImpl implements NonShoppingCartDAO {
 	public int insertNonMember(NonShoppingCart nsc) throws SQLException, NamingException {
 		return session.insert(ns + ".insertNonMember", nsc);
 	}
+
+	@Override
+	public int deleteNonMember() throws SQLException, NamingException {
+		return session.delete(ns + ".deleteNonMember");
+	}
 }

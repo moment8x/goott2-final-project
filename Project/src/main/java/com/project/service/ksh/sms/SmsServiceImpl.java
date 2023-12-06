@@ -1,18 +1,14 @@
 package com.project.service.ksh.sms;
 
 import java.net.URI;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.inject.Inject;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.etc.ksh.SendMessageConfig;
 import com.project.vodto.ksh.MessageDTO;
 import com.project.vodto.ksh.SmsRequestDto;
 import com.project.vodto.ksh.SmsResponseDto;
@@ -43,7 +38,7 @@ public class SmsServiceImpl implements SmsService {
 	private String phone;
 	
 	public SmsResponseDto sendSms(MessageDTO messageDto) throws Exception {
-		
+		System.out.println(serviceId);
 		// 현재시간
         String time = Long.toString(System.currentTimeMillis());
 
@@ -78,7 +73,6 @@ public class SmsServiceImpl implements SmsService {
         //restTemplate를 통해 외부 api와 통신
 
         SmsResponseDto smsResponseDto = restTemplate.postForObject(new URI("https://sens.apigw.ntruss.com/sms/v2/services/"+ serviceId +"/messages"), httpBody, SmsResponseDto.class);
-        SmsResponseDto responseDto = new SmsResponseDto();
         
         return smsResponseDto;
     }

@@ -14,10 +14,11 @@ import lombok.ToString;
 @Setter
 @ToString
 public class CouponLog {
-	private int no;
-	private String member_id;
-	private String coupon_number;
-	private String coupon_name;
-	private Timestamp obtained_date;
-	private Timestamp used_date;
+	private int couponLogsSeq;
+	private String memberId;
+	private String couponNumber;
+	private String couponName;
+	private Timestamp obtainedDate; //얻은 날짜
+	private Timestamp usedDate;
+	private Timestamp expirationDate; //만료 날짜
 }

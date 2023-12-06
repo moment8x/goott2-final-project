@@ -12,7 +12,8 @@
 <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-
+<script src="/resources/js/ksh/addr.js"></script>
+<script src="/resources/js/ksh/cancelPayment.js"></script>
 <script>
 let itemLen = $(".summery-contain").find("li").length; // 상품 종류
 let addrValid = false;
@@ -28,12 +29,15 @@ let IMP = window.IMP;
 IMP.init("${impKey}") // 예: 'imp00000000a'
 let isPaid = false;
 let orderId = ('${requestScope.orderId}');
-//console.log(orderId);
 let products = [];
 let createName = "";
 let finalTotal = 0;
 	$(function() {
-
+		itemLen = $(".summery-contain").find("li").length; // 상품 종류
+		for(i=0; i<itemLen; i++) {
+	    	  let localePrice = (Number($('#productPrice'+i).text())).toLocaleString('ko-KR');
+	    	  $('#productPrice'+i).text(localePrice);
+	      }
 		finalTotal = totalAmount + shippingFee;
 		console.log(finalTotal);
 		$("#payToAmount").text(finalTotal);
@@ -54,19 +58,18 @@ let finalTotal = 0;
 		$('#nonRecipientPhoneNumber').on('blur', function () {
 			let regNumber = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
 			if (regNumber.test($('#nonRecipientPhoneNumber').val())) {
-				isValidCellPhone = true;
-				
+				isValidCellPhone = true;	
 			} else {
 				alert("올바른 전화번호가 아닙니다.")
-				
 				isValidCellPhone = false;
 			}
 		});
-		
+	
 		$("#nonOrderNo").val(orderId);
-		
-
-		
+		  $("#payToAmount").text((totalAmount + shippingFee).toLocaleString('ko-KR'));	    
+	      $('#subTotal').text(totalAmount.toLocaleString('ko-KR'));
+	      $('#shippingFee').text(shippingFee.toLocaleString('ko-KR'));
+	
 		$("#selectMessage").on("change", function(){
 
 		if($("option:selected", this).text() == "직접입력") {
@@ -76,50 +79,11 @@ let finalTotal = 0;
 			$('#directInput').attr('style', 'display:none');	
 		}
 		});
-		itemLen = $(".summery-contain").find("li").length; // 상품 종류
+		
 	});
 		
 		//$("#subTotal").val();
-	
-	
 
-	
-	function goPopup() {
-		// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
-		var pop = window.open("jusoPopup", "pop",
-				"width=570,height=420, scrollbars=yes, resizable=yes");
-
-		// 모바일 웹인 경우, 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrMobileLinkUrl.do)를 호출하게 됩니다.
-		//var pop = window.open("/popup/jusoPopup.jsp","pop","scrollbars=yes, resizable=yes"); 
-	}
-	/** API 서비스 제공항목 확대 (2017.02) **/
-	function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
-			roadAddrPart2, engAddr, jibunAddr, zipNo, admCd, rnMgtSn, bdMgtSn,
-			detBdNmList, bdNm, bdKdcd, siNm, sggNm, emdNm, liNm, rn, udrtYn,
-			buldMnnm, buldSlno, mtYn, lnbrMnnm, lnbrSlno, emdNo) {
-		// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
-
-		
-		
-		// 배송주소록 추가 주소찾기
-		let addZipNo = null
-		let addAddr = null
-		let addAddrDetail = null
-
-		if(document.querySelector("#addZipNo")){
-			addZipNo = document.querySelector("#addZipNo")
-			addZipNo.value = zipNo;
-		}
-		if(document.querySelector("#addAddr")){
-			addAddr = document.querySelector("#addAddr")
-			addAddr.value = roadAddrPart1;
-		}
-		if(document.querySelector("#addAddrDetail")){
-			addAddrDetail = document.querySelector("#addAddrDetail")
-			addAddrDetail.value = addrDetail
-		}
-	}
-	
 	function getOrderId() {
 		console.log($("#nonOrderNo").val());
 		
@@ -133,12 +97,9 @@ let finalTotal = 0;
 			product.nonOrderNo = orderId;
 			product.productId = $(".summery-contain").find("li").eq(i).attr("id");
 			products2[i] = product; 
-		}
-		
-		
+		}	
 	}
-		
-			
+	
 
 	function identify() {
 		// IMP.certification(param, callback) 호출
@@ -168,7 +129,7 @@ let finalTotal = 0;
           pay_method : "card",
           merchant_uid : orderId, // 주문번호
           name : createName, // 수정필______________________________________
-          amount : Number($('#payToAmount').text()), // 숫자 타입
+          amount : Number($('#payToAmount').text().replaceAll(",","")), // 숫자 타입
           buyer_email : "",
           buyer_name : $('#nonRecipientName').val(),
           buyer_tel : $('#nonRecipientPhoneNumber').val(),
@@ -191,11 +152,17 @@ let finalTotal = 0;
                 //"paymentTime" : data.response.paidAt,// 결제 시각
                 "amountToPay" : rsp.paid_amount,
                 //"cardName" : data.response.cardName,
-                //"cardNumber" : data.response.cardNumber,   주석 처리 한 것은 백에서 작업.
-                "nonRecipientName" : $("#nonRecipientName").val(),
-                "nonRecipientPhoneNumber" : $('#nonRecipientPhoneNumber').val(),    
+                //"cardNumber" : data.response.cardNumber,   주석 처리 한 것은 백에서 작업.            
                 "impUid" : rsp.imp_uid,
-                products,         
+                products,
+                nonOrderHistory : {
+	            	   "nonRecipientName" : $('#recipient').text(),
+	             		  "nonRecipientPhoneNumber" : $('#recipientContact').text(),
+	             		  "nonZipCode" : $('#zipCode').text(),
+	             		  "nonShippingAddress" : $('#address').text(),
+	             		  "nonDetailedShippingAddress" : $('#detailAddress').text().replaceAll("\n",""),
+	             		  "nonDeliveryMessage" : deliveryMessage,
+	               }
               }
               $.ajax({
                 url : "/pay/output/",
@@ -223,55 +190,7 @@ let finalTotal = 0;
         })
       }
 
-	// 검증 실패로 인한 취소
-	function failVerification() {
-		rc = {
-			"imp_uid" : "imp_651936891989",
-			"amount" : 200,
-			"checksum" : 200,
-			"reason" : "사후검증 실패로 인한 취소 테스트",
-		}
-		$.ajax({
-			url : "/pay/cancel",
-			type : "POST",
-			contentType : "application/json",
-			data : JSON.stringify(rc),
-			async : false,
-			success : function(result) {
-				console.log(result);
-				alert("사후검증 결과 위조된 금액으로 취소 처리됐습니다.");
-			},
-			error : function(error) {
-				alert("취소 실패" + error);
-
-			}
-
-		})
-	}
-
-	// 취소
-	function cancelPayment() {
-		rc = {
-			"imp_uid" : "imp_651959197008",
-			"amount" : 200,
-			"checksum" : 200,
-			"reason" : "전체 환불",
-		}
-		$.ajax({
-			url : "/pay/cancel",
-			type : "POST",
-			contentType : "application/json",
-			data : JSON.stringify(rc),
-			async : false,
-			success : function(result) {
-				console.log(result);
-				alert("취소 완료");
-			},
-			error : function(error) {
-				alert("취소 실패" + error);
-			}
-		})
-	}
+	
 
 	function validateAll() {
 		if($('#addAddr').val() != "") {
@@ -313,20 +232,26 @@ let finalTotal = 0;
 	         products[i].nonOrderNo = orderId;
 	         products[i].productId = $(".summery-contain").find("li").eq(i).attr("id");
 	         products[i].productQuantity = $('#productQty'+i).text();
-	         products[i].productPrice = $('#productPrice'+i).text();
+	         products[i].productPrice = $('#productPrice'+i).text().replaceAll(",","");
 	       
 	         products[i].productOrderNo = orderId + "-"+(i+1);
+	      }
+	      if($("select[name=nonDeliveryMessage] option:selected").text() == "직접입력") {
+	    	  console.log('여기오냐');
+	    	  deliveryMessage = $('#directInput').val();
+	      } else {
+	    	  deliveryMessage = $("select[name=deliveryMessage] option:selected").text();
 	      }
 	         /* $('#addRecipient').val($('#recipient').text());
 	         $('#addAddress').val($('#address').text());
 	         $('#addDetailAddress').val($('#detailAddress').text());
 	         $('#addZipCode').val($('#zipCode').text());
 	         $('#addRecipientContact').val($('#recipientContact').text());
-	         console.log("아?",$('#addRecipientContact').val());
-	         console.log("아?",$('#addAddress').val());
-	         console.log("아?",$('#addDetailAddress').val());
-	         console.log("아?",$('#addZipCode').val());
-	         console.log("아?",$('#addRecipientContact').val()); */
+	         console.log($('#addRecipientContact').val());
+	         console.log($('#addAddress').val());
+	         console.log($('#addDetailAddress').val());
+	         console.log($('#addZipCode').val());
+	         console.log($('#addRecipientContact').val()); */
 
 	      if(itemLen > 1) {
 	         createName = $('#productName0').text()+" 외 "+(itemLen - 1)+"개";
@@ -339,29 +264,40 @@ let finalTotal = 0;
 	   }
 	
 	function checkPayMethod() {
+		 let payNo = "";
+		 let objAmountToPay = Number($('#payToAmount').text().replaceAll(",",""));
 		if(validateAll()) {
 			if ($("input[name='payMethod']").is(':checked')) {
 		         // 전체 radio 중에서 하나라도 체크되어 있는지 확인
 		         // 아무것도 선택안되어있으면, false
 		         let payMethod = $("input[name='payMethod']:checked").val();
+		         
 		         // score의 라디오 중 체크된 것의 값만 가져옴
 		         // 아무것도 선택안되어있으면, undefined
 		         console.log(payMethod);
-		         if (payMethod == "bkt") {
-		            let bktPayNo = "bkt"
+		         if (payMethod == "bkt" || payMethod == "ptr") {
+		            let payNo = "bkt_"
 		                  + ((String(new Date().getTime())).substring(1));
 		            packData();
 		            obj = {
-		               "paymentNumber" : bktPayNo, // 결제번호 생성 코드 필요
+		               "paymentNumber" : payNo, // 결제번호 생성 코드 필요
 		               "nonOrderNo" : orderId, // 주문번호
 		               "paymentMethod" : payMethod, // 결제수단
 		               "totalAmount" : totalAmount, // 총 상품 금액, 수정 필요
 		               "shippingFee" : shippingFee, // 배송비
-		               "amountToPay" : Number($('#payToAmount').text()), // (total+배송비-포인트-적립금)
-		               "actualPaymentAmount" : 0, // 실 결제 금액(무통장입금은 default 0)
-		               "nonRecipientName" : $("#nonRecipientName").val(),
-		               "nonRecipientPhoneNumber" : $('#nonRecipientPhoneNumber').val(),    
-		               products,   
+		               "amountToPay" : objAmountToPay, // (total+배송비-포인트-적립금)
+		               "actualPaymentAmount" : 0, // 실 결제 금액(무통장입금은 default 0)              
+		               products,
+		               nonOrderHistory : {
+		            	   "nonRecipientName" : $('#recipient').text(),
+		             		  "nonRecipientPhoneNumber" : $('#recipientContact').text(),
+		             		  "nonZipCode" : $('#zipCode').text(),
+		             		  "nonShippingAddress" : $('#address').text(),
+		             		  "nonDetailedShippingAddress" : $('#detailAddress').text().replaceAll("\n",""),
+		             		  "nonDeliveryMessage" : deliveryMessage,
+		             		  "nonPassword" : $('#nonPassword').val(),
+		             		  "nonEmail" : $('#nonEmail').val(),
+		               }
 		            };
 		            console.log(obj);
 		            $.ajax({

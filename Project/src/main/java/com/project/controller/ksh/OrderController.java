@@ -69,52 +69,51 @@ public class OrderController {
 		return path;
 	}
 
-	public Model returnPath(String orderId, Model model, OrderIdAndQty items, HttpServletRequest request, String productId,
-			int qty) {
+	public Model returnPath(String orderId, Model model, OrderIdAndQty items, HttpServletRequest request,
+			String productId, int qty) {
 		String impKey = (String) request.getAttribute("impKey");
 
 		if (!productId.equals("") && qty > 0) {
 			List<String> productIds = new ArrayList<String>();
 			productIds.add(productId);
 			items.setProductId(productIds);
-			List<Integer> productQty = new ArrayList<Integer>(); 
+			List<Integer> productQty = new ArrayList<Integer>();
 			productQty.add(qty);
 			items.setProductQuantity(productQty);
 		}
 
-			// 회원인지
-			if (orderId.contains("O")) {
-				// 쿠폰, 포인트, 적립금, 배송 주소록
-				HttpSession session = request.getSession();
-				Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
+		// 회원인지
+		if (orderId.contains("O")) {
+			// 쿠폰, 포인트, 적립금, 배송 주소록
+			HttpSession session = request.getSession();
+			Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 
-				// member 다시 조회
-				try {
-					Memberkjy memberInfo = os.getMemberInfo(member.getMemberId());
-					List<ShippingAddress> shippingAddr = os.getShippingAddress(member.getMemberId());
+			// member 다시 조회
+			try {
+				Memberkjy memberInfo = os.getMemberInfo(member.getMemberId());
+				List<ShippingAddress> shippingAddr = os.getShippingAddress(member.getMemberId());
 //						List<ShippingAddress> otherAddr = new ArrayList<ShippingAddress>();
 
-					for (ShippingAddress saddr : shippingAddr) {
-						if (saddr.getBasicAddr() == 'Y') {
-							model.addAttribute("basicAddr", saddr);
-						}
+				for (ShippingAddress saddr : shippingAddr) {
+					if (saddr.getBasicAddr() == 'Y') {
+						model.addAttribute("basicAddr", saddr);
 					}
-					model.addAttribute("member", memberInfo);
-					model.addAttribute("shippingAddr", shippingAddr);
-					System.out.println(shippingAddr.toString());
-					// 쿠폰이 한 개라도 있으면
-					if (member.getCouponCount() > 0) {
-						List<CouponInfos> couponInfos = os.getCouponInfos(member.getMemberId());
-						model.addAttribute("couponInfos", couponInfos);
-						System.out.println(couponInfos.toString());
-					}
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
+				model.addAttribute("member", memberInfo);
+				model.addAttribute("shippingAddr", shippingAddr);
+				System.out.println(shippingAddr.toString());
+				// 쿠폰이 한 개라도 있으면
+				if (member.getCouponCount() > 0) {
+					List<CouponInfos> couponInfos = os.getCouponInfos(member.getMemberId());
+					model.addAttribute("couponInfos", couponInfos);
+					System.out.println(couponInfos.toString());
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		
-		
+		}
+
 		List<String> productCategory = new ArrayList<String>();
 		List<OrderInfo> productInfos = new ArrayList<OrderInfo>();
 		PaymentDTO pd = new PaymentDTO();
@@ -130,7 +129,7 @@ public class OrderController {
 			for (OrderInfo i : productInfos) {
 				if (i.getCurrentQuantity() < items.getProductQuantity().get(index)) {
 					i.setAdequacy("N");
-					//path = "/commonError";
+					// path = "/commonError";
 				} else {
 					i.setAdequacy("Y");
 				}
@@ -163,38 +162,35 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "nonOrderComplete", method = RequestMethod.POST)
-	public void orderComplete(HttpServletRequest request, NonOrderHistory noh, Model model, @RequestParam("products") List<String> productId) {
+	public void orderComplete(HttpServletRequest request, NonOrderHistory noh, Model model,
+			@RequestParam("products") List<String> productId) {
 		// 비회원 주문 결제 완료하고 주문 내역 창 띄우기
 
 		System.out.println("결제 완료하고 주문 내역 저장하기");
 		System.out.println(noh.toString());
 		Map<String, Object> paymentDetail = new HashMap<String, Object>();
-		
-		// 비회원 회원 아이디 set
-		Cookie cookie = WebUtils.getCookie(request, "nom");
-		System.out.println(cookie.getValue());
-		noh.setNonMemberId(cookie.getValue());
-		
+
+//		// 비회원 회원 아이디 set
+//		Cookie cookie = WebUtils.getCookie(request, "nom");
+//		System.out.println(cookie.getValue());
+//		noh.setNonMemberId(cookie.getValue());
+
 		try {
 //			 결제랑 주문상세 조회
 			paymentDetail = os.getPaymentDetail(noh, productId);
-			CompleteOrder co =((CompleteOrder)paymentDetail.get("paymentHistory"));
+			//CompleteOrder co = ((CompleteOrder) paymentDetail.get("paymentHistory"));
 			System.out.println("paymentDetail 조회 - " + paymentDetail.toString());
-			if(co.getPaymentMethod().equals("bkt")) {
-				noh.setNonDeliveryStatus("입금전");
-			} else {
-				noh.setNonDeliveryStatus("결제완료");
-			}
-			// 주문내역 테이블 저장
-			if(nonOrderCount == 0) {
-			if (os.saveNonOrderHistory(noh)) {
-				nonOrderCount++;
-				System.out.println("결제랑 주문 상세 정보 가져오고 주문 내역 테이블까지 저장 성공");
-				
-			}
-			}
-			model.addAttribute("paymentDetail", paymentDetail);
 			
+			// 주문내역 테이블 저장 - 테스트중!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//			if (nonOrderCount == 0) {
+//				if (os.saveNonOrderHistory(noh)) {
+//					nonOrderCount++;
+//					System.out.println("결제랑 주문 상세 정보 가져오고 주문 내역 테이블까지 저장 성공");
+//
+//				}
+//			}
+			model.addAttribute("paymentDetail", paymentDetail);
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -208,48 +204,38 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "orderComplete", method = RequestMethod.POST)
-	public void orderComplete(OrderHistory oh, Model model, @RequestParam("products") List<String> productId) {
+	public void orderComplete(HttpServletRequest request, Model model, @RequestParam("orderNo") String orderNo) {
 		// 주문 결제 완료하고 주문 내역 창 띄우기
 
 		System.out.println("결제 완료하고 주문 내역 저장하기");
-		System.out.println(oh.toString());
 
 		Map<String, Object> paymentDetail = new HashMap<String, Object>();
+
+		if(request.getSession().getAttribute("orderNo") != null) {
+			orderNo = (String) request.getAttribute("orderNo");
+		}
+		System.out.println(orderNo);
+		
 		
 		try {
 //			 결제랑 주문상세 조회
-			paymentDetail = os.getPaymentDetail(oh, productId);
+			paymentDetail = os.getPaymentDetail(orderNo);
 			System.out.println("paymentDetail 조회 - " + paymentDetail.toString());
-			if(((CompleteOrder)paymentDetail.get("paymentHistory")).getPaymentMethod().equals("bkt")) {
-				oh.setDeliveryStatus("입금전");
-			} else {
-				oh.setDeliveryStatus("결제완료");
-			}
-			// 주문내역 테이블 저장
-			if(orderCount == 0) {
-				
-				if (os.saveOrderHistory(oh)) {
-					orderCount++;
-					System.out.println("결제랑 주문 상세 정보 가져오고 주문 내역 테이블까지 저장 성공");
-				}
-			}
+			
+//			// 주문내역 테이블 저장 테스트중 잠시 주석!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//			if (orderCount == 0) {
+//
+//				if (os.saveOrderHistory(oh)) {
+//					orderCount++;
+//					System.out.println("결제랑 주문 상세 정보 가져오고 주문 내역 테이블까지 저장 성공");
+//				}
+//			}
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		model.addAttribute("paymentDetail", paymentDetail);
-	}
-
-	@RequestMapping(value = "get/", method = RequestMethod.GET)
-	public void getOrderHistory(@RequestParam("orderId") String orderId) {
-		System.out.println("주문 내역 창 띄우기");
-		try {
-//			os.getOrderHistory();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 }

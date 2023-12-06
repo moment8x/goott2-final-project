@@ -15,8 +15,6 @@ import com.project.vodto.CouponInfos;
 import com.project.vodto.DetailOrderItem;
 import com.project.vodto.NonOrderHistory;
 import com.project.vodto.OrderHistory;
-import com.project.vodto.Payment;
-import com.project.vodto.Product;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.kjy.Memberkjy;
 import com.project.vodto.ksh.CompleteOrder;
@@ -38,7 +36,7 @@ public class OrderDAOImpl implements OrderDAO {
 	}
 
 	@Override
-	public int saveDetailItems(List<DetailOrderItem> itemList) {
+	public int saveDetailItems(List<DetailOrderItem> itemList) throws Exception {
 		int count = 0;
 		Map<String, Object> map = new HashMap<>();
 		map.put("list", itemList);
@@ -60,23 +58,26 @@ public class OrderDAOImpl implements OrderDAO {
 	}
 
 	@Override
-	public int insertNewOrderHistory(OrderHistory oh) {
+	public int insertNewOrderHistory(OrderHistory oh) throws Exception {
 		return ses.insert(ns + ".insertNewOrderHistory", oh);
 	}
 
 	@Override
-	public CompleteOrder getPaymentHistory(String orderNo) {
+	public CompleteOrder getPaymentHistory(String orderNo) throws Exception {
 		Map<String, Object> map = new HashMap<>();
 		if(orderNo.contains("O")) {
 			map.put("orderNo", orderNo);
 		} else {
 			map.put("nonOrderNo", orderNo);
 		}
-		return ses.selectOne(ns + ".getPaymentDetail", map);
+		CompleteOrder c = ses.selectOne(ns + ".getPaymentDetail", map);
+		System.out.println("뭔데!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		System.out.println(c.toString());
+		return c;
 	}
 
 	@Override
-	public List<OrderInfo> getProductInfo(List<String> productId) {
+	public List<OrderInfo> getProductInfo(List<String> productId) throws Exception {
 		List<OrderInfo> productInfos = new ArrayList<OrderInfo>();
 
 		if (productId.size() > 1) {
@@ -93,7 +94,7 @@ public class OrderDAOImpl implements OrderDAO {
 	}
 
 	@Override
-	public int saveBankTransfer(PaymentDTO pd) {
+	public int saveBankTransfer(PaymentDTO pd) throws Exception {
 		// 무통장입금 테이블 저장
 		return ses.insert(ns + ".saveBankTransfer", pd);
 	}
@@ -150,8 +151,9 @@ public class OrderDAOImpl implements OrderDAO {
 		params.put("relatedOrder", pd.getOrderNo());
 
 		params.put("usedDate", date);
-
+		System.out.println("안녕요"+pd.getCouponNumbers());
 		for (String coupon : pd.getCouponNumbers()) {
+			System.out.println("여기 몇번 탐?");
 			params.put("coupon", coupon);
 			count += ses.update(ns + ".updateCouponLogs", params);
 		}
@@ -240,10 +242,15 @@ public class OrderDAOImpl implements OrderDAO {
 	}
 
 	@Override
-	public int getRealAmount(List<String> productId) throws Exception {
-		
-		return 0;
+	public List<String> getProductIds(String orderNo) throws Exception {
+		// 결제 완료 페이지를 위한 상품 id 리스트 가져오기
+		List<String> productIds = ses.selectList(ns+".getProductIds", orderNo);
+		return productIds;
 	}
+	
+	
+
+
 
 //	@Override
 //	public int insertNewOrder(NonOrderHistory noh) throws Exception {

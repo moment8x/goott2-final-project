@@ -7,4 +7,9 @@
 	<insert id="insertNonMember">
 		INSERT INTO non_shopping_cart VALUES(#{nonMemberId}, #{nonMemberExpirationPeriod})
 	</insert>
+	<delete id="deleteNonMember">
+		<![CDATA[
+			DELETE FROM non_shopping_cart WHERE non_member_expiration_period < now()
+		]]>
+	</delete>
 </mapper>

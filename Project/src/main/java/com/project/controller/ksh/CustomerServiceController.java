@@ -56,13 +56,16 @@ public class CustomerServiceController {
 	}
 
 	@RequestMapping(value = "uploadFile", method = RequestMethod.POST) // 서버
-	public @ResponseBody List<UploadFiles> uploadFile(HttpServletRequest request, MultipartFile uploadFile) {
+	public @ResponseBody List<UploadFiles> uploadFile
+	(HttpServletRequest request, MultipartFile uploadFile, @RequestParam(value="files2[]", defaultValue = "") ArrayList<UploadFiles> files) {
 		// 1. 파일이 저장될 경로 확인
+		System.out.println("안녕요");
 		String realPath = request.getSession().getServletContext().getRealPath("resources/inquiryUploads");
 		try {
 			// 2. 서비스단에 데이터 전송
-			fileList = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(),
-					uploadFile.getContentType(), uploadFile.getBytes(), realPath, fileList);
+			System.out.println(files.toString());
+//			fileList = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(),
+//					uploadFile.getContentType(), uploadFile.getBytes(), realPath, fileList);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -77,7 +80,7 @@ public class CustomerServiceController {
 
 		if (fileList.size() > 0) {
 			for (UploadFiles file : fileList) {
-				ufService.deleteFile(file, realPath);
+				ufService.deleteFile(file.getNewFileName(), realPath);
 			}
 			fileList.clear();
 			deleteFileList.clear();

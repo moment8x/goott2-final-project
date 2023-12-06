@@ -1,39 +1,28 @@
 package com.project.service.kjy;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeUtility;
 
-import org.springframework.core.io.InputStreamSource;
-import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.google.protobuf.compiler.PluginProtos.CodeGeneratorResponse.File;
-import com.project.dao.kjr.LoginDao;
+import com.project.dao.kjy.LoginDao;
 import com.project.vodto.kjy.LoginDTO;
 import com.project.vodto.kjy.Memberkjy;
 
 @Service
 public class LoginServiceImpl implements LoginService {
 	@Inject
-	private LoginDao loginDao;
+	private com.project.dao.kjy.LoginDao loginDao;
 	@Inject
 	private JavaMailSender mailSender;
+	private String emailCode = "";
+	private Memberkjy member = null;
 	
 
 	@Override
@@ -76,20 +65,25 @@ public class LoginServiceImpl implements LoginService {
 		return result;
 	}
 	
-	public void emailAuth(String email, String userName) throws Exception {
-		System.out.println("!!111s");
+	public boolean emailAuth(String email, String userName, String userId) throws Exception {
+		boolean result = false;
 		// 먼저 db에서 해당 이메일을 쓰는 사람이 있는지 확인
-		Memberkjy findMember = loginDao.selectMemberByNameAndEmail(email, userName);
+		Memberkjy findMember = loginDao.selectMemberByNameAndEmail(userId, email, userName);
 		if(findMember != null) {
-			System.out.println("!!2222");
-			emailaSend(email);
+			this.member = findMember;
+			if(emailaSend(email)) {
+				result = true;
+			}
 		}
-		
+		return result;
 	}
 	
 	public boolean emailaSend(String email) throws MessagingException{
 		String code = UUID.randomUUID().toString();
+		System.out.println("code!!!!!!!!!!!!!!!!!!!!!!!!!! : " + code);
 		//System.setProperty("mail.debug", "true");
+		System.clearProperty("mail.debug");
+		this.emailCode = code;
 		
 		boolean result = false;
 		
@@ -111,5 +105,28 @@ public class LoginServiceImpl implements LoginService {
 		result = true;
 		
 		return result;
-	} 
+	}
+
+
+	@Override
+	public Memberkjy validEmailCode(String emailCode) {
+		if(this.emailCode.equals(emailCode)) {
+			return this.member;
+		}
+		return null;
+	}
+
+
+	@Override
+	public boolean changePassword(String userId, String password) {
+		
+		return loginDao.updatePassword(userId, password);
+	}
+
+
+	@Override
+	public boolean isAdmin(String id) throws Exception {
+		
+		return loginDao.isAdminBySelectPermission(id);
+	}
 }

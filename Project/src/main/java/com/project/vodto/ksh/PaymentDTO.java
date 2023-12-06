@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import com.project.vodto.DetailOrderItem;
+import com.project.vodto.NonOrderHistory;
+import com.project.vodto.OrderHistory;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,6 +43,8 @@ public class PaymentDTO {
 	private String phoneNumber;
 	private String nonRecipientPhoneNumber;
 	private String nonRecipientName;
+	private OrderHistory orderHistory;
+	private NonOrderHistory nonOrderHistory;
 	
 	
 }

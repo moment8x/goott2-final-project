@@ -18,7 +18,7 @@ public class AdminInquiryDAOImpl implements AdminInquiryDAO {
 	private final SqlSession ses;
 	
 	@Override
-	public List<InquiryResponse> findInquiryByInfo(InquiryCondition inquiryCond) throws Exception {
+	public List<InquiryResponse> findInquiryByInfo(InquiryCondition inquiryCond) {
 		return ses.selectList(ns + ".selectInquiryInfo",inquiryCond);
 	}
 

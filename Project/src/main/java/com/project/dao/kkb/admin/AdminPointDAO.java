@@ -8,9 +8,9 @@ import com.project.vodto.kkb.PointListResponse;
 public interface AdminPointDAO {
 	
 	/* 포인트 정보 */
-	PointInfoResponse findPointInfoById(String memberId) throws Exception;
+	PointInfoResponse findPointInfoById(String memberId);
 	
 	/* 포인트 내역 */
-	List<PointListResponse> findPointListById(String memberId) throws Exception;
+	List<PointListResponse> findPointListById(String memberId);
 
 }

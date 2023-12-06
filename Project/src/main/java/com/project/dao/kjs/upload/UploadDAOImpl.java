@@ -24,9 +24,14 @@ public class UploadDAOImpl implements UploadDAO {
 	}
 
 	@Override
-	public Integer selectUploadFile(UploadFiles file) throws SQLException, NamingException {
+	public Integer selectUploadFile(String newFileName) throws SQLException, NamingException {
 //		file.setNewFileName(file.getNewFileName().replace("\\", "/"));
 		
-		return session.selectOne(ns + ".isExist", file);
+		return session.selectOne(ns + ".isExist", newFileName);
+	}
+
+	@Override
+	public int deleteUploadFile(int uploadFilesSeq) throws SQLException, NamingException {
+		return session.delete(ns + ".deleteUploadFile", uploadFilesSeq);
 	}
 }

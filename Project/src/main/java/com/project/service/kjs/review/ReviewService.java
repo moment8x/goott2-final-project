@@ -21,5 +21,9 @@ public interface ReviewService {
 	// 리뷰 수정을 위한 데이터 조회
 	ReviewBoardDTO getReview(int postNo, String memberId) throws SQLException, NamingException;
 	// 리뷰 수정
-	boolean updateReview(int postNo, String content, int rating, List<UploadFiles> fileList) throws SQLException, NamingException;
+	boolean updateReview(int postNo, String content, int rating, List<UploadFiles> fileList, List<String> deleteFileList, String realPath, String productId) throws SQLException, NamingException;
+	// 삭제할 권한 확인
+	boolean deleteCheck(int postNo, String memberId, String productId) throws SQLException, NamingException;
+	// 리뷰 삭제
+	boolean deleteReview(int postNo) throws SQLException, NamingException;
 }

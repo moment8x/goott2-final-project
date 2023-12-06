@@ -27,7 +27,7 @@
    rel="stylesheet">
 
 
-
+<link rel="stylesheet" href="/resources/assets/css/animate.min.css" />
 <!-- bootstrap css -->
 <link id="rtl-link" rel="stylesheet" type="text/css"
    href="/resources/assets/css/vendors/bootstrap.css">
@@ -52,39 +52,39 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 
 <script>
+	let page = 1;
+	let lastPage = 1;
+	
    $(function () {
       $('.single-item').slick();
       
       $('.review-imgs').click(function (e) {
-         let output = "";
-         let index = $(this).prev().val();
-         let src = `<c:out value='${reviewList}'/>`;
-         src = src.split("ReviewBoardDTO");
-         src = src[index].split("imagesAddr=[")[1];
-         src = src.replaceAll("]", "");
-         src = src.replaceAll(")", "");
-         src = src.replaceAll("thumb_", "");
-         src = src.split(', ');
-         console.log("src", src);
-         
-         for (let i = 0; i < src.length; i++) {
-            if (src[i] !== "") {
-               output += "<div><img src='../resources/uploads" + src[i] + "'></div>";
-            }
-         }
-         
-         console.log(output);
-         
-         $('.fade-img').html(output);
-         
-         $('.fade-img').slick({
-            dots: false,
-            infinite: true,
-            speed: 500,
-            fade: true,
-            cssEase: 'linear'
-         });
-      });
+    	  let output = "";
+    	  let index = $(this).prev().val();
+    	  let src = `<c:out value='${reviewList}'/>`;
+    	  src = src.split("ReviewBoardDTO");
+    	  src = src[index].split("imagesAddr=[")[1];
+    	  src = src.replaceAll("]", "");
+    	  src = src.replaceAll(")", "");
+      	  src = src.replaceAll("thumb_", "");
+      	  src = src.split(', ');
+      	  
+      	  for (let i = 0; i < src.length; i++) {
+      		  if (src[i] !== "") {
+      			  output += "<div><img src='../resources/uploads" + src[i] + "'></div>";
+      		  }
+      	  }
+      	  
+      	  $('.fade-img').html(output);
+      	  
+      	  $('.one-time').slick({
+      		  dots: true,
+      		  infinite: true,
+      		  speed: 300,
+      		  slidesToShow: 1,
+      		  adaptiveHeight: true
+      	  });
+	  });
    
       changeStar();
       
@@ -117,30 +117,106 @@
          }
       });
       
-      // 페이징
-      $('.paging-btn').click(function(e) {
-         let page = $(this).html();
-         let productId = "${product.productId}";
-         console.log("productId", productId);
-         $.ajax({
-            url: "/review/" + productId,
-            type: "GET",
-            data: {
-               "productId" : productId,
-               "page" : page
-            },
-            dataType: "JSON",
-            async: false,
-            success: function(data) {
-               console.log("success", data);
-               showReview(data);
-               changeStar();
-            }, error: function(data) {
-               console.log("err", data);
-            }
-         });
-      });
+      pagination();
    });
+	
+	// 페이지 이동 버튼 클릭 시 이벤트 함수
+	function pagination() {
+		$('.paging-btn').click(function(e) {
+			page = $(this).html();
+			processPage();
+		});
+		$('.first-btn').click(function(e) {
+			page = 1;
+			processPage();
+		});
+		$('.last-btn').click(function(e) {
+			page = lastPage;
+			processPage();
+		});
+		$('.prev-btn').click(function(e) {
+			if (page % 10 === 0) {
+				page = page - 10;
+			} else {
+				page = (page / 10) * 10 + 1
+			}
+			processPage();
+		});
+		$('.next-btn').click(function(e) {
+			if (page % 10 === 0) {
+				page = page + 1;
+			} else {
+				page = ((page / 10) + 1) * 10 + 1
+			}
+			processPage();
+		});
+	}
+	
+	// 페이징 처리
+	function processPage() {
+		let productId = "${product.productId}";
+		$.ajax({
+			url: "/review/" + productId,
+			type: "GET",
+			data: {
+				"productId" : productId,
+				"page" : page
+			},
+		dataType: "JSON",
+		async: false,
+		success: function(data) {
+           console.log("success", data);
+           showReview(data);
+           paging(data.pagingInfo);
+           changeStar();
+           lastPage = data.pagingInfo.totalPageCnt;
+        }, error: function(data) {
+           console.log("err", data);
+        }
+     });
+	}
+	
+	// 페이징 출력
+	function paging(pagingInfo) {
+		let output = '<nav class="custome-pagination"><ul class="pagination justify-content-center">';	// 페이징
+		if (pagingInfo.pageBlockOfCurrentPage == 1) {
+			output += '<li class="page-item disabled">';
+			output += '<a class="first-btn page-link"><i class="fa-solid fa-angles-left"></i></a></li>';
+			output += '<li class="page-item disabled">';
+			output += '<a class="prev-btn page-link"><i class="fa-solid fa-chevron-left"></i></a></li>';
+		} else {
+			output += '<li class="page-item active">';
+			output += '<a class="first-btn page-link"><i class="fa-solid fa-angles-left"></i></a></li>';
+			output += '<li class="page-item active">';
+			output += '<a class="prev-btn page-link"><i class="fa-solid fa-chevron-left"></i></a></li>';
+		}
+		if (pagingInfo.totalPagingBlockCnt > pagingInfo.endNumOfCurrentPagingBlock) {
+			for (let i = pagingInfo.startNumOfCurrentPagingBlock; i <= pagingInfo.endNumOfCurrentPagingBlock; i++) {
+				output += '<li class="page-item active">';
+				output += '<a class="page-link paging-btn">' + i + '</a></li>';
+			}
+		} else {
+			for (let i = pagingInfo.startNumOfCurrentPagingBlock; i <= pagingInfo.totalPageCnt; i++) {
+				output += '<li class="page-item active">';
+				output += '<a class="page-link paging-btn">' + i + '</a></li>';
+			}
+		}
+		if (pagingInfo.totalPagingBlockCnt === pagingInfo.pageBlockOfCurrentPage) {
+			output += '<li class="page-item disabled">';
+			output += '<a class="next-btn page-link"><i class="fa-solid fa-chevron-right"></i></a></li>';
+			output += '<li class="page-item disabled">';
+			output += '<a class="last-btn page-link"><i class="fa-solid fa-angles-right"></i></a></li>';
+		} else {
+			output += '<li class="page-item active">';
+			output += '<a class="next-btn page-link"><i class="fa-solid fa-chevron-right"></i></a></li>';
+			output += '<li class="page-item active">';
+			output += '<a class="last-btn page-link"><i class="fa-solid fa-angles-right"></i></a></li>';
+		}
+			
+		output += "</ul></nav>";
+		$('.page').html(output);
+		pagination();
+	}
    
    // 첨부파일 함수
    function uploadFiles() {
@@ -149,8 +225,6 @@
       });
       $(".upFileArea").on("drop", function(e) {
          e.preventDefault();
-         
-         console.log(e.originalEvent.dataTransfer.files);
          
          let key = $(this).attr("id").split("-")[0];
          let files = e.originalEvent.dataTransfer.files;
@@ -277,11 +351,7 @@
       let rating = $('#review-' + index + ' input:radio[name="updateRating"]:checked').val();
       let content = $('#review-' + index + ' div.reply textarea').val();
       let productId = "${product.productId}";
-      //console.log("author", author);
-      console.log("rating", rating);
-      console.log("content", content);
-      console.log("productId", productId);
-      /*$.ajax({
+      $.ajax({
          url : "/review/update",
          type : "POST",
          data : {
@@ -289,16 +359,19 @@
             //"author" : author,
             "rating" : rating,
             "content" : content,
-            "productId" : productId
+            "productId" : productId,
+            "page" : page
          },
          dataType : "JSON",
          async : false,
          success : function(data) {
             console.log("success", data);
+            showReview(data);
+            paging(data.pagingInfo);
          }, error : function(data) {
             console.log("err", data);
          }
-      });*/
+      });
    }
    
    // 리뷰 수정 중 취소 시
@@ -309,7 +382,7 @@
       
       if ("${sessionScope.loginMember.memberId}" == author) {
          output += '<a onclick="updateReviewCheck(' + index + ', ' + postNo + ');">수정</a>';
-         output += '<a onclick="removeReviewCheck(${index}, ' + postNo + ');" style="top:20px; color:#ff3535;">삭제</a>';
+         output += '<a onclick="removeReviewCheck(' + index + ', ' + postNo + ');" style="top:20px; color:#ff3535;">삭제</a>';
       }
       output += '</p>';
       
@@ -330,30 +403,25 @@
    // 리뷰 삭제 클릭 시
    function removeReviewCheck(index, postNo) {
       let productId = "${product.productId}";
-      alert("아직 구현 X");
-      // 해당 리뷰 삭제 가능한지 확인
-      /*$.ajax({
-         url: "/review/update",
-         type: "GET",
+      // 해당 리뷰 삭제 가능한지 확인 후 삭제 가능할 시 삭제..?
+      $.ajax({
+         url: "/review/delete",
+         type: "POST",
          data: {
             "productId" : productId,
-            "postNo" : postNo
+            "postNo" : postNo,
+            "page" : page
          },
          dataType: "JSON",
          async: false,
          success: function(data) {
-            console.log("success", data);
-            if (data.status === "success") {
-               // 리뷰 삭제 시작
-               
-            } else {
-               alert("작성자만 삭제 가능합니다.");
-               return false;
-            }
+            console.log("delete", data);
+            showReview(data);
+            paging(data.pagingInfo);
          }, error: function(data) {
             console.log("err", data);
          }
-      });*/
+      });
    }
    
    // 리뷰출력
@@ -393,8 +461,7 @@
          }
          output += '</p></div></div></div></li>';
       }
-      console.log("output", output);
-      
+     
       $('.review-list').html(output);
    }
    
@@ -452,6 +519,7 @@
             console.log(data);
             if (data.status === "success") {
                alert("장바구니 등록 완료");
+               newCart(data.cartItems);
             } else if (data.status === "exist") {
                alert("기존에 장바구니에 존재하는 상품입니다.");
             }
@@ -500,61 +568,64 @@
 </script>
    
 <style type="text/css">
-.flip-card {
-   background-color: transparent;
-   width: 390px;
-   height: 570px;
-   perspective: 1000px;
-   display: flex;
-   margin: auto;
-}
-
-.flip-card-inner {
-   position: relative;
-   width: 100%;
-   height: 100%;
-   text-align: center;
-   transition: transform 0.6s;
-   transform-style: preserve-3d;
-   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-   z-index: -1;
-}
-
-.flip-card:hover .flip-card-inner {
-   transform: rotateY(180deg);
-}
-
-.flip-card-front, .flip-card-back {
-   position: absolute;
-   width: 100%;
-   height: 100%;
-   -webkit-backface-visibility: hidden;
-   backface-visibility: hidden;
-}
-
-.flip-card-front {
-   background-color: #bbb;
-   color: black;
-}
-
-.flip-card-back {
-   background-color: #2980b9;
-   color: white;
-   transform: rotateY(180deg);
-}
-
-.upFileArea {
-   width: 100%;
-   height: 200px;
-   border: 1px solid black;
-}
-
-.star-rating input{
-   display: none;
-}
-textarea {
-   resize: none;
-}
+	.flip-card {
+	   background-color: transparent;
+	   width: 390px;
+	   height: 570px;
+	   perspective: 1000px;
+	   display: flex;
+	   margin: auto;
+	}
+	
+	.flip-card-inner {
+	   position: relative;
+	   width: 100%;
+	   height: 100%;
+	   text-align: center;
+	   transition: transform 0.6s;
+	   transform-style: preserve-3d;
+	   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+	   z-index: -1;
+	}
+	
+	.flip-card:hover .flip-card-inner {
+	   transform: rotateY(180deg);
+	}
+	
+	.flip-card-front, .flip-card-back {
+	   position: absolute;
+	   width: 100%;
+	   height: 100%;
+	   -webkit-backface-visibility: hidden;
+	   backface-visibility: hidden;
+	}
+	
+	.flip-card-front {
+	   background-color: #bbb;
+	   color: black;
+	}
+	
+	.flip-card-back {
+	   background-color: #2980b9;
+	   color: white;
+	   transform: rotateY(180deg);
+	}
+	
+	.upFileArea {
+	   width: 100%;
+	   height: 200px;
+	   border: 1px solid black;
+	}
+	
+	.star-rating input{
+	   display: none;
+	}
+	textarea {
+	   resize: none;
+	}
+	.modal-body {
+		margin : auto;
+	}
 </style>
 
 
@@ -1068,24 +1139,67 @@ textarea {
                                                          </ul>
                                                       </div>
                                                       
-                                                      <div>
+                                                      <div class="page">
                                                          <!-- 페이징 -->
-                                                         <c:choose>
-                                                            <c:when test="${pagingInfo.totalPagingBlockCnt > paingInfo.endNumOfCurrentPagingBlock}">
-                                                               <c:forEach var="i" begin="${pagingInfo.startNumOfCurrentPagingBlock}" end="${pagingInfo.endNumOfCurrentPagingBlock}" step="1">
-                                                                  <li class="page-item active">
-                                                                     <button type="button" class="btn btn-success paging-btn">${i}</button>
-                                                                  </li>
-                                                               </c:forEach>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                               <c:forEach var="i" begin="${pagingInfo.startNumOfCurrentPagingBlock}" end="${pagingInfo.totalPageCnt }" step="1">
-                                                                  <li class="page-item active">
-                                                                     <button type="button" class="btn btn-success paging-btn">${i}</button>
-                                                                  </li>
-                                                               </c:forEach>
-                                                            </c:otherwise>
-                                                         </c:choose>
+                                                         <nav class="custome-pagination">
+	                                                         <ul class="pagination justify-content-center">
+	                                                         	<!-- arrow btn -->
+	                                                         	<c:choose>
+	                                                         		<c:when test="${pagingInfo.pageBlockOfCurrentPage == 1}">
+	                                                         			<li class="page-item disabled">
+	                                                         				<a class="first-btn page-link"><i class="fa-solid fa-angles-left"></i></a>
+	                                                         			</li>
+	                                                         			<li class="page-item disabled">
+	                                                         				<a class="prev-btn page-link"><i class="fa-solid fa-chevron-left"></i></a>
+	                                                         			</li>
+	                                                         		</c:when>
+	                                                         		<c:otherwise>
+	                                                         			<li class="page-item active">
+	                                                         				<a class="first-btn page-link"><i class="fa-solid fa-angles-left"></i></a>
+	                                                         			</li>
+	                                                         			<li class="page-item active">
+	                                                         				<a type="button" class="prev-btn page-link"><i class="fa-solid fa-chevron-left"></i></a>
+	                                                         			</li>
+	                                                         		</c:otherwise>
+	                                                         	</c:choose>
+	                                                         	<!-- 번호 btn -->
+	                                                         	<c:choose>
+	                                                         		<c:when test="${pagingInfo.totalPagingBlockCnt > paingInfo.endNumOfCurrentPagingBlock}">
+	                                                         			<c:forEach var="i" begin="${pagingInfo.startNumOfCurrentPagingBlock}" end="${pagingInfo.endNumOfCurrentPagingBlock}" step="1">
+	                                                         				<li class="page-item active">
+	                                                         					<a class="page-link paging-btn">${i}</a>
+	                                                         				</li>
+	                                                         			</c:forEach>
+	                                                         		</c:when>
+	                                                         		<c:otherwise>
+	                                                         			<c:forEach var="i" begin="${pagingInfo.startNumOfCurrentPagingBlock}" end="${pagingInfo.totalPageCnt }" step="1">
+	                                                         				<li class="page-item active">
+	                                                         					<a class="page-link paging-btn">${i}</a>
+	                                                         				</li>
+	                                                         			</c:forEach>
+	                                                         		</c:otherwise>
+	                                                         	</c:choose>
+	                                                         	<!-- arrow btn -->
+	                                                         	<c:choose>
+	                                                         		<c:when test="${pagingInfo.totalPagingBlockCnt == pagingInfo.pageBlockOfCurrentPage}">
+	                                                         			<li class="page-item disabled">
+	                                                         				<a class="next-btn page-link"><i class="fa-solid fa-chevron-right"></i></a>
+	                                                         			</li>
+	                                                         			<li class="page-item disabled">
+	                                                         				<a class="last-btn page-link"><i class="fa-solid fa-angles-right"></i></a>
+	                                                         			</li>
+	                                                         		</c:when>
+	                                                         		<c:otherwise>
+	                                                         			<li class="page-item active">
+	                                                         				<a class="next-btn page-link"><i class="fa-solid fa-chevron-right"></i></a>
+	                                                         			</li>
+	                                                         			<li class="page-item active">
+	                                                         				<a class="last-btn page-link"><i class="fa-solid fa-angles-right"></i></a>
+	                                                         			</li>
+	                                                         		</c:otherwise>
+	                                                         	</c:choose>
+	                                                         </ul>
+                                                         </nav>
                                                       </div>
                                                    </div>
                                                 </div>
@@ -1495,4 +1609,378 @@ textarea {
                                           <button type="button" class="qty-right-plus bg-gray"
                                              data-type="plus" data-field="">
                                              <i class="fa fa-plus" aria-hidden="true"></i>
-         
+                                          </button>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div>
+                        <div class="product-box-3 wow fadeInUp" data-wow-delay="0.15s">
+                           <div class="product-header">
+                              <div class="product-image">
+                                 <a href="product-left-thumbnail.html"> <img
+                                    src="/resources/assets/images/cake/product/4.png"
+                                    class="img-fluid blur-up lazyload" alt="">
+                                 </a>
+
+                                 <ul class="product-option">
+                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="View"><a href="javascript:void(0)"
+                                       data-bs-toggle="modal" data-bs-target="#view"> <i
+                                          data-feather="eye"></i>
+                                    </a></li>
+
+                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="Compare"><a href="compare.html"> <i
+                                          data-feather="refresh-cw"></i>
+                                    </a></li>
+
+                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="Wishlist"><a href="wishlist.html"
+                                       class="notifi-wishlist"> <i data-feather="heart"></i>
+                                    </a></li>
+                                 </ul>
+                              </div>
+                           </div>
+
+                           <div class="product-footer">
+                              <div class="product-detail">
+                                 <span class="span-name">Snacks</span> <a
+                                    href="product-left-thumbnail.html">
+                                    <h5 class="name">SnackAmor Combo Pack of Jowar Stick
+                                       and Jowar Chips</h5>
+                                 </a>
+                                 <div class="product-rating mt-2">
+                                    <ul class="rating">
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                    </ul>
+                                    <span>(5.0)</span>
+                                 </div>
+                                 <h6 class="unit">570 G</h6>
+                                 <h5 class="price">
+                                    <span class="theme-color">$12.52</span>
+                                    <del>$13.62</del>
+                                 </h5>
+                                 <div class="add-to-cart-box bg-white">
+                                    <button class="btn btn-add-cart addcart-button">
+                                       Add <span class="add-icon bg-light-gray"> <i
+                                          class="fa-solid fa-plus"></i>
+                                       </span>
+                                    </button>
+                                    <div class="cart_qty qty-box">
+                                       <div class="input-group bg-white">
+                                          <button type="button" class="qty-left-minus bg-gray"
+                                             data-type="minus" data-field="">
+                                             <i class="fa fa-minus" aria-hidden="true"></i>
+                                          </button>
+                                          <input class="form-control input-number qty-input"
+                                             type="text" name="quantity" value="1">
+                                          <button type="button" class="qty-right-plus bg-gray"
+                                             data-type="plus" data-field="">
+                                             <i class="fa fa-plus" aria-hidden="true"></i>
+                                          </button>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div>
+                        <div class="product-box-3 wow fadeInUp" data-wow-delay="0.2s">
+                           <div class="product-header">
+                              <div class="product-image">
+                                 <a href="product-left-thumbnail.html"> <img
+                                    src="/resources/assets/images/cake/product/5.png"
+                                    class="img-fluid blur-up lazyload" alt="">
+                                 </a>
+
+                                 <ul class="product-option">
+                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="View"><a href="javascript:void(0)"
+                                       data-bs-toggle="modal" data-bs-target="#view"> <i
+                                          data-feather="eye"></i>
+                                    </a></li>
+
+                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="Compare"><a href="compare.html"> <i
+                                          data-feather="refresh-cw"></i>
+                                    </a></li>
+
+                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="Wishlist"><a href="wishlist.html"
+                                       class="notifi-wishlist"> <i data-feather="heart"></i>
+                                    </a></li>
+                                 </ul>
+                              </div>
+                           </div>
+
+                           <div class="product-footer">
+                              <div class="product-detail">
+                                 <span class="span-name">Snacks</span> <a
+                                    href="product-left-thumbnail.html">
+                                    <h5 class="name">Yumitos Chilli Sprinkled Potato Chips
+                                       100 g</h5>
+                                 </a>
+                                 <div class="product-rating mt-2">
+                                    <ul class="rating">
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star"></i></li>
+                                       <li><i data-feather="star"></i></li>
+                                    </ul>
+                                    <span>(3.8)</span>
+                                 </div>
+                                 <h6 class="unit">100 G</h6>
+                                 <h5 class="price">
+                                    <span class="theme-color">$10.25</span>
+                                    <del>$12.36</del>
+                                 </h5>
+                                 <div class="add-to-cart-box bg-white">
+                                    <button class="btn btn-add-cart addcart-button">
+                                       Add <span class="add-icon bg-light-gray"> <i
+                                          class="fa-solid fa-plus"></i>
+                                       </span>
+                                    </button>
+                                    <div class="cart_qty qty-box">
+                                       <div class="input-group bg-white">
+                                          <button type="button" class="qty-left-minus bg-gray"
+                                             data-type="minus" data-field="">
+                                             <i class="fa fa-minus" aria-hidden="true"></i>
+                                          </button>
+                                          <input class="form-control input-number qty-input"
+                                             type="text" name="quantity" value="1">
+                                          <button type="button" class="qty-right-plus bg-gray"
+                                             data-type="plus" data-field="">
+                                             <i class="fa fa-plus" aria-hidden="true"></i>
+                                          </button>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div>
+                        <div class="product-box-3 wow fadeInUp" data-wow-delay="0.25s">
+                           <div class="product-header">
+                              <div class="product-image">
+                                 <a href="product-left-thumbnail.html"> <img
+                                    src="/resources/assets/images/cake/product/6.png"
+                                    class="img-fluid blur-up lazyload" alt="">
+                                 </a>
+
+                                 <ul class="product-option">
+                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="View"><a href="javascript:void(0)"
+                                       data-bs-toggle="modal" data-bs-target="#view"> <i
+                                          data-feather="eye"></i>
+                                    </a></li>
+
+                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="Compare"><a href="compare.html"> <i
+                                          data-feather="refresh-cw"></i>
+                                    </a></li>
+
+                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="Wishlist"><a href="wishlist.html"
+                                       class="notifi-wishlist"> <i data-feather="heart"></i>
+                                    </a></li>
+                                 </ul>
+                              </div>
+                           </div>
+
+                           <div class="product-footer">
+                              <div class="product-detail">
+                                 <span class="span-name">Vegetable</span> <a
+                                    href="product-left-thumbnail.html">
+                                    <h5 class="name">Fantasy Crunchy Choco Chip Cookies</h5>
+                                 </a>
+                                 <div class="product-rating mt-2">
+                                    <ul class="rating">
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star"></i></li>
+                                    </ul>
+                                    <span>(4.0)</span>
+                                 </div>
+
+                                 <h6 class="unit">550 G</h6>
+
+                                 <h5 class="price">
+                                    <span class="theme-color">$14.25</span>
+                                    <del>$16.57</del>
+                                 </h5>
+                                 <div class="add-to-cart-box bg-white">
+                                    <button class="btn btn-add-cart addcart-button">
+                                       Add <span class="add-icon bg-light-gray"> <i
+                                          class="fa-solid fa-plus"></i>
+                                       </span>
+                                    </button>
+                                    <div class="cart_qty qty-box">
+                                       <div class="input-group bg-white">
+                                          <button type="button" class="qty-left-minus bg-gray"
+                                             data-type="minus" data-field="">
+                                             <i class="fa fa-minus" aria-hidden="true"></i>
+                                          </button>
+                                          <input class="form-control input-number qty-input"
+                                             type="text" name="quantity" value="1">
+                                          <button type="button" class="qty-right-plus bg-gray"
+                                             data-type="plus" data-field="">
+                                             <i class="fa fa-plus" aria-hidden="true"></i>
+                                          </button>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div>
+                        <div class="product-box-3 wow fadeInUp" data-wow-delay="0.3s">
+                           <div class="product-header">
+                              <div class="product-image">
+                                 <a href="product-left-thumbnail.html"> <img
+                                    src="/resources/assets/images/cake/product/7.png"
+                                    class="img-fluid" alt="">
+                                 </a>
+
+                                 <ul class="product-option">
+                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="View"><a href="javascript:void(0)"
+                                       data-bs-toggle="modal" data-bs-target="#view"> <i
+                                          data-feather="eye"></i>
+                                    </a></li>
+
+                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="Compare"><a href="compare.html"> <i
+                                          data-feather="refresh-cw"></i>
+                                    </a></li>
+
+                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="Wishlist"><a href="wishlist.html"
+                                       class="notifi-wishlist"> <i data-feather="heart"></i>
+                                    </a></li>
+                                 </ul>
+                              </div>
+                           </div>
+
+                           <div class="product-footer">
+                              <div class="product-detail">
+                                 <span class="span-name">Vegetable</span> <a
+                                    href="product-left-thumbnail.html">
+                                    <h5 class="name">Fresh Bread and Pastry Flour 200 g</h5>
+                                 </a>
+                                 <div class="product-rating mt-2">
+                                    <ul class="rating">
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star" class="fill"></i></li>
+                                       <li><i data-feather="star"></i></li>
+                                       <li><i data-feather="star"></i></li>
+                                    </ul>
+                                    <span>(3.8)</span>
+                                 </div>
+
+                                 <h6 class="unit">1 Kg</h6>
+
+                                 <h5 class="price">
+                                    <span class="theme-color">$12.68</span>
+                                    <del>$14.69</del>
+                                 </h5>
+                                 <div class="add-to-cart-box bg-white">
+                                    <button class="btn btn-add-cart addcart-button">
+                                       Add <span class="add-icon bg-light-gray"> <i
+                                          class="fa-solid fa-plus"></i>
+                                       </span>
+                                    </button>
+                                    <div class="cart_qty qty-box">
+                                       <div class="input-group bg-white">
+                                          <button type="button" class="qty-left-minus bg-gray"
+                                             data-type="minus" data-field="">
+                                             <i class="fa fa-minus" aria-hidden="true"></i>
+                                          </button>
+                                          <input class="form-control input-number qty-input"
+                                             type="text" name="quantity" value="1">
+                                          <button type="button" class="qty-right-plus bg-gray"
+                                             data-type="plus" data-field="">
+                                             <i class="fa fa-plus" aria-hidden="true"></i>
+                                          </button>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+      <!-- Releted Product Section End -->
+
+
+   </div>
+
+   <jsp:include page="./footer.jsp"></jsp:include>
+
+	<!-- The Modal -->
+	<div class="modal fade" id="myModal">
+	  <div class="modal-dialog modal-lg">
+	    <div class="modal-content">
+	
+	      <!-- Modal Header -->
+	      <div class="modal-header">
+	        <h4 class="modal-title">이미지</h4>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+	      </div>
+	
+	      <!-- Modal body -->
+	      <div class="modal-body">
+	      	<div class="fade-img"></div>
+	      </div>
+	
+	      <!-- Modal footer -->
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+	      </div>
+	
+	    </div>
+	  </div>
+	</div>
+	  
+	<!-- jquery ui-->
+	<script src="/resources/assets/js/jquery-ui.min.js"></script>
+	<!-- Bootstrap js-->
+	<script src="/resources/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<script src="/resources/assets/js/bootstrap/popper.min.js"></script>
+	<script src="/resources/assets/js/bootstrap/bootstrap-notify.min.js"></script>
+	<!-- feather icon js-->
+	<script src="/resources/assets/js/feather/feather.min.js"></script>
+	<script src="/resources/assets/js/feather/feather-icon.js"></script>
+	<!-- Lazyload Js -->
+	<script src="/resources/assets/js/lazysizes.min.js"></script>
+	<!-- Slick js-->
+	<script src="/resources/assets/js/slick/slick.js"></script>
+	<script src="/resources/assets/js/slick/custom_slick.js"></script>
+	<!-- Quantity js -->
+	<script src="/resources/assets/js/quantity.js"></script>
+	<!-- script js -->
+	<script src="/resources/assets/js/script.js"></script>
+	</body>
+</html>     

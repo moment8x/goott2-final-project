@@ -243,39 +243,7 @@
                     </div>
                 </div>
 
-                                <div class="service-detail">
-                                    <h5>Every Fresh Products</h5>
-                                </div>
-                            </div>
-
-                            <div class="service-box">
-                                <div class="service-image">
-                                    <img src="/resources/assets/svg/delivery.svg" class="blur-up lazyload" alt="">
-                                </div>
-
-                                <div class="service-detail">
-                                    <h5>Free Delivery For Order Over $50</h5>
-                                </div>
-                            </div>
-
-                            <div class="service-box">
-                                <div class="service-image">
-                                    <img src="/resources/assets/svg/discount.svg" class="blur-up lazyload" alt="">
-                                </div>
-
-                                <div class="service-detail">
-                                    <h5>Daily Mega Discounts</h5>
-                                </div>
-                            </div>
-
-                            <div class="service-box">
-                                <div class="service-image">
-                                    <img src="/resources/assets/svg/market.svg" class="blur-up lazyload" alt="">
-                                </div>
-
-                                <div class="service-detail">
-                                    <h5>Best Price On The Market</h5>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>

@@ -42,15 +42,15 @@ function changeProduct(pId, type) {
 }
 
 function changeSellingProductInfo(data) {
-	$("#sellingProductInfoLink").attr("href","/detail/"+data.product_id)
-	$("#sellingProductInfoImg").attr("src", data.product_image);
-	$("#sellingProductInfoName").html(data.product_name);
+	$("#sellingProductInfoLink").attr("href","/detail/"+data.productId)
+	$("#sellingProductInfoImg").attr("src", data.productImage);
+	$("#sellingProductInfoName").html(data.productName);
 	$("#sellingProductInfoPublisher").html(data.publisher);
 }
 function changeRatingProductInfo(data) {
-	$("#ratingProductInfoLink").attr("href","/detail/"+data.product_id)
-	$("#ratingProductInfoImg").attr("src", data.product_image);
-	$("#ratingProductInfoName").html(data.product_name);
+	$("#ratingProductInfoLink").attr("href","/detail/"+data.productId)
+	$("#ratingProductInfoImg").attr("src", data.productImage);
+	$("#ratingProductInfoName").html(data.productName);
 	$("#ratingProductInfoPublisher").html(data.publisher);
 }
 </script>
@@ -69,7 +69,7 @@ function changeRatingProductInfo(data) {
 }
 	.productInfoImg {
 	width: 400px; 
-	height: 500px; 
+	height: 600px; 
 	margin-top: 70px;"
 	}
 	.main {
@@ -246,14 +246,14 @@ function changeRatingProductInfo(data) {
                             <div class="col-12 px-0">
                                 <div class="product-box wow fadeIn" data00-wow-delay="0.1s">
                                     <div class="product-image">
-                                        <a href="/detail/${bestSellerProduct.product_id }">
-                                            <img src="${bestSellerProduct.product_image }"
+                                        <a href="/detail/${bestSellerProduct.productId }">
+                                            <img src="${bestSellerProduct.productImage }"
                                                 class="img-fluid blur-up lazyload" alt=""  style="height: 400px;">
                                         </a>
                                     </div>
                                     <div class="product-detail">
-                                        <a href="/detail/${bestSellerProduct.product_id }">
-                                            <h4 class="name name-2 h-100 text-abb">${bestSellerProduct.product_name }</h4>
+                                        <a href="/detail/${bestSellerProduct.productId }">
+                                            <h4 class="name name-2 h-100 text-abb">${bestSellerProduct.productName }</h4>
                                         </a>
                                         <div class="product-rating mt-2">
                                             <ul class="rating">
@@ -278,10 +278,10 @@ function changeRatingProductInfo(data) {
 
                                         <div class="counter-box">
                                             <span class="theme-color">
-                                            	<fmt:formatNumber value="${bestSellerProduct.selling_price}" pattern="#,###원" />
+                                            	<fmt:formatNumber value="${bestSellerProduct.sellingPrice}" pattern="#,###원" />
                                             </span>
                                             <del>
-												<fmt:formatNumber value="${bestSellerProduct.consumer_price}" pattern="#,###원" />
+												<fmt:formatNumber value="${bestSellerProduct.consumerPrice}" pattern="#,###원" />
 											</del>
                                         </div>
                                     </div>
@@ -329,14 +329,14 @@ function changeRatingProductInfo(data) {
                             <div class="col-12 px-0">
                                 <div class="product-box wow fadeIn" data-wow-delay="0.1s">
                                     <div class="product-image">
-                                        <a href="/detail/${newProduct.product_id }">
-                                            <img src="${newProduct.product_image }"
+                                        <a href="/detail/${newProduct.productId }">
+                                            <img src="${newProduct.productImage }"
                                                 class="img-fluid blur-up lazyload" alt="" style="height: 400px;">
                                         </a>
                                     </div>
                                     <div class="product-detail">
-                                        <a href="/detail/${newProduct.product_id }">
-                                            <h4 class="name name-2 h-100 text-abb">${newProduct.product_name }</h4>
+                                        <a href="/detail/${newProduct.productId }">
+                                            <h4 class="name name-2 h-100 text-abb">${newProduct.productName }</h4>
                                         </a>
 
                                         <div class="product-rating mt-2">
@@ -362,10 +362,10 @@ function changeRatingProductInfo(data) {
 
                                         <div class="counter-box">
                                             <span class="theme-color">
-                                            	<fmt:formatNumber value="${newProduct.selling_price}" pattern="#,###원" />
+                                            	<fmt:formatNumber value="${newProduct.sellingPrice}" pattern="#,###원" />
                                             </span>
                                             <del>
-												<fmt:formatNumber value="${newProduct.consumer_price}" pattern="#,###원" />
+												<fmt:formatNumber value="${newProduct.consumerPrice}" pattern="#,###원" />
 											</del>
                                         </div>
                                     </div>
@@ -392,14 +392,14 @@ function changeRatingProductInfo(data) {
                                 </div>
                             <c:forEach var="sellingProduct" items="${listProductsMap.sellingList }" varStatus="loop">
                                 <div class="top-selling-contain wow">
-                                    <a href="javascript:void(0)" class="top-selling-image" onclick="changeProduct('${sellingProduct.product_id}', 'selling');">
-                                        <img src="${sellingProduct.product_image }"
+                                    <a href="javascript:void(0)" class="top-selling-image" onclick="changeProduct('${sellingProduct.productId}', 'selling');">
+                                        <img src="${sellingProduct.productImage }"
                                             class="img-fluid blur-up lazyload" alt="">
                                     </a>
 
                                     <div class="top-selling-detail">
-                                        <a href="javascript:void(0)" onclick="changeProduct('${sellingProduct.product_id}', 'selling'););">
-                                            <h5 class="text-abb-300">${sellingProduct.product_name }</h5>
+                                        <a href="javascript:void(0)" onclick="changeProduct('${sellingProduct.productId}', 'selling'););">
+                                            <h5 class="text-abb-300">${sellingProduct.productName }</h5>
                                         </a>
                                         <div class="product-rating">
                                             <ul class="rating selling-rating">
@@ -422,10 +422,10 @@ function changeRatingProductInfo(data) {
                                             <span>(34)</span>
                                         </div>
                                         <span class="theme-color">
-                                            <fmt:formatNumber value="${sellingProduct.selling_price}" pattern="#,###원" />
+                                            <fmt:formatNumber value="${sellingProduct.sellingPrice}" pattern="#,###원" />
                                         </span>
                                         <del>
-											<fmt:formatNumber value="${sellingProduct.consumer_price}" pattern="#,###원" />
+											<fmt:formatNumber value="${sellingProduct.consumerPrice}" pattern="#,###원" />
 										</del>
                                     </div>
                                 </div>
@@ -433,13 +433,13 @@ function changeRatingProductInfo(data) {
                             </div>
                         </div>
                         <div class="col-6 productInfo">
-                        	<a href="/detail/${listProductsMap.sellingList[0].product_id }" id="sellingProductInfoLink">
-                        	<img src="${listProductsMap.sellingList[0].product_image }" id="sellingProductInfoImg" class="productInfoImg" />
+                        	<a href="/detail/${listProductsMap.sellingList[0].productId }" id="sellingProductInfoLink">
+                        	<img src="${listProductsMap.sellingList[0].productImage }" id="sellingProductInfoImg" class="productInfoImg" />
                         	<div id="sellingProductInfoPublisher" style="margin: 40px 0 20px 0">
                         		${listProductsMap.sellingList[0].publisher }
                         	</div>
                         	<div>
-                        		<h2 id="sellingProductInfoName">${listProductsMap.sellingList[0].product_name }</h2>
+                        		<h2 id="sellingProductInfoName">${listProductsMap.sellingList[0].productName }</h2>
                         	</div>
                         	</a>
                         </div>
@@ -454,14 +454,14 @@ function changeRatingProductInfo(data) {
                                 </div>
 								<c:forEach var="ratingProduct" items="${listProductsMap.ratingList }">
                                 <div class="top-selling-contain wow">
-                                    <a href="product-left-thumbnail.html" class="top-selling-image" onclick="changeProduct('${ratingProduct.product_id}');">
-                                        <img src="${ratingProduct.product_image }"
+                                    <a href="product-left-thumbnail.html" class="top-selling-image" onclick="changeProduct('${ratingProduct.productId}');">
+                                        <img src="${ratingProduct.productImage }"
                                             class="img-fluid blur-up lazyload" alt="">
                                     </a>
 
                                     <div class="top-selling-detail">
-                                        <a href="product-left-thumbnail.html" onclick="changeProduct('${ratingProduct.product_id}');">
-                                            <h5 class="text-abb-300">${ratingProduct.product_name }</h5>
+                                        <a href="product-left-thumbnail.html" onclick="changeProduct('${ratingProduct.productId}');">
+                                            <h5 class="text-abb-300">${ratingProduct.productName }</h5>
                                         </a>
                                         <div class="product-rating">
                                             <ul class="rating">
@@ -484,10 +484,10 @@ function changeRatingProductInfo(data) {
                                             <span>(34)</span>
                                         </div>
                                         <span class="theme-color">
-                                            <fmt:formatNumber value="${ratingProduct.selling_price}" pattern="#,###원" />
+                                            <fmt:formatNumber value="${ratingProduct.sellingPrice}" pattern="#,###원" />
                                         </span>
                                         <del>
-											<fmt:formatNumber value="${ratingProduct.consumer_price}" pattern="#,###원" />
+											<fmt:formatNumber value="${ratingProduct.consumerPrice}" pattern="#,###원" />
 										</del>
                                     </div>
                                 </div>
@@ -495,11 +495,11 @@ function changeRatingProductInfo(data) {
                             </div>
                         </div>
                         <div class="col-6 productInfo">
-                        	<a href="/detail/${listProductsMap.ratingList[0].product_id }" id="ratingProductInfoLink">
-                        	<img src="${listProductsMap.ratingList[0].product_image }" id="ratingProductInfoImg" class="productInfoImg"/>
+                        	<a href="/detail/${listProductsMap.ratingList[0].productId }" id="ratingProductInfoLink">
+                        	<img src="${listProductsMap.ratingList[0].productImage }" id="ratingProductInfoImg" class="productInfoImg"/>
                         	<div id="ratingProductInfoPublisher" style="margin: 40px 0 20px 0">${listProductsMap.ratingList[0].publisher }</div>
                         	<div>
-                        		<h2 id="ratingProductInfoName">${listProductsMap.ratingList[0].product_name }</h2>
+                        		<h2 id="ratingProductInfoName">${listProductsMap.ratingList[0].productName }</h2>
                         	</div>
                         	</a>
                         </div>
@@ -529,15 +529,15 @@ function changeRatingProductInfo(data) {
                         <div>
                             <div class="blog-box">
                                 <div class="blog-box-image">
-                                    <a href="/detail/${cartProduct.product_id }" class="blog-image">
-                                        <img src="${cartProduct.product_image }" class="bg-img blur-up lazyload cartProductImg" 
+                                    <a href="/detail/${cartProduct.productId }" class="blog-image">
+                                        <img src="${cartProduct.productImage }" class="bg-img blur-up lazyload cartProductImg" 
                                             alt="">
                                     </a>
                                 </div>
 
                                 <div class="blog-detail">
                                     <h6>${cartProduct.publisher }</h6>
-                                    <h5>${cartProduct.product_name }</h5>
+                                    <h5>${cartProduct.productName }</h5>
                                 </div>
                             </div>
                         </div>

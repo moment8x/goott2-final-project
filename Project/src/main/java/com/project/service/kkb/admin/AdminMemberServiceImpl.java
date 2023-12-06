@@ -29,16 +29,17 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	private final ApplicationEventPublisher publisher;
 	
 	@Override
-	public Map<String, Object> getTotalMemberCount() throws Exception {
+	public Map<String, Object> getTotalMemberCount() {
+		
 		int totalCount = 0;
+		
 		if(memberCount.getCurrentCount() > 0) {
-			/* TotalMemberCountEvent에 저장해둔 값 가져옴 */
-			System.out.println("이벤트 객체에서 전체 회원 수 조회");
+			/* MemberCountListener에 저장해둔 값 가져옴 */
+			System.out.println("저장해둔 전체 회원 수 조회");
 			totalCount = memberCount.getCurrentCount(); 
 		} else {
 			System.out.println("DB에서 전체 회원 수 조회");
-			totalCount = adminMemberRepository.countAll();	
-			publisher.publishEvent(new TotalMemberCountEvent(totalCount));
+			updateMemberCount();
 		}
 		Map<String, Object> result = new HashMap<>();
 		result.put("total", totalCount);
@@ -47,7 +48,8 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	}
 	
 	@Override
-	public void updateMemberCount() throws Exception {
+	public void updateMemberCount(){
+		
 		int memberCount = adminMemberRepository.countAll();	
 		System.out.println("회원 수 갱신");
 		/* 이벤트 발행 */
@@ -55,20 +57,12 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	}	
 	
 	@Override
-	public Map<String, Object> editMemberDetailInfo(MemberParam member) throws Exception {
-		
-		int result = adminMemberRepository.changeMemberDetailInfo(member);
-		Map<String, Object> status = new HashMap<>();
-		if(result == 1) {
-			status.put("status", "success");
-		} else {
-			status.put("status", "fail");
-		}
-		return status;
+	public int editMemberDetailInfo(MemberParam member) {		
+		return adminMemberRepository.changeMemberDetailInfo(member);
 	}
 	
 	@Override
-	public Map<String, Object> getMemberDetailInfo(String memberId) throws Exception {
+	public Map<String, Object> getMemberDetailInfo(String memberId) {
 		
 		MemberParam detailInfo = adminMemberRepository.findDetailInfoById(memberId);
 		Map<String, Object> result = new HashMap<>();
@@ -78,7 +72,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	}
 	
 	@Override
-	public Map<String, Object> getHomeDetailInfo(String memberId) throws Exception {
+	public Map<String, Object> getHomeDetailInfo(String memberId) {
 		
 		MemberBasicInfo basicInfo = adminMemberRepository.findBasicInfoById(memberId);
 		List<MemberRecentOrder> recentOrder = adminMemberRepository.findRecentOrderById(memberId);
@@ -96,7 +90,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	
 	
 	@Override
-	public Map<String, Object> getMemberInfo(MemberCondition memberCond ) throws Exception {
+	public Map<String, Object> getMemberInfo(MemberCondition memberCond ) {
 		
 		/* 전화번호 "-" 제거 */
 		memberCond.setCellPhoneNumber(memberCond.getCellPhoneNumber().replace("-", "")); 
@@ -105,8 +99,6 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		List<MemberResponse> responseList = adminMemberRepository.findByInfo(memberCond);
 		
 		for ( MemberResponse responseParam : responseList ) {
-			
-			/* === 값 세팅 === */
 			
 			/* 성별 */
 			Character gender = responseParam.getGender().equals('M') ? '남': '여';
@@ -119,7 +111,6 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 			if(responseParam.getAddress() != null) {
 				responseParam.setRegion(detectRegion(responseParam));	
 			}
-			
 		}
 	
 		Map<String, Object> result = new HashMap<>();
@@ -130,13 +121,14 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	}
 	
 	private String detectRegion(MemberResponse param) {
+		
 		List<String> regions = 
 				Arrays.asList("서울","경기","인천","강원","충남", "충청북도","충북","충청북도",
 						"대전","경북","경상북도","경남","경상남도","대구","부산","울산",
 						"전북","전라북도","전남","전라남도","광주","세종","제주");
 		
 		String region = "해외";
-		for( String value : regions ) {
+		for(String value : regions) {
 			if(param.getAddress().contains(value)) {
 				region = value.length() == 4 
 						? value.substring(0, 1) + value.substring(2, 3)
@@ -166,18 +158,4 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		
 		return age+"세";
 	}
-
-//	@EventListener(ContextRefreshedEvent.class)
-//	public void updateMemberCount(ContextRefreshedEvent e) throws Exception {
-//		
-//		// Root WebApplicationContext 초기화 시에만 체크
-//		if (e.getApplicationContext().getParent() == null) {
-//			int updateCount = adminMemberRepository.countAll();	
-//			System.out.println("context refresh");
-//			
-//			// 전체 회원 수를 조회하는 이벤트 발행
-//	        publisher.publishEvent(new TotalMemberCountEvent(updateCount));
-//		}
-//	}
-//	
 }
