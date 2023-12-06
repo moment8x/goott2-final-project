@@ -14,9 +14,9 @@
 		FROM order_history o
 		INNER JOIN detailed_order_items d
 		ON o.order_no = d.order_no
-		WHERE member_id = '${memberId}'
+		WHERE member_id = '#{memberId}'
 			AND delivery_status='배송완료'
-			AND product_id='${productId}'
+			AND product_id='#{productId}'
 		GROUP BY o.order_no
 	</select>
 	<select id="firstCheck" resultType="int">

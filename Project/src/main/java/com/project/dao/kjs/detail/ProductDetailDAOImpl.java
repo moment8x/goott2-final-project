@@ -1,7 +1,9 @@
 package com.project.dao.kjs.detail;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import com.project.vodto.kjs.BestSellerVO;
 import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ProductImage;
+import com.project.vodto.kjs.RelatedProductDTO;
 
 @Repository
 public class ProductDetailDAOImpl implements ProductDetailDAO {
@@ -39,5 +42,17 @@ public class ProductDetailDAOImpl implements ProductDetailDAO {
 	@Override
 	public List<BestSellerVO> getBestSeller(int count) throws SQLException, NamingException {
 		return ses.selectList(ns + ".getBestSeller", count);
+	}
+
+	@Override
+	public List<RelatedProductDTO> getRelatedProduct(int count, String productId, String categoryKey, String publisher)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("count", count);
+		params.put("productId", productId);
+		params.put("categoryKey", categoryKey);
+		params.put("publisher", publisher);
+		
+		return ses.selectList(ns + ".getRelatedProduct", params);
 	}
 }

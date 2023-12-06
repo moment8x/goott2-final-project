@@ -23,6 +23,7 @@ import com.project.vodto.PagingInfo;
 import com.project.vodto.kjs.BestSellerVO;
 import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ProductImage;
+import com.project.vodto.kjs.RelatedProductDTO;
 import com.project.vodto.kjs.ReviewBoardDTO;
 
 @Controller
@@ -45,6 +46,8 @@ public class ProductDetailController {
 		List<ProductImage> productImage = pdService.getProductImages(productId);
 		// 해당 productId로 리뷰글 조회
 		Map<String, Object> map = rService.getReviewList(productId, page);
+		// 관련 상품 조회
+		List<RelatedProductDTO> relatedProduct = pdService.getRelatedProduct(productId, product.getPublisher(), product.getCategoryKey());
 		
 		@SuppressWarnings("unchecked")
 		List<ReviewBoardDTO> reviewList = (List<ReviewBoardDTO>)map.get("reviewList");
@@ -55,6 +58,7 @@ public class ProductDetailController {
 		model.addAttribute("categories", categories);
 		model.addAttribute("reviewList", reviewList);
 		model.addAttribute("pagingInfo", pagingInfo);
+		model.addAttribute("related", relatedProduct);
 		
 		return "detail";
     }

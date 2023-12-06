@@ -13,6 +13,7 @@ import com.project.dao.kjs.detail.ProductDetailDAO;
 import com.project.vodto.kjs.BestSellerVO;
 import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ProductImage;
+import com.project.vodto.kjs.RelatedProductDTO;
 
 @Service
 public class ProductDetailServiceImpl implements ProductDetailService {
@@ -47,6 +48,26 @@ public class ProductDetailServiceImpl implements ProductDetailService {
 		List<BestSellerVO> result = new ArrayList<BestSellerVO>();
 		
 		result = pdDao.getBestSeller(count);
+		
+		return result;
+	}
+
+	@Override
+	public List<RelatedProductDTO> getRelatedProduct(String productId, String publisher, String categoryKey)
+			throws SQLException, NamingException {
+		// 조회할 개수
+		int count = 7;
+		
+		List<RelatedProductDTO> result = new ArrayList<RelatedProductDTO>();
+		result = pdDao.getRelatedProduct(count, productId, categoryKey, publisher);
+		
+		// 표시할 제목 길이 조절
+		int length = 8;
+		for (RelatedProductDTO data : result) {
+			if (data.getProductName().length() > length) {
+				data.setProductName(data.getProductName().substring(0, length) + "⋯");
+			}
+		}
 		
 		return result;
 	}

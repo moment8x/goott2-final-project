@@ -73,7 +73,7 @@ public class RegisterController {
 	}
 	
 	@RequestMapping(value="signUp", method=RequestMethod.POST)
-	public void signUp(SignUpDTO member, Model model) {
+	public String signUp(SignUpDTO member, Model model) {
 		
 		try {
 			if (fileList != null) {
@@ -85,6 +85,7 @@ public class RegisterController {
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
 		}
+		return "redirect:/";
 	}
 	
 	@RequestMapping(value="uploadFile", method=RequestMethod.POST)
@@ -156,13 +157,23 @@ public class RegisterController {
 	}
 	
 	@RequestMapping("snsRegister")
-	public void snsRegister(Model model) {
+	public String snsRegister(Model model) {
 		System.out.println("================스타트=================");
 		SnsRegisterInfo snsInfo = (SnsRegisterInfo) model.asMap().get("snsInfo");
 		System.out.println("정보받음 " + snsInfo);
 		
-		
+		if (snsInfo.getEmail() != null) {
+			// 네이버
+			model.addAttribute("email", snsInfo.getEmail());
+			model.addAttribute("mobile", snsInfo.getMobile());
+			model.addAttribute("name", snsInfo.getName());
+			model.addAttribute("birthday", snsInfo.getBirthyear() + "-" + snsInfo.getBirthday());
+			model.addAttribute("mobile_e164", snsInfo.getMobile_e164());
+		} else {
+			// 카카오
+		}
 		
 		System.out.println("================끝났음=================");
+		return "redirect:/register/register?snsSignUp=1";
 	}
 }

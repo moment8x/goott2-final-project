@@ -99,7 +99,6 @@ public class ReviewController {
 			rService.saveReview(review, calcFileList());
 			ufService.deleteUploadedFile(deleteFileList, realPath);
 		} catch (SQLException | NamingException | IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		fileList.clear();
@@ -194,7 +193,6 @@ public class ReviewController {
 			}
 			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.OK);
 		} catch (SQLException | NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			map.put("status", "error");
 			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.BAD_REQUEST);

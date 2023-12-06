@@ -40,7 +40,7 @@ public class HeaderCartInterceptor extends HandlerInterceptorAdapter {
 				Timestamp sessionLimit = new Timestamp(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));	// DB에 저장할 값
 				
 				cookie = new Cookie("nom", sessionValue);	// [key, value] : [nom, sessionValue]의 쿠키 생성
-				cookie.setMaxAge(1000 * 60 * 60 * 24);	// 쿠키의 유효기간 설정(1일)
+				cookie.setMaxAge(1000 * 60 * 60 * 24 * 7);	// 쿠키의 유효기간 설정(1일)
 				cookie.setPath("/");	// 쿠키가 적용될 경로 지정
 				// 비회원 쿠키를 DB에 저장
 				if (nmsService.saveNonMemberId(sessionValue, sessionLimit)) {
