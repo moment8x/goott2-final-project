@@ -391,7 +391,7 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public Map<String, Object> selectCancelOrder(String memberId, String orderNo, int detailedOrderId)
+	public Map<String, Object> selectCancelOrder(String memberId, String orderNo, int detailedOrderId, int selectQty)
 			throws SQLException, NamingException {
 		Map<String, Object> result = new HashMap<String, Object>();
 
@@ -410,7 +410,7 @@ public class MemberServiceImpl implements MemberService {
 		int refundAmount = 0; // 취소시 환불 금액
 		int cancelProductPrice = cancelOrder.getProductPrice(); // 취소할 상품 금액
 		int couponDiscount = cancelOrder.getCouponDiscount(); // 상품당 적용한 쿠폰 할인 금액
-		int cancelPrice = cancelProductPrice - couponDiscount; // 취소할 상품금액에서 쿠폰할인
+		int cancelPrice = (cancelProductPrice * selectQty) - couponDiscount; // 취소할 상품금액에서 쿠폰할인
 
 		if (couponsHistory.size() > 0) {
 			for (CouponHistory ch : couponsHistory) {
@@ -650,72 +650,72 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean returnOrder(ReturnOrder ro, String memberId) throws SQLException, NamingException {
-		Map<String, Object> map = selectCancelOrder(memberId, ro.getOrderNo(), ro.getDetailedOrderId());
-		DetailOrder detailOrder = (DetailOrder) map.get("selectCancelOrder");
-		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, ro.getOrderNo());
+//		Map<String, Object> map = selectCancelOrder(memberId, ro.getOrderNo(), ro.getDetailedOrderId());
+//		DetailOrder detailOrder = (DetailOrder) map.get("selectCancelOrder");
+//		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, ro.getOrderNo());
+//
+//		boolean result = false;
+//		boolean allApplyReturn = true;
+//
+//		if (mDao.insertReturn(detailOrder.getProductId(), ro) > 0) {
+//			System.out.println("반품 인서트 완");
+//			if (mDao.insertReturnShippingAddress(ro) > 0) {
+//				System.out.println("회수 배송지 입력 완");
+//				if (mDao.updateRefundAccount(memberId, ro) > 0) {
+//					System.out.println("멤버 환불정보 업데이트 완");
+//					if (mDao.updateDetailProductStatusWithReturn(ro.getDetailedOrderId()) > 0) {
+//						System.out.println("디테일 상품 상태 업데이트 완");
+//						for (DetailOrder returnDetail : detailOrders) {
+//							// 모든 디테일 상품 상태가 반품신청이라면 주문내역 배송상태 반품신청으로 변경
+//							if (!"반품신청".equals(returnDetail.getProductStatus())) {
+//								allApplyReturn = false;
+//								break;
+//							} else {
+//								mDao.updatedeliveryStatusWithReturn(memberId, ro.getOrderNo());
+//								System.out.println("주문내역 배송상태 변경 완");
+//							}
+//						}
+//					}
+//				}
+//			}
+//			result = true;
+//		}
 
-		boolean result = false;
-		boolean allApplyReturn = true;
-
-		if (mDao.insertReturn(detailOrder.getProductId(), ro) > 0) {
-			System.out.println("반품 인서트 완");
-			if (mDao.insertReturnShippingAddress(ro) > 0) {
-				System.out.println("회수 배송지 입력 완");
-				if (mDao.updateRefundAccount(memberId, ro) > 0) {
-					System.out.println("멤버 환불정보 업데이트 완");
-					if (mDao.updateDetailProductStatusWithReturn(ro.getDetailedOrderId()) > 0) {
-						System.out.println("디테일 상품 상태 업데이트 완");
-						for (DetailOrder returnDetail : detailOrders) {
-							// 모든 디테일 상품 상태가 반품신청이라면 주문내역 배송상태 반품신청으로 변경
-							if (!"반품신청".equals(returnDetail.getProductStatus())) {
-								allApplyReturn = false;
-								break;
-							} else {
-								mDao.updatedeliveryStatusWithReturn(memberId, ro.getOrderNo());
-								System.out.println("주문내역 배송상태 변경 완");
-							}
-						}
-					}
-				}
-			}
-			result = true;
-		}
-
-		return result;
+		return false;
 	}
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean exchangeOrder(exchangeDTO ed, String memberId) throws SQLException, NamingException {
-		Map<String, Object> map = selectCancelOrder(memberId, ed.getOrderNo(), ed.getDetailedOrderId());
-		DetailOrder detailOrder = (DetailOrder) map.get("selectCancelOrder");
-		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, ed.getOrderNo());
+//		Map<String, Object> map = selectCancelOrder(memberId, ed.getOrderNo(), ed.getDetailedOrderId());
+//		DetailOrder detailOrder = (DetailOrder) map.get("selectCancelOrder");
+//		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, ed.getOrderNo());
+//
+//		boolean result = false;
+//		boolean allApplyExchange = true;
+//
+//		if (mDao.insertReturnWithExchange(detailOrder.getProductId(), ed) > 0) {
+//			System.out.println("반품테이블 인서트 완");
+//			if (mDao.insertExchangeShippingAddress(ed) > 0) {
+//				System.out.println("회수 배송지, 교환 배송지 인서트 완");
+//				if (mDao.updateDetailProductStatusWithExchange(ed.getDetailedOrderId()) > 0) {
+//					System.out.println("디테일 상품 상태 업데이트 완");
+//					for (DetailOrder exchangeDetail : detailOrders) {
+//						// 모든 디테일 상품 상태가 교환신청이라면 주문내역 배송상태 교환신청으로 변경
+//						if (!"교환신청".equals(exchangeDetail.getProductStatus())) {
+//							allApplyExchange = false;
+//							break;
+//						} else {
+//							mDao.updateDeliveryStatusWithExchange(memberId, ed.getOrderNo());
+//							System.out.println("주문내역 배송상태 변경 완");
+//						}
+//					}
+//				}
+//			}
+//			result = true;
+//		}
 
-		boolean result = false;
-		boolean allApplyExchange = true;
-
-		if (mDao.insertReturnWithExchange(detailOrder.getProductId(), ed) > 0) {
-			System.out.println("반품테이블 인서트 완");
-			if (mDao.insertExchangeShippingAddress(ed) > 0) {
-				System.out.println("회수 배송지, 교환 배송지 인서트 완");
-				if (mDao.updateDetailProductStatusWithExchange(ed.getDetailedOrderId()) > 0) {
-					System.out.println("디테일 상품 상태 업데이트 완");
-					for (DetailOrder exchangeDetail : detailOrders) {
-						// 모든 디테일 상품 상태가 교환신청이라면 주문내역 배송상태 교환신청으로 변경
-						if (!"교환신청".equals(exchangeDetail.getProductStatus())) {
-							allApplyExchange = false;
-							break;
-						} else {
-							mDao.updateDeliveryStatusWithExchange(memberId, ed.getOrderNo());
-							System.out.println("주문내역 배송상태 변경 완");
-						}
-					}
-				}
-			}
-			result = true;
-		}
-
-		return result;
+		return false;
 	}
 
 	@Override

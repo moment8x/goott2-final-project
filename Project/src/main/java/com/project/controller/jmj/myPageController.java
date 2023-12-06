@@ -28,6 +28,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -552,11 +553,11 @@ public class myPageController {
 	
 	@RequestMapping(value = "calcRefundAmount", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> orderDetailFromJson(@RequestParam("orderNo") String orderNo, @RequestParam("detailedOrderId") int detailedOrderId,
-			 HttpServletRequest request, Model model) {
+			@RequestParam int selectQty, HttpServletRequest request, Model model) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
-		
+		System.out.println("selectQty"  + selectQty);
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
 		
@@ -564,7 +565,7 @@ public class myPageController {
 		
 		try {
 			// 주문상품 상세정보, 쿠폰사용내역
-			Map<String, Object> map = mService.selectCancelOrder(memberId, orderNo, detailedOrderId);
+			Map<String, Object> map = mService.selectCancelOrder(memberId, orderNo, detailedOrderId, selectQty);
 
 
 			result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);

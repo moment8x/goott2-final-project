@@ -96,7 +96,12 @@ $(function () {
 	let icOrderTime = $('.infoContent.detailOrderOrderTime').text().substring(0,21)
 	$('.infoContent.detailOrderOrderTime').text(icOrderTime)
 		
-	
+	$(".checkbox_animated.check-box.selectOrderCancel").change(function(){
+		if ($('.checkbox_animated.check-box.selectOrderCancel:checked').length == $('.checkbox_animated.check-box.selectOrderCancel').length) {
+			console.log("모두 체크됨")
+			$("input[name=order]").prop("checked", true);
+		}
+	});	
 })
 
 //교환 신청 버튼 누르면
@@ -269,109 +274,94 @@ function orderCancel(){
 }
 
 	//취소창에서 상품 선택하고 수량 입력하면 환불 계산
-	function selectOrderCancel() {		
+	function selectOrderCancel(detailedOrderId) {
+		let orderNo = '${detailOrder.orderNo}';
 	    let orderQty = ${orderQty} // 총 주문 수량
 	    let actualAmount = ${detailOrder.actualPaymentAmount} // 카드 실결제금액
 	    let bktActualAmount = ${bankTransfer.amountToPay} // 무통장 실결제금액
-	    let selectQty = 0;
-	    //체크박스가 모두 체크되면 전체선택 체크박스 체크
-	  	$(".checkbox_animated.check-box.selectOrderCancel").change(function(){
-    		if ($('.checkbox_animated.check-box.selectOrderCancel:checked').length == $('.checkbox_animated.check-box.selectOrderCancel').length) {
-    			alert("모두 체크됨")
-    			$("input[name=order]").prop("checked", true);
-    		}
-    	});	
-	    
-	  	$('.form-control.cancelQty').change(function () {
-	  		selectQty = selectQty = $('#cancelQty').val();
- 			let totalQty = calculateTotalQuantity(); //입력한 총 수량
- 		 	 console.log('총 수량:', totalQty);
- 		  $('.totalCancelQty').text("취소 상품 수량 : " + totalQty + "권")
- 		  
- 		  console.log(selectQty)
-		
-	  $("input[name='order']:checked").each(function () {
-	    let detailedOrderId = $(this).val();
-	    let orderNo = '${detailOrder.orderNo}';
-	    $.ajax({
-	      url: "/user/calcRefundAmount", // 데이터를 수신받을 서버 주소
-	      type: "post", // 통신방식(GET, POST, PUT, DELETE)
-	      data: {
-	    	  detailedOrderId, 
-	    	  orderNo,
-	      },
-	      dataType: "json",
-	      async: false,
-	      success: function (data) {
-	        console.log(data);
-	        
-	        let paymentMethod = "${detailOrder.paymentMethod}" // 결제수단
-	       	let usedCouponName = $('.infoContent.usedCoupon').text() //사용한 쿠폰이름
-	       	let usedReward = ${detailOrder.usedReward} // 사용한 적립금
-	    	let usedPoint = ${detailOrder.usedPoints} // 사용한 포인트
-	        
-	       	//취소 상품 수량 입력
-	       
-	         
-	  		  
-	  		  console.log(selectQty)
-	  		  
-	  		 //개별취소시 쿠폰환불이 가능한지
-	  		 $.each(data.couponsHistory, function(i, elt){
-		  		 if(data.status == "okCoupon"){
-		  			  $('#refundCoupon').text(elt.couponName)
-		  		  }else if(data.status == "noCoupon"){
-		  			$('#refundCoupon').text("없음")
-		  		  }	  		
-	  		 })
-	  		 
-	  		//전체선택 체크박스 체크되고 총 취소상품 수량이랑 총 주문 수량이랑 일치한다면 => 전체취소
-	  		if($("#selectAllOrder").is(":checked") && totalQty == orderQty){
-	  			alert("전체취소한당")
-	  			//쿠폰
-	  			if(data.couponsHistory == null){
-	  				$('#refundCoupon').text("없음")
-	  			}else{
-	  				$('#refundCoupon').text(usedCouponName)			
-	  			}
-	  			//환불금액
-	  			if(paymentMethod == "bkt"){
-		  			$('#refundAmount').text(bktActualAmount.toLocaleString()+ "원")		  				
-	  			}else{
-	  				$('#refundAmount').text(actualAmount.toLocaleString()+ "원")		
-	  			}
-	  			//적립금
-	  			$('#refundReward').text(usedReward.toLocaleString()+ "원")
-	  			//포인트
-	  			 $('#refundPoint').text(usedPoint.toLocaleString()+ "점") 
-	  		}else{
-	  			alert("부분취소한당")
-	  			
-	  			let refundAmount = data.calcRefund.refundAmount
-	  			let refundReward = data.calcRefund.updateReward
-	  			let refundPoint = data.calcRefund.updatePoint
-	  			
-	  			//환불금액
-		  		$('#refundAmount').text(refundAmount.toLocaleString()+ "원")		  				
-	  			//적립금
-	  			$('#refundReward').text(refundReward.toLocaleString()+ "원")
-	  			//포인트
-	  			 $('#refundPoint').text(refundPoint.toLocaleString()+ "점") 
-	  		}
-	  		
-	  		if($('#cancelQty').val() > data.cancelOrder.productQuantity){
-	  			alert("주문 수량보다 많이 입력 할 수 없습니다.")
-	  			$('.totalCancelQty').text("취소 상품 수량 : " + 0)
-	  		}	  		  
-	      },
-	      error: function (error) {
-	    	  console.log(error);
-	      },
-	    });
-	  })
-	  });
-	}
+	  	let selectQty = 0
+ 		let totalQty = calculateTotalQuantity(); //입력한 총 수량
+ 		
+ 		console.log('총 수량:', totalQty);
+ 		
+ 		 $('.totalCancelQty').text("취소 상품 수량 : " + totalQty + "권")
+ 		 $('.form-control.cancelQty').each(function() {
+ 			selectQty = $(this).val()
+	 		 console.log(selectQty)
+	 		$.ajax({
+	 		      url: "/user/calcRefundAmount", // 데이터를 수신받을 서버 주소
+	 		      type: "post", // 통신방식(GET, POST, PUT, DELETE)
+	 		      data: {
+	 		    	  detailedOrderId, 
+	 		    	  orderNo,
+	 		    	  selectQty
+	 		      },
+	 		      dataType: "json",
+	 		      async: false,
+	 		      success: function (data) {
+	 		        console.log(data);
+	 		        
+	 		        let paymentMethod = "${detailOrder.paymentMethod}" // 결제수단
+	 		       	let usedCouponName = $('.infoContent.usedCoupon').text() //사용한 쿠폰이름
+	 		       	let usedReward = ${detailOrder.usedReward} // 사용한 적립금
+	 		    	let usedPoint = ${detailOrder.usedPoints} // 사용한 포인트
+	 		    	let refundAmount = 0
+	 		        
+	 		  		 //개별취소시 쿠폰환불이 가능한지
+	 		  		 $.each(data.couponsHistory, function(i, elt){
+	 			  		 if(data.status == "okCoupon"){
+	 			  			  $('#refundCoupon').text(elt.couponName)
+	 			  		  }else if(data.status == "noCoupon"){
+	 			  			$('#refundCoupon').text("없음")
+	 			  		  }	  		
+	 		  		 })
+	 		  		 
+	 		  		//전체선택 체크박스 체크되고 총 취소상품 수량이랑 총 주문 수량이랑 일치한다면 => 전체취소
+	 		  		if($("#selectAllOrder").is(":checked") && totalQty == orderQty){
+	 		  			console.log("전체취소한당")
+	 		  			//쿠폰
+	 		  			if(data.couponsHistory == null){
+	 		  				$('#refundCoupon').text("없음")
+	 		  			}else{
+	 		  				$('#refundCoupon').text(usedCouponName)			
+	 		  			}
+	 		  			//환불금액
+	 		  			if(paymentMethod == "bkt"){
+	 			  			$('#refundAmount').text(bktActualAmount.toLocaleString()+ "원")		  				
+	 		  			}else{
+	 		  				$('#refundAmount').text(actualAmount.toLocaleString()+ "원")		
+	 		  			}
+	 		  			//적립금
+	 		  			$('#refundReward').text(usedReward.toLocaleString()+ "원")
+	 		  			//포인트
+	 		  			 $('#refundPoint').text(usedPoint.toLocaleString()+ "점") 
+	 		  		}else{
+	 		  			console.log("부분취소한당")
 
+	 		  			refundAmount += data.calcRefund.refundAmount
+	 		  			let refundReward = data.calcRefund.updateReward
+	 		  			let refundPoint = data.calcRefund.updatePoint
+	 		  			
+	 		  			//환불금액
+	 			  		$('#refundAmount').text(refundAmount.toLocaleString()+ "원")		  				
+	 		  			//적립금
+	 		  			$('#refundReward').text(refundReward.toLocaleString()+ "원")
+	 		  			//포인트
+	 		  			 $('#refundPoint').text(refundPoint.toLocaleString()+ "점") 
+	 		  		}
+	 		  		
+	 		  		if(selectQty > data.cancelOrder.productQuantity){
+	 		  			alert("주문 수량보다 많이 입력 할 수 없습니다.")
+	 		  			$('.totalCancelQty').text("취소 상품 수량 : " + 0)
+	 		  			$('#refundAmount').text("0 원")
+	 		  		}	  		  
+	 		      },
+	 		      error: function (error) {
+	 		    	  console.log(error);
+	 		      },
+	 		    });
+ 		 })
+	}
 	
 	//환불 예정 포인트, 적립금 구하기
 	function calculate(n, k, usedAmount) { // 총 주문 수량, 입력한 총 수량, 포인트, 적립금
@@ -389,7 +379,6 @@ function orderCancel(){
 
 		 return totalQuantity;
 	}
-
 
 //배송주소록 수정
 function shippingAddrModify() {
@@ -1233,7 +1222,7 @@ function editRturnAccount() {
 				<div class="modal-body">
 					<input class="checkbox_animated check-box" type="checkbox"
 						name="order" id="selectAllOrder" onclick="selectAll();"
-						onchange="selectOrderCancel();" /> <label
+						 /> <label
 						class="form-check-label" for="selectAllOrder"><span>전체선택</span></label>
 					<c:forEach var="order" items="${detailOrderInfo }">
 						<table class="table mb-0 productInfo">
@@ -1248,7 +1237,7 @@ function editRturnAccount() {
 														<input
 															class="checkbox_animated check-box selectOrderCancel"
 															type="checkbox" value="${order.detailedOrderId }"
-															onchange="selectOrderCancel();" name="order"
+															name="order"
 															id="selectOrderCancel" />
 														<a href="/detail/${order.productId }"
 															class="product-image"> <img
@@ -1261,7 +1250,7 @@ function editRturnAccount() {
 														<input
 															class="checkbox_animated check-box selectOrderCancel"
 															type="checkbox" value="${order.detailedOrderId }"
-															onchange="selectOrderCancel();" name="order"
+															 name="order"
 															id="selectOrderCancelWithNoImg" />
 														<a href="/detail/${order.productId }"
 															class="product-image"> <img
@@ -1303,7 +1292,7 @@ function editRturnAccount() {
 										<td class="name">
 											<h4 class="table-title text-content">수량</h4> <input
 											type="text" class="form-control cancelQty" id="cancelQty"
-											value="0" />
+											onchange="selectOrderCancel(${order.detailedOrderId });"/>
 
 										</td>
 
