@@ -299,7 +299,7 @@ li:first-child.newProd {
 									varStatus="loop">
 									<c:choose>
 										<c:when test="${loop.index == 3 }">
-											<a href="/detail/${bestSeller.productId }">
+											<a href="/detail/${bestSeller.productId }" style="color: black;">
 											<div id="bestSellerId">
 												<c:choose>
 													<c:when test="${bestSeller.introductionIntro != null }">
@@ -352,11 +352,15 @@ li:first-child.newProd {
 														<ul>
 														<c:forEach var="sellingProduct" items="${listMap.sellingList }" varStatus="loop" begin="0" end="6">
 															<c:choose>
-																<c:when test="${loop.index == 0 || loop.index == 1 }">												
+																<c:when test="${loop.index == 0 || loop.index == 1 }">
+																<a href="/detail/${sellingProduct.productId }" style="color: black;">												
 																	<li><div class="lankList"><img src="${sellingProduct.productImage}"/><div class="sellingListInfo"><img class="numberIcon" src="/resources/assets/images/numberIcon/${loop.index + 1 }.png" /><div class="sellingListInfo"><h3>${sellingProduct.productName }</h3><div>${sellingProduct.publisher }</div></div><div class="sellingListInfo"><fmt:formatNumber value="${sellingProduct.sellingPrice}" pattern="#,###원" /></div></div></li>
+																</a>
 																</c:when>
 																<c:otherwise>
+																<a href="/detail/${sellingProduct.productId }" style="color: black;">	
 																	<li><img class="numberIcon" src="/resources/assets/images/numberIcon/${loop.index + 1 }.png" />${sellingProduct.productName }</li>
+																</a>
 																</c:otherwise>
 															</c:choose>
 														</c:forEach>
@@ -370,13 +374,15 @@ li:first-child.newProd {
 								<div class="newPoductList">
 								<h2 class="subj">새로 나온 책</h2>
 									<ul>
-									<c:forEach var="newProduct" items="${listMap.newList }">								
+									<c:forEach var="newProduct" items="${listMap.newList }">
+									<a href="/detail/${newProduct.productId }" style="color: black;">								
 										<li class="newProd">
 										<img src="${newProduct.productImage }">
 										<h3>${newProduct.productName }</h3>
 										<span><fmt:formatNumber value="${newProduct.sellingPrice}" pattern="#,###원" /></span>
 										<del style="color: gray;">
 										<fmt:formatNumber value="${newProduct.consumerPrice}" pattern="#,###원" /></del></li>
+									</a>
 									</c:forEach>
 									</ul>
 								</div>

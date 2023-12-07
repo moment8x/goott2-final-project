@@ -123,7 +123,7 @@
   	</select>
   	
   	<select id="selectNewPrducts" resultMap="ProductsForList">
-  		select (select i.product_image from product_images i where i.product_id = p.product_id limit 1)as product_image, p.product_id, p.product_name, p.publisher, p.consumer_price, p.selling_price, p.publication_date, (select r.rating from ratings r where p.product_id = r.product_id) as rating from products p where p.publication_date <![CDATA[ <= ]]> curdate() group by p.product_id order by publication_date desc limit 5;
+  		select (select i.product_image from product_images i where i.product_id = p.product_id limit 1)as product_image, p.product_id, p.product_name, p.publisher, p.consumer_price, p.selling_price, p.publication_date, (select r.rating from ratings r where p.product_id = r.product_id) as rating from products p where p.publication_date <![CDATA[ <= ]]> curdate() group by p.product_id order by publication_date desc limit 10;
   	</select>
   	
   	<resultMap type="com.project.vodto.kjy.ProductsForList" id="ProductsForList">
