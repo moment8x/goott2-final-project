@@ -47,6 +47,27 @@ public interface AdminOrderDAO {
 	/* 주문 상세 정보 (상태 확인) */
 	List<OrderStatus> findOrdersStatus(List<ProductCancelRequest> productOrderNoList);
 	
+	
+	int saveOrderCancelReward(List<String> orderNoList);
+
+	int saveOrderCancelPoint(List<String> orderNoList);
+
+	int changeOrderCancel(List<String> orderNoList);
+
+	int changeOrderCancelHistory(List<String> orderNoList);
+
+	int changeOrderCancelCoupon(List<String> orderNoList);
+
+	int changeOrderCancelMember(List<String> orderNoList);
+
+	int changeOrderCancelPayments(List<String> orderNoList);
+
+	List<PendingCancelInfoResponse> findCancelInfo(List<String> orderNoList);
+
+	int saveOrderCancel(List<PendingCancelInfoResponse> cancelInfoList);
+	
+	
+	
 	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
 	int changeProductCancel(List<String> productNoList);
 
@@ -62,9 +83,16 @@ public interface AdminOrderDAO {
 	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) */
 	int changeProductCancelCoupon(List<CheckedCoupons> couponList);
 
-	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 적립금 로그 테이블 update(column : reason, balance, reward)) */
+	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 적립금 로그 테이블 insert) */
+	int saveProductCancelReward(List<ProductCancelRequest> productOrderNoList);
+	
+	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 적립금 로그 관련 테이블 update
+			결제, 회원 테이블 (column : p.used_reward, m.total_rewards, m.accumulated_use_reward)) */
 	int changeProductCancelReward(List<ProductCancelRequest> productOrderNoList);
 
+	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 포인트 로그 테이블 insert) */
+	int saveProductCancelPoint(List<ProductCancelRequest> productOrderNoList);
+	
 	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 포인트 로그 테이블 update(column : reason, balance, point)) */
 	int changeProductCancelPoint(List<ProductCancelRequest> productOrderNoList);
 
@@ -106,11 +134,11 @@ public interface AdminOrderDAO {
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) */
 	int changePendingOrderCancelCoupon(List<String> orderNoList);
 	
-	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 적립금 로그 테이블 update(column : reason, balance, reward)) */
-	int changePendingOrderCancelReward(List<String> orderNoList);
+	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 적립금 로그 테이블 insert) */
+	int savePendingOrderCancelReward(List<String> orderNoList);
 	
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 포인트 로그 테이블 update(column : reason, balance, point)) */
-	int changePendingOrderCancelPoint(List<String> orderNoList);
+	int savePendingOrderCancelPoint(List<String> orderNoList);
 	
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 회원 테이블 update(column : coupon_count, total_points, 
 	 * 							total_rewards, accumulated_use_reward,accumulated_use_point)) */
@@ -122,6 +150,7 @@ public interface AdminOrderDAO {
 	/* 입금 전 관리 (주문 취소 버튼[주문번호별] - 취소 테이블에 추가) */
 	int savePendingOrderCancel(List<PendingCancelInfoResponse> cancelInfoList);
 	
+
 	
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
 	int changePendingProductCancel(List<String> productNoList);
@@ -141,6 +170,9 @@ public interface AdminOrderDAO {
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 적립금 로그 테이블 update(column : reason, balance, reward)) */
 	int changePendingProductCancelReward(List<ProductCancelRequest> productOrderNoList);
 
+	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 포인트 로그 테이블 insert) */
+	int savePendingProductCancelPoint(List<ProductCancelRequest> productOrderNoList);
+	
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 포인트 로그 테이블 update(column : reason, balance, point)) */
 	int changePendingProductCancelPoint(List<ProductCancelRequest> productOrderNoList);
 
@@ -228,5 +260,9 @@ public interface AdminOrderDAO {
 	
 	/* 카드 취소 조회 (조회) */
 	List<CardCancelResponse> findCardCancelProduct(CardCancelCondition cardCancelCond);
+
+/*------------------------------------------------------------------------------------------------------*/
+		
+	
 
 }

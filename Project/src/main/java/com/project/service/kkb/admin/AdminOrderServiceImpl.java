@@ -320,15 +320,11 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		
 		int result = -1;
 		
-		/* 적립금 로그 테이블 update(column : reason, balance, reward) */
-		if(adminOrderDao.changePendingOrderCancelReward(orderNoList) <= 0) {
-			return result;
-		}
+		/* 적립금 로그 테이블 insert */
+		adminOrderDao.savePendingOrderCancelReward(orderNoList);
 		
 		/* 포인트 로그 테이블 update(column : reason, balance, point) */
-		if(adminOrderDao.changePendingOrderCancelPoint(orderNoList) <= 0) {
-			return result ;
-		}
+		adminOrderDao.savePendingOrderCancelPoint(orderNoList);
 		
 		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
 		if(adminOrderDao.changePendingOrderCancel(orderNoList) <= 0 ) {
@@ -463,15 +459,11 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		
 		int result = -1;
 		
-		/* 적립금 로그 테이블 update(column : reason, balance, reward) */
-		if(adminOrderDao.changeOrderCancelReward(orderNoList) <= 0) {
-			return result;
-		}
+		/* 적립금 로그 테이블 insert */
+		adminOrderDao.saveOrderCancelReward(orderNoList);
 		
-		/* 포인트 로그 테이블 update(column : reason, balance, point) */
-		if(adminOrderDao.changeOrderCancelPoint(orderNoList) <= 0) {
-			return result ;
-		}
+		/* 포인트 로그 테이블 insert */
+		adminOrderDao.saveOrderCancelPoint(orderNoList);
 		
 		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
 		if(adminOrderDao.changeOrderCancel(orderNoList) <= 0 ) {
@@ -525,8 +517,6 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		if(!PendingProductNo.isEmpty() && editPendingProductCancel(PendingProductNo) > 0) { 
 			return result;
 		}
-		 
-		 
 		return result;
 	}
 	

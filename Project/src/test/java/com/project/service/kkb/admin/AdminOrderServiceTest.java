@@ -348,10 +348,19 @@ public class AdminOrderServiceTest {
 	@Transactional
 	public void testChangePendingProductCancelPayments(){
 		//given
-    	List<String> orderNoList = Arrays.asList("O1701466461394-1", "O1701466461394-2");
-		
+
+    	//    	List<String> orderNoList = Arrays.asList("O1701466461394-1", "O1701466461394-2");
+    	List<ProductCancelRequest> productOrderNoList = new ArrayList<ProductCancelRequest>();
+    	
+    	ProductCancelRequest cancel1 = new ProductCancelRequest();
+    	ProductCancelRequest cancel2 = new ProductCancelRequest();
+    	cancel1.setProductOrderNo("O1701466461394-1");
+    	cancel2.setProductOrderNo("O1701466461394-2");
+    	productOrderNoList.add(cancel1);
+    	productOrderNoList.add(cancel2);
+    	
 		//when
-    	int result = adminOrderDao.changePendingProductCancelPayments(orderNoList);
+    	int result = adminOrderDao.changePendingProductCancelPayments(productOrderNoList);
 		
 		//then
     	System.out.println("result : " + result);

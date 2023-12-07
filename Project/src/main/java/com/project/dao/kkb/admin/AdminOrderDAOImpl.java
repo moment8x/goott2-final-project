@@ -108,6 +108,11 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	public int changePendingProductCancelReward(List<ProductCancelRequest> productOrderNoList) {
 		return ses.update(ns + ".updatePendingProductCancelReward", productOrderNoList);
 	}
+	
+	@Override
+	public int savePendingProductCancelPoint(List<ProductCancelRequest> productOrderNoList) {
+		return ses.insert(ns + ".insertPendingProductCancelPoint", productOrderNoList);
+	}
 
 	@Override
 	public int changePendingProductCancelPoint(List<ProductCancelRequest> productOrderNoList) {
@@ -145,13 +150,13 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	}
 
 	@Override
-	public int changePendingOrderCancelReward(List<String> orderNoList) {
-		return ses.update(ns + ".updatePendingOrderCancelReward", orderNoList);
+	public int savePendingOrderCancelReward(List<String> orderNoList) {
+		return ses.insert(ns + ".insertPendingOrderCancel", orderNoList);
 	}
 
 	@Override
-	public int changePendingOrderCancelPoint(List<String> orderNoList) {
-		return ses.update(ns + ".updatePendingOrderCancelPoint", orderNoList);
+	public int savePendingOrderCancelPoint(List<String> orderNoList) {
+		return ses.update(ns + ".insertPendingOrderCancelPoint", orderNoList);
 	}
 
 	@Override
@@ -290,10 +295,20 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	}
 	
 	@Override
+	public int saveProductCancelReward(List<ProductCancelRequest> productOrderNoList) {
+		return ses.insert(ns + ".insertProductCancelReward", productOrderNoList);
+	}
+	
+	@Override
 	public int changeProductCancelReward(List<ProductCancelRequest> productOrderNoList) {
 		return ses.update(ns + ".updateProductCancelReward", productOrderNoList);
 	}
 
+	@Override
+	public int saveProductCancelPoint(List<ProductCancelRequest> productOrderNoList) {
+		return ses.insert(ns + ".insertProductCancelPoint", productOrderNoList);
+	}
+	
 	@Override
 	public int changeProductCancelPoint(List<ProductCancelRequest> productOrderNoList) {
 		return ses.update(ns + ".updateProductCancelPoint", productOrderNoList);
@@ -331,5 +346,59 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	@Override
 	public List<CardCancelResponse> findCardCancelProduct(CardCancelCondition cardCancelCond) {
 		return ses.selectList(ns + ".selectCardCancelByInfo", cardCancelCond);
+	}
+
+	//-----------------------------
+	
+	@Override
+	public int saveOrderCancelReward(List<String> orderNoList) {
+		return ses.insert(ns + ".insertOrderCancelReward", orderNoList);
+	}
+
+	@Override
+	public int saveOrderCancelPoint(List<String> orderNoList) {
+		return ses.insert(ns + ".insertOrderCancelPoint", orderNoList);
+	}
+
+	@Override
+	public int changeOrderCancel(List<String> orderNoList) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int changeOrderCancelHistory(List<String> orderNoList) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int changeOrderCancelCoupon(List<String> orderNoList) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int changeOrderCancelMember(List<String> orderNoList) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int changeOrderCancelPayments(List<String> orderNoList) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<PendingCancelInfoResponse> findCancelInfo(List<String> orderNoList) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int saveOrderCancel(List<PendingCancelInfoResponse> cancelInfoList) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }
