@@ -8,6 +8,7 @@ import com.project.vodto.ProductCategory;
 import com.project.vodto.kjs.AdminStockListVO;
 import com.project.vodto.kjs.AdminUpdateStockVO;
 import com.project.vodto.kjs.AdminProductsSearchVO;
+import com.project.vodto.ksh.AdminProductsList;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +35,15 @@ public class AdminProductsDAOImpl implements AdminProductsDAO {
 	private final SqlSession ses;
 	
 	// ----------------------------- 김상희 -----------------------------
+	
+	@Override
+	public int getProductsOnSaleCount() {
+		// 판매 중인 상품 개수
+		return ses.selectOne(ns+".getProductsOnSaleCount");
+	}
+	
+	public List<AdminProductsList> getAllProducts(String sellingProducts) {
+		return ses.selectList(ns+".getAllProducts");
 	
 	// ----------------------------------------------------------------
 	// ----------------------------- 김재용 -----------------------------

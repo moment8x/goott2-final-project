@@ -26,7 +26,7 @@ public class InquiryDAOImpl implements InquiryDAO {
 
 
 	@Override
-	public CustomerInquiry saveInquiry(CustomerInquiry inquiry) throws Exception {
+	public CustomerInquiryDTO saveInquiry(CustomerInquiryDTO inquiry) throws Exception {
 		// 문의 저장
 		ses.insert(ns+".saveInquiry", inquiry);
 		
@@ -102,7 +102,7 @@ public class InquiryDAOImpl implements InquiryDAO {
 
 
 	@Override
-	public int updateInquiry(CustomerInquiry inquiry) throws Exception {
+	public int updateInquiry(CustomerInquiryDTO inquiry) throws Exception {
 		// 문의 업데이트
 		return ses.update(ns+".updateInquiry", inquiry);
 	}

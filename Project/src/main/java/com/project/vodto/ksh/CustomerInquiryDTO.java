@@ -3,6 +3,8 @@ package com.project.vodto.ksh;
 import java.sql.Timestamp;
 import java.util.List;
 
+import com.project.vodto.UploadFiles;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,4 +32,7 @@ public class CustomerInquiryDTO {
 	private String email;
 	private String orderNo;
 	private int uploadFilesSeq;
+	private List<UploadFiles> objList;
+	private List<UploadFiles> deleteList;
+	
 }

@@ -31,7 +31,9 @@ public interface OrderService {
 
 	//Map<String, Object> getOrderHistory() throws Exception;
 	
-	Map<String, Object>getPaymentDetail(OrderHistory oh, List<String> productId) throws Exception;
+//	Map<String, Object>getPaymentDetail(OrderHistory oh, List<String> productId) throws Exception;
+	
+	Map<String, Object>getPaymentDetail(String orderNo) throws Exception;
 	
 	Map<String, Object>getPaymentDetail(NonOrderHistory noh, List<String> productId) throws Exception;
 

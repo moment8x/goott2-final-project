@@ -16,10 +16,13 @@ import com.project.vodto.kjs.ProductImage;
 import com.project.vodto.kjy.Categories;
 import com.project.vodto.kjy.ProductCategories;
 import com.project.vodto.kjy.Products;
+import com.project.vodto.kjs.AdminProductsListVO;
+import com.project.vodto.ksh.AdminProductsList;
 
 public interface AdminProductsDAO {
 	// ----------------------------- 김상희 -----------------------------
-	
+	int getProductsOnSaleCount();
+	List<AdminProductsList> getAllProducts(String sellingProducts);
 	// ----------------------------------------------------------------
 	// ----------------------------- 김재용 -----------------------------
 	// product 리스트, 이미지들 가져오기

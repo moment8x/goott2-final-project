@@ -140,6 +140,7 @@ public class UploadFileServiceImpl implements UploadFileService {
 	@Override
 	   public int deleteFile(UploadFiles uf, String realPath) {
 	      int result = -1;
+	      System.out.println(uf.getNewFileName());
 	      File file = new File(realPath + uf.getNewFileName());
 	      if (file.exists()) {
 	         if (uf.getThumbnailFileName() != null || uf.getThumbnailFileName().equals("")) {

@@ -28,7 +28,7 @@ public class InquiryServiceImpl implements InquiryService {
 	private InquiryDAO inquiryDao;
 
 	@Override
-	public int saveInquiry(CustomerInquiry inquiry, List<UploadFiles> fileList) throws Exception {
+	public int saveInquiry(CustomerInquiryDTO inquiry, List<UploadFiles> fileList) throws Exception {
 		// 문의 저장
 		int result = 0;
 		inquiry.setContent(inquiry.getContent().replace("\r\n", "<br />"));
@@ -128,7 +128,7 @@ public class InquiryServiceImpl implements InquiryService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public int updateInquiry(CustomerInquiry inquiry, List<UploadFiles> deleteFileList, List<UploadFiles> fileList)
+	public int updateInquiry(CustomerInquiryDTO inquiry, List<UploadFiles> deleteFileList, List<UploadFiles> fileList)
 			throws Exception {
 		// 문의 수정
 		int result = 0;

@@ -128,7 +128,7 @@
 								</div>
 
 								<div class="faq-box-contain">
-									<h3>자주 묻는 질문</h3>
+									<h3>FAQ</h3>
 									<p>Bring to the table win-win survival strategies to ensure
 										proactive domination.</p>
 								</div>
@@ -156,7 +156,9 @@
 								</div>
 
 								<div class="faq-box-contain">
-									<h3><a href="/cs/makeInquiry">1:1 문의접수</a></h3>
+									<h3>
+										<a href="/cs/makeInquiry">1:1 문의접수</a>
+									</h3>
 									<p>Lorizzle ipsizzle boom shackalack sit get down get down.</p>
 								</div>
 							</div>
@@ -191,15 +193,15 @@
 			<div class="row">
 				<div class="col-xl-5">
 					<div class="faq-contain">
-						<h2>Frequently Asked Questions</h2>
+						<h2>FAQ</h2>
 						<p>
-							We are answering most frequent questions. No worries if you not
-							find exact one. You can find out more by searching or continuing
-							clicking button below or directly <a href="contact-us.html"
+							찾으시는 질문이 없다면 1:1 문의 접수를 이용해주세요. 신속히 처리해드리겠습니다. <a href="/cs/makeInquiry"
 								class="theme-color text-decoration-underline">contact our
 								support.</a>
 						</p>
 					</div>
+					<br>
+					<div><img src="https://miro.medium.com/v2/resize:fit:720/format:webp/0*FdLLSjLPudGd-Pt5" style="width:550px; height:800px;"></div>
 				</div>
 
 				<div class="col-xl-7">
@@ -210,25 +212,26 @@
 									<button class="accordion-button" type="button"
 										data-bs-toggle="collapse" data-bs-target="#collapseOne"
 										aria-expanded="true" aria-controls="collapseOne">
-										What is Fastkart and why was the name changed? <i
-											class="fa-solid fa-angle-down"></i>
+										주문을 수정(취소/변경)할 수 있나요? <i class="fa-solid fa-angle-down"></i>
 									</button>
 								</h2>
 								<div id="collapseOne" class="accordion-collapse collapse show"
 									aria-labelledby="headingOne" data-bs-parent="#accordionExample">
 									<div class="accordion-body">
-										<p>Fastkart is leading the charge in transforming India’s
-											vast, unorganised grocery landscape through cutting-edge
-											technology and innovation. Blinkit is India’s largest and
-											most convenient hyper-local delivery company, which enables
-											you to order grocery, fruits & vegetables, and other daily
-											essential products, directly via your mobile or web browser.</p>
-
+										<p>회원님께서 주문하신 상품은 아래의 단계별로 처리됩니다.&nbsp;</p>
+										<p style="font-weight: bold;">입금전 - 결제완료 - 출고전 - 출고완료 -배송중
+											- 배송완료&nbsp;</p>
 										<p>
-											To know the reason why we changed our brand name from Grofers
-											to Fastkart, read this <span class="fw-bold">blog
-												post.</span>
+											주문수정(취소/변경)은 주문/배송조회에서 회원 로그인 후 하실 수 있습니다. <br>비회원 주문의
+											경우는 주문하실 때 입력했던 이메일 주소와 비밀번호로 로그인하실 수 있습니다.&nbsp;
 										</p>
+										<p>
+											- 입금전, 결제완료, 출고전 단계의 주문은 취소가 가능합니다.<br> - 출고완료된 상품은
+											주문취소가 불가합니다.<br> - 배송중인 상품은 택배사로 물품을 인계되는 단계로 주문취소가
+											불가합니다.
+										</p>
+
+
 									</div>
 								</div>
 							</div>
@@ -238,18 +241,18 @@
 									<button class="accordion-button collapsed" type="button"
 										data-bs-toggle="collapse" data-bs-target="#collapseTwo"
 										aria-expanded="false" aria-controls="collapseTwo">
-										How to remove the impurities of Graphene oxide? <i
-											class="fa-solid fa-angle-down"></i>
+										주문한 상품이 아직 안 왔어요. <i class="fa-solid fa-angle-down"></i>
 									</button>
 								</h2>
 								<div id="collapseTwo" class="accordion-collapse collapse"
 									aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
 									<div class="accordion-body">
-										<p>Discover, Explore & Understanding The Product
-											Description Maecenas ullamcorper eros libero, facilisis
-											tempor mi dapibus vel. Sed ut felis ligula. Pellentesque
-											vestibulum, tellus id euismod aliquet, justo velit tincidunt
-											justo, nec pulvinar tortor elit vitae urna.</p>
+										<p>주문하신 도서를 아직 못받아 보셨다면 다음 사항을 확인해 주십시오.&nbsp;</p>
+										<p>
+											- 주문·배송 확인 시 상품의 처리상태가 출고완료로 되어 있는 경우 이 상품은 당사에서는 출고처리를 한
+											것입니다.<br> 당사에서 출고처리가 되었으나 2~3일 이내에 받아보시지 못한 경우는 고객센터의
+											1:1문의를 이용하시면 신속히 처리해 드립니다.
+										</p>
 									</div>
 								</div>
 							</div>
@@ -259,18 +262,19 @@
 									<button class="accordion-button collapsed" type="button"
 										data-bs-toggle="collapse" data-bs-target="#collapseThree"
 										aria-expanded="false" aria-controls="collapseThree">
-										How long will delivery take? <i class="fa-solid fa-angle-down"></i>
+										인터넷 주문도서의 반품이 가능한가요? <i class="fa-solid fa-angle-down"></i>
 									</button>
 								</h2>
 								<div id="collapseThree" class="accordion-collapse collapse"
 									aria-labelledby="headingThree"
 									data-bs-parent="#accordionExample">
 									<div class="accordion-body">
-										<p>Discover, Explore & Understanding The Product
-											Description Maecenas ullamcorper eros libero, facilisis
-											tempor mi dapibus vel. Sed ut felis ligula. Pellentesque
-											vestibulum, tellus id euismod aliquet, justo velit tincidunt
-											justo, nec pulvinar tortor elit vitae urna.</p>
+										<p>
+											-고객님의 변심 또는 주문오류로 인한 반품과 교환은 불가합니다.<br> - 주문하신 상품의 결함 및
+											계약내용과 다를 경우, 문제점 발견 후 7일 이내 반품신청이 가능합니다.<br> - 디어북스
+											마이페이지 > 주문내역 > 주문 상세에서 직접 반품/교환을 신청하실 수 있습니다.<br> 회수기사
+											방문 전에 미리 도서를 동봉하여 택배포장을 준비하여 주시기 바랍니다.<br>
+										</p>
 									</div>
 								</div>
 							</div>
@@ -280,20 +284,28 @@
 									<button class="accordion-button collapsed" type="button"
 										data-bs-toggle="collapse" data-bs-target="#collapseFour"
 										aria-expanded="true" aria-controls="collapseFour">
-										How do I find my Windows Product key? <i
-											class="fa-solid fa-angle-down"></i>
+										회원가입/회원탈퇴는 어떻게 하나요? <i class="fa-solid fa-angle-down"></i>
 									</button>
 								</h2>
 								<div id="collapseFour" class="accordion-collapse collapse"
 									aria-labelledby="headingFour"
 									data-bs-parent="#accordionExample">
 									<div class="accordion-body">
-										<p>The product key is located inside the product
-											packaging, on the receipt or confirmation page for a digital
-											purchase or in a confirmation e-mail that shows you purchased
-											Windows. If you purchased a digital copy from Microsoft
-											Store, you can locate your product key in your Account under
-											Digital Content.</p>
+										<p>개인 회원가입 : 홈 > register를 통해 회원가입이 가능합니다.</p>
+										<a href="/register/register">회원가입 바로가기</a><br> <br>
+										<p>
+											회원 탈퇴&nbsp;<br>
+											<br>디어북스의 회원가입 및 탈퇴는 방문자의 의사를 존중합니다. 자유롭게 탈퇴하실 수 있으며, 탈퇴
+											방법은 다음과 같습니다. 회원 탈퇴 전, 유의사항을 반드시 확인해 주세요.<br>
+											<br>1. WEB : 마이 > 회원정보관리 > 회원정보 수정 > 회원탈퇴 > 탈퇴사유 입력 후
+											확인&nbsp; 회원탈퇴 시 유의사항&nbsp; 1. 회원탈퇴 시 모든 회원정보와 할인쿠폰, 통합포인트,
+											마일리지, 교환권, 교보캐시, 이벤트 교보e캐시, 구매내역이 자동으로 삭제되며, 복구가 불가합니다.<br>
+											2. 자동 삭제 항목(복구 불가능) : 회원정보, 상품구매, eBook 콘텐츠, 할인쿠폰, 마일리지,
+											통합포인트, 예치금, 교보e캐시 등의 모든 내역<br> 3. 회원 아이디에 대해서는 서비스 이용의
+											혼선 방지, 법령에서 규정하는 회원 거래 정보의 보존기간 동안의 보관 의무의 이행, 기타 안정적인 서비스
+											제공을 위하여 필요한 정보이므로 탈퇴 후 동일 아이디로의 재가입은 허용되지 않습니다.<br> 4.
+											다만, 주문 건에 따른 후속처리 발생에 대비하여 최근 1달 내 구매내역이 있으실 경우에는 탈퇴가 불가합니다.<br>
+										</p>
 									</div>
 								</div>
 							</div>
@@ -303,23 +315,27 @@
 									<button class="accordion-button collapsed" type="button"
 										data-bs-toggle="collapse" data-bs-target="#collapseFive"
 										aria-expanded="false" aria-controls="collapseFive">
-										I've downloaded an ISO file, now what? <i
-											class="fa-solid fa-angle-down"></i>
+										주문취소 시 환불은 어떻게 되나요? <i class="fa-solid fa-angle-down"></i>
 									</button>
 								</h2>
 								<div id="collapseFive" class="accordion-collapse collapse"
 									aria-labelledby="headingFive"
 									data-bs-parent="#accordionExample">
 									<div class="accordion-body">
-										<p>You can use the ISO file to create bootable media for
-											installation or recovery. You can also install Windows on
-											your current device by opening the ISO file, selecting the
-											Setup and following the instructions.</p>
+										<p>
+											주문 시 사용된 결제수단 별로 환불되며, 결제수단 별 자세한 환불 방법은 아래와 같습니다.<br><br>
 
-										<p>To create bootable media such as a bootable USB drive
-											or DVD, you will need an ISO burning or mounting software. We
-											recommend always using a blank USB or blank DVD because
-											contents may be deleted when creating a bootable image.</p>
+											결제수단별 환불 안내<br><br>
+											(1) 신용카드<br><br> - 전체 취소 : 카드사 매입전은
+											당일 취소되며, 카드사 매입 후는 카드사에 따라 2일~ 최대 2주(공휴일 제외) 소요됩니다.<br> - 부분 취소 :
+											카드사 매입 후 취소 처리되며, 카드사에 따라 2일~ 최대 2주(공휴일 제외) 소요됩니다. (당일 부분취소한
+											경우도 동일함) <br><br>※ 신용카드 부분 취소 유의 사항 <br>- 카드사 취소 처리되는 시점에 카드사에서 취소 문자
+											전송됩니다.<br> - 신용카드를 제외한 결제 수단(카카오페이, 네이버페이와 같은 간편 결제)은 부분 취소가 불가하므로 이 점 유의하시기 바랍니다.
+										</p>
+
+										<p>(2) 간편결제(신용카드를 제외한 결제 수단)<br><br> - 부분 취소 불가하고 전체 취소만 가능합니다. </p>
+										<p>(3) 재화결제(포인트, 적립금)<br><br> - 포인트나 적립금을 현금과 함께 사용하여 결제 했을 경우 부분 취소 시엔 적립금 > 포인트 > 현금 순으로 환불됩니다.</p>
+										<p>(4) 무통장입금<br><br> - 전체 취소와 부분 취소 모두 환불 요청 확인되는 즉시 처리됩니다. 환불 신청 건이 많은 경우 2 ~ 3일(공휴일 제외) 소요될 수 있습니다.</p>
 									</div>
 								</div>
 							</div>
@@ -329,18 +345,15 @@
 									<button class="accordion-button collapsed" type="button"
 										data-bs-toggle="collapse" data-bs-target="#collapseSix"
 										aria-expanded="false" aria-controls="collapseSix">
-										What's the difference between 32-bit and 64-bit versions of
-										Windows? <i class="fa-solid fa-angle-down"></i>
+										포인트랑 적립금에 대해 알려주세요. <i class="fa-solid fa-angle-down"></i>
 									</button>
 								</h2>
 								<div id="collapseSix" class="accordion-collapse collapse"
 									aria-labelledby="headingSix" data-bs-parent="#accordionExample">
 									<div class="accordion-body">
-										<p>The terms 32-bit and 64-bit refer to the way a
-											computer's processor (also called a CPU) handles information.
-											The 64-bit version of Windows handles large amounts of random
-											access memory (RAM) more effectively than a 32-bit system.
-											Not all devices can run the 64-bit versions of Windows.</p>
+										<p> - 디어북스의 통합회원이 되면, 디어북스 온라인에서 구매시 사용 할 수 있는 재화입니다.</p>
+										<p> - 적립금 : 회원 등급에 따라 구매 시에 해당되는 적립률로 배송완료 시점에 적립됩니다.<br>
+										 - 포인트 : 이벤트로 적립되는 재화입니다. </p>
 									</div>
 								</div>
 							</div>
@@ -350,7 +363,7 @@
 									<button class="accordion-button collapsed" type="button"
 										data-bs-toggle="collapse" data-bs-target="#collapseSeven"
 										aria-expanded="true" aria-controls="collapseSeven">
-										Questionnaire on online shopping behavior during COVID-19. <i
+										쿠폰 사용 시 제한이 있나요? <i
 											class="fa-solid fa-angle-down"></i>
 									</button>
 								</h2>
@@ -358,18 +371,9 @@
 									aria-labelledby="headingSeven"
 									data-bs-parent="#accordionExample">
 									<div class="accordion-body">
-										<p>Fastkart is leading the charge in transforming India’s
-											vast, unorganised grocery landscape through cutting-edge
-											technology and innovation. Blinkit is India’s largest and
-											most convenient hyper-local delivery company, which enables
-											you to order grocery, fruits & vegetables, and other daily
-											essential products, directly via your mobile or web browser.</p>
-
-										<p>
-											To know the reason why we changed our brand name from Grofers
-											to Fastkart, read this <span class="fw-bold">blog
-												post.</span>
-										</p>
+										<p>상품쿠폰, 배송쿠폰 제한없이 중복 적용 가능합니다.</p>
+										단, 쿠폰 여러 개 선택 시 구매 금액을 초과하게 된다면 마지막으로 선택한 쿠폰은 자동으로 선택 취소됩니다. 
+										
 									</div>
 								</div>
 							</div>
@@ -379,7 +383,7 @@
 									<button class="accordion-button collapsed" type="button"
 										data-bs-toggle="collapse" data-bs-target="#collapseEight"
 										aria-expanded="false" aria-controls="collapseEight">
-										How Can I Get More Attention From Customers? <i
+										주문취소 시 쿠폰 환원이 되나요? <i
 											class="fa-solid fa-angle-down"></i>
 									</button>
 								</h2>
@@ -402,23 +406,17 @@
 									<button class="accordion-button collapsed" type="button"
 										data-bs-toggle="collapse" data-bs-target="#collapseNine"
 										aria-expanded="false" aria-controls="collapseNine">
-										What is payment method? <i class="fa-solid fa-angle-down"></i>
+										비회원 주문이 가능한가요? <i class="fa-solid fa-angle-down"></i>
 									</button>
 								</h2>
 								<div id="collapseNine" class="accordion-collapse collapse"
 									aria-labelledby="headingNine"
 									data-bs-parent="#accordionExample">
 									<div class="accordion-body">
-										<p>simply dummy text of the printing and typesetting
-											industry. Lorem Ipsum has been the industry's standard dummy
-											text ever since the 1500s, when an unknown printer took a
-											galley of type and scrambled it to make a type specimen book.
-											It has survived not only five centuries, but also the leap
-											into electronic typesetting, remaining essentially unchanged.
-											It was popularised in the 1960s with the release of Letraset
-											sheets containing Lorem Ipsum passages, and more recently
-											with desktop publishing software like Aldus PageMaker
-											including versions of Lorem Ipsum</p>
+										<p>네. 디어북스는 비회원으로도 주문하실 수 있습니다.
+비회원으로 주문을 하시려면 비회원 주문을 클릭하시고 해당사항을 입력하시면 됩니다.
+주문에 관련된 사항을 모두 입력하시고 결제 과정에서 본인 확인을 위한 이메일 주소와 비밀번호만 입력하시면 됩니다.
+주문/배송조회는 주문 시 입력한 이메일주소와 비밀번호로 로그인하실 수 있습니다.</p>
 									</div>
 								</div>
 							</div>

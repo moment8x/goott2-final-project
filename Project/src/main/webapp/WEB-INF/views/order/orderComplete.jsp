@@ -207,18 +207,18 @@
 											</td>
 
 											<td class="price">
-												<h4 class="table-title text-content">Price</h4>
+												<h4 class="table-title text-content">가격</h4>
 												<h6 class="theme-color">${item.productPrice}</h6>
 											</td>
 
 											<td class="quantity">
-												<h4 class="table-title text-content">Qty</h4>
-												<h4 class="text-title">01</h4>
+												<h4 class="table-title text-content">수량</h4>
+												<h4 class="text-title">${item.productQuantity }</h4>
 											</td>
 
 											<td class="subtotal">
-												<h4 class="table-title text-content">Total</h4>
-												<h5>$35.10</h5>
+												<h4 class="table-title text-content">총 금액</h4>
+												<h5>${item.calculatedPrice }</h5>
 											</td>
 										</tr>
 									</c:forEach>
@@ -305,7 +305,7 @@
 						<div class="col-lg-12 col-sm-6">
 							<div class="summery-box">
 								<div class="summery-header">
-									<h3>결제정보</h3>
+									<h3>결제 정보</h3>
 									<h5 class="ms-auto theme-color"></h5>
 								</div>
 
@@ -317,7 +317,7 @@
 
 									<li>
 										<h4>할인금액</h4>
-										<h4 class="price theme-color">0원</h4>
+										<h4 class="price theme-color">${requestScope.paymentDetail.paymentHistory.discountAmount }원</h4>
 									</li>
 
 									<li>
@@ -331,8 +331,15 @@
 
 								<ul class="summery-total">
 									<li class="list-total">
-										<h4>Total (USD)</h4>
-										<h4 class="price">$19.28</h4>
+										<h4>총 결제 금액</h4>
+										<c:choose>
+										<c:when test="${requestScope.paymentDetail.paymentHistory.paymentMethod eq 'bkt'}">
+										<h4 class="price">${requestScope.paymentDetail.paymentHistory.actualPaymentAmount}</h4>
+										</c:when>
+										<c:otherwise>
+										<h4 class="price">${requestScope.paymentDetail.paymentHistory.amountToPay }</h4>
+										</c:otherwise>
+										</c:choose>
 									</li>
 								</ul>
 							</div>
@@ -341,7 +348,7 @@
 						<div class="col-lg-12 col-sm-6">
 							<div class="summery-box">
 								<div class="summery-header d-block">
-									<h3>Shipping Address</h3>
+									<h3>배송 정보</h3>
 								</div>
 
 								<ul class="summery-contain pb-0 border-bottom-0">
@@ -369,7 +376,7 @@
 							</div>
 						</div>
 
-						<div class="col-12">
+					<!-- <div class="col-12">
 							<div class="summery-box">
 								<div class="summery-header d-block">
 									<h3>Payment Method</h3>
@@ -383,7 +390,7 @@
 									</li>
 								</ul>
 							</div>
-						</div>
+						</div> -->
 					</div>
 				</div>
 			</div>

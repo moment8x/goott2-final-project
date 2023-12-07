@@ -1,6 +1,6 @@
 package com.project.vodto.ksh;
 
-import java.sql.Timestamp;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,9 +18,12 @@ public class CompleteOrder {
 	private String nonOrderNo;
 	private String paymentMethod;
 	private String cardName;
+	private List<String> productId;
 	private int totalAmount;
+	private int shippingFee;
 	private int actualPaymentAmount;
 	private int amountToPay;
+	private int discountAmount;
 	private String recipientName;
 	private String recipientPhoneNumber;
 	private String shippingAddress;

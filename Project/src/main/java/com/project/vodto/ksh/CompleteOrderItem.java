@@ -19,4 +19,5 @@ public class CompleteOrderItem {
 	private int productQuantity;
 	private String productName;
 	private String productImage;
+	private int calculatedPrice;
 }

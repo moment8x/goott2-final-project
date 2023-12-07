@@ -5,14 +5,24 @@
 
 <mapper namespace="com.project.mappers.adminProductsMapper">
 	<!-- ============================================ 상희 ============================================  -->
-	<select id="getAllProductsCount" resultType="Integer">
-		select count(*) FROM products
-	</select>
 	<select id="getProductsOnSaleCount">
 		select count(*) from products where current_quantity > 0;
 	</select>
-	<select id="getOutOfStockProductsCount">
-		select count(*) from products where current_quantity = 0;
+	<select id="getAllProducts" resultType="com.project.vodto.ksh.AdminProductsList">
+		SELECT @rownum:=@rownum+1 AS no, p.product_id, p.product_name, category.id
+		as category_key, category.name as category_name,
+		(SELECT product_image FROM product_images pi WHERE pi.product_id =
+		p.product_id LIMIT 1) as product_image,
+		p.consumer_price, p.selling_price,
+		CONCAT('/detail/', p.product_id) as url
+		FROM products p
+		INNER JOIN categories category
+		ON category.id = p.category_key
+		INNER JOIN (SELECT @rownum:=0) AS r
+		<if test='sellingProducts != null and !sellingProducts.equals("")'>
+		where current_quantity > 0
+		</if>
+		ORDER BY no DESC;
 	</select>
 	<!-- ==============================================================================================  -->
 	<!-- ============================================ 재용 ============================================  -->

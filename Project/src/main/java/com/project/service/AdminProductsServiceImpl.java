@@ -28,6 +28,7 @@ import com.project.vodto.ProductCategory;
 import com.project.vodto.kjs.AdminStockListVO;
 import com.project.vodto.kjs.AdminUpdateStockVO;
 import com.project.vodto.kjs.AdminProductsSearchVO;
+import com.project.vodto.ksh.AdminProductsList;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +39,25 @@ public class AdminProductsServiceImpl implements AdminProductsService {
 	private final AdminProductsDAO adminProductsRepository;
 	
 	// ----------------------------- 김상희 -----------------------------
+	@Override
+	public Map<String, Object> getAllProductsCount() {
+		Map<String, Object> result = new HashMap<>();
+		int totalCount = adminProductsRepository.getTotalProductsCount();
+		int productsOnSaleCount = adminProductsRepository.getProductsOnSaleCount();
+		int outOfStockProductCount = totalCount - productsOnSaleCount;
+		result.put("totalCount", totalCount);
+		result.put("productsOnSaleCount", productsOnSaleCount);
+		result.put("outOfStockProductCount", outOfStockProductCount);
+		return result;
+	}
+	
+	@Override
+	public Map<String, Object> getAllProducts(String sellingProducts) {
+		Map<String, Object> result = new HashMap<>();
+		List<AdminProductsList> allProducts = adminProductsRepository.getAllProducts(sellingProducts);
+		result.put("allProducts", allProducts);
+		return result;
+	}
 	
 	// ----------------------------------------------------------------
 	// ----------------------------- 김재용 -----------------------------

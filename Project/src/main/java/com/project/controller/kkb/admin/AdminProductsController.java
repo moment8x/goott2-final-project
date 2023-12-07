@@ -36,6 +36,8 @@ import com.project.vodto.UploadFiles;
 import com.project.vodto.kjs.ProductImage;
 import com.project.vodto.kjy.Categories;
 import com.project.vodto.kjy.Products;
+import java.util.HashMap;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,9 +47,23 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/admin/products")
 public class AdminProductsController {
 	
-	private final AdminProductsService adminProductsService;
+	@Inject
+	private AdminProductsService adminProductsService;
 	
 	// ----------------------------- 김상희 -----------------------------
+	@GetMapping("/dashBoardMain")
+	public Map<String, Object> getAllPrdoctsCount() {
+		Map<String, Object> result = adminProductsService.getAllProductsCount();
+		return result;
+	}
+	
+	@GetMapping("/productManage")	// 모든 상품 조회(판매중인 상품은 쿼리스트링으로 받아서)
+	public Map<String, Object> getAllPrducts(@RequestParam String sellingProducts) {
+		
+		Map<String, Object> result = adminProductsService.getAllProducts(sellingProducts);
+		
+		return result;
+	}
 	
 	// ----------------------------------------------------------------
 	// ----------------------------- 김재용 -----------------------------

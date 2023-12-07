@@ -6,7 +6,7 @@
 <mapper namespace="com.ksh.mappers.InquiryMapper">
 
 	<insert id="saveInquiry"
-		parameterType="com.project.vodto.CustomerInquiry">
+		parameterType="com.project.vodto.ksh.CustomerInquiryDTO">
 		insert into customer_inquiries_board (author, title, content,
 		answer_status, ref, inquiry_type) values (#{author}, #{title},
 		#{content}, 'n', (select auto_increment from information_schema.tables
