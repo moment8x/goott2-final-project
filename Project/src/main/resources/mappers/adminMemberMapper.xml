@@ -40,72 +40,76 @@
 	</select>
 	
 	<select id="selectRecentPost" resultType="MemberRecentPost">
-		SELECT c.category_name, c.subcategory, b.title, b.author, b.created_date 
-		FROM   board b
-		INNER JOIN board_categories c
-			ON b.category_id = c.category_id
-		WHERE b.author = #{memberId}
-		ORDER BY b.post_no DESC limit 5
+		SELECT 		c.category_name, c.subcategory, b.title, b.author, b.created_date 
+		FROM   		board b
+		INNER JOIN  board_categories c
+		ON 			b.category_id = c.category_id
+		WHERE 		b.author = #{memberId}
+		ORDER BY 	b.post_no DESC limit 5
 	</select>
 	
 	<select id="selectRecentInquiry" resultType="MemberRecentInquiry">
-		SELECT title, author, created_date, answer_status
-		FROM   customer_inquiries_board 
-		WHERE  author = #{memberId}
+		SELECT 	 title, author, created_date, answer_status
+		FROM   	 customer_inquiries_board 
+		WHERE  	 author = #{memberId}
 		ORDER BY post_no DESC limit 5 
 	</select>
 	
 	<select id="selectRecentOrder" resultType="MemberRecentOrder">
-		SELECT h.order_time,
-			   h.order_no,
-		       p.actual_payment_amount,
-		       p.payment_method,
-		       p.payment_status,
+		SELECT		 h.order_time,
+			   		h.order_no,
+		       		p.actual_payment_amount,
+		       		p.payment_method,
+		       		p.payment_status,
 		CASE   WHEN h.delivery_status = '배송중' THEN '배송중'
 			   WHEN h.delivery_status = '배송완료' THEN '배송완료'
 			   WHEN h.delivery_status = '취소' THEN '배송없음'
 			   ELSE '배송전'
-			   END delivery_status,
+			   END  delivery_status,
 		CASE   WHEN cancels.count = total.count THEN '전체취소'
 			   WHEN cancels.count BETWEEN 1 AND (total.count - 1) THEN '부분취소'
 			   ELSE '취소 안 함'
-		       END cancels,
+		       END  cancels,
 		CASE   WHEN exchanges.count = total.count THEN '전체교환'
 			   WHEN exchanges.count BETWEEN 1 AND (total.count - 1) THEN '부분교환'
 			   ELSE '교환 안 함'
-		       END exchanges,
+		       END  exchanges,
 		CASE   WHEN returns.count = total.count THEN '전체반품'
 			   WHEN returns.count BETWEEN 1 AND (total.count - 1) THEN '부분반품'
 			   ELSE '반품 안 함'
-		       END returns
-		FROM payments p
-		INNER JOIN order_history h 
-			ON p.order_no = h.order_no
-		LEFT JOIN (
-			    SELECT order_no, count(*) count
-			    FROM detailed_order_items 
-			    WHERE product_status = '취소'
-			    GROUP BY order_no) cancels
-			ON h.order_no = cancels.order_no
-		LEFT JOIN (
-			    SELECT order_no, count(*) count
-			    FROM detailed_order_items 
-			    WHERE product_status = '교환'
-			    GROUP BY order_no) exchanges
-			ON h.order_no = exchanges.order_no
-		LEFT JOIN (
-			    SELECT order_no, count(*) count
-			    FROM detailed_order_items 
-			    WHERE product_status = '반품'
-			    GROUP BY order_no) returns
-			ON h.order_no = returns.order_no
-		LEFT JOIN (
-			    SELECT order_no, count(*) count
-			    FROM detailed_order_items 
-			    GROUP BY order_no) total 
-			ON h.order_no = total.order_no
-		WHERE h.member_id = #{memberId}
-		ORDER BY h.order_time DESC limit 5	
+		       END  returns
+		FROM 		payments p
+		INNER JOIN  order_history h 
+		ON 			p.order_no = h.order_no
+		LEFT JOIN   (
+					    SELECT order_no, count(*) count
+					    FROM detailed_order_items 
+					    WHERE product_status = '취소'
+					    GROUP BY order_no
+				    ) cancels
+		ON 			h.order_no = cancels.order_no
+		LEFT JOIN   (
+					    SELECT order_no, count(*) count
+					    FROM detailed_order_items 
+					    WHERE product_status = '교환'
+					    GROUP BY order_no
+				    ) exchanges
+		ON 			h.order_no = exchanges.order_no
+		LEFT JOIN   (
+					    SELECT order_no, count(*) count
+					    FROM detailed_order_items 
+					    WHERE product_status = '반품'
+					    GROUP BY order_no
+			    	) returns
+		ON 			h.order_no = returns.order_no
+		LEFT JOIN 	(
+					    SELECT order_no, count(*) count
+					    FROM detailed_order_items 
+					    GROUP BY order_no
+				    ) total 
+		ON 			h.order_no = total.order_no
+		WHERE 		h.member_id = #{memberId}
+		ORDER BY 	h.order_time DESC limit 5	
 	</select>
 	
 	<select id="selectBasicInfo" resultType="MemberBasicInfo">
@@ -117,7 +121,15 @@
 	</select>
 	
 	<select id="selectMemberInfo" resultType="MemberResponse">
-		SELECT registration_date, name, member_id, membership_grade, phone_number, cell_phone_number, gender, date_of_birth, address
+		SELECT registration_date, 
+			   name, 
+			   member_id, 
+			   membership_grade, 
+			   phone_number, 
+			   cell_phone_number, 
+			   gender, 
+			   date_of_birth, 
+			   address
 		FROM   member 
 		<where>
 			 <if test='memberId != null and !memberId.equals("")'>

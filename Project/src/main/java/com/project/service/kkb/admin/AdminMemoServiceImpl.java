@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import com.project.dao.kkb.admin.AdminMemoDAO;
 import com.project.vodto.kjy.Memberkjy;
@@ -17,15 +18,15 @@ import com.project.vodto.kkb.MemoListResponse;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Repository
+@Service
 public class AdminMemoServiceImpl implements AdminMemoService {
 	
-	private final AdminMemoDAO adminMemoDAO;
+	private final AdminMemoDAO adminMemoDao;
 	
 	@Override
 	public Map<String, Object> getMemoById(MemoInfoCondition memoInfoCond) {
 		
-		List<MemoListResponse> memoList = adminMemoDAO.findMemoById(memoInfoCond);
+		List<MemoListResponse> memoList = adminMemoDao.findMemoById(memoInfoCond);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("memoList", memoList);
@@ -44,7 +45,7 @@ public class AdminMemoServiceImpl implements AdminMemoService {
 			throw new RuntimeException("권한 없음");
 		}
 		memoCond.setAdminId(member.getMemberId());
-		int result = adminMemoDAO.saveMemberMemo(memoCond);
+		int result = adminMemoDao.saveMemberMemo(memoCond);
 		
 		return result;
 	}

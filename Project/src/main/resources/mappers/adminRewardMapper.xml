@@ -11,9 +11,9 @@
 	</select>	
 	
 	<select id="selectRewardList" resultType="RewardListResponse">
-		SELECT reason, date, reward, balance, related_order
-		FROM   reward_logs
-		WHERE member_id = #{memberId}
+		SELECT 	 reason, date, reward, balance, related_order
+		FROM   	 reward_logs
+		WHERE 	 member_id = #{memberId}
 		ORDER BY date DESC
 	</select>	
 </mapper>

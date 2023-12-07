@@ -8,11 +8,10 @@ import lombok.Getter;
 @Getter
 public class MemberCountListener {
 	
-	private int currentCount;
+	private int currentCount = 0;
 	
 	@EventListener
 	public void handleEvent(TotalMemberCountEvent event) {
 		currentCount = event.getTotalMemberCount();
-		System.out.println("MemberCountListener currentCount: "+ currentCount);
 	}
 }

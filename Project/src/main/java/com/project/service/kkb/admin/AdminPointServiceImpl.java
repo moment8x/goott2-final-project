@@ -16,13 +16,13 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class AdminPointServiceImpl implements AdminPointService {
 
-	private final AdminPointDAO adminPointRepository;
+	private final AdminPointDAO adminPointDao;
 	
 	@Override
 	public Map<String, Object> getPointInfo(String memberId) {
 	
-		PointInfoResponse pointInfo = adminPointRepository.findPointInfoById(memberId);
-		List<PointListResponse> pointList = adminPointRepository.findPointListById(memberId);
+		PointInfoResponse pointInfo = adminPointDao.findPointInfoById(memberId);
+		List<PointListResponse> pointList = adminPointDao.findPointListById(memberId);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("pointInfo", pointInfo);

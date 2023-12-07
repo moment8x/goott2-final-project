@@ -19,12 +19,14 @@ import com.project.vodto.kkb.MemberRecentPost;
 import com.project.vodto.kkb.MemberResponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminMemberServiceImpl implements AdminMemberService {
 
-	private final AdminMemberDAO adminMemberRepository;
+	private final AdminMemberDAO adminMemberDao;
 	private final MemberCountListener memberCount;
 	private final ApplicationEventPublisher publisher;
 	
@@ -33,14 +35,13 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		
 		int totalCount = 0;
 		
-		if(memberCount.getCurrentCount() > 0) {
-			/* MemberCountListener에 저장해둔 값 가져옴 */
-			System.out.println("저장해둔 전체 회원 수 조회");
-			totalCount = memberCount.getCurrentCount(); 
-		} else {
-			System.out.println("DB에서 전체 회원 수 조회");
+		if(memberCount.getCurrentCount() == 0) {
+			log.info("DB에서 전체 회원 수 조회");
 			updateMemberCount();
-		}
+			totalCount = memberCount.getCurrentCount();
+		} 		
+		/* DB에 접근 x, MemberCountListener에 저장해둔 값 가져옴 */
+		totalCount = memberCount.getCurrentCount(); 
 		Map<String, Object> result = new HashMap<>();
 		result.put("total", totalCount);
 		
@@ -50,21 +51,21 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	@Override
 	public void updateMemberCount(){
 		
-		int memberCount = adminMemberRepository.countAll();	
-		System.out.println("회원 수 갱신");
+		int memberCount = adminMemberDao.countAll();	
+		log.info("회원 수 갱신");
 		/* 이벤트 발행 */
 		publisher.publishEvent(new TotalMemberCountEvent(memberCount));
 	}	
 	
 	@Override
 	public int editMemberDetailInfo(MemberParam member) {		
-		return adminMemberRepository.changeMemberDetailInfo(member);
+		return adminMemberDao.changeMemberDetailInfo(member);
 	}
 	
 	@Override
 	public Map<String, Object> getMemberDetailInfo(String memberId) {
 		
-		MemberParam detailInfo = adminMemberRepository.findDetailInfoById(memberId);
+		MemberParam detailInfo = adminMemberDao.findDetailInfoById(memberId);
 		Map<String, Object> result = new HashMap<>();
 		result.put("detailInfo", detailInfo);
 		
@@ -74,10 +75,10 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 	@Override
 	public Map<String, Object> getHomeDetailInfo(String memberId) {
 		
-		MemberBasicInfo basicInfo = adminMemberRepository.findBasicInfoById(memberId);
-		List<MemberRecentOrder> recentOrder = adminMemberRepository.findRecentOrderById(memberId);
-		List<MemberRecentPost> recentPost = adminMemberRepository.findRecentPostById(memberId);
-		List<MemberRecentInquiry> recentInquiry = adminMemberRepository.findRecentInquiryById(memberId);
+		MemberBasicInfo basicInfo = adminMemberDao.findBasicInfoById(memberId);
+		List<MemberRecentOrder> recentOrder = adminMemberDao.findRecentOrderById(memberId);
+		List<MemberRecentPost> recentPost = adminMemberDao.findRecentPostById(memberId);
+		List<MemberRecentInquiry> recentInquiry = adminMemberDao.findRecentInquiryById(memberId);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("basicInfo", basicInfo);
@@ -96,7 +97,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		memberCond.setCellPhoneNumber(memberCond.getCellPhoneNumber().replace("-", "")); 
 		memberCond.setPhoneNumber(memberCond.getPhoneNumber().replace("-", ""));
 		
-		List<MemberResponse> responseList = adminMemberRepository.findByInfo(memberCond);
+		List<MemberResponse> responseList = adminMemberDao.findByInfo(memberCond);
 		
 		for ( MemberResponse responseParam : responseList ) {
 			
