@@ -136,7 +136,7 @@ public interface MemberDAO {
 	DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId) throws SQLException, NamingException;
 	
 	//취소테이블 인서트
-	int insertCancelOrder(String productId, String reason,int totalRefundAmount, int detailedOrderId, String paymentMethod) throws SQLException, NamingException;
+	int insertCancelOrder(String productId, String reason,int amount, int detailedOrderId, String paymentMethod) throws SQLException, NamingException;
 	
 	//취소할경우 디테일 상품상태 업데이트
 	int updateDetailProductStatus(int detailedOrderId) throws SQLException, NamingException;
@@ -145,7 +145,7 @@ public interface MemberDAO {
 	int updateRefundAccount(String memberId, CancelDTO tmpCancel) throws SQLException, NamingException;
 	
 	//환불테이블 인서트
-	int insertRefund(String productId, CancelDTO tmpCancel, String paymentMethod, int amountAfterDiscount, int amountBeforeDiscount) throws SQLException, NamingException;
+	int insertRefund(String productId, int totalRefundAmount, int actualRefundAmount, int refundRewardUsed, int refundPointUsed, int refundCouponDiscount) throws SQLException, NamingException;
 	
 	//취소시 사용한 적립금이 있다면 적립금 로그 인서트
 	int insertRewardLog(String memberId, CancelDTO tmpCancel, int totalReward) throws SQLException, NamingException;
@@ -254,6 +254,9 @@ public interface MemberDAO {
 	
 	//쿠폰사용금액 합치지 않은 쿠폰내역
 	List<CouponHistory> getOrderCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException;
+	
+	//디테일오더 아이디 가져오기
+	int selectDetailOrderId(String productId, String orderNo) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -267,6 +270,7 @@ public interface MemberDAO {
 	// 기본 배송지 설정
 	int insertShipping(ShippingAddrDTO shipping) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+	
 
 
 

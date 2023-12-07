@@ -291,12 +291,12 @@
 		</selectKey>
 		<choose>
 			<when test="paymentMethod != null and paymentMethod.equals('bkt')">
-				insert into refunds(product_id, total_refund_amount, refund_reward_used, refund_point_used, actual_refund_amount, cancel_id)
-				values (#{productId},#{totalRefundAmount},#{refundRewardUsed},#{refundPointUsed}, #{amount}, #{no})
+				insert into refunds(product_id, total_refund_amount, actual_refund_amount, refund_reward_used, refund_point_used, refund_coupon_discount, cancel_id)
+				values (#{productId},#{totalRefundAmount}, #{actualRefundAmount} ,#{refundRewardUsed},#{refundPointUsed}, #{refundCouponDiscount}, #{no})
 			</when>
 			<otherwise>
-				insert into refunds(product_id, total_refund_amount, refund_reward_used, refund_point_used, cancel_id)
-				values (#{productId},#{totalRefundAmount},#{refundRewardUsed},#{refundPointUsed}, #{no})
+				insert into refunds(product_id, total_refund_amount, refund_reward_used, refund_point_used, refund_coupon_discount, cancel_id)
+				values (#{productId},#{totalRefundAmount},#{refundRewardUsed},#{refundPointUsed}, #{refundCouponDiscount}, #{no})
 			</otherwise>
 		</choose>
 	</insert>
@@ -490,6 +490,10 @@
 		where cl.member_id = #{memberId} and cl.related_order = #{orderNo}
 		and c.coupon_number = cl.coupon_number
         and d.order_no = cl.related_order
+	</select>
+	
+	<select id="selectDetailOrderId" resultType="int">
+		select detailed_order_id from detailed_order_items where product_id = #{productId} and order_no = #{orderNo}
 	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">

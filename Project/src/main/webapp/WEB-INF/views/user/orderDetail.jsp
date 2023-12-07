@@ -201,67 +201,58 @@ function applyReturn() {
 
 //취소 버튼을 누르면
 function orderCancel(){
-	let result = false;
-	let cancelReason = $('#cancelReason').val();
-        if (cancelReason.trim() === '') {
-            alert('사유를 입력해주세요.');
-            return result
-        } 
-	$("input[name='order']:checked").each(function () {
-		let cancelReason = $('#cancelReason').val();
-		let totalQty = calculateTotalQuantity()
-		let orderQty = ${orderQty}
-		let point = ${detailOrder.usedPoints} //결제 할 때 사용한 포인트
-		let reward = ${detailOrder.usedReward}
+	let reason = $('#cancelReason').val();
+    if (reason.trim() === '') {
+        alert('사유를 입력해주세요.');
+     }
+
+//	$("input[name='order']:checked").each(function () {
+//		let cancelReason = $('#cancelReason').val();
+//		let totalQty = calculateTotalQuantity()
+//		let orderQty = `${orderQty}`
+	//	let usedPoint = `${detailOrder.usedPoints}` //사용한 포인트
+	//	let usedReward = `${detailOrder.usedReward}` //사용한 적립금
+	//	let selectQty = $('.form-control.cancelQty').val()
 		
-		let detailedOrderId = Number($(this).val());
-		let reason = $('#cancelReason').val()
-		let amount = Number($('#refundAmount').text().replace(",", "").replace("원", ""))
-		let refundPointUsed = 0
-		let refundRewardUsed = 0
-		let orderNo = '${detailOrder.orderNo}';
+	//	let detailedOrderId = Number($(this).val());
+	//	let reason = $('#cancelReason').val()
+	//	let amount = Number($('#refundAmount').text().replace(",", "").replace("원", ""))
+	//	let refundPointUsed = 0
+	//	let refundRewardUsed = 0
+		let orderNo = `${detailOrder.orderNo}`;
 		let refundBank = $('#changeRefundBank').text();
 		let refundAccount = $('#changeRefundAccount').text();
 		let accountHolder = $('#changeAccountHolder').text();
+	//	let totalRefundAmount = ${detailOrder.totalAmount} //취소하는 상품의 할인전금액
+		let actualRefundAmount = $('#refundAmount').text().replace(",", "").replace("원", ""); // 할인후 금액(돌려줄 환불액)
 		
-		if(totalQty != orderQty){
-			refundPointUsed = calculate(orderQty, totalQty, point)
-			refundRewardUsed = calculate(orderQty, totalQty, reward)
-		}else if(totalQty == orderQty){
-			refundPointUsed = Math.floor(point / orderQty)
-			refundRewardUsed = Math.floor(reward / orderQty)
-		}
-		let totalRefundAmount = Number(amount) + Number(refundPointUsed) + Number(refundRewardUsed)
+		console.log("환불포인트" + usedPoint)
+		console.log("환불 적립금" + usedReward)
+		console.log("환불금액 " + actualRefundAmount)
+	//	console.log("총 환불금액" + totalRefundAmount)
 		
-		console.log("환불포인트" + refundPointUsed)
-		console.log("환불 적립금" + refundRewardUsed)
-		console.log("환불금액 " + amount)
-		console.log("총 환불금액" + totalRefundAmount)
-		console.log("디테일번호" + detailedOrderId)	
+		 $('.form-control.cancelQty').each(function() {
+ 			selectQty = $(this).val()
+		
+		console.log("selectQty" + selectQty)	
 	
 		$.ajax({
 			url : '/user/cancelOrder', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data : {
-				reason,
-				amount,
-				refundPointUsed,
-				refundRewardUsed,
-				totalRefundAmount,
-				detailedOrderId,
 				orderNo,
 				refundBank,
 				refundAccount,
 				accountHolder,
-				orderQty,
-				totalQty
+				actualRefundAmount,
+				selectQty
 			},
 			dataType : 'text',
 			async : false,
 			success : function(data) {
 				console.log(data);
 				if(data == 'success'){
-					result = true;
+					alert("취소가 완료 되었습니다.")
 					location.reload()
 				}
 			},
@@ -270,24 +261,26 @@ function orderCancel(){
 			}
 		});
 	})
-	return result
+
 }
 
 	//취소창에서 상품 선택하고 수량 입력하면 환불 계산
 	function selectOrderCancel(detailedOrderId) {
-		let orderNo = '${detailOrder.orderNo}';
-	    let orderQty = ${orderQty} // 총 주문 수량
-	    let actualAmount = ${detailOrder.actualPaymentAmount} // 카드 실결제금액
-	    let bktActualAmount = ${bankTransfer.amountToPay} // 무통장 실결제금액
-	  	let selectQty = 0
- 		let totalQty = calculateTotalQuantity(); //입력한 총 수량
- 		
+		let orderNo = `${detailOrder.orderNo}`;
+	    let orderQty = `${orderQty}` // 총 주문 수량
+	    let actualAmount = `${detailOrder.actualPaymentAmount}` // 카드 실결제금액
+	    let bktActualAmount = `${bankTransfer.amountToPay}` // 무통장 실결제금액
+	    let totalQty = calculateTotalQuantity(); //입력한 총 수량		
+ 		let selectQty = 0;
+ 		let refundAmount = 0
+	    
+ 		$('.totalCancelQty').text("취소 상품 수량 : " + totalQty + "권")
  		console.log('총 수량:', totalQty);
  		
- 		 $('.totalCancelQty').text("취소 상품 수량 : " + totalQty + "권")
  		 $('.form-control.cancelQty').each(function() {
  			selectQty = $(this).val()
 	 		 console.log(selectQty)
+	 		 
 	 		$.ajax({
 	 		      url: "/user/calcRefundAmount", // 데이터를 수신받을 서버 주소
 	 		      type: "post", // 통신방식(GET, POST, PUT, DELETE)
@@ -305,8 +298,8 @@ function orderCancel(){
 	 		       	let usedCouponName = $('.infoContent.usedCoupon').text() //사용한 쿠폰이름
 	 		       	let usedReward = ${detailOrder.usedReward} // 사용한 적립금
 	 		    	let usedPoint = ${detailOrder.usedPoints} // 사용한 포인트
-	 		    	let refundAmount = 0
-	 		        
+	 		    	
+	
 	 		  		 //개별취소시 쿠폰환불이 가능한지
 	 		  		 $.each(data.couponsHistory, function(i, elt){
 	 			  		 if(data.status == "okCoupon"){
@@ -364,9 +357,9 @@ function orderCancel(){
 	}
 	
 	//환불 예정 포인트, 적립금 구하기
-	function calculate(n, k, usedAmount) { // 총 주문 수량, 입력한 총 수량, 포인트, 적립금
-		return ((n - k) / n) * usedAmount
-	}
+	//function calculate(n, k, usedAmount) { // 총 주문 수량, 입력한 총 수량, 포인트, 적립금
+	//	return ((n - k) / n) * usedAmount
+	//}
 	
 	//취소 수량 입력받아서 총 수량 구하기
 	function calculateTotalQuantity() {
@@ -1421,18 +1414,33 @@ function editRturnAccount() {
 							<h4>환불 금액</h4> <span id="refundAmount"></span>
 
 						</li>
-
-						<c:if test="${detailOrder.usedPoints != 0 }">
-							<li class="pb-0 refundList">
-								<h4>환불 포인트</h4> <span id="refundPoint"> </span>
-							</li>
-						</c:if>
-
-						<c:if test="${detailOrder.usedReward != 0 }">
-							<li class="pb-0 refundList">
-								<h4>환불 적립금</h4> <span id="refundReward"> </span>
-							</li>
-						</c:if>
+						
+						<c:choose>
+							<c:when test="${detailOrder.usedPoints != 0 }">
+								<li class="pb-0 refundList">
+									<h4>환불 포인트</h4> <span id="refundPoint"> </span>
+								</li>
+							</c:when>
+							<c:otherwise>
+								<li class="pb-0 refundList">
+									<h4>환불 포인트</h4> <span id="refundPoint">0점</span>
+								</li>
+							</c:otherwise>
+						</c:choose>
+						
+						<c:choose>
+							<c:when test="${detailOrder.usedReward != 0 }">
+								<li class="pb-0 refundList">
+									<h4>환불 적립금</h4> <span id="refundReward"> </span>
+								</li>
+							</c:when>
+							<c:otherwise>
+								<li class="pb-0 refundList">
+									<h4>환불 적립금</h4> <span id="refundReward">0원</span>
+								</li>
+							</c:otherwise>
+						</c:choose>
+						
 						<li class="pb-0 refundList"><c:if
 								test="${couponHistory != null}">
 								<h4>환불 예정 쿠폰</h4>
@@ -1449,7 +1457,7 @@ function editRturnAccount() {
 					<button type="button" class="btn btn-secondary btn-md"
 						data-bs-dismiss="modal">닫기</button>
 					<button type="button" class="btn theme-bg-color btn-md text-white"
-						onclick="return orderCancel();" data-bs-dismiss="modal">취소</button>
+						onclick="orderCancel();" data-bs-dismiss="modal">취소</button>
 				</div>
 			</div>
 		</div>

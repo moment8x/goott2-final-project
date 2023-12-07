@@ -288,7 +288,7 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public List<DetailOrder> getDetailOrderInfo(String memberId, String orderNo) throws SQLException, NamingException {
+	public List<DetailOrder> getDetailOrderInfo (String memberId, String orderNo) throws SQLException, NamingException {
 
 		return mDao.selectDetailOrder(memberId, orderNo);
 	}
@@ -394,7 +394,7 @@ public class MemberServiceImpl implements MemberService {
 	public Map<String, Object> selectCancelOrder(String memberId, String orderNo, int detailedOrderId, int selectQty)
 			throws SQLException, NamingException {
 		Map<String, Object> result = new HashMap<String, Object>();
-
+		
 		List<DetailOrder> detailOrder = mDao.selectDetailOrder(memberId, orderNo); // 해당주문에서 주문한 상품 전체
 		List<CouponHistory> couponsHistory = mDao.getOrderCouponsHistory(memberId, orderNo); // 해당주문에서 사용한 쿠폰내역
 		DetailOrder cancelOrder = mDao.selectCancelOrder(memberId, orderNo, detailedOrderId); // 해당주문에서 취소하려고 선택한 상품
@@ -527,14 +527,28 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean cancelOrder(CancelDTO tmpCancel, String memberId) throws SQLException, NamingException {
-//		boolean result = false;
-//		boolean allCancel = true;
+		boolean result = false;
+		boolean allCancel = true;
+		String productId = null ;
+		int productPrice = 0;
+		int amount = productPrice * tmpCancel.getSelectQty();
+		
+		List<DetailOrder> detailOrder = mDao.selectDetailOrder(memberId, tmpCancel.getOrderNo()); // 해당주문에서 주문한 상품 전체
+		for(DetailOrder dOrder : detailOrder) {
+			productId = dOrder.getProductId();
+			productPrice = dOrder.getProductPrice();
+		}
+		int detailedOrderId = mDao.selectDetailOrderId(productId, tmpCancel.getOrderNo());
+		DetailOrder cancelOrder = mDao.selectCancelOrder(memberId, tmpCancel.getOrderNo(), detailedOrderId); // 해당주문에서 취소하려고 선택한 상품
+		DetailOrderInfo detailOrderInfo = mDao.selectDetailOrderInfo(memberId, tmpCancel.getOrderNo()); // 해당 주문 주문상세
+		
+		int totalRefundAmount = amount + detailOrderInfo.getUsedPoints() + detailOrderInfo.getUsedReward() + cancelOrder.getCouponDiscount(); //취소하는 상품 할인전금액
 //
 //		Map<String, Object> order = selectCancelOrder(memberId, tmpCancel.getOrderNo(), tmpCancel.getDetailedOrderId());
 //		DetailOrder detailOrder = (DetailOrder) order.get("selectCancelOrder");
 //		List<CouponHistory> coupons = (List<CouponHistory>) order.get("couponsHistory");
 //		Member member = mDao.selectMyInfo(memberId);
-//		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, tmpCancel.getOrderNo());
+//		List<DetailOrder> detailOrders = (memberId, tmpCancel.getOrderNo());
 //
 //		int amountAfterDiscount = 0; // 할인 후 금액
 //		int amountBeforeDiscount = 0; // 할인 전 금액
@@ -571,12 +585,12 @@ public class MemberServiceImpl implements MemberService {
 //		System.out.println("@@@@@@@@@@@@@@@@@@상품금액금액" + productPrice);
 //
 //		// 취소테이블 인서트
-//		if (mDao.insertCancelOrder(detailOrder.getProductId(), tmpCancel.getReason(), amountBeforeDiscount,
-//				tmpCancel.getDetailedOrderId(), detailOrder.getPaymentMethod()) > 0) {
+		
+//		if (mDao.insertCancelOrder(productId, memberId, amount, detailedOrderId, detailOrderInfo.getPaymentMethod()) >0) {
 //			System.out.println("취소 저장 완");
-//			// //환불테이블 인서트
-//			if (mDao.insertRefund(detailOrder.getProductId(), tmpCancel, detailOrder.getPaymentMethod(),
-//					amountAfterDiscount, amountBeforeDiscount) > 0) {
+////			// //환불테이블 인서트
+//			if (mDao.insertRefund(productId, totalRefundAmount, tmpCancel.getActualRefundAmount(), detailOrderInfo.getUsedReward(), 
+//					detailOrderInfo.getUsedPoints(), ) > 0) {
 //				System.out.println("환불 저장 완");
 //				// 디테일 프로덕트상태 업데이트
 //				if (mDao.updateDetailProductStatus(tmpCancel.getDetailedOrderId()) > 0) {
@@ -644,7 +658,7 @@ public class MemberServiceImpl implements MemberService {
 //
 //			result = true;
 //		}
-		return false;
+		return result;
 	}
 
 	@Override
@@ -652,7 +666,7 @@ public class MemberServiceImpl implements MemberService {
 	public boolean returnOrder(ReturnOrder ro, String memberId) throws SQLException, NamingException {
 //		Map<String, Object> map = selectCancelOrder(memberId, ro.getOrderNo(), ro.getDetailedOrderId());
 //		DetailOrder detailOrder = (DetailOrder) map.get("selectCancelOrder");
-//		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, ro.getOrderNo());
+//		List<DetailOrder> detailOrders = (memberId, ro.getOrderNo());
 //
 //		boolean result = false;
 //		boolean allApplyReturn = true;
@@ -689,7 +703,7 @@ public class MemberServiceImpl implements MemberService {
 	public boolean exchangeOrder(exchangeDTO ed, String memberId) throws SQLException, NamingException {
 //		Map<String, Object> map = selectCancelOrder(memberId, ed.getOrderNo(), ed.getDetailedOrderId());
 //		DetailOrder detailOrder = (DetailOrder) map.get("selectCancelOrder");
-//		List<DetailOrder> detailOrders = getDetailOrderInfo(memberId, ed.getOrderNo());
+//		List<DetailOrder> detailOrders = (memberId, ed.getOrderNo());
 //
 //		boolean result = false;
 //		boolean allApplyExchange = true;
