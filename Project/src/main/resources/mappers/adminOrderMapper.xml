@@ -1456,25 +1456,273 @@
 		ORDER BY h.order_time DESC, d.product_order_no DESC
 	</select>
 	
-	<!-- 주문 취소 -->
-	<update id="updateOrderCancelHistory" parameterType="java.util.List">
-			UPDATE order_history
-			SET    delivery_status = '주문취소' 
-			WHERE  delivery_status = '결제완료' AND order_no IN
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-	        	#{orderNo}
-	    	</foreach>
+<!-- 주문 상세 정보 (결제 완료 상태 이후 주문 취소 - 품목번호별) -->
+	
+	<!-- 환불 처리 -->
+	<insert id="insertProductCancelRefund">
+	
+	</insert>
+	
+	<!-- 주문 상세 정보 (주문 취소 버튼[품목주문별] - 적립금 로그 테이블 update(column : reason, balance, reward)) -->
+	<update id="updateProductCancelReward" parameterType="java.util.List">
+			UPDATE		 reward_logs r
+			INNER JOIN	 payments p
+			ON 			 r.related_order = p.order_no
+			INNER JOIN   detailed_order_items d
+			ON			 p.order_no = d.order_no
+			INNER JOIN   member m
+			ON 			 r.member_id = m.member_id
+			SET 	 	 r.reason = '주문취소',
+						 r.reward = 
+							CASE 
+							<foreach collection="list" item="item" >
+						 		 WHEN ((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity})) >= p.used_reward
+				 				 THEN p.used_reward
+				 				 WHEN <![CDATA[((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity})) < p.used_reward ]]>
+				 				 THEN ROUND((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity}))
+	 				  	    </foreach>
+				 			END,
+			 			 r.balance = 
+			 			 	CASE 
+			 			 	<foreach collection="list" item="item" >
+		 			 			 WHEN ((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity})) >= p.used_reward
+				                 THEN m.total_rewards + p.used_reward
+				                 WHEN <![CDATA[((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity})) < p.used_reward ]]>
+				                 THEN m.total_rewards + ROUND((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity}))
+				            </foreach>
+				            END,
+			 			 p.used_reward =
+			 				CASE 
+			 				<foreach collection="list" item="item" >
+			 				     WHEN ((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity})) >= p.used_reward
+	                             THEN 0
+	                             WHEN <![CDATA[((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity})) < p.used_reward ]]>
+	                             THEN p.used_reward - ROUND((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity}))
+	                        </foreach>
+	                        END,
+                         m.total_rewards = m.total_rewards + p.used_reward,
+                         m.accumulated_use_reward = m.accumulated_use_reward - p.used_points
+			WHERE 		 r.reason != '주문취소' AND 
+						 p.payment_status = '결제완료' AND 
+						 p.used_reward > 0 AND 
+						 d.product_order_no IN
+						 <foreach collection="list" item="item" open="(" close=")" separator=",">
+						  	#{item.productOrderNo}
+						 </foreach>
 	</update>
 	
-	<update id="updateOrderCancelCoupon" parameterType="java.util.List">
-			UPDATE coupon_logs
-			SET    used_date = NULL,related_order = NULL
-			WHERE  related_order IN
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-	        	#{orderNo}
-	    	</foreach>
+	<!-- 주문 상세 정보 (주문 취소 버튼[품목주문별] - 포인트 로그 테이블 update(column : reason, balance, point)) -->
+	<update id="updateProductCancelPoint" parameterType="java.util.List">
+			UPDATE		 point_logs l
+			INNER JOIN	 payments p
+			ON 			 l.related_order = p.order_no
+			INNER JOIN   detailed_order_items d
+			ON			 p.order_no = d.order_no
+			INNER JOIN   member m
+			ON 			 l.member_id = m.member_id
+			INNER JOIN   reward_logs r
+			ON			 l.related_order = r.related_order
+			SET 	 	 l.reason = '주문취소',
+						 l.point = 
+							CASE 
+							<foreach collection="list" item="item" >
+						 		 WHEN ((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity}) - r.reward) >= p.used_points
+				 				 THEN p.used_points
+				 				 WHEN <![CDATA[((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity}) - r.reward) < p.used_points ]]>
+				 				 THEN ROUND((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity}) - r.reward)
+	 				  	    </foreach>
+				 			END,
+			 			 r.balance = 
+			 			 	CASE 
+			 			 	<foreach collection="list" item="item" >
+		 			 			 WHEN ((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity}) - r.reward) >= p.used_points
+				                 THEN m.total_points + p.used_points
+				                 WHEN <![CDATA[((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity}) - r.reward) < p.used_points ]]>
+				                 THEN m.total_points + ROUND((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity}) - r.reward)
+				            </foreach>
+				            END,
+			 			 p.used_points =
+			 				CASE 
+			 				<foreach collection="list" item="item" >
+			 				     WHEN ((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity}) - r.reward) >= p.used_points
+	                             THEN 0
+	                             WHEN <![CDATA[((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity}) - r.reward) < p.used_points ]]>
+	                             THEN p.used_points - ROUND((d.product_price * #{item.quantity}) - (d.coupon_discount / d.product_quantity * #{item.quantity}) - r.reward)
+	                        </foreach>
+	                        END,
+                         m.total_points = m.total_points + p.used_points,
+                         m.accumulated_use_point = m.accumulated_use_point - p.used_points
+			WHERE 		 l.reason != '주문취소' AND 
+						 r.reason = '주문취소' AND
+						 p.payment_status = '결제완료' AND 
+						 p.used_points > 0 AND 
+						 d.product_order_no IN
+						 <foreach collection="list" item="item" open="(" close=")" separator=",">
+						  	#{item.productOrderNo}
+						 </foreach>
 	</update>
 	
+	<!-- 주문 상세 정보 (주문 취소 버튼[품목주문별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) -->
+	<update id="updateProductCancel" parameterType="java.util.List">
+	        UPDATE  detailed_order_items 
+	        SET 	product_status = '주문취소', coupon_discount = 0
+	        WHERE   product_status = '결제완료' AND product_order_no IN
+			        <foreach collection="list" item="productOrderNo" open="(" close=")" separator=",">
+		        		#{productOrderNo}
+		    		</foreach>
+	</update>
+	
+	<!-- 주문 상세 정보 (주문 취소 버튼[품목주문별] - 주문 내역 테이블 update(column : delivery_status)) -->
+	<update id="updateProductCancelHistory" parameterType="java.util.List">
+			UPDATE 		order_history h
+			LEFT JOIN 	(
+							SELECT  count(detailed_order_id) count, order_no
+							FROM    detailed_order_items 
+							WHERE   product_status = '입금전' AND order_no IN 
+									<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+										#{orderNo} 
+									</foreach>
+						) d
+			ON 			h.order_no = d.order_no
+			SET    		h.delivery_status = if(COALESCE(d.count, 0) = 0 ,'주문취소', '부분취소') 
+			WHERE  		h.order_no IN 
+						<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+							#{orderNo}
+						</foreach>
+	</update>
+	
+	<!-- 주문 상세 정보 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) select) -->
+	<resultMap id="productCouponsResultMap" type="CheckedCoupons">
+	    <id column="related_order" property="orderNo"/>
+	    <collection property="coupons" resultMap="productCouponCountResultMap"/>
+	</resultMap>
+	
+	<resultMap id="productCouponCountResultMap" type="CouponCount">
+	    <result column="coupon_number" property="couponNumber"/>
+	    <result column="count" property="count"/>
+	</resultMap>
+	
+	<select id="selectProductCancelCoupon" parameterType="java.util.List" resultMap="productCouponsResultMap">
+		<foreach collection="list" item="orderNo" separator="UNION">
+	        SELECT		log.coupon_number,
+			            COALESCE(ssq.count, 0) count,
+			            log.related_order
+			FROM		coupon_logs log
+			LEFT JOIN (
+			                SELECT		cc.coupon_number,
+										count(cc.coupon_number) count
+			                FROM		coupon_categories cc
+			                INNER JOIN (
+											SELECT		d.order_no,
+														d.product_order_no,
+														p.category_key
+											FROM		detailed_order_items d
+											INNER JOIN 	products p 
+			                                ON 			d.product_id = p.product_id
+											WHERE		d.product_status REGEXP '입금전|결제완료' AND d.order_no = #{orderNo}
+										) s 
+							ON 			s.category_key = cc.category_key
+			                INNER JOIN (
+											SELECT		coupon_number
+											FROM		coupon_logs
+											WHERE		used_date IS NOT NULL AND related_order = #{orderNo}
+											GROUP BY	coupon_number
+										) sq 
+							ON 			cc.coupon_number = sq.coupon_number
+			                WHERE		cc.category_key = s.category_key
+			                GROUP BY	cc.coupon_number
+			            ) ssq 
+			ON 			log.coupon_number = ssq.coupon_number
+			WHERE		log.related_order = #{orderNo}
+			GROUP BY	coupon_number
+    	</foreach>
+	</select>
+	
+	<!-- 주문 상세 정보 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) -->
+	<update id="updateProductCancelCoupon" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+	        UPDATE  coupon_logs
+	        SET 	used_date = NULL, related_order = NULL
+	        WHERE   related_order = #{item.orderNo}
+			        AND (
+				            <foreach collection="item.coupons" item="coupon" index="couponIndex" separator=" OR ">
+				                (coupon_number = #{coupon.couponNumber} AND #{coupon.count} = 0)
+				            </foreach>
+			        	)
+	    </foreach>
+	</update>
+	
+	<!-- 주문 상세 정보 (주문 취소 버튼[품목주문별] - 회원 테이블 update(column : coupon_count, total_points, 
+	  							total_rewards, accumulated_use_reward,accumulated_use_point)) -->
+	<update id="updateProductCancelMember" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+			UPDATE		 member m
+			INNER JOIN	 order_history o
+			ON  		 m.member_id = o.member_id
+			SET 		 m.coupon_count = m.coupon_count + #{item.couponCount}
+			WHERE 		 o.order_no = #{item.orderNo}
+		</foreach>
+	</update>
+	
+	<!-- 주문 상세 정보 (주문 취소 버튼[품목주문별] - 결제 테이블 update(column : payment_status)) -->
+	<update id="updateProductCancelPayments" parameterType="java.util.List"> 
+			UPDATE 		payments p
+			INNER JOIN  order_history o
+			ON 			p.order_no = o.order_no
+			INNER JOIN 	detailed_order_items d
+			ON 			p.order_no = d.order_no
+			SET 		p.payment_status = o.delivery_status,
+						p.total_amount = 
+						<foreach collection="list" item="item">
+							p.total_amount - (d.product_price * #{item.quantity})	
+						</foreach>,	
+						p.shipping_fee = 
+							CASE 
+							<foreach collection="list" item="item">
+								 WHEN p.total_amount >= 10000
+	                             THEN 0
+	                             WHEN <![CDATA[p.total_amount < 10000]]>
+	                             THEN 3000
+							</foreach>	
+	                        END					
+			WHERE 		d.product_order_no IN
+						<foreach collection="list" item="item" open="(" close=")" separator=",">
+				        	#{item.productOrderNo}
+				    	</foreach>
+	</update>
+	
+	<!-- 주문 상세 정보 (주문 취소 버튼[품목주문별] - 취소용 추가 정보 조회) -->
+	<select id="selectProductCancelInfo" resultType="PendingCancelInfoResponse">
+		SELECT  detailed_order_id, product_id, product_order_no 
+		FROM    detailed_order_items
+		WHERE   product_status = '주문취소' AND order_no IN
+				<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+		        	#{orderNo}
+		    	</foreach>
+	</select>
+	
+	<!-- 주문 상세 정보 (주문 취소 버튼[품목주문별] - 취소 테이블에 추가) -->
+	<insert id="insertProductCancel" parameterType="java.util.List">
+			INSERT INTO cancellations(product_id, reason, amount, processing_status, 
+									  refund_status, request_time, completion_time, detailed_order_id) 
+            VALUES	
+           	<foreach collection="list" item="item" separator=",">
+            (		
+            	#{item.productId}, 
+            	'주문취소[관리자]', 
+            	(SELECT (product_price * product_quantity) amount FROM detailed_order_items WHERE product_order_no = #{item.productOrderNo}), 
+            	'취소완료',
+            	'Y',
+            	NOW(),
+            	NOW(),
+            	#{item.detailedOrderId}
+            )	
+			</foreach>
+	</insert>
+
+<!-- 주문 상세 정보 (결제 완료 상태 이후 주문 취소 - 주문번호별) -->
+	
+	<!-- 주문 상세 정보 (주문 취소 버튼[주문번호별] - 적립금 로그 테이블 update(column : reason, balance, reward)) -->
 	<update id="updateOrderCancelReward" parameterType="java.util.List">			
 			UPDATE		 reward_logs r
 			INNER JOIN	 payments p
@@ -1487,11 +1735,12 @@
 			WHERE 		 r.reason != '주문취소' AND  
 						 p.payment_status = '결제완료' AND 
 						 r.related_order IN
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-			 	#{orderNo} 
-			</foreach>
+						<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+						 	#{orderNo} 
+						</foreach>
 	</update>
 	
+	<!-- 주문 상세 정보 (주문 취소 버튼[주문번호별] - 포인트 로그 테이블 update(column : reason, balance, point)) -->
 	<update id="updateOrderCancelPoint" parameterType="java.util.List">
 			UPDATE		 point_logs l
 			INNER JOIN	 payments p
@@ -1504,11 +1753,43 @@
 			WHERE 		 l.reason != '주문취소' AND 
 						 p.payment_status = '결제완료' AND 
 						 l.related_order IN 
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-				#{orderNo}
-			</foreach>
+						<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+							#{orderNo}
+						</foreach>
 	</update>
 	
+	<!-- 주문 상세 정보 (주문 취소 버튼[주문번호별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) -->
+	<update id="updateOrderCancel" parameterType="java.util.List">
+	         UPDATE  detailed_order_items 
+	        SET 	product_status = '주문취소', coupon_discount = 0
+	        WHERE 	product_status = '결제완료' AND order_no IN
+			        <foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+		        		#{orderNo}
+		    		</foreach>
+	</update>
+	
+	<!-- 주문 상세 정보 (주문 취소 버튼[주문번호별] - 주문 내역 테이블 update(column : delivery_status)) -->
+	<update id="updateOrderCancelHistory" parameterType="java.util.List">
+			UPDATE order_history
+			SET    delivery_status = '주문취소' 
+			WHERE  delivery_status = '결제완료' AND order_no IN
+					<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+			        	#{orderNo}
+			    	</foreach>
+	</update>
+	
+	<!-- 주문 상세 정보 (주문 취소 버튼[주문번호별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) -->
+	<update id="updateOrderCancelCoupon" parameterType="java.util.List">
+			UPDATE  coupon_logs
+			SET     used_date = NULL,related_order = NULL
+			WHERE   related_order IN
+					<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+			        	#{orderNo}
+			    	</foreach>
+	</update>
+	
+	<!-- 주문 상세 정보 (주문 취소 버튼[주문번호별] - 회원 테이블 update(column : coupon_count, total_points, 
+	 							total_rewards, accumulated_use_reward,accumulated_use_point)) -->
 	<update id="updateOrderCancelMember" parameterType="java.util.List">
 		<foreach collection="list" item="orderNo" separator=";">
 			UPDATE		 member m
@@ -1532,125 +1813,74 @@
 		</foreach>
 	</update>
 	
-	<update id="updateOrderCancel" parameterType="java.util.List">
-	        UPDATE  detailed_order_items 
-	        SET 	product_status = '주문취소', coupon_discount = 0
-	        WHERE 	product_status = '결제완료' AND order_no IN
-	        <foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-        		#{orderNo}
-    		</foreach>
-	</update>
-	
+	<!-- 주문 상세 정보 (주문 취소 버튼[주문번호별] - 결제 테이블 update(column : payment_status)) -->
 	<update id="updateOrderCancelPayments" parameterType="java.util.List">
-			UPDATE payments
-			SET    payment_status = '주문취소', 
-				   used_points = 0,
-				   used_reward = 0,
-				   total_amount = 0,
-				   shipping_fee = 0
-			WHERE  payment_status = '결제완료' AND order_no IN
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-	        	#{orderNo}
-	    	</foreach>
+			UPDATE  payments
+			SET     payment_status = '주문취소', 
+				    used_points = 0,
+				    used_reward = 0,
+				    total_amount = 0,
+				    shipping_fee = 0
+			WHERE   payment_status = '결제완료' AND order_no IN
+					<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+			        	#{orderNo}
+			    	</foreach>
 	</update>
 	
+	<!-- 주문 상세 정보 (주문 취소 버튼[주문번호별] - 취소용 추가 정보 조회) -->
 	<select id="selectCancelInfo" resultType="PendingCancelInfoResponse">
 		SELECT  detailed_order_id, product_id, product_order_no 
 		FROM    detailed_order_items
-		WHERE   order_no IN
-		<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-        	#{orderNo}
-    	</foreach>
+		WHERE   product_status = '주문취소' AND order_no IN
+				<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+		        	#{orderNo}
+		    	</foreach>
 	</select>
-	
+
+	<!-- 주문 상세 정보 (주문 취소 버튼[주문번호별] - 취소 테이블에 추가) -->
 	<insert id="insertOrderCancel" parameterType="java.util.List">
 			INSERT INTO cancellations(product_id, reason, amount, processing_status, 
 									  refund_status, request_time, completion_time, detailed_order_id) 
-			VALUES     	
-			 <foreach collection="list" item="item" separator=",">
-				(#{item.productId},'관리자',0,'취소완료','Y',NOW(),NOW(),#{item.detailedOrderId}) 
+            VALUES	
+           	<foreach collection="list" item="item" separator=",">
+            (		
+            	#{item.productId}, 
+            	'주문취소[관리자]', 
+            	(SELECT (product_price * product_quantity) amount FROM detailed_order_items WHERE product_order_no = #{item.productOrderNo}), 
+            	'취소완료',
+            	'Y',
+            	NOW(),
+            	NOW(),
+            	#{item.detailedOrderId}
+            )	
 			</foreach>
 	</insert>
-	
-	<!-- 입금전 주문취소 품목별 -->
-	<update id="updatePendingProductCancelHistory" parameterType="java.util.List">
-			UPDATE 		order_history h
-			LEFT JOIN 	(
-							SELECT count(detailed_order_id) count, order_no
-							FROM   detailed_order_items 
-							WHERE  product_status = '입금전' AND order_no IN 
-							<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-								#{orderNo} 
-							</foreach>
-						) d
-			ON 			h.order_no = d.order_no
-			SET    		h.delivery_status = if(COALESCE(d.count, 0) = 0 ,'주문취소', '부분취소') 
-			WHERE  		h.order_no IN 
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-				#{orderNo}
-			</foreach>
-	</update>
 
-	<!-- 입금 전 관리 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) select) -->
-	<resultMap id="pendingCouponsResultMap" type="CheckedCoupons">
-	    <id column="related_order" property="orderNo"/>
-	    <collection property="coupons" resultMap="pendingCouponCountResultMap"/>
-	</resultMap>
-	
-	<resultMap id="pendingCouponCountResultMap" type="CouponCount">
-	    <result column="coupon_number" property="couponNumber"/>
-	    <result column="count" property="count"/>
-	</resultMap>
-	
-	<select id="selectPendingProductCancelCoupon" parameterType="java.util.List" resultMap="pendingCouponsResultMap">
-		<foreach collection="list" item="orderNo" separator="UNION">
-	        SELECT		log.coupon_number,
-			            COALESCE(ssq.count, 0) count,
-			            log.related_order
-			FROM		coupon_logs log
-			LEFT JOIN (
-			                SELECT		cc.coupon_number,
-										count(cc.coupon_number) count
-			                FROM		coupon_categories cc
-			                INNER JOIN (
-											SELECT		d.order_no,
-														d.product_order_no,
-														p.category_key
-											FROM		detailed_order_items d
-											INNER JOIN 	products p 
-			                                ON 			d.product_id = p.product_id
-											WHERE		d.product_status = '입금전' AND d.order_no = #{orderNo}
-										) s 
-							ON 			s.category_key = cc.category_key
-			                INNER JOIN (
-											SELECT		coupon_number
-											FROM		coupon_logs
-											WHERE		used_date IS NOT NULL AND related_order = #{orderNo}
-											GROUP BY	coupon_number
-										) sq 
-							ON 			cc.coupon_number = sq.coupon_number
-			                WHERE		cc.category_key = s.category_key
-			                GROUP BY	cc.coupon_number
-			            ) ssq 
-			ON 			log.coupon_number = ssq.coupon_number
-			WHERE		log.related_order = #{orderNo}
-			GROUP BY	coupon_number
-    	</foreach>
+	<!-- 주문 상세 정보 (상태 확인) -->
+	<select id="selectOrdersStatus" resultType="OrderStatus">
+		SELECT  <foreach collection="list" item="item">
+					<choose>
+						<when test="item.productOrderNo == null">
+							order_no,
+						</when>
+						<when test="item.orderNo == null">
+							product_order_no,
+						</when>
+					</choose>					
+				</foreach> 
+				product_status
+		FROM 	detailed_order_items
+		WHERE 	product_order_no IN 
+				<foreach collection="list" item="item" open="(" close=")" separator=",">
+				  	#{item.productOrderNo}
+				</foreach>
+				or order_no IN 
+				<foreach collection="list" item="item" open="(" close=")" separator=",">
+				  	#{item.orderNo}
+				</foreach>
 	</select>
 	
-	<!-- 입금 전 관리 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) -->
-	<update id="updatePendingProductCancelCoupon" parameterType="java.util.List">
-		<foreach collection="list" item="item" separator=";">
-	        UPDATE  coupon_logs
-	        SET 	used_date = NULL, related_order = NULL
-	        WHERE   related_order = #{item.orderNo}
-			        AND (
-				            <foreach collection="item.coupons" item="coupon" index="couponIndex" separator=" OR ">
-				                (coupon_number = #{coupon.couponNumber} AND #{coupon.count} = 0)
-				            </foreach>
-			        	)
-	    </foreach>
-	</update>
+<!-- 입금전 주문취소 품목주문별 -->
 	
 	<!-- 입금 전 관리 (주문 취소 버튼[품목주문별] - 적립금 로그 테이블 update(column : reason, balance, reward)) -->
 	<update id="updatePendingProductCancelReward" parameterType="java.util.List">
@@ -1751,6 +1981,97 @@
 						 </foreach>
 	</update>
 	
+	
+	<!-- 입금 전 관리 (주문 취소 버튼[품목주문별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) -->
+	<update id="updatePendingProductCancel" parameterType="java.util.List">
+	        UPDATE  detailed_order_items 
+	        SET 	product_status = '주문취소', coupon_discount = 0
+	        WHERE   product_status = '입금전' AND product_order_no IN
+			        <foreach collection="list" item="productOrderNo" open="(" close=")" separator=",">
+		        		#{productOrderNo}
+		    		</foreach>
+	</update>
+	
+	<!-- 입금 전 관리 (주문 취소 버튼[품목주문별] - 주문 내역 테이블 update(column : delivery_status)) -->
+	<update id="updatePendingProductCancelHistory" parameterType="java.util.List">
+			UPDATE 		order_history h
+			LEFT JOIN 	(
+							SELECT  count(detailed_order_id) count, order_no
+							FROM    detailed_order_items 
+							WHERE   product_status = '입금전' AND order_no IN 
+									<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+										#{orderNo} 
+									</foreach>
+						) d
+			ON 			h.order_no = d.order_no
+			SET    		h.delivery_status = if(COALESCE(d.count, 0) = 0 ,'주문취소', '부분취소') 
+			WHERE  		h.order_no IN 
+						<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+							#{orderNo}
+						</foreach>
+	</update>
+	
+	<!-- 입금 전 관리 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) select) -->
+	<resultMap id="pendingCouponsResultMap" type="CheckedCoupons">
+	    <id column="related_order" property="orderNo"/>
+	    <collection property="coupons" resultMap="pendingCouponCountResultMap"/>
+	</resultMap>
+	
+	<resultMap id="pendingCouponCountResultMap" type="CouponCount">
+	    <result column="coupon_number" property="couponNumber"/>
+	    <result column="count" property="count"/>
+	</resultMap>
+	
+	<select id="selectPendingProductCancelCoupon" parameterType="java.util.List" resultMap="pendingCouponsResultMap">
+		<foreach collection="list" item="orderNo" separator="UNION">
+	        SELECT		log.coupon_number,
+			            COALESCE(ssq.count, 0) count,
+			            log.related_order
+			FROM		coupon_logs log
+			LEFT JOIN (
+			                SELECT		cc.coupon_number,
+										count(cc.coupon_number) count
+			                FROM		coupon_categories cc
+			                INNER JOIN (
+											SELECT		d.order_no,
+														d.product_order_no,
+														p.category_key
+											FROM		detailed_order_items d
+											INNER JOIN 	products p 
+			                                ON 			d.product_id = p.product_id
+											WHERE		d.product_status = '입금전' AND d.order_no = #{orderNo}
+										) s 
+							ON 			s.category_key = cc.category_key
+			                INNER JOIN (
+											SELECT		coupon_number
+											FROM		coupon_logs
+											WHERE		used_date IS NOT NULL AND related_order = #{orderNo}
+											GROUP BY	coupon_number
+										) sq 
+							ON 			cc.coupon_number = sq.coupon_number
+			                WHERE		cc.category_key = s.category_key
+			                GROUP BY	cc.coupon_number
+			            ) ssq 
+			ON 			log.coupon_number = ssq.coupon_number
+			WHERE		log.related_order = #{orderNo}
+			GROUP BY	coupon_number
+    	</foreach>
+	</select>
+	
+	<!-- 입금 전 관리 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) -->
+	<update id="updatePendingProductCancelCoupon" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+	        UPDATE  coupon_logs
+	        SET 	used_date = NULL, related_order = NULL
+	        WHERE   related_order = #{item.orderNo}
+			        AND (
+				            <foreach collection="item.coupons" item="coupon" index="couponIndex" separator=" OR ">
+				                (coupon_number = #{coupon.couponNumber} AND #{coupon.count} = 0)
+				            </foreach>
+			        	)
+	    </foreach>
+	</update>
+	
 	<!-- 입금 전 관리 (주문 취소 버튼[품목주문별] - 회원 테이블 update(column : coupon_count, total_points, 
 	  							total_rewards, accumulated_use_reward,accumulated_use_point)) -->
 	<update id="updatePendingProductCancelMember" parameterType="java.util.List">
@@ -1761,17 +2082,7 @@
 			SET 		 m.coupon_count = m.coupon_count + #{item.couponCount}
 			WHERE 		 o.order_no = #{item.orderNo}
 		</foreach>
-	</update>
-	
-	<!-- 입금 전 관리 (주문 취소 버튼[품목주문별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) -->
-	<update id="updatePendingProductCancel" parameterType="java.util.List">
-	        UPDATE  detailed_order_items 
-	        SET 	product_status = '주문취소', coupon_discount = 0
-	        WHERE   product_status = '입금전' AND product_order_no IN
-	        <foreach collection="list" item="productOrderNo" open="(" close=")" separator=",">
-        		#{productOrderNo}
-    		</foreach>
-	</update>
+	</update>	
 	
 	<!-- 입금 전 관리 (주문 취소 버튼[품목주문별] - 결제 테이블 update(column : payment_status)) -->
 	<update id="updatePendingProductCancelPayments" parameterType="java.util.List"> 
@@ -1781,20 +2092,23 @@
 			INNER JOIN 	detailed_order_items d
 			ON 			p.order_no = d.order_no
 			SET 		p.payment_status = o.delivery_status,
-						p.total_amount = p.total_amount - (d.product_price * d.product_quantity),	
+						p.total_amount = 
+						<foreach collection="list" item="item">
+							p.total_amount - (d.product_price * #{item.quantity})	
+						</foreach>,	
 						p.shipping_fee = 
 							CASE 
-							<foreach collection="list" item="productOrderNo" index="index">
-								 WHEN #{index} = ${list.size - 1} AND p.total_amount >= 10000
+							<foreach collection="list" item="item">
+								 WHEN p.total_amount >= 10000
 	                             THEN 0
-	                             WHEN #{index} = ${list.size - 1} AND <![CDATA[p.total_amount < 10000]]>
+	                             WHEN <![CDATA[p.total_amount < 10000]]>
 	                             THEN 3000
 							</foreach>	
 	                        END					
 			WHERE 		d.product_order_no IN
-			<foreach collection="list" item="productOrderNo" index="index" open="(" close=")" separator=",">
-	        	#{productOrderNo}
-	    	</foreach>
+						<foreach collection="list" item="item" open="(" close=")" separator=",">
+				        	#{item.productOrderNo}
+				    	</foreach>
 	</update>
 	
 	<!-- 입금 전 관리 (주문 취소 버튼[품목주문별] - 취소용 추가 정보 조회) -->
@@ -1802,30 +2116,12 @@
 		SELECT  detailed_order_id, product_id, product_order_no 
 		FROM    detailed_order_items
 		WHERE   product_status = '주문취소' AND order_no IN
-		<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-        	#{orderNo}
-    	</foreach>
+				<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+		        	#{orderNo}
+		    	</foreach>
 	</select>
 	
-	<!-- 입금전 주문취소 주문번호별 -->
-	<update id="updatePendingOrderCancelHistory" parameterType="java.util.List">
-			UPDATE order_history
-			SET    delivery_status = '주문취소' 
-			WHERE  delivery_status = '입금전' AND order_no IN
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-	        	#{orderNo}
-	    	</foreach>
-	</update>
-	
-	<!-- 입금 전 관리 (주문 취소 버튼[주문번호별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) -->
-	<update id="updatePendingOrderCancelCoupon" parameterType="java.util.List">
-			UPDATE coupon_logs
-			SET    used_date = NULL,related_order = NULL
-			WHERE  related_order IN
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-	        	#{orderNo}
-	    	</foreach>
-	</update>
+<!-- 입금전 주문취소 주문번호별 -->
 	
 	<!-- 입금 전 관리 (주문 취소 버튼[주문번호별] - 적립금 로그 테이블 update(column : reason, balance, reward)) -->
 	<update id="updatePendingOrderCancelReward" parameterType="java.util.List">			
@@ -1840,9 +2136,9 @@
 			WHERE 		 r.reason != '주문취소' AND  
 						 p.payment_status = '입금전' AND 
 						 r.related_order IN
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-			 	#{orderNo} 
-			</foreach>
+						<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+						 	#{orderNo} 
+						</foreach>
 	</update>
 	
 	<!-- 입금 전 관리 (주문 취소 버튼[주문번호별] - 포인트 로그 테이블 update(column : reason, balance, point)) -->
@@ -1858,11 +2154,40 @@
 			WHERE 		 l.reason != '주문취소' AND 
 						 p.payment_status = '입금전' AND 
 						 l.related_order IN 
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-				#{orderNo}
-			</foreach>
+						<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+							#{orderNo}
+						</foreach>
 	</update>
 	
+	<!-- 입금 전 관리 (주문 취소 버튼[주문번호별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) -->
+	<update id="updatePendingOrderCancel" parameterType="java.util.List">
+	        UPDATE  detailed_order_items 
+	        SET 	product_status = '주문취소', coupon_discount = 0
+	        WHERE 	product_status = '입금전' AND order_no IN
+			        <foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+		        		#{orderNo}
+		    		</foreach>
+	</update>
+	
+	<!-- 입금 전 관리 (주문 취소 버튼[주문번호별] - 주문 내역 테이블 update(column : delivery_status)) -->
+	<update id="updatePendingOrderCancelHistory" parameterType="java.util.List">
+			UPDATE order_history
+			SET    delivery_status = '주문취소' 
+			WHERE  delivery_status = '입금전' AND order_no IN
+					<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+			        	#{orderNo}
+			    	</foreach>
+	</update>
+	
+	<!-- 입금 전 관리 (주문 취소 버튼[주문번호별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) -->
+	<update id="updatePendingOrderCancelCoupon" parameterType="java.util.List">
+			UPDATE  coupon_logs
+			SET     used_date = NULL,related_order = NULL
+			WHERE   related_order IN
+					<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+			        	#{orderNo}
+			    	</foreach>
+	</update>
 	
 	<!-- 입금 전 관리 (주문 취소 버튼[주문번호별] - 회원 테이블 update(column : coupon_count, total_points, 
 	 							total_rewards, accumulated_use_reward,accumulated_use_point)) -->
@@ -1889,47 +2214,46 @@
 		</foreach>
 	</update>
 	
-	<!-- 입금 전 관리 (주문 취소 버튼[주문번호별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) -->
-	<update id="updatePendingOrderCancel" parameterType="java.util.List">
-	        UPDATE  detailed_order_items 
-	        SET 	product_status = '주문취소', coupon_discount = 0
-	        WHERE 	product_status = '입금전' AND order_no IN
-	        <foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-        		#{orderNo}
-    		</foreach>
-	</update>
-	
 	<!-- 입금 전 관리 (주문 취소 버튼[주문번호별] - 결제 테이블 update(column : payment_status)) -->
 	<update id="updatePendingOrderCancelPayments" parameterType="java.util.List">
-			UPDATE payments
-			SET    payment_status = '주문취소', 
-				   used_points = 0,
-				   used_reward = 0,
-				   total_amount = 0,
-				   shipping_fee = 0
-			WHERE  payment_status = '입금전' AND order_no IN
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-	        	#{orderNo}
-	    	</foreach>
+			UPDATE  payments
+			SET     payment_status = '주문취소', 
+				    used_points = 0,
+				    used_reward = 0,
+				    total_amount = 0,
+				    shipping_fee = 0
+			WHERE   payment_status = '입금전' AND order_no IN
+					<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+			        	#{orderNo}
+			    	</foreach>
 	</update>
 	
 	<!-- 입금 전 관리 (주문 취소 버튼[주문번호별] - 취소용 추가 정보 조회) -->
 	<select id="selectPendingCancelInfo" resultType="PendingCancelInfoResponse">
 		SELECT  detailed_order_id, product_id, product_order_no 
 		FROM    detailed_order_items
-		WHERE   order_no IN
-		<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-        	#{orderNo}
-    	</foreach>
+		WHERE   product_status = '주문취소' AND order_no IN
+				<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+		        	#{orderNo}
+		    	</foreach>
 	</select>
 	
-	<!-- 입금 전 관리 (주문 취소 버튼[주문번호별] - 취소 테이블에 추가) -->
-	<insert id="insertPendingOrderCancel" parameterType="java.util.List">
+	<!-- 입금 전 관리 (주문 취소 버튼[주문번호별, 품목주문별] - 취소 테이블에 추가) -->
+	<insert id="insertPendingOrderCancel" parameterType="java.util.List">			
 			INSERT INTO cancellations(product_id, reason, amount, processing_status, 
 									  refund_status, request_time, completion_time, detailed_order_id) 
-			VALUES     	
-			 <foreach collection="list" item="item" separator=",">
-				(#{item.productId},'관리자',0,'취소완료','Y',NOW(),NOW(),#{item.detailedOrderId}) 
+            VALUES	
+           	<foreach collection="list" item="item" separator=",">
+            (		
+            	#{item.productId}, 
+            	'입금전 취소[관리자]', 
+            	(SELECT (product_price * product_quantity) amount FROM detailed_order_items WHERE product_order_no = #{item.productOrderNo}), 
+            	'취소완료',
+            	'Y',
+            	NOW(),
+            	NOW(),
+            	#{item.detailedOrderId}
+            )	
 			</foreach>
 	</insert>
 	
@@ -1963,12 +2287,12 @@
 	
 	<!-- 입금 전 관리 (입금 확인 버튼 - 입금 확인 날짜 입력) -->
 	<update id="updatePreShippedDate">
-			UPDATE bank_transfers
-			SET    confirm_date = NOW()
-			WHERE  order_no IN
-			<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
-				 #{orderNo}
-			</foreach>
+			UPDATE  bank_transfers
+			SET     confirm_date = NOW()
+			WHERE   order_no IN
+					<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+						 #{orderNo}
+					</foreach>
 	</update>
 	
 	<!-- 입금전 관리 (조회) -->
@@ -2173,7 +2497,7 @@
 					<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
 						#{orderNo}
 					</foreach>
-	</update>
+	</update>	
 	
 	<!-- 전체 주문 조회 (품목주문별) -->
 	<select id="selectOrderProductInfo" resultType="OrderProductResponse">

@@ -19,12 +19,13 @@ import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
+import com.project.vodto.kkb.OrderStatus;
 import com.project.vodto.kkb.PendingCancelCondition;
 import com.project.vodto.kkb.PendingCancelInfoResponse;
 import com.project.vodto.kkb.PendingCancelResponse;
 import com.project.vodto.kkb.PendingCondition;
 import com.project.vodto.kkb.PendingNoResponse;
-import com.project.vodto.kkb.PendingProductCancelRequest;
+import com.project.vodto.kkb.ProductCancelRequest;
 import com.project.vodto.kkb.PendingProductResponse;
 import com.project.vodto.kkb.PreparationNoResponse;
 import com.project.vodto.kkb.PreparationProductResponse;
@@ -43,34 +44,39 @@ public interface AdminOrderDAO {
 	 * 배송 준비중 관리 (입금전 처리[결제완료 -> 입금전] 주문번호 기준으로만 */
 	int changePendingPayment(List<String> orderNoList);
 	
+	/* 주문 상세 정보 (상태 확인) */
+	List<OrderStatus> findOrdersStatus(List<ProductCancelRequest> productOrderNoList);
 	
-	/* 주문 상세 정보 (주문 취소 버튼 - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
+	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 주문 상세 상품 테이블 update(column : product_status, coupon_discount)) */
 	int changeProductCancel(List<String> productNoList);
 
-	/* 주문 상세 정보 (주문 취소 버튼 - 주문 내역 테이블 update(column : delivery_status)) */
+	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 주문 내역 테이블 update(column : delivery_status)) */
 	int changeProductCancelHistory(List<String> orderNoList);
 
-	/* 주문 상세 정보 (주문 취소 버튼 - 결제 테이블 update(column : payment_status)) */
-	int changeProductCancelPayments(List<String> productNoList);
+	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 결제 테이블 update(column : payment_status)) */
+	int changeProductCancelPayments(List<ProductCancelRequest> productOrderNoList);
 	
-	/* 주문 상세 정보 (주문 취소 버튼 - 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) select) */
+	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) select) */
 	List<CheckedCoupons> findProductCancelCoupon(List<String> orderNoList);
 
-	/* 주문 상세 정보 (주문 취소 버튼 - 쿠폰 로그 테이블 update(column : used_date, related_order)) */
+	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(column : used_date, related_order)) */
 	int changeProductCancelCoupon(List<CheckedCoupons> couponList);
 
-	/* 주문 상세 정보 (주문 취소 버튼 - 적립금 로그 테이블 update(column : reason, balance, reward)) */
-	int changeProductCancelReward(List<PendingProductCancelRequest> productOrderNoList);
+	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 적립금 로그 테이블 update(column : reason, balance, reward)) */
+	int changeProductCancelReward(List<ProductCancelRequest> productOrderNoList);
 
-	/* 주문 상세 정보 (주문 취소 버튼 - 포인트 로그 테이블 update(column : reason, balance, point)) */
-	int changeProductCancelPoint(List<PendingProductCancelRequest> productOrderNoList);
+	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 포인트 로그 테이블 update(column : reason, balance, point)) */
+	int changeProductCancelPoint(List<ProductCancelRequest> productOrderNoList);
 
-	/* 주문 상세 정보 (주문 취소 버튼 - 회원 테이블 update(column : coupon_count, total_points, 
+	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 회원 테이블 update(column : coupon_count, total_points, 
 	 * 							total_rewards, accumulated_use_reward,accumulated_use_point)) */
 	int changeProductCancelMember(List<CanceledCoupons> canceledCoupons);
 	
-	/* 주문 상세 정보 (주문 취소 버튼 - 취소용 추가 정보 조회) */
+	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 취소용 추가 정보 조회) */
 	List<PendingCancelInfoResponse> findProductCancelInfo(List<String> orderNoList);
+	
+	/* 주문 상세 정보 (주문 취소 버튼[품목주문별] - 취소 테이블에 추가) */
+	int saveProductCancel(List<PendingCancelInfoResponse> cancelInfoList);	
 	
 /*------------------------------------------------------------------------------------------------------*/
 	
@@ -124,7 +130,7 @@ public interface AdminOrderDAO {
 	int changePendingProductCancelHistory(List<String> orderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 결제 테이블 update(column : payment_status)) */
-	int changePendingProductCancelPayments(List<String> productNoList);
+	int changePendingProductCancelPayments(List<ProductCancelRequest> productOrderNoList);
 	
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) select) */
 	List<CheckedCoupons> findPendingProductCancelCoupon(List<String> orderNoList);
@@ -133,10 +139,10 @@ public interface AdminOrderDAO {
 	int changePendingProductCancelCoupon(List<CheckedCoupons> couponList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 적립금 로그 테이블 update(column : reason, balance, reward)) */
-	int changePendingProductCancelReward(List<PendingProductCancelRequest> productOrderNoList);
+	int changePendingProductCancelReward(List<ProductCancelRequest> productOrderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 포인트 로그 테이블 update(column : reason, balance, point)) */
-	int changePendingProductCancelPoint(List<PendingProductCancelRequest> productOrderNoList);
+	int changePendingProductCancelPoint(List<ProductCancelRequest> productOrderNoList);
 
 	/* 입금 전 관리 (주문 취소 버튼[품목주문별] - 회원 테이블 update(column : coupon_count, total_points, 
 	 * 							total_rewards, accumulated_use_reward,accumulated_use_point)) */

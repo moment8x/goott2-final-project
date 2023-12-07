@@ -9,7 +9,7 @@ import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.PendingCancelCondition;
 import com.project.vodto.kkb.PendingCondition;
-import com.project.vodto.kkb.PendingProductCancelRequest;
+import com.project.vodto.kkb.ProductCancelRequest;
 
 public interface AdminOrderService {
 	 
@@ -25,8 +25,14 @@ public interface AdminOrderService {
 	 * 배송 준비중 관리 (입금전 처리[결제완료 -> 입금전] */
 	int editPendingPayment(List<String> orderNoList);
 	
-	/* 주문 상세 정보 (주문 취소) */
-	int editProductCancel(List<PendingProductCancelRequest> productOrderNoList);
+	/* 주문 상세 정보 (상태 확인) */
+	int getOrdersByStatus(List<ProductCancelRequest> productOrderNoList);
+	
+	/* 주문 상세 정보 (주문 취소 - 주문번호별) */
+	int editOrderCancel(List<String> productOrderNoList);
+	
+	/* 주문 상세 정보 (주문 취소 - 품목주문별) */
+	int editProductCancel(List<ProductCancelRequest> productOrderNoList);
 	
 /*------------------------------------------------------------------------------------------------------*/
 	
@@ -41,7 +47,7 @@ public interface AdminOrderService {
 	int editPendingOrderCancel(List<String> orderNoList);
 	
 	/* 입금 전 관리 (주문 취소 버튼 - 품목주문별) */
-	int editPendingProductCancel(List<PendingProductCancelRequest> productOrderNoList);
+	int editPendingProductCancel(List<ProductCancelRequest> productOrderNoList);
 	
 /*------------------------------------------------------------------------------------------------------*/
 	

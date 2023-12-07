@@ -48,6 +48,7 @@
 		<typeAlias type="com.project.vodto.kkb.ReturnResponse" alias="ReturnResponse" />
 		<typeAlias type="com.project.vodto.kkb.RefundResponse" alias="RefundResponse" />
 		<typeAlias type="com.project.vodto.kkb.CardCancelResponse" alias="CardCancelResponse" />
+		<typeAlias type="com.project.vodto.kkb.OrderStatus" alias="OrderStatus" />
 		<typeAlias type="com.project.vodto.kkb.CouponCount" alias="CouponCount" />
 		<typeAlias type="com.project.vodto.kkb.CheckedCoupons" alias="CheckedCoupons" />
 		<typeAlias type="com.project.vodto.Product" alias="product" />

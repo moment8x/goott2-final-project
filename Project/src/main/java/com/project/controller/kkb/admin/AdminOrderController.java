@@ -21,7 +21,7 @@ import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.PendingCancelCondition;
 import com.project.vodto.kkb.PendingCondition;
-import com.project.vodto.kkb.PendingProductCancelRequest;
+import com.project.vodto.kkb.ProductCancelRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -148,7 +148,7 @@ public class AdminOrderController {
 	/* 입금 전 관리 (주문 취소 버튼 - 품목주문별) */
 	@PutMapping("/PreShipped/p/cancel")
 	public ResponseEntity<String> setPendingProductCancel(
-			@RequestBody List<PendingProductCancelRequest> productOrderNoList) {	
+			@RequestBody List<ProductCancelRequest> productOrderNoList) {	
 		
 		int result = adminOrderService.editPendingProductCancel(productOrderNoList);
 		
@@ -387,7 +387,7 @@ public class AdminOrderController {
 	/* 주문 상세 정보(주문 취소) */
 	@PutMapping("/cancel")
 	public ResponseEntity<String> setProductCancel(
-			@RequestBody List<PendingProductCancelRequest> productOrderNoList) {	
+			@RequestBody List<ProductCancelRequest> productOrderNoList) {	
 		
 		int result = adminOrderService.editProductCancel(productOrderNoList);
 		

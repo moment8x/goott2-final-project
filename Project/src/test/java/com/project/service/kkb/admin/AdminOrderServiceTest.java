@@ -4,7 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +25,9 @@ import com.project.dao.kkb.admin.AdminOrderDAO;
 import com.project.vodto.kkb.CanceledCoupons;
 import com.project.vodto.kkb.CheckedCoupons;
 import com.project.vodto.kkb.CouponCount;
-import com.project.vodto.kkb.PendingProductCancelRequest;
+import com.project.vodto.kkb.OrderStatus;
+import com.project.vodto.kkb.PendingCancelInfoResponse;
+import com.project.vodto.kkb.ProductCancelRequest;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = DataSourceConfig.class)
@@ -96,23 +102,23 @@ public class AdminOrderServiceTest {
 //    public void testConvert() {
 //    	
 //    	//Given
-//    	PendingProductCancelRequest product1 = new PendingProductCancelRequest();
+//    	ProductCancelRequest product1 = new ProductCancelRequest();
 //    	product1.setProductOrderNo("O1700034153645-1");
 //    	
-//    	PendingProductCancelRequest product2 = new PendingProductCancelRequest();
+//    	ProductCancelRequest product2 = new ProductCancelRequest();
 //    	product2.setProductOrderNo("O1700034153645-2");
 //    	
-//    	PendingProductCancelRequest product3 = new PendingProductCancelRequest();
+//    	ProductCancelRequest product3 = new ProductCancelRequest();
 //    	product3.setProductOrderNo("O1700034153645-3");
 //    	
-//    	PendingProductCancelRequest product4 = new PendingProductCancelRequest();
+//    	ProductCancelRequest product4 = new ProductCancelRequest();
 //    	product4.setProductOrderNo("O1700034426708-1");
 //    	
-//    	PendingProductCancelRequest product5 = new PendingProductCancelRequest();
+//    	ProductCancelRequest product5 = new ProductCancelRequest();
 //    	product5.setProductOrderNo("O1700034426708-2");
 //    	
 //    	
-//    	List<PendingProductCancelRequest> productOrderNoList = new ArrayList<>();
+//    	List<ProductCancelRequest> productOrderNoList = new ArrayList<>();
 //    	productOrderNoList.add(product1);
 //    	productOrderNoList.add(product2);
 //    	productOrderNoList.add(product3);
@@ -122,7 +128,7 @@ public class AdminOrderServiceTest {
 //    	//When    	
 //    	List<String> orderNoList = productOrderNoList
 //    			.stream()
-//    			.collect(Collectors.groupingBy(PendingProductCancelRequest::getConvertedOrderNo))
+//    			.collect(Collectors.groupingBy(ProductCancelRequest::getConvertedOrderNo))
 //	            .entrySet().stream()
 //	            .map(order -> order.getKey())
 //	            .collect(Collectors.toList());
@@ -135,23 +141,23 @@ public class AdminOrderServiceTest {
 //    public void testChangePendingProductCancelHistory() {
 //
 //	    // Given
-//    	PendingProductCancelRequest product1 = new PendingProductCancelRequest();
+//    	ProductCancelRequest product1 = new ProductCancelRequest();
 //    	product1.setProductOrderNo("O1701466461394-1");
 //    	
-//    	PendingProductCancelRequest product2 = new PendingProductCancelRequest();
+//    	ProductCancelRequest product2 = new ProductCancelRequest();
 //    	product2.setProductOrderNo("O1701466461394-2");
 //    	
-//    	PendingProductCancelRequest product3 = new PendingProductCancelRequest();
+//    	ProductCancelRequest product3 = new ProductCancelRequest();
 //    	product3.setProductOrderNo("O1701466461394-3");
 //    	
-//    	PendingProductCancelRequest product4 = new PendingProductCancelRequest();
+//    	ProductCancelRequest product4 = new ProductCancelRequest();
 //    	product4.setProductOrderNo("O1701338658628-1");
 //    	
-//    	PendingProductCancelRequest product5 = new PendingProductCancelRequest();
+//    	ProductCancelRequest product5 = new ProductCancelRequest();
 //    	product5.setProductOrderNo("O1701338658628-2");
 //    	
 //    	
-//    	List<PendingProductCancelRequest> productOrderNoList = new ArrayList<>();
+//    	List<ProductCancelRequest> productOrderNoList = new ArrayList<>();
 //    	productOrderNoList.add(product1);
 //    	productOrderNoList.add(product2);
 //    	productOrderNoList.add(product3);
@@ -160,7 +166,7 @@ public class AdminOrderServiceTest {
 //
 //	    List<String> orderNoList = productOrderNoList
 //    			.stream()
-//    			.collect(Collectors.groupingBy(PendingProductCancelRequest::getConvertedOrderNo))
+//    			.collect(Collectors.groupingBy(ProductCancelRequest::getConvertedOrderNo))
 //	            .entrySet().stream()
 //	            .map(order -> order.getKey())
 //	            .collect(Collectors.toList());
@@ -220,11 +226,11 @@ public class AdminOrderServiceTest {
 	public void testChangePendingProductCancelReward(){
 		//given
 //    	("O1701466461394-1","O1701335516842-1");
-    	List<PendingProductCancelRequest> productNoList = new ArrayList<PendingProductCancelRequest>();
-    	PendingProductCancelRequest item1 = new PendingProductCancelRequest();
+    	List<ProductCancelRequest> productNoList = new ArrayList<ProductCancelRequest>();
+    	ProductCancelRequest item1 = new ProductCancelRequest();
     	item1.setProductOrderNo("O1701466461394-1");
     	item1.setQuantity(1);
-    	PendingProductCancelRequest item2 = new PendingProductCancelRequest();
+    	ProductCancelRequest item2 = new ProductCancelRequest();
     	item2.setProductOrderNo("O1701335516842-1");
     	item2.setQuantity(1);
     	productNoList.add(item1);
@@ -244,11 +250,11 @@ public class AdminOrderServiceTest {
 	@Transactional
 	public void testChangePendingProductCancelPoint(){
 		//given
-    	List<PendingProductCancelRequest> productNoList = new ArrayList<PendingProductCancelRequest>();
-    	PendingProductCancelRequest item1 = new PendingProductCancelRequest();
+    	List<ProductCancelRequest> productNoList = new ArrayList<ProductCancelRequest>();
+    	ProductCancelRequest item1 = new ProductCancelRequest();
     	item1.setProductOrderNo("O1701466461394-1");
     	item1.setQuantity(1);
-    	PendingProductCancelRequest item2 = new PendingProductCancelRequest();
+    	ProductCancelRequest item2 = new ProductCancelRequest();
     	item2.setProductOrderNo("O1701335516842-1");
     	item2.setQuantity(1);
     	productNoList.add(item1);
@@ -285,26 +291,26 @@ public class AdminOrderServiceTest {
 		assertThat(result).isGreaterThan(0);
 	}
     
-    @Test
-	@Transactional
-	public void testEditPendingProductCancel(){
-		//given
-    	List<PendingProductCancelRequest> productOrderNoList = new ArrayList<PendingProductCancelRequest>();
-    	PendingProductCancelRequest cancel1 = new PendingProductCancelRequest();
-    	cancel1.setProductOrderNo("O1701466461394-1");
-    	PendingProductCancelRequest cancel2 = new PendingProductCancelRequest();
-    	cancel2.setProductOrderNo("O1701335516842-1");
-    	
-    	productOrderNoList.add(cancel1);
-    	productOrderNoList.add(cancel2);
-		
-		//when
-		int result = adminOrderService.editPendingProductCancel(productOrderNoList);
-		
-		//then
-		System.out.println("result : " + result);
-		assertThat(result).isGreaterThan(0);
-	}
+//    @Test
+//	@Transactional
+//	public void testEditPendingProductCancel(){
+//		//given
+//    	List<ProductCancelRequest> productOrderNoList = new ArrayList<ProductCancelRequest>();
+//    	ProductCancelRequest cancel1 = new ProductCancelRequest();
+//    	cancel1.setProductOrderNo("O1701466461394-1");
+//    	ProductCancelRequest cancel2 = new ProductCancelRequest();
+//    	cancel2.setProductOrderNo("O1701335516842-1");
+//    	
+//    	productOrderNoList.add(cancel1);
+//    	productOrderNoList.add(cancel2);
+//		
+//		//when
+//		int result = adminOrderService.editPendingProductCancel(productOrderNoList);
+//		
+//		//then
+//		System.out.println("result : " + result);
+//		assertThat(result).isGreaterThan(0);
+//	}
     
     @Test
 	@Transactional
@@ -350,6 +356,133 @@ public class AdminOrderServiceTest {
 		//then
     	System.out.println("result : " + result);
 //		assertThat(result).isGreaterThan(0);
+	}
+    
+    @Test
+	@Transactional
+	public void testFindOrdersStatusByOrderNo(){
+		//given
+    	List<ProductCancelRequest> productOrderNoList = new ArrayList<ProductCancelRequest>();
+    	ProductCancelRequest cancel1 = new ProductCancelRequest();
+    	ProductCancelRequest cancel2 = new ProductCancelRequest();
+    	ProductCancelRequest cancel3 = new ProductCancelRequest();
+    	ProductCancelRequest cancel4 = new ProductCancelRequest();
+    	
+    	cancel1.setOrderNo("O1701466461394");
+    	cancel2.setOrderNo("O1701335516842");
+    	cancel3.setOrderNo("O1701331238383");
+    	cancel4.setOrderNo("O1700812765494");
+    	
+    	productOrderNoList.add(cancel1);
+    	productOrderNoList.add(cancel2);
+    	productOrderNoList.add(cancel3);
+    	productOrderNoList.add(cancel4);
+		
+		//when
+    	List<OrderStatus> orderStatusList = adminOrderDao.findOrdersStatus(productOrderNoList);
+    	
+    	/* OrderNO 안에 다른 상태인 상품이 들어있으면 제외 */
+    	List<String> exclusionOrderNo = Optional.ofNullable(orderStatusList.stream()
+    			.filter(e -> !e.getProductStatus().equals("입금전"))
+    			.map(OrderStatus::getOrderNo)
+    			.collect(Collectors.toList()))
+    			.orElseGet(Collections::emptyList);
+		
+    	/* 입금 전 상태인 OrderNo */
+    	List<String> pendingOrderNo = orderStatusList.stream()
+    			.filter(e -> exclusionOrderNo.stream()
+    					.noneMatch(Predicate.isEqual(e.getOrderNo())))
+    					.filter(e -> e.getProductStatus().equals("입금전") && e.getProductOrderNo() == null)
+    					.map(OrderStatus::getOrderNo)
+	    				.distinct()
+	    				.collect(Collectors.toList());
+    	
+    	/*----------------------------------------------------------------------------------------*/
+    	
+		/* OrderNO 안에 다른 상태인 상품이 들어있으면 제외 */
+    	List<String> exclusionPreShippedOrderNo = Optional.ofNullable(orderStatusList.stream()
+    			.filter(e -> !e.getProductStatus().equals("결제완료"))
+    			.map(OrderStatus::getOrderNo)
+    			.collect(Collectors.toList()))
+    			.orElseGet(Collections::emptyList);
+		
+    	/* 결제완료 상태인 OrderNo */
+    	List<String> preShippedOrderNo = orderStatusList.stream()
+    			.filter(e -> exclusionPreShippedOrderNo.stream()
+    					.noneMatch(Predicate.isEqual(e.getOrderNo())))
+    					.filter(e -> e.getProductStatus().equals("결제완료") && e.getProductOrderNo() == null)
+    					.map(OrderStatus::getOrderNo)
+	    				.distinct()
+	    				.collect(Collectors.toList());
+    			
+    	//then		
+    	pendingOrderNo.forEach(no -> System.out.println("입금전 orderNo : " + no));
+    	preShippedOrderNo.forEach(no -> System.out.println("결제 완료 orderNo : " + no));
+    
+	}
+    
+    @Test
+	@Transactional
+	public void testFindOrdersStatusByProductOrderNo(){
+		//given
+    	List<ProductCancelRequest> productOrderNoList = new ArrayList<ProductCancelRequest>();
+    	ProductCancelRequest cancel1 = ProductCancelRequest.of("O1701466461394-1");
+    	ProductCancelRequest cancel2 = ProductCancelRequest.of("O1701335516842-1");
+    	ProductCancelRequest cancel3 = ProductCancelRequest.of("O1701662611938-1");
+    	
+    	productOrderNoList.add(cancel1);
+    	productOrderNoList.add(cancel2);
+    	productOrderNoList.add(cancel3);
+		
+		//when
+    	List<OrderStatus> orderStatusList = adminOrderDao.findOrdersStatus(productOrderNoList);
+    
+    	/* 입금전 상태인 ProductNo */
+    	List<ProductCancelRequest> pendingProductNo = orderStatusList.stream()
+				.filter(e -> e.getProductStatus().equals("입금전") && e.getOrderNo() == null)
+				.map(OrderStatus::getProductOrderNo)
+				.map(ProductCancelRequest::of)
+				.collect(Collectors.toList());
+    	
+    	/* 결제완료 상태인 ProductNo */
+    	List<String> preShippedProductNo = orderStatusList.stream()
+				.filter(e -> e.getProductStatus().equals("결제완료") && e.getOrderNo() == null)
+				.map(OrderStatus::getProductOrderNo)
+				.collect(Collectors.toList());
+		
+    			
+    	//then		
+    	pendingProductNo.forEach(no -> System.out.println("입금전 ProductNo : " + no.getProductOrderNo()));
+//    	preShippedProductNo.forEach(no -> System.out.println("결제 완료 ProductNo : " + no));
+    	
+//    	assertThat(preShippedProductNo.isEmpty()).isTrue();
+	}
+    
+    @Test
+	@Transactional
+	public void testSavePendingOrderCancel(){
+		//given
+    	
+    	PendingCancelInfoResponse cancelInfo = new PendingCancelInfoResponse();
+    	cancelInfo.setDetailedOrderId("361");
+    	cancelInfo.setProductId("S000210736183");
+    	cancelInfo.setProductOrderNo("O1701466461394-1");
+    	
+    	PendingCancelInfoResponse cancelInfo2 = new PendingCancelInfoResponse();
+    	cancelInfo2.setDetailedOrderId("361");
+    	cancelInfo2.setProductId("S000210736183");
+    	cancelInfo2.setProductOrderNo("O1701466461394-1");
+    	
+		
+    	List<PendingCancelInfoResponse> cancelInfoList = new ArrayList<PendingCancelInfoResponse>();
+    	cancelInfoList.add(cancelInfo);
+    	cancelInfoList.add(cancelInfo2);
+    	
+		//when
+    	int result = adminOrderDao.savePendingOrderCancel(cancelInfoList);
+		
+		//then
+		System.out.println(result);
 	}
     
 }

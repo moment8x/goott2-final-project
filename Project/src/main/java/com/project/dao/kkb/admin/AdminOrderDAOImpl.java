@@ -22,12 +22,13 @@ import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderCondition;
 import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
+import com.project.vodto.kkb.OrderStatus;
 import com.project.vodto.kkb.PendingCancelCondition;
 import com.project.vodto.kkb.PendingCancelInfoResponse;
 import com.project.vodto.kkb.PendingCancelResponse;
 import com.project.vodto.kkb.PendingCondition;
 import com.project.vodto.kkb.PendingNoResponse;
-import com.project.vodto.kkb.PendingProductCancelRequest;
+import com.project.vodto.kkb.ProductCancelRequest;
 import com.project.vodto.kkb.PendingProductResponse;
 import com.project.vodto.kkb.PreparationNoResponse;
 import com.project.vodto.kkb.PreparationProductResponse;
@@ -89,8 +90,8 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	}
 
 	@Override
-	public int changePendingProductCancelPayments(List<String> productNoList) {
-		return ses.update(ns + ".updatePendingProductCancelPayments", productNoList);
+	public int changePendingProductCancelPayments(List<ProductCancelRequest> productOrderNoList) {
+		return ses.update(ns + ".updatePendingProductCancelPayments", productOrderNoList);
 	}
 	
 	@Override
@@ -104,12 +105,12 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	}
 	
 	@Override
-	public int changePendingProductCancelReward(List<PendingProductCancelRequest> productOrderNoList) {
+	public int changePendingProductCancelReward(List<ProductCancelRequest> productOrderNoList) {
 		return ses.update(ns + ".updatePendingProductCancelReward", productOrderNoList);
 	}
 
 	@Override
-	public int changePendingProductCancelPoint(List<PendingProductCancelRequest> productOrderNoList) {
+	public int changePendingProductCancelPoint(List<ProductCancelRequest> productOrderNoList) {
 		return ses.update(ns + ".updatePendingProductCancelPoint", productOrderNoList);
 	}
 
@@ -259,6 +260,11 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	}
 	
 	@Override
+	public List<OrderStatus> findOrdersStatus(List<ProductCancelRequest> productOrderNoList) {
+		return ses.selectList(ns + ".selectOrdersStatus", productOrderNoList);
+	}
+	
+	@Override
 	public int changeProductCancel(List<String> productNoList) {
 		return ses.update(ns + ".updateProductCancel", productNoList);
 	}
@@ -269,8 +275,8 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	}
 
 	@Override
-	public int changeProductCancelPayments(List<String> productNoList) {
-		return ses.update(ns + ".updateProductCancelPayments", productNoList);
+	public int changeProductCancelPayments(List<ProductCancelRequest> productOrderNoList) {
+		return ses.update(ns + ".updateProductCancelPayments", productOrderNoList);
 	}
 	
 	@Override
@@ -284,12 +290,12 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	}
 	
 	@Override
-	public int changeProductCancelReward(List<PendingProductCancelRequest> productOrderNoList) {
+	public int changeProductCancelReward(List<ProductCancelRequest> productOrderNoList) {
 		return ses.update(ns + ".updateProductCancelReward", productOrderNoList);
 	}
 
 	@Override
-	public int changeProductCancelPoint(List<PendingProductCancelRequest> productOrderNoList) {
+	public int changeProductCancelPoint(List<ProductCancelRequest> productOrderNoList) {
 		return ses.update(ns + ".updateProductCancelPoint", productOrderNoList);
 	}
 
@@ -301,6 +307,10 @@ public class AdminOrderDAOImpl implements AdminOrderDAO {
 	@Override
 	public List<PendingCancelInfoResponse> findProductCancelInfo(List<String> orderNoList) {
 		return ses.selectList(ns + ".selectProductCancelInfo", orderNoList);
+	}
+	@Override
+	public int saveProductCancel(List<PendingCancelInfoResponse> cancelInfoList) {
+		return ses.insert(ns + ".insertProductCancel", cancelInfoList);
 	}
 
 	@Override

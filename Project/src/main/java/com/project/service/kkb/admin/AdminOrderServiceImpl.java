@@ -1,8 +1,11 @@
 package com.project.service.kkb.admin;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -29,10 +32,9 @@ import com.project.vodto.kkb.InTransitProductResponse;
 import com.project.vodto.kkb.InvoiceCondition;
 import com.project.vodto.kkb.OrderByProduct;
 import com.project.vodto.kkb.OrderCondition;
-import com.project.vodto.kkb.OrderDetailEtcResponse;
-import com.project.vodto.kkb.OrderDetailResponse;
 import com.project.vodto.kkb.OrderNoResponse;
 import com.project.vodto.kkb.OrderProductResponse;
+import com.project.vodto.kkb.OrderStatus;
 import com.project.vodto.kkb.PendingByProduct;
 import com.project.vodto.kkb.PendingCancelCondition;
 import com.project.vodto.kkb.PendingCancelInfoByProduct;
@@ -41,12 +43,12 @@ import com.project.vodto.kkb.PendingCancelInfoResponse;
 import com.project.vodto.kkb.PendingCancelResponse;
 import com.project.vodto.kkb.PendingCondition;
 import com.project.vodto.kkb.PendingNoResponse;
-import com.project.vodto.kkb.PendingProductCancelRequest;
 import com.project.vodto.kkb.PendingProductResponse;
 import com.project.vodto.kkb.PreparationInfoByProduct;
 import com.project.vodto.kkb.PreparationInfoProduct;
 import com.project.vodto.kkb.PreparationNoResponse;
 import com.project.vodto.kkb.PreparationProductResponse;
+import com.project.vodto.kkb.ProductCancelRequest;
 import com.project.vodto.kkb.RefundResponse;
 import com.project.vodto.kkb.ReturnResponse;
 
@@ -250,33 +252,20 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	/* 입금 전 관리 (주문 취소 버튼 - 품목주문별) */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public int editPendingProductCancel(List<PendingProductCancelRequest> productOrderNoList) {
+	public int editPendingProductCancel(List<ProductCancelRequest> productOrderNoList) {
 		
 		int result = -1;
 		
 		List<String> orderNoList = productOrderNoList.stream()
-    			.collect(Collectors.groupingBy(PendingProductCancelRequest::getConvertedOrderNo))
+    			.collect(Collectors.groupingBy(ProductCancelRequest::getConvertedOrderNo))
 	            .entrySet().stream()
 	            .map(order -> order.getKey())
 	            .collect(Collectors.toList());
 		
 		List<String> productNoList = productOrderNoList.stream()
-				.map(PendingProductCancelRequest::getProductOrderNo)	
+				.map(ProductCancelRequest::getProductOrderNo)	
 				.collect(Collectors.toList());
 	
-		/* 주문 내역 테이블 update(column : delivery_status) */
-		if(adminOrderDao.changePendingProductCancelHistory(orderNoList) <= 0) {
-			return result;
-		}
-		
-		/* 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) 확인하기 위해 select) */
-		List<CheckedCoupons> couponList = adminOrderDao.findPendingProductCancelCoupon(orderNoList);
-		
-		
-		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
-		adminOrderDao.changePendingProductCancelCoupon(couponList); // 적용 쿠폰 수가 0일 때만 돌려줌
-		
-		
 		/* 적립금 로그 테이블 update(column : reason, balance, reward) 
 		 * 회원 테이블 update(column : total_rewards, accumulated_use_reward) */
 		if(adminOrderDao.changePendingProductCancelReward(productOrderNoList) <= 0) {
@@ -289,6 +278,23 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 			return result;
 		}
 		
+		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
+		if(adminOrderDao.changePendingProductCancel(productNoList) <= 0 ) {
+			return result;
+		}
+		
+		/* 주문 내역 테이블 update(column : delivery_status) */
+		if(adminOrderDao.changePendingProductCancelHistory(orderNoList) <= 0) {
+			return result;
+		}
+		
+		/* 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) 확인하기 위해 select) */
+		List<CheckedCoupons> couponList = adminOrderDao.findPendingProductCancelCoupon(orderNoList);
+		
+		
+		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
+		adminOrderDao.changePendingProductCancelCoupon(couponList); // 적용 쿠폰 수가 0일 때만 돌려줌
+		
 		/* 회원 테이블 update(column : total_points, total_rewards, coupon_count,
 		 * 							accumulated_use_reward, accumulated_use_point ) */
 		List<CanceledCoupons> canceledCoupons = CanceledCoupons.convert(couponList);
@@ -296,13 +302,8 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 			return result;
 		}
 		
-		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
-		if(adminOrderDao.changePendingProductCancel(productNoList) <= 0 ) {
-			return result;
-		}
-		
 		/* 결제 테이블 update(column : payment_status) */
-		if(adminOrderDao.changePendingProductCancelPayments(productNoList) > 0) {
+		if(adminOrderDao.changePendingProductCancelPayments(productOrderNoList) > 0) {
 			List<PendingCancelInfoResponse> cancelInfoList = 
 					adminOrderDao.findPendingProductCancelInfo(orderNoList);
 			
@@ -319,16 +320,6 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		
 		int result = -1;
 		
-		/* 주문 내역 테이블 update(column : delivery_status) */
-		if(adminOrderDao.changePendingOrderCancelHistory(orderNoList) <= 0) {
-			return result;
-		}
-		
-		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
-		if(adminOrderDao.changePendingOrderCancelCoupon(orderNoList) <= 0) {
-			return result;
-		}
-		
 		/* 적립금 로그 테이블 update(column : reason, balance, reward) */
 		if(adminOrderDao.changePendingOrderCancelReward(orderNoList) <= 0) {
 			return result;
@@ -339,14 +330,24 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 			return result ;
 		}
 		
-		/* 회원 테이블 update(column : total_points, total_rewards, coupon_count,
-		 * 							accumulated_use_reward,accumulated_use_point ) */
-		if(adminOrderDao.changePendingOrderCancelMember(orderNoList) <= 0) {
+		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
+		if(adminOrderDao.changePendingOrderCancel(orderNoList) <= 0 ) {
 			return result;
 		}
 		
-		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
-		if(adminOrderDao.changePendingOrderCancel(orderNoList) <= 0 ) {
+		/* 주문 내역 테이블 update(column : delivery_status) */
+		if(adminOrderDao.changePendingOrderCancelHistory(orderNoList) <= 0) {
+			return result;
+		}
+		
+		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
+		if(adminOrderDao.changePendingOrderCancelCoupon(orderNoList) <= 0) {
+			return result;
+		}
+		
+		/* 회원 테이블 update(column : total_points, total_rewards, coupon_count,
+		 * 							accumulated_use_reward,accumulated_use_point ) */
+		if(adminOrderDao.changePendingOrderCancelMember(orderNoList) <= 0) {
 			return result;
 		}
 		
@@ -391,35 +392,23 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		return result;
 	}
 	
-	/* 주문 상세 정보 (주문 취소) */
+	/* 주문 상세 정보 (결제 완료 상태 이후 주문 취소 - 품목주문별) */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public int editProductCancel(List<PendingProductCancelRequest> productOrderNoList) {
+	public int editProductCancel(List<ProductCancelRequest> productOrderNoList) {
 		
 		int result = -1;
-		
+			
 		List<String> orderNoList = productOrderNoList.stream()
-    			.collect(Collectors.groupingBy(PendingProductCancelRequest::getConvertedOrderNo))
+    			.collect(Collectors.groupingBy(ProductCancelRequest::getConvertedOrderNo))
 	            .entrySet().stream()
 	            .map(order -> order.getKey())
 	            .collect(Collectors.toList());
 		
 		List<String> productNoList = productOrderNoList.stream()
-				.map(PendingProductCancelRequest::getProductOrderNo)	
+				.map(ProductCancelRequest::getProductOrderNo)	
 				.collect(Collectors.toList());
 	
-		/* 주문 내역 테이블 update(column : delivery_status) */
-		if(adminOrderDao.changeProductCancelHistory(orderNoList) <= 0) {
-			return result;
-		}
-		
-		/* 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) 확인하기 위해 select) */
-		List<CheckedCoupons> couponList = adminOrderDao.findProductCancelCoupon(orderNoList);
-		
-		
-		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
-		adminOrderDao.changeProductCancelCoupon(couponList); // 적용 쿠폰 수가 0일 때만 돌려줌
-		
 		
 		/* 적립금 로그 테이블 update(column : reason, balance, reward) 
 		 * 회원 테이블 update(column : total_rewards, accumulated_use_reward) */
@@ -433,6 +422,22 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 			return result;
 		}
 		
+		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
+		if(adminOrderDao.changeProductCancel(productNoList) <= 0 ) {
+			return result;
+		}
+		
+		/* 주문 내역 테이블 update(column : delivery_status) */
+		if(adminOrderDao.changeProductCancelHistory(orderNoList) <= 0) {
+			return result;
+		}
+		
+		/* 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) 확인하기 위해 select) */
+		List<CheckedCoupons> couponList = adminOrderDao.findProductCancelCoupon(orderNoList);
+		
+		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
+		adminOrderDao.changeProductCancelCoupon(couponList); // 적용 쿠폰 수가 0일 때만 돌려줌
+		
 		/* 회원 테이블 update(column : total_points, total_rewards, coupon_count,
 		 * 							accumulated_use_reward, accumulated_use_point ) */
 		List<CanceledCoupons> canceledCoupons = CanceledCoupons.convert(couponList);
@@ -440,22 +445,90 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 			return result;
 		}
 		
-		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
-		if(adminOrderDao.changeProductCancel(productNoList) <= 0 ) {
-			return result;
-		}
-		
 		/* 결제 테이블 update(column : payment_status) */
-		if(adminOrderDao.changeProductCancelPayments(productNoList) > 0) {
+		if(adminOrderDao.changeProductCancelPayments(productOrderNoList) > 0) {
 			List<PendingCancelInfoResponse> cancelInfoList = 
 					adminOrderDao.findProductCancelInfo(orderNoList);
 			
-			result = adminOrderDao.savePendingOrderCancel(cancelInfoList);
+			result = adminOrderDao.saveProductCancel(cancelInfoList);
 		}
 		
 		return result;
 	}
 	
+	/* 주문 상세 정보 (결제 완료 상태 이후 주문 취소 - 주문번호별) */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int editOrderCancel(List<String> orderNoList) {
+		
+		int result = -1;
+		
+		/* 적립금 로그 테이블 update(column : reason, balance, reward) */
+		if(adminOrderDao.changeOrderCancelReward(orderNoList) <= 0) {
+			return result;
+		}
+		
+		/* 포인트 로그 테이블 update(column : reason, balance, point) */
+		if(adminOrderDao.changeOrderCancelPoint(orderNoList) <= 0) {
+			return result ;
+		}
+		
+		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
+		if(adminOrderDao.changeOrderCancel(orderNoList) <= 0 ) {
+			return result;
+		}
+		
+		/* 주문 내역 테이블 update(column : delivery_status) */
+		if(adminOrderDao.changeOrderCancelHistory(orderNoList) <= 0) {
+			return result;
+		}
+		
+		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
+		if(adminOrderDao.changeOrderCancelCoupon(orderNoList) <= 0) {
+			return result;
+		}
+		
+		/* 회원 테이블 update(column : total_points, total_rewards, coupon_count,
+		 * 							accumulated_use_reward,accumulated_use_point ) */
+		if(adminOrderDao.changeOrderCancelMember(orderNoList) <= 0) {
+			return result;
+		}
+		
+		/* 결제 테이블 update(column : payment_status) */
+		if(adminOrderDao.changeOrderCancelPayments(orderNoList) > 0) {
+			List<PendingCancelInfoResponse> cancelInfoList = 
+					adminOrderDao.findCancelInfo(orderNoList);
+			
+			result = adminOrderDao.saveOrderCancel(cancelInfoList);
+		}
+		
+		return result;
+	}
+	
+	/* 주문 상세 정보 (취소전 상태 확인 -> 상태에 맞는 취소 실행) */
+	@Override
+	public int getOrdersByStatus(List<ProductCancelRequest> productOrderNoList) {
+		
+		int result = -1;
+		
+		List<OrderStatus> filterPendingByOrderNo = adminOrderDao.findOrdersStatus(productOrderNoList);
+		
+		List<String> PendingOrderNo = filterPendingByOrderNo(filterPendingByOrderNo);
+		List<ProductCancelRequest> PendingProductNo = filterPendingByProductNo(filterPendingByOrderNo);
+		List<String> ShippedOrderNo = filterPreShippedByOrderNo(filterPendingByOrderNo);
+		List<String> ShippedProductNo = filterShippedByProductNo(filterPendingByOrderNo);
+		 
+		if(!PendingOrderNo.isEmpty() && editPendingOrderCancel(PendingOrderNo) > 0) { 
+			return result;
+		}
+		
+		if(!PendingProductNo.isEmpty() && editPendingProductCancel(PendingProductNo) > 0) { 
+			return result;
+		}
+		 
+		 
+		return result;
+	}
 	
 	/* 주문 상세 정보 (입금전 처리 [결제완료 -> 입금전] ) 
 	 * 배송 준비중 관리 (입금전 처리[결제완료 -> 입금전] 주문번호 기준으로만 */
@@ -468,13 +541,14 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	@Override
 	public Map<String, Object> getOrderDetailInfo(String orderNo) {
 		
-		List<OrderDetailResponse> orderDetailList = adminOrderDao.findOrderDetailInfo(orderNo);
-		List<OrderDetailEtcResponse> orderDetailList = adminOrderDao.findOrderDetailEtc(orderNo);
-		
-		Map<String, Object> result = new HashMap<>();
-		result.put("orderDetailList", orderDetailList);
-		
-		return result;
+//		List<OrderDetailResponse> orderDetailList = adminOrderDao.findOrderDetailInfo(orderNo);
+//		List<OrderDetailEtcResponse> orderDetailList = adminOrderDao.findOrderDetailEtc(orderNo);
+//		
+//		Map<String, Object> result = new HashMap<>();
+//		result.put("orderDetailList", orderDetailList);
+//		
+//		return result;
+		return null;
 	}
 	
 	/* 전체 주문 조회 */
@@ -491,6 +565,79 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		return result;
 	}
 	
+/*----------------------------------------------------------------------------------------------------------------*/
+	
+	/* 입금전 상태만 남김 (주문번호 기준)*/
+	private List<String> filterPendingByOrderNo(List<OrderStatus> orderStatusList) {
+		
+		/* OrderNO 안에 다른 상태인 상품이 들어있으면 제외 */
+		List<String> exclusionOrderNo = Optional.ofNullable(orderStatusList.stream()
+    			.filter(e -> !e.getProductStatus().equals("입금전"))
+    			.map(OrderStatus::getOrderNo)
+    			.collect(Collectors.toList()))
+    			.orElseGet(Collections::emptyList);
+		
+    	/* 입금 전 상태인 OrderNo */
+    	List<String> pendingOrderNo = orderStatusList.stream()
+    			.filter(e -> exclusionOrderNo.stream()
+    					.noneMatch(Predicate.isEqual(e.getOrderNo())))
+    					.filter(e -> e.getProductStatus().equals("입금전") && e.getProductOrderNo() == null)
+    					.map(OrderStatus::getOrderNo)
+	    				.distinct()
+	    				.collect(Collectors.toList());
+	
+    	return pendingOrderNo;
+	}
+	
+	/* 입금전 상태만 남김 (품목별 주문번호 기준)*/
+	private List<ProductCancelRequest> filterPendingByProductNo(List<OrderStatus> orderStatusList) {
+		
+		/* 입금 전 상태인 ProductNo */
+    	List<ProductCancelRequest> pendingProductNo = orderStatusList.stream()
+    					.filter(e -> e.getProductStatus().equals("입금전") && e.getOrderNo() == null)
+    					.map(OrderStatus::getProductOrderNo)
+    					.map(ProductCancelRequest::of)
+	    				.collect(Collectors.toList());
+	
+    	return pendingProductNo;
+	}
+	
+	/* 결제완료 상태만 남김 (주문번호 기준)*/
+	private List<String> filterPreShippedByOrderNo(List<OrderStatus> orderStatusList) {
+			
+		/* OrderNO 안에 다른 상태인 상품이 들어있으면 제외 */
+    	List<String> exclusionPreShippedOrderNo = Optional.ofNullable(orderStatusList.stream()
+    			.filter(e -> !e.getProductStatus().equals("결제완료"))
+    			.map(OrderStatus::getOrderNo)
+    			.collect(Collectors.toList()))
+    			.orElseGet(Collections::emptyList);
+		
+    	/* 결제완료 상태인 OrderNo */
+    	List<String> preShippedOrderNo = orderStatusList.stream()
+    			.filter(e -> exclusionPreShippedOrderNo.stream()
+    					.noneMatch(Predicate.isEqual(e.getOrderNo())))
+    					.filter(e -> e.getProductStatus().equals("결제완료") && e.getProductOrderNo() == null)
+    					.map(OrderStatus::getOrderNo)
+	    				.distinct()
+	    				.collect(Collectors.toList());
+	
+    	return preShippedOrderNo;
+	}
+	
+	/* 결제완료 상태만 남김 (품목별 주문번호 기준)*/
+	private List<String> filterShippedByProductNo(List<OrderStatus> orderStatusList) {
+		
+		/* 결제완료 상태인 ProductNo */
+    	List<String> preShippedProductNo = orderStatusList.stream()
+				.filter(e -> e.getProductStatus().equals("결제완료") && e.getOrderNo() == null)
+				.map(OrderStatus::getProductOrderNo)
+				.collect(Collectors.toList());
+	
+    	return preShippedProductNo;
+	}
+	
+	
+	/* 특정 필드만 그룹화 */
 	private List<OrderByProduct> getOrderByProduct(OrderCondition orderCond) {
 	    
 		List<OrderProductResponse> list = adminOrderDao.findProductByInfo(orderCond);
@@ -522,7 +669,8 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	            })
 	            .collect(Collectors.toList());
 	}
-
+	
+	/* 특정 필드만 그룹화 */
 	private List<PendingByProduct> getPendingByProduct(PendingCondition pendingCond) {
 		    
 			List<PendingProductResponse> list = adminOrderDao.findPendingProductByInfo(pendingCond);
@@ -553,6 +701,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		            .collect(Collectors.toList());
 	}
 	
+	/* 특정 필드만 그룹화 */
 	private List<PreparationInfoByProduct> getPreparationByProduct(OrderCondition preparationCond) {
 	    
 		List<PreparationNoResponse> list = adminOrderDao.findPreparationByInfo(preparationCond);
@@ -585,6 +734,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	            .collect(Collectors.toList());
 	}
 	
+	/* 특정 필드만 그룹화 */
 	private List<InTransitInfoByProduct> getInTransitByProduct(OrderCondition inTransitCond) {
 		
 		List<InTransitNoResponse> list = adminOrderDao.findInTransitByInfo(inTransitCond);
@@ -614,6 +764,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	            .collect(Collectors.toList());
 	}
 	
+	/* 특정 필드만 그룹화 */
 	private List<DeliveredInfoByProduct> getDeliveredByProduct(OrderCondition deliveredCond) {
 		
 		List<DeliveredNoResponse> list = adminOrderDao.findDeliveredByInfo(deliveredCond);
@@ -643,6 +794,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	            .collect(Collectors.toList());
 	}
 	
+	/* 특정 필드만 그룹화 */
 	private List<PendingCancelInfoByProduct> getPendingCancelByProduct(PendingCancelCondition deliveredCond) {
 			
 			List<PendingCancelResponse> list = adminOrderDao.findPendingCancelByInfo(deliveredCond);
@@ -673,4 +825,6 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		            })
 		            .collect(Collectors.toList());
 		}
+
+
 }
