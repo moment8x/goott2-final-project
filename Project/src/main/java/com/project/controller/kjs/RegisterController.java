@@ -92,7 +92,7 @@ public class RegisterController {
 	public @ResponseBody UploadFiles uploadFile(HttpServletRequest request, MultipartFile uploadFile) {
 		// 1. 파일이 저장될 경로 확인
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
-		
+		UploadFiles file = null;
 		try {
 			// 2. 파일 업로드
 			if (fileList.get(0) != null) {
@@ -102,13 +102,13 @@ public class RegisterController {
 				}
 			}
 			// 새 파일 업로드.
-			fileList = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(), 
-					uploadFile.getContentType(), uploadFile.getBytes(), realPath, fileList);
+			file = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(), 
+					uploadFile.getContentType(), uploadFile.getBytes(), realPath);
 		} catch (IOException | SQLException | NamingException e) {
 			e.printStackTrace();
 		}
 		
-		return fileList.get(0);
+		return file;
 	}
 	
 	@RequestMapping("refreshFile")

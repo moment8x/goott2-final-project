@@ -10,8 +10,7 @@ import com.project.vodto.UploadFiles;
 
 public interface UploadFileService {
 	// 실제 파일 업로드
-	List<UploadFiles> uploadFile(String originalFileName, long size, String contentType, byte[] data,
-			String realPath, List<UploadFiles> fileList) throws IOException;
+	UploadFiles uploadFile(String originalFileName, long size, String contentType, byte[] data, String realPath) throws IOException;
 	// 실제 파일 삭제
 	int deleteFile(String newFileName, String realPath);
 	// 기존 파일이 DB에 존재하는지 확인

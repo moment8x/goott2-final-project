@@ -55,6 +55,8 @@
 <script>
 	let page = 1;
 	let lastPage = 1;
+	let fileList = [];
+	let deleteFileList = [];
 	
    $(function () {
       $('.single-item').slick();
@@ -120,7 +122,42 @@
       
       pagination();
       getBestSeller();
-   });
+      
+		$('#submit-btn').click(function(e) {
+			//let productId = ${product.productId}
+			//let rating = $('input[name=rating]:checked').val();
+			//let content = $('#floatingTextarea2').val();
+			let key = "insert";
+			if (isValid()) {
+				let sendData = {
+						"productId" : "${product.productId}",
+						"rating" : $('input[name=rating]:checked').val(),
+						"content" : $('#floatingTextarea2').val(),
+						fileList,
+						deleteFileList
+				}
+				console.log("sendData",sendData);
+				$.ajax({
+					url : "/review/saveReview",
+					type : "POST",
+					contentType : "application/json",
+					data : JSON.stringify(sendData),
+					async : false,
+					success : function(data) {
+						console.log("업로드성공", data);
+						if (data != null) 
+							fileList = [];
+							deleteFileList = [];
+							showUploadedFile(key);
+					}, error : function(data) {
+						console.log("업로드 실패", data);
+					}
+				});
+			} else {
+				alert("실패");
+			}
+		});
+	});
 	
 	// 관련 상품 장바구니 추가
 	function addCartRelated(productId) {
@@ -154,10 +191,9 @@
 			dataType : "JSON",
 			async : false,
 			success : function(data) {
-				console.log("BS success", data);
 				printBestSeller(data);
 			}, error : function(data) {
-				console.loog("BS error", data);
+				console.log("BS error", data);
 			}
 		});
 	}
@@ -277,64 +313,50 @@
 		pagination();
 	}
    
-   // 첨부파일 함수
-   function uploadFiles() {
-      $(".upFileArea").on("dragenter dragover", function(e) {
-         e.preventDefault();
-      });
-      $(".upFileArea").on("drop", function(e) {
-         e.preventDefault();
-         
-         let key = $(this).attr("id").split("-")[0];
-         let files = e.originalEvent.dataTransfer.files;
-         for (let i = 0; i < files.length; i++) {
-            let form = new FormData();
-            form.append("uploadFile", files[i]);   // 파일의 이름을 컨트롤러단의 MultipartFile 객체명과 맞춘다.
-            
-            $.ajax({
-               url : "/review/uploadFile",
-               type : "post",
-               data : form,
-               dataType : "json",
-               async : false,
-               processData : false,   // text데이터에 대해 쿼리스트링 처리를 하지 않겠다.  default = true
-               contentType : false,   // application/x-www-form-urlencoded 처리 안함.(인코딩 하지 않음)  default = true
-               success : function(data) {
-                  console.log("업로드성공", data);
-                  if (data != null) {
-                     showUploadedFile(key, data);
-                  }
-               }, error : function(data) {
-                  console.log("업로드 실패", data);
-               }
-            });
-         }
-      });
-   }
+	// 첨부파일 함수
+	function uploadFiles() {
+		$(".upFileArea").on("dragenter dragover", function(e) {
+			e.preventDefault();
+		});
+		$(".upFileArea").on("drop", function(e) {
+			e.preventDefault();
+			
+			let key = $(this).attr("id").split("-")[0];
+			let files = e.originalEvent.dataTransfer.files;
+			for (let i = 0; i < files.length; i++) {
+				let form = new FormData();
+				
+				form.append("uploadFile", files[i]);   // 파일의 이름을 컨트롤러단의 MultipartFile 객체명과 맞춘다.
+				$.ajax({
+					url : "/review/uploadFile",
+					type : "post",
+					data : form,
+					dataType : "json",
+					async : false,
+					processData : false,   // text데이터에 대해 쿼리스트링 처리를 하지 않겠다.  default = true
+					contentType : false,   // application/x-www-form-urlencoded 처리 안함.(인코딩 하지 않음)  default = true
+					success : function(data) {
+						console.log("업로드성공", data);
+						if (data != null) {
+							fileList.push(data);
+							showUploadedFile(key);
+						}
+					}, error : function(data) {
+						console.log("업로드 실패", data);
+					}
+				});
+			}
+		});
+	}
    
    // 업로드 파일 삭제 시 실행할 이벤트
    function uploadFileDelete() {
       $('.u-img').on('click', function(e) {
          e.stopPropagation();
          let key = $(this).parent().parent().attr("id").split("-")[0];
-         let thumbFileName = $(this).prev().attr("src").split("/resources/uploads")[1];
-         $.ajax({
-            url : "/review/deleteUploadFile",
-            type : "POST",
-            data : {
-               "thumbFileName" : thumbFileName
-            },
-            dataType : "JSON",
-            async : false,
-            success: function(data) {
-               console.log("success", data); 
-               if (data != null) {
-                  showUploadedFile(key, data);
-               }
-            }, error: function(data) {
-               console.log("err", data);
-            }
-         });
+         let thumbFileName = $(this).prev().attr("src").split("/resources/uploads")[1].replaceAll("/", "\\");
+         deleteFileList.push(thumbFileName);
+         showUploadedFile(key);
       });
    }
    
@@ -356,10 +378,11 @@
             console.log("success", data);
             if (data.status === "success") {
                // 리뷰 수정 시작
+               fileList = data.fileList;
                openReviewWriter(index, data.review);
                uploadFiles();
                changeStar();
-               showUploadedFile("update", data.review.images);
+               showUploadedFile("update");
             } else {
                alert("작성자만 수정 가능합니다.");
                return false;
@@ -404,23 +427,25 @@
       $('#review-' + index + ' div.product-rating').html(output2);
    }
    
-   // 리뷰 수정 완료 시
-   function updateReview(index, postNo) {
-      //let author = $('#review-' + index + ' div.name').text();
-      let rating = $('#review-' + index + ' input:radio[name="updateRating"]:checked').val();
-      let content = $('#review-' + index + ' div.reply textarea').val();
-      let productId = "${product.productId}";
+	// 리뷰 수정 완료 시
+	function updateReview(index, postNo) {
+		let rating = $('#review-' + index + ' input:radio[name="updateRating"]:checked').val();
+		let content = $('#review-' + index + ' div.reply textarea').val();
+		let productId = "${product.productId}";
+		let sendData = {
+			"postNo" : postNo,
+			"rating" : rating,
+			"content" : content,
+			"productId" : productId,
+			"page" : page,
+			fileList,
+			deleteFileList
+		}
       $.ajax({
          url : "/review/update",
          type : "POST",
-         data : {
-            "postNo" : postNo,
-            //"author" : author,
-            "rating" : rating,
-            "content" : content,
-            "productId" : productId,
-            "page" : page
-         },
+         contentType : "application/json",
+         data : JSON.stringify(sendData),
          dataType : "JSON",
          async : false,
          success : function(data) {
@@ -457,6 +482,8 @@
       
       $('#review-' + index + ' div.reply').html(output);
       $('#review-' + index + ' div.product-rating').html(output2);
+      fileList = [];
+      deleteList = [];
    }
    
    // 리뷰 삭제 클릭 시
@@ -597,33 +624,39 @@
       return result;
    }
    
-   // 업로드 된 파일 표시       
-   function showUploadedFile(key, json) {
-      let output = "";
-      let index = 0;
-      for(let data of json){
-         let name = data.thumbnailFileName.replaceAll("\\", "/");
-         output += `<span><img src='../resources/uploads\${name}'/><i class="fa-solid fa-circle-xmark u-img" style="color: #fc1d1d;"></i></span>`;
-         index++;
-      }
-      if (key === "insert") {
-         $('#insert-uploadFiles').html(output);
-      } else if (key === "update") {
-         $('#update-uploadFiles').html(output);
-      }
-      uploadFileDelete();
-   }
+	// 업로드 된 파일 표시
+	function showUploadedFile(key) {
+		let output = "";
+		let deleteList = [];
+		for (let deleteData of deleteFileList) {
+			deleteList.push(deleteData.split("thumb_")[1]);
+		}
+		for (let data of fileList){
+			let newFileName = data.newFileName;
+			newFileName = newFileName.substring(newFileName.lastIndexOf("\\") + 1);
+			if (deleteList.includes(newFileName) === false) {
+				let name = data.thumbnailFileName.replace("\\", "/");
+				output += `<span><img src='../resources/uploads\${name}'/><i class="fa-solid fa-circle-xmark u-img" style="color: #fc1d1d;"></i></span>`;
+			}
+		}
+		if (key === "insert") {
+			$('#insert-uploadFiles').html(output);
+		} else if (key === "update") {
+			$('#update-uploadFiles').html(output);
+		}
+		uploadFileDelete();
+	}
    
-   // 페이지 나갈 시
-   window.onbeforeunload = function (e) {
-      console.log("beforeunload 실행");
-       window.navigator.sendBeacon('/review/refreshFile');
-   };
-             
-   // form버튼으로 페이지 이동 시
-   $(document).on("submit", "form", function (e) {
-      window.onbeforeunload = null;
-   });
+	// 페이지 나갈 시
+	window.onbeforeunload = function (e) {
+		console.log("beforeunload 실행");
+		window.navigator.sendBeacon('/review/refreshFile');
+	};
+	
+	// form버튼으로 페이지 이동 시
+	$(document).on("submit", "form", function (e) {
+		window.onbeforeunload = null;
+	});
 </script>
    
 <style type="text/css">
@@ -1079,7 +1112,8 @@
                                                       <h4 class="fw-500">Add a review</h4>
                                                    </div>
                                                    
-                                                   <form action="/review/saveReview" method="POST" enctype="multipart/form-data" onsubmit="return isValid();">
+                                                   <!-- <form action="/review/saveReview" method="POST" enctype="multipart/form-data" onsubmit="return isValid();"> -->
+                                                   <form id="review-form">
                                                       <input type="hidden" name="productId" value="${product.productId }">
                                                      <div class="row g-4">
                                                         <!-- 평점 넣기 -->
@@ -1122,7 +1156,7 @@
                                                          
                                                          <div class="col-md-12">
                                                             <div class="form-floating theme-form-floating">
-                                                               <button class="btn" style="background-color: #198754; color: #fff;">리뷰 달기</button>
+                                                               <button class="btn" type="button" id="submit-btn" style="background-color: #198754; color: #fff;">리뷰 달기</button>
                                                             </div>
                                                          </div>
                                                       </div>

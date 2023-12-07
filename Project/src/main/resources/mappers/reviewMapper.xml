@@ -9,21 +9,21 @@
 	<select id="getReviewNo" resultType="Integer">
 		SELECT post_no FROM review_board WHERE author = #{author} ORDER BY post_no DESC limit 1
 	</select>
-	<select id="getPruchaseRecord" resultType="String">
+	<select id="getPurchaseRecord" resultType="String">
 		SELECT o.order_no
 		FROM order_history o
 		INNER JOIN detailed_order_items d
 		ON o.order_no = d.order_no
-		WHERE member_id = '#{memberId}'
+		WHERE member_id = #{memberId}
 			AND delivery_status='배송완료'
-			AND product_id='#{productId}'
+			AND product_id=#{productId}
 		GROUP BY o.order_no
 	</select>
 	<select id="firstCheck" resultType="int">
 		SELECT count(post_no) FROM review_board WHERE author=#{memberId} AND product_id=#{productID}
 	</select>
 	<select id="isExists" resultType="int">
-		SELECT post_no FROM review_board WHERE author=#{memberId} AND product_id=#{productId} AND is_delete = 'N'
+		SELECT count(post_no) FROM review_board WHERE author=#{memberId} AND product_id=#{productId} AND is_delete = 'N'
 	</select>
 	<select id="getPointRule" resultType="Integer">
 		SELECT point FROM point_rules WHERE reason=#{reason}
