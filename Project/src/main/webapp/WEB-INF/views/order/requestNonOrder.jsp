@@ -58,12 +58,18 @@ let finalTotal = 0;
 		$('#nonRecipientPhoneNumber').on('blur', function () {
 			let regNumber = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
 			if (regNumber.test($('#nonRecipientPhoneNumber').val())) {
+				let addHyphen = $('#nonRecipientPhoneNumber').val().replace(/[^0-9]/g, '').replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
+				$('#nonRecipientPhoneNumber').val(addHyphen);
 				isValidCellPhone = true;	
 			} else {
-				alert("올바른 전화번호가 아닙니다.")
+				alert("올바른 전화번호가 아닙니다.");
+				$('#nonRecipientPhoneNumber').val("");
 				isValidCellPhone = false;
 			}
+				
 		});
+		
+		
 	
 		$("#nonOrderNo").val(orderId);
 		  $("#payToAmount").text((totalAmount + shippingFee).toLocaleString('ko-KR'));	    

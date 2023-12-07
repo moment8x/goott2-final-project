@@ -64,7 +64,9 @@
 	let update = false;
 	let postNo = new URLSearchParams(location.search).get('postNo');
 	let content = ("${requestScope.inquiry.content}");
-	let files2 = [];
+	let objList = [];
+	let deleteList = [];
+
 	
 	$(function() {
 		convertedContent = content.replaceAll("<br />","\r\n");
@@ -111,7 +113,6 @@
 					
 						let form = new FormData();
 						form.append("uploadFile", files[i]); // 파일의 이름을 컨트롤러단의 MultipartFile 객체명과 맞춘다.
-						form.append("files2", files2);
 						$.ajax({
 							url : "/cs/uploadFile",
 							type : "post",
@@ -123,6 +124,8 @@
 							success : function(data) {
 								console.log("업로드성공", data);
 								if (data != null) {
+									console.log(data);
+									addObject(data);
 									showUploadedFile(data);
 								}
 							},
@@ -137,6 +140,15 @@
 				}
 		});
 	})
+	
+	function addObject(data) {
+		let i = objList.length;
+	    objList[i] = new Object();
+	    objList[i] = data[0];
+	    //objList[i].thumbnailFileName = data[0].thumbnailFileName;
+	      
+		console.log(objList);
+	}
 	
 	// 업로드 된 파일 표시    	
 	function showUploadedFile(json) {
@@ -183,7 +195,8 @@
 			
 			if(purpose == 'save') {
 				saveFile = true;
-			$('#saveInquiry').submit();
+				updateInquiry(saveInquiry);
+			//$('#saveInquiry').submit();
 			} else if (purpose == 'change') { // 수정하려 할 때
 				 $('input').prop('readonly', false);
 				 $('textarea').prop('readonly', false);
@@ -200,11 +213,45 @@
 					alert("변경 사항이 없습니다.");
 				} else {
 					saveFile = true;
-					$('#updateInquiry').submit();
+					updateInquiry();
+					/* $('#updateInquiry').submit(); */
 				}
 			}
 		}
 		closeConfirmModal();
+	}
+	
+	function updateInquiry(text) {
+		let mapping = text;
+		console.log(Number(postNo));
+		inquiry = {
+				"postNo" : Number(postNo),
+				"title" : $('#inquiryTitle').val(),
+				"content" : $('#inquiryContent').val(),
+				"phoneNumber" : "",
+				"inquiryType" : $('#selectState').val(),
+				objList,
+				deleteList,
+		}
+		console.log(inquiry);
+		$.ajax({
+			url : "/cs/"+mapping,
+			type : "POST",
+			contentType : "application/json",
+			data : JSON.stringify(inquiry),
+			async : false,
+			success : function(data) {
+				console.log("업로드성공", data);
+				if (data != null) {
+					console.log(data);
+					addObject(data);
+					showUploadedFile(data);
+				}
+			},
+			error : function(data) {
+				console.log("업로드 실패", data);
+			}
+		});
 	}
 	
 	function checkChanges() {
@@ -237,6 +284,14 @@
 		}
 	};
 	
+	function removeFile(data) {
+		let i = deleteList.length;
+	    deleteList[i] = new Object();
+	    deleteList[i] = data;
+	    //deleteList[i].thumbnailFileName = data.thumbnailFileName;
+		console.log(deleteList);
+	}
+	
 	function removeSpecificImg(id) {
 		console.log(id);
 		let fileName = id.slice(0, -1);
@@ -248,10 +303,12 @@
 				"fileName" : fileName,
 				"purpose" : update,
 			},
-			dataType : "text",
+			dataType : "json",
 			async : false,
 			success : function(data) {
 				console.log("클릭한 이미지 삭제 성공");
+				console.log(data);
+				removeFile(data);
 				let div = document.getElementById(fileName);
 				console.log(fileName);
 				console.log(div);

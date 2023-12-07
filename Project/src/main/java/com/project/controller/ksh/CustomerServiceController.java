@@ -1,6 +1,7 @@
 package com.project.controller.ksh;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,11 +37,9 @@ public class CustomerServiceController {
 
 	@Inject
 	InquiryService inquiryService;
-	
 
 	List<UploadFiles> fileList = new ArrayList<UploadFiles>();
 	List<UploadFiles> deleteFileList = new ArrayList<UploadFiles>();
-
 
 	boolean update = false;
 
@@ -56,21 +56,20 @@ public class CustomerServiceController {
 	}
 
 	@RequestMapping(value = "uploadFile", method = RequestMethod.POST) // 서버
-	public @ResponseBody List<UploadFiles> uploadFile
-	(HttpServletRequest request, MultipartFile uploadFile, @RequestParam(value="files2[]", defaultValue = "") ArrayList<UploadFiles> files) {
+	public @ResponseBody List<UploadFiles> uploadFile(HttpServletRequest request, MultipartFile uploadFile) {
 		// 1. 파일이 저장될 경로 확인
 		System.out.println("안녕요");
+		List<UploadFiles> files = null;
 		String realPath = request.getSession().getServletContext().getRealPath("resources/inquiryUploads");
 		try {
 			// 2. 서비스단에 데이터 전송
-			System.out.println(files.toString());
-//			fileList = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(),
-//					uploadFile.getContentType(), uploadFile.getBytes(), realPath, fileList);
+			files = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(),
+					uploadFile.getContentType(), uploadFile.getBytes(), realPath, fileList);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		System.out.println(fileList.toString());
-		return fileList;
+		return files;
 	}
 
 	@RequestMapping("refreshFile")
@@ -84,21 +83,20 @@ public class CustomerServiceController {
 			}
 			fileList.clear();
 			deleteFileList.clear();
-			
-			
+
 			System.out.println("리프레쉬끝");
 		}
 	}
 
 	@RequestMapping(value = "saveInquiry", method = RequestMethod.POST)
-	public String saveInquiry(CustomerInquiry inquiry, HttpServletRequest request) {
+	public String saveInquiry(CustomerInquiryDTO inquiry, HttpServletRequest request) {
 		System.out.println(inquiry.toString());
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 
 		try {
 			inquiry.setAuthor(member.getMemberId());
-			inquiryService.saveInquiry(inquiry, fileList);
+			inquiryService.saveInquiry(inquiry, inquiry.getObjList());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -117,9 +115,10 @@ public class CustomerServiceController {
 	}
 
 	@RequestMapping(value = "viewInquiry", method = RequestMethod.GET)
-	public String viewInquiry(HttpServletRequest request, Model model, @RequestParam(value = "pageNo", defaultValue = "1") int pageNo) {
+	public String viewInquiry(HttpServletRequest request, Model model,
+			@RequestParam(value = "pageNo", defaultValue = "1") int pageNo) {
 		String path = isLogin("viewInquiry", request);
-		System.out.println(pageNo +"페이지의 1:1 문의 내역");
+		System.out.println(pageNo + "페이지의 1:1 문의 내역");
 		List<CustomerInquiry> myInquiries = null;
 		PagingInfo pi = null;
 		if (path.contains("cs")) {
@@ -128,56 +127,61 @@ public class CustomerServiceController {
 				String memberId = ((Memberkjy) session.getAttribute("loginMember")).getMemberId();
 				// 제목, 답변상태, 글 번호 필요
 				try {
-					Map<String, Object> map = inquiryService.getInquiries(memberId,pageNo);
-					myInquiries = (List<CustomerInquiry>)map.get("myInquiries");
-					pi = (PagingInfo)map.get("pagingInfo");
+					Map<String, Object> map = inquiryService.getInquiries(memberId, pageNo);
+					myInquiries = (List<CustomerInquiry>) map.get("myInquiries");
+					pi = (PagingInfo) map.get("pagingInfo");
 					System.out.println(myInquiries.toString());
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				model.addAttribute("myInquiries", myInquiries);
-				model.addAttribute("pagingInfo", pi); 
+				model.addAttribute("pagingInfo", pi);
 			}
 		}
 		return path;
 	}
 
 	@RequestMapping(value = "removeSpecificImg", method = RequestMethod.GET)
-	public ResponseEntity<String> removeSpecificImg(@RequestParam("fileName") String thumbFileName,
+	public @ResponseBody UploadFiles removeSpecificImg(@RequestParam("fileName") String thumbFileName,
 			@RequestParam("purpose") String purpose, HttpServletRequest request) {
 		// 서버만 지우기
+		UploadFiles result = new UploadFiles();
 		System.out.println("오긴와?" + purpose.toString());
 		String realPath = request.getSession().getServletContext().getRealPath("resources/inquiryUploads");
 		String fileName = thumbFileName.replace("thumb_", ""); // newFileName
 		UploadFiles file = new UploadFiles();
 		file.setNewFileName(fileName);
 		file.setThumbnailFileName(thumbFileName);
-		ResponseEntity<String> result = new ResponseEntity<String>("fail", HttpStatus.CONFLICT);
-		int i = 0;
+		result = file;
+
+
+//		int i = 0;
 		if (purpose.equals("true")) {
-			System.out.println("수정하는데 파일 삭제하세요?");
-			deleteFileList.add(file);
-			result = new ResponseEntity<String>("success", HttpStatus.OK);
+			System.out.println("수정 시 파일 삭제");
+			//deleteFileList.add(file);
+			
 		} else if (purpose.equals("delete")) {
+			System.out.println("일단 여기까지 오긴한다만...");
 			if (ufService.deleteFile(file, realPath) > 0) {
 				System.out.println("작성할 때 올린 파일 취소!");
 			}
 		} else {
 			if (ufService.deleteFile(file, realPath) > 0) {
 				System.out.println("진짜지운다?");
-				for (UploadFiles uf : fileList) {
-					System.out.println("uf : " + uf.getNewFileName());
-					System.out.println("fileName : " + fileName.substring(12));
-					if (uf.getNewFileName().contains(fileName.substring(12))) {
-
-						break;
-					}
-					i++;
-				}
-				fileList.remove(i);
-				result = new ResponseEntity<String>("success", HttpStatus.OK);
+//				for (UploadFiles uf : fileList) {
+//					System.out.println("uf : " + uf.getNewFileName());
+//					System.out.println("fileName : " + fileName.substring(12));
+//					if (uf.getNewFileName().contains(fileName.substring(12))) {
+//
+//						break;
+//					}
+////					i++;
+//				}
+//				fileList.remove(i);
+				
 			}
+		
 		}
 
 		return result;
@@ -205,12 +209,12 @@ public class CustomerServiceController {
 					if (inquiry.getUploadFilesSeq() > 0) {
 						System.out.println("파일이 있다고요");
 						List<UploadFiles> uploadFiles = inquiryService.getInquiryFiles(inquiry.getAuthor(), postNo);
-						
+
 						if (uploadFiles != null) {
 							model.addAttribute("uploadFiles", uploadFiles);
-						} 
+						}
 					} else {
-					
+
 					}
 					update = true;
 					model.addAttribute("inquiry", inquiry);
@@ -229,9 +233,9 @@ public class CustomerServiceController {
 	}
 
 	@RequestMapping(value = "updateInquiry", method = RequestMethod.POST)
-	public String updateInquiry(CustomerInquiry inquiry, HttpServletRequest request) {
-		
-		System.out.println(deleteFileList.toString());
+	public String updateInquiry(@RequestBody CustomerInquiryDTO inquiry, HttpServletRequest request) {
+
+		System.out.println(inquiry.toString());
 		HttpSession session = request.getSession();
 		// postNo 조작해서 넘어올 수 있으므로 체크 필요 (수정하려는 사람이 수정하려는 글의 작성자와 일치하는지)
 		try {
@@ -243,18 +247,15 @@ public class CustomerServiceController {
 				if (yaho > 0) { // inquiry 가져옴
 					// 작성자 일치, 수정 가능
 					inquiry.setAuthor(memberId);
-					if (deleteFileList.size() > 0) {
-						for (UploadFiles delFile : deleteFileList) {
+					if (inquiry.getDeleteList().size() > 0) {
+						for (UploadFiles delFile : inquiry.getDeleteList()) {
 							removeSpecificImg(delFile.getThumbnailFileName(), "delete", request);
 						}
 					}
-					System.out.println(deleteFileList.toString());
-					if (inquiryService.updateInquiry(inquiry, deleteFileList, fileList) > 0) {
+					if (inquiryService.updateInquiry(inquiry, inquiry.getDeleteList(), inquiry.getObjList()) > 0) {
 						System.out.println("파일처리 무찔렀다! 와아!");
 					}
 					;
-					fileList.clear();
-					deleteFileList.clear();
 				}
 				;
 			}
@@ -263,8 +264,7 @@ public class CustomerServiceController {
 			e.printStackTrace();
 		}
 
-		
-		return "redirect:/cs/detailInquiry?postNo=" + inquiry.getPostNo();
+		return inquiry.getAuthor();
 	}
 
 	@RequestMapping(value = "delete", method = RequestMethod.GET)

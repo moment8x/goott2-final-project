@@ -9,7 +9,7 @@ import com.project.vodto.ksh.CustomerInquiryDTO;
 
 public interface InquiryService {
 
-	int saveInquiry(CustomerInquiry inquiry, List<UploadFiles> fileList) throws Exception;
+	int saveInquiry(CustomerInquiryDTO inquiry, List<UploadFiles> fileList) throws Exception;
 
 	Map<String, Object> getInquiries(String memberId, int pageNo) throws Exception;
 
@@ -19,7 +19,7 @@ public interface InquiryService {
 
 	int checkValidation(int postNo, String memberId) throws Exception;
 
-	int updateInquiry(CustomerInquiry inquiry, List<UploadFiles> deleteFileList,List<UploadFiles> fileList) throws Exception;
+	int updateInquiry(CustomerInquiryDTO inquiry, List<UploadFiles> deleteFileList,List<UploadFiles> fileList) throws Exception;
 
 	int deleteInquiry(int postNo, String memberId, String realPath) throws Exception;
 

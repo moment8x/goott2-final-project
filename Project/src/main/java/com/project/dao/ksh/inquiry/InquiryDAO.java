@@ -11,7 +11,7 @@ import com.project.vodto.ksh.UploadFilesDTO;
 
 public interface InquiryDAO {
 
-	CustomerInquiry saveInquiry(CustomerInquiry inquiry) throws Exception;
+	CustomerInquiryDTO saveInquiry(CustomerInquiryDTO inquiry) throws Exception;
 
 	int insertUploadImage(UploadFiles file) throws Exception;
 
@@ -27,7 +27,7 @@ public interface InquiryDAO {
 
 	int deleteFiles(List<UploadFiles> deleteFiles) throws Exception;
 
-	int updateInquiry(CustomerInquiry inquiry) throws Exception;
+	int updateInquiry(CustomerInquiryDTO inquiry) throws Exception;
 
 	int deleteInquiry(CustomerInquiryDTO inquiry) throws Exception;
 	
