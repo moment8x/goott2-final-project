@@ -145,10 +145,10 @@ public interface MemberDAO {
 	int updateRefundAccount(String memberId, CancelDTO tmpCancel) throws SQLException, NamingException;
 	
 	//환불테이블 인서트
-	int insertRefund(String productId, int totalRefundAmount, int actualRefundAmount, int refundRewardUsed, int refundPointUsed, int refundCouponDiscount) throws SQLException, NamingException;
+	int insertRefund(String productId, int totalRefundAmount, int actualRefundAmount, int refundRewardUsed, int refundPointUsed, int refundCouponDiscount, String paymentMethod) throws SQLException, NamingException;
 	
 	//취소시 사용한 적립금이 있다면 적립금 로그 인서트
-	int insertRewardLog(String memberId, CancelDTO tmpCancel, int totalReward) throws SQLException, NamingException;
+	int insertRewardLog(String memberId, String orderNo, int refundRewardUsed, int totalReward) throws SQLException, NamingException;
 	
 	//멤버 적립금 업데이트
 	int updateMemberReward(int addReward, String memberId) throws SQLException, NamingException;

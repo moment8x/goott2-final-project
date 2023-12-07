@@ -406,26 +406,26 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public int insertRefund(String productId, int totalRefundAmount, int actualRefundAmount, int refundRewardUsed, int refundPointUsed, int refundCouponDiscount)
+	public int insertRefund(String productId, int totalRefundAmount, int actualRefundAmount, int refundRewardUsed, int refundPointUsed, int refundCouponDiscount, String paymentMethod)
 			throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
-//		params.put("productId", productId);
-//		params.put("amount", amountAfterDiscount);
-//		params.put("refundRewardUsed", tmpCancel.getRefundRewardUsed());
-//		params.put("refundPointUsed", tmpCancel.getRefundPointUsed());
-//		params.put("totalRefundAmount", amountBeforeDiscount);
-//		params.put("paymentMethod", paymentMethod);
+		params.put("productId", productId);
+		params.put("totalRefundAmount", totalRefundAmount);
+		params.put("actualRefundAmount", actualRefundAmount);
+		params.put("refundRewardUsed", refundRewardUsed);
+		params.put("refundPointUsed", refundPointUsed);
+		params.put("refundCouponDiscount", refundCouponDiscount);
+		params.put("paymentMethod", paymentMethod);
 		
 		return ses.insert(ns + ".insertRefund", params);
 	}
 	
 	@Override
-	public int insertRewardLog(String memberId, CancelDTO tmpCancel, int totalReward)
-			throws SQLException, NamingException {
+	public int insertRewardLog(String memberId, String orderNo, int refundRewardUsed, int totalReward) throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("memberId", memberId);
-		params.put("refundRewardUsed", tmpCancel.getRefundRewardUsed());
-		params.put("orderNo", tmpCancel.getOrderNo());
+		params.put("refundRewardUsed", refundRewardUsed);
+		params.put("orderNo", orderNo);
 		params.put("balance", totalReward);
 		
 		return ses.insert(ns + ".insertRewardLog", params);
