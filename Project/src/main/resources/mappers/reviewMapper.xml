@@ -7,7 +7,7 @@
 		INSERT INTO review_board(author, content, ref, rating, product_id) VALUES(#{author}, #{content}, #{ref}, #{rating}, #{productId})
 	</insert>
 	<select id="getReviewNo" resultType="Integer">
-		SELECT post_no FROM review_board WHERE author = #{author} limit 1
+		SELECT post_no FROM review_board WHERE author = #{author} ORDER BY post_no DESC limit 1
 	</select>
 	<select id="getPruchaseRecord" resultType="String">
 		SELECT o.order_no

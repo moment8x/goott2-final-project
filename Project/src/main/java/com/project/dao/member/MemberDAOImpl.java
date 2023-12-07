@@ -297,12 +297,12 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	
 	@Override
-	public List<CouponHistory> getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException {
+	public CouponHistory getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("memberId", memberId);
 		params.put("orderNo", orderNo);
 		
-		return ses.selectList(ns + ".getCouponsHistory", params);
+		return ses.selectOne(ns + ".getCouponsHistory", params);
 	}
 	
 	@Override
@@ -376,12 +376,12 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	
 	@Override
-	public int insertCancelOrder(String productId, String reason, int amountBeforeDiscount, int detailedOrderId, String paymentMethod)
+	public int insertCancelOrder(String productId, String reason, int amount, int detailedOrderId, String paymentMethod)
 			throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("productId", productId);
 		params.put("reason", reason);
-		params.put("amount", amountBeforeDiscount);
+		params.put("amount", amount);
 		params.put("detailedOrderId", detailedOrderId);
 		params.put("paymentMethod", paymentMethod);
 		
@@ -406,15 +406,15 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public int insertRefund(String productId, CancelDTO tmpCancel, String paymentMethod, int amountAfterDiscount, int amountBeforeDiscount)
+	public int insertRefund(String productId, int totalRefundAmount, int actualRefundAmount, int refundRewardUsed, int refundPointUsed, int refundCouponDiscount)
 			throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("productId", productId);
-		params.put("amount", amountAfterDiscount);
-		params.put("refundRewardUsed", tmpCancel.getRefundRewardUsed());
-		params.put("refundPointUsed", tmpCancel.getRefundPointUsed());
-		params.put("totalRefundAmount", amountBeforeDiscount);
-		params.put("paymentMethod", paymentMethod);
+//		params.put("productId", productId);
+//		params.put("amount", amountAfterDiscount);
+//		params.put("refundRewardUsed", tmpCancel.getRefundRewardUsed());
+//		params.put("refundPointUsed", tmpCancel.getRefundPointUsed());
+//		params.put("totalRefundAmount", amountBeforeDiscount);
+//		params.put("paymentMethod", paymentMethod);
 		
 		return ses.insert(ns + ".insertRefund", params);
 	}
@@ -691,6 +691,43 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectOne(ns + ".selectMyReview", params);
 	}
 
+	@Override
+	public List<UploadFiles> selectMyReviewUf(String memberId, int postNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("postNo", postNo);
+		
+		return ses.selectList(ns + ".selectMyReviewUf", params);
+	}
+
+	@Override
+	public List<String> selectCouponCategoryKey(String orderNo, String memberId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.selectList(ns + ".selectCouponCategoryKey", params);
+	}
+	
+	@Override
+	public List<CouponHistory> getOrderCouponsHistory(String memberId, String orderNo)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		
+		return ses.selectList(ns + ".getOrderCouponsHistory", params);
+	}
+	
+	@Override
+	public int selectDetailOrderId(String productId, String orderNo) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("productId", productId);
+		params.put("orderNo", orderNo);
+		
+		return ses.selectOne(ns + ".selectDetailOrderId", params);
+	}
+
 
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
@@ -733,6 +770,8 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.insert(ns + ".insertShipping", shipping);
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+
 
 
 

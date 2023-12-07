@@ -96,7 +96,7 @@
 	</update>
 	
 	<select id="getDetailOrder" resultType="com.project.vodto.jmj.DetailOrder"> 
-		select d.product_price,d.product_quantity, d.product_status, prod.product_id, d.detailed_order_id, o.delivery_status,
+		select d.product_price,d.product_quantity, d.product_status, prod.product_id, d.detailed_order_id, o.delivery_status, prod.category_key,
 		(SELECT p.product_image FROM product_images p WHERE p.product_id = prod.product_id limit 1) AS product_image, prod.product_name, d.product_invoice_number
 	    from detailed_order_items d, products prod, order_history o, (SELECT * FROM product_images GROUP BY product_id) p
 	    where member_id = #{memberId} and d.order_no = #{orderNo}
@@ -142,10 +142,11 @@
 	</update>
 
 	<select id="getCouponsHistory" resultType="com.project.vodto.jmj.CouponHistory">
-		select c.discount_amount, c.coupon_name, cl.expiration_date, cl.coupon_logs_seq
-		from coupons c, coupon_logs cl
+		select sum(coupon_discount) coupon_discount, c.coupon_name, cl.expiration_date, cl.coupon_logs_seq, d.order_no
+		from coupons c, coupon_logs cl, detailed_order_items d
 		where cl.member_id = #{memberId} and cl.related_order = #{orderNo}
 		and c.coupon_number = cl.coupon_number
+        and d.order_no = cl.related_order
 	</select>
 	
 	<select id="getBankTransfer" resultType="com.project.vodto.jmj.GetBankTransfer">
@@ -254,7 +255,7 @@
 	</select>
 	
 	<select id="selectCancelOrder" resultType="com.project.vodto.jmj.DetailOrder">
-		select d.product_price,d.product_quantity, d.product_status, prod.product_id, d.detailed_order_id, pay.payment_method,
+		select d.product_price,d.product_quantity, d.product_status, prod.product_id, d.detailed_order_id, pay.payment_method, prod.category_key, d.coupon_discount,
 		(SELECT p.product_image FROM product_images p WHERE p.product_id = prod.product_id limit 1) AS product_image, prod.product_name, d.product_invoice_number
 	    from detailed_order_items d, products prod, order_history o, (SELECT * FROM product_images GROUP BY product_id) p, payments pay
 	    where member_id = #{memberId} and d.order_no = #{orderNo} and d.detailed_order_id = #{detailedOrderId}
@@ -290,12 +291,12 @@
 		</selectKey>
 		<choose>
 			<when test="paymentMethod != null and paymentMethod.equals('bkt')">
-				insert into refunds(product_id, total_refund_amount, refund_reward_used, refund_point_used, actual_refund_amount, cancel_id)
-				values (#{productId},#{totalRefundAmount},#{refundRewardUsed},#{refundPointUsed}, #{amount}, #{no})
+				insert into refunds(product_id, total_refund_amount, actual_refund_amount, refund_reward_used, refund_point_used, refund_coupon_discount, cancel_id)
+				values (#{productId},#{totalRefundAmount}, #{actualRefundAmount} ,#{refundRewardUsed},#{refundPointUsed}, #{refundCouponDiscount}, #{no})
 			</when>
 			<otherwise>
-				insert into refunds(product_id, total_refund_amount, refund_reward_used, refund_point_used, cancel_id)
-				values (#{productId},#{totalRefundAmount},#{refundRewardUsed},#{refundPointUsed}, #{no})
+				insert into refunds(product_id, total_refund_amount, refund_reward_used, refund_point_used, refund_coupon_discount, cancel_id)
+				values (#{productId},#{totalRefundAmount},#{refundRewardUsed},#{refundPointUsed}, #{refundCouponDiscount}, #{no})
 			</otherwise>
 		</choose>
 	</insert>
@@ -457,17 +458,42 @@
 	<select id="selectMyreview" resultType="com.project.vodto.jmj.MyPageReview">
 		select rb.post_no, rb.created_date, rb.content, rb.rating, rb.product_id, rb.is_delete, pi.product_image, p.product_name
 		from review_board rb, (SELECT * FROM product_images GROUP BY product_id) pi, products p
-		where rb.author = #{memberId}
+		where rb.author = #{memberId} and rb.is_delete='N'
 		and rb.product_id = pi.product_id
-		and pi.product_id = p.product_id
+		and pi.product_id = p.product_id order by rb.created_date desc
 	</select>
 	
 	<select id="selectMyReview" resultType="com.project.vodto.jmj.MyPageReview">
 		select rb.post_no, rb.created_date, rb.content, rb.rating, rb.product_id, rb.is_delete, pi.product_image, p.product_name
 		from review_board rb, (SELECT * FROM product_images GROUP BY product_id) pi, products p
-		where rb.author = #{memberId} and post_no = #{postNo}
+		where rb.author = #{memberId} and post_no = #{postNo} and rb.is_delete='N'
 		and rb.product_id = pi.product_id
 		and pi.product_id = p.product_id
+	</select>
+	
+	<select id="selectMyReviewUf" resultType="com.project.vodto.UploadFiles">
+		select uf.* from upload_files uf, review_uf ru, review_board rb
+		where rb.author = #{memberId} and rb.is_delete = 'N' and rb.post_no = #{postNo}
+		and uf.upload_files_seq = ru.upload_files_seq
+		and ru.post_no = rb.post_no
+	</select>
+	
+	<select id="selectCouponCategoryKey" resultType="String">
+		select cc.category_key from coupon_logs cl, coupon_categories cc
+		where cl.member_id = #{memberId} and cl.related_order = #{orderNo}
+		and cl.coupon_number = cc.coupon_number
+	</select>
+	
+	<select id="getOrderCouponsHistory" resultType="com.project.vodto.jmj.CouponHistory">
+		select coupon_discount, c.coupon_name, cl.expiration_date, cl.coupon_logs_seq, d.order_no, d.product_id, d.detailed_order_id
+		from coupons c, coupon_logs cl, detailed_order_items d
+		where cl.member_id = #{memberId} and cl.related_order = #{orderNo}
+		and c.coupon_number = cl.coupon_number
+        and d.order_no = cl.related_order
+	</select>
+	
+	<select id="selectDetailOrderId" resultType="int">
+		select detailed_order_id from detailed_order_items where product_id = #{productId} and order_no = #{orderNo}
 	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">

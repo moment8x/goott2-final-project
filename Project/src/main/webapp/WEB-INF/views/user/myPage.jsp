@@ -908,6 +908,7 @@
 		$('.custome-pagination').html(output)
 	}
 	
+	//찜 삭제
 	function delWishlist(productId) {
 		$.ajax({
 			url : '/user/delWishlist', // 데이터를 수신받을 서버 주소
@@ -922,7 +923,7 @@
 				if(data == "success"){
 					let wishlistItem = $('#' + productId);
 	                wishlistItem.fadeOut(300, function () {
-	                    wishlistItem.remove(); // 또는 wishlistItem.hide();
+	                    wishlistItem.remove();
 	                });
 				}
 			},
@@ -931,6 +932,7 @@
 		});
 	}
 	
+	//찜 목록에있는 상품 장바구니 추가
 	function addShoppingCart(productId) {
 		$.ajax({
 			url : '/user/addShoppingCart', // 데이터를 수신받을 서버 주소
@@ -951,6 +953,7 @@
 		});
 	}
 	
+	//리뷰랑 리뷰uf가져오기
 	function selectReview(postNo) {
 		$.ajax({
 			url : '/user/selectModifyReview', // 데이터를 수신받을 서버 주소
@@ -962,18 +965,19 @@
 			async : false,
 			success : function(data) {
 				console.log(data)
-				let output = `<table class="table mb-0 productInfo">`;
+				let output = `<div class="modal-body">`
+				output += `<table class="table mb-0 productInfo">`;
 				output += `<tbody>`;
 				output += `<tr>`;
 				output += `<td class="product-detail">`;
 				output += `<div class="product border-0">`;
-				if(data.productImage == null){
-					output += `<a href="/detail/\${data.productId}" class="product-image">`;
-					output += `<img src="/resources/assets/images/noimage.jpg" class="img-fluid blur-up lazyload" alt="\${data.productName}">`;
+				if(data.review.productImage == null){
+					output += `<a href="/detail/\${data.review.productId}" class="product-image">`;
+					output += `<img src="/resources/assets/images/noimage.jpg" class="img-fluid blur-up lazyload" alt="\${data.review.productName}">`;
 					output += `</a>`;
 				}else{
-					output += `<a href="/detail/\${data.productId}" class="product-image">`;
-					output += `<img src="\${data.productImage}" class="img-fluid blur-up lazyload" alt="\${data.productName}" id="reviewProductImg">`;
+					output += `<a href="/detail/\${data.review.productId}" class="product-image">`;
+					output += `<img src="\${data.review.productImage}" class="img-fluid blur-up lazyload" alt="\${data.review.productName}" id="reviewProductImg">`;
 					output += `</a>`;
 				}
 				output += `</div>`;
@@ -982,82 +986,245 @@
 				output += `</tr>`
 				output += `<tr>`
 				output += `<td class="name">`
-				output += `<a href="/detail/\${data.productId}" id="productName">`
-				output += `<h4 class="table-title text-content">\${data.productName}</h4>` 
+				output += `<a href="/detail/\${data.review.productId}" id="productName">`
+				output += `<h4 class="table-title text-content">\${data.review.productName}</h4>` 
 				output += `</a>`
 				output += `</td>`
 				output += `<td class="name">`
 				output += `<h4 class="table-title text-content">`
-				let rating = `\${data.rating}`
-				output += `<i class="fa-regular fa-star" id="rating1" style="color: #0DA487;" onclick="reviewRating('rating1')" value="1"></i>`					
-				output += `<i class="fa-regular fa-star" id="rating2" style="color: #0DA487;" onclick="reviewRating('rating2')" value="2"></i>`					
-				output += `<i class="fa-regular fa-star" id="rating3" style="color: #0DA487;" onclick="reviewRating('rating3')" value="3"></i>`					
-				output += `<i class="fa-regular fa-star" id="rating4" style="color: #0DA487;" onclick="reviewRating('rating4')" value="4"></i>`					
-				output += `<i class="fa-regular fa-star" id="rating5" style="color: #0DA487;" onclick="reviewRating('rating5')" value="5"></i>`
+				for(let i = 1; i <6; i++){
+					output += `<input type="radio" name="reviewStar" value="\${i}" id="rate\${i}" class='reviewStar'>`	
+					output += `<label for="rate\${i}">`
+					output += `<i class="fa-regular fa-star" id="rating\${i}" style="color: #0DA487;" onclick="reviewRating('rating\${i}')"></i>`	
+					output += `</label>`
+				}
 				output += `</h4>` 
 				output += `</td>`
 				output += `</tr>`
 				output += `</tbody>`
 				output += `</table>`
 				output += `<div class="form-floating mb-4 theme-form-floating">`
-				output += `<textarea rows="7" cols="62" value="">\${data.content}</textarea>`
+				output += `<textarea rows="7" cols="62" id="reviewContent">\${data.review.content}</textarea>`
 				output += `<div>`
 				output += `<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>`
 				output += `몇글자까지 가능?`
 				output += `</div>`
 				output += `</div>`
-				output += `<div class="form-floating mb-4 theme-form-floating">`
-				output += `사진첨부`
-				output += `<div>`
-				output += `<div>`
-				output += `<input type="file" id="uploadReviewImg" /> <input type="button" value="등록" onclick="uploadReviewImg();" />`
+				output += `<div class="mb-3">`
+				output += `<label for="upFile" class="form-label">첨부파일</label>`
+				output += `<div class="upFileArea">업로드할 파일을 드래그앤 드랍 하세요.`
 				output += `</div>`
-				output += `<div class="uploadFile">`
+				output += `<div class="uploadFile"></div>`
+				output += `<div class="modal-footer">`
+				output += `<button type="button" class="btn btn-secondary btn-md"
+					data-bs-dismiss="modal">닫기</button>`
+				output += `<button type="button" class="btn theme-bg-color btn-md text-white"
+					onclick="updateReview(\${data.review.postNo}, '\${data.review.productId}')">수정</button>`
 				output += `</div>`
-				output += `</div>`
+				
+				let postNo = data.review.postNo
+				console.log(postNo)
+				
+				let output2 = ''
+				//DB에 있는 uf출력
+				$.each(data.reviewUf, function(i, elt) {
+					let name = elt.newFileName.replace("\\", "/")
+					console.log(elt.newFileName)
+					if(elt.thumbnailFileName != null){ //이미지
+						let thumb = elt.thumbnailFileName.replace("\\", "/")
+						output2 += `<img src = '/resources/uploads/\${thumb}' class='upImg'  id="\${elt.originalFileName}" />
+						<i class="fa-regular fa-square-minus" onclick ='remFile(\${postNo},this);'></i>`;
+					}else{
+						output2 += `<a href='/resources/uploads/\${name}' id="${postNo}" >\${elt.originalFileName}</a>
+						<i class="fa-regular fa-square-minus" onclick ='remFile(this);'></i>`;
+					}
+				})
+				
+				$('.viewModifyReview').html(output);
+				$('.uploadFile').html(output2);
+				
+				$('.upFileArea').on("dragenter dragover", function(evt) {
+					evt.preventDefault();
+				});
 					
-				$('.modal-body.modifyReview').html(output);
+				$('.upFileArea').on("drop", function(evt) {
+					evt.preventDefault();
+					
+					let files = evt.originalEvent.dataTransfer.files;
+					
+					for(let i = 0; i < files.length; i++){ 
+			            let form = new FormData() //자바스크립트에서 만들었다. form태그를 객체처럼 만들었다.
+			            form.append("uploadFile", files[i]); //파일의 이름을 컨트롤러 단의 MultipartFile 매개변수명과 동일하도록 한다.
+			            console.log(files[i]);
+			         
+			            //업로드한 파일이있다면 추가
+			            modifyReview(form);
+					}
+				});
 			},
 			error : function() {
 			}
 		});
 	}
 
+	//리뷰수정 버튼 누르면
+	function updateReview(postNo, productId) {
+		let rating = $("input:radio[name='reviewStar']:checked").val();
+		let reviewContent = $('#reviewContent').val()
+		$.ajax({
+	         url: "/user/updateReview",
+	         type: "GET",
+	         data: {
+	            "productId" : productId,
+	            "postNo" : postNo,
+	            "rating" : rating,
+	            "content" : reviewContent
+	         },
+	         dataType: "JSON",
+	         async: false,
+	         success: function(data) {
+	            console.log("success", data);
+	            if (data.status === "success") {
+	               $('#modifyReviewModal').hide
+	               location.reload()
+	            } 
+	         }, error: function(data) {
+	            console.log("err", data);
+	         }
+	      });
+	}
+	
+	//리뷰 삭제 버튼 누르면
+	function delReview(postNo, productId) {
+	      $.ajax({
+	         url: "/user/deleteReview",
+	         type: "POST",
+	         data: {
+	            "productId" : productId,
+	            "postNo" : postNo,
+	         },
+	         dataType: "JSON",
+	         async: false,
+	         success: function(data) {
+	            console.log("delete", data);
+	            let review = $('#' + productId);
+	            review.fadeOut(300, function () {
+	            	review.remove();
+	            })
+	         }, error: function(data) {
+	            console.log("err", data);
+	         }
+	      });
+	}
+	
+	//업로드파일 추가
+	function modifyReview(form) {
+		$.ajax({
+			url : 'modifyReview', // 데이터를 수신받을 서버 주소
+			type : 'POST', // 통신방식(GET, POST, PUT, DELETE)
+			data : form, 
+			dataType : 'json',
+			async : false,
+			processData : false, //text데이터에 대해 쿼리스트링 처리를 하지 않겠다
+			contentType : false, // 파일은 2진수로 되어있어서 인코딩 처리를 안 함. 디폴트는 인코딩 처리해서 서버로 보냄.x-www-form-urlencoded 처리 안 함(인코딩 하지 않음)
+			success : function(data) {
+				console.log(data);
+				
+				if(data != null){
+					showUploadedFile(data);
+				}
+			},
+		});
+	}
+	
+	//업로드한 파일이있다면 추가
+	function showUploadedFile(file) {
+		let output = "";
+		
+		$.each(file, function(i, elt) {
+				let name = elt.newFileName.replace("\\", "/");
+			if(elt.thumbnailFileName != null){ //이미지
+				let thumb = elt.thumbnailFileName.replace("\\", "/");
+				output += `<img src = '/resources/uploads/\${thumb}'  id="\${elt.originalFileName}" class='upImg'/>
+					<i class="fa-regular fa-square-minus" onclick ='remFile(this);'></i>`;
+			}else{
+				output += `<a href='/resources/uploads/\${name}' id="\${elt.originalFileName}" >\${elt.originalFileName}</a>
+					<i class="fa-regular fa-square-minus" onclick ='remFile(this);'></i>`;
+			}
+
+		})
+		$('.uploadFile').append(output);
+	}
+
+	//별점 아이콘변경
 	function reviewRating(id) {
 		let reviewRatingId = $(`#\${id}`);
-		
 		if (reviewRatingId.hasClass("fa-regular")) {
 			reviewRatingId.removeClass("fa-regular").addClass("fa-solid")
-			console.log(reviewRatingId.attr("value"))
 		}else if (reviewRatingId.hasClass("fa-solid")) {
 			reviewRatingId.removeClass("fa-solid").addClass("fa-regular")
 		}
 	}
 	
-	function uploadReviewImg() {
+	//업로드파일 삭제버튼 눌렀을 때
+	function remFile(postNo, fileId) {
+		let removeFile = $(fileId).prev().attr('src')
+		let removeFileId = $(fileId).prev().attr('id')
+		console.log(removeFile)
+		//alert(postNo + "번 파일")
+		//console.log(thumbFileName + "썸네일 이름!!")
+		let thumbFileName = removeFile.split("/resources/uploads")[1]
+		console.log(postNo)
+		console.log(thumbFileName)
 		
+		$.ajax({
+			url : 'deleteUploadFile', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE) 
+			data : {
+				postNo,
+				thumbFileName
+			}, 
+			dataType : 'text',
+			async : false,
+			success : function(data) {
+				console.log(data);
+					$(fileId).prev().remove();
+					$(fileId).remove();
+			},
+		});
 	}
 
 </script>
 <style>
-.upFileArea{
+.wishItemName, .wishItemPrice{
+	text-align: center;
+}
+#writeInquiry {
+	margin-left: 800px;
+}
+
+.reviewStar {
+	display: none;
+}
+
+.upFileArea {
 	width: 100%;
 	height: 100px;
 	border: 1px dotted #333;
 	padding: 10px;
-		
 	font-weight: bold;
 	color: #d6d2d8;
 	font-size: 20px;
-		
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
-#reviewProductImg{
+
+#reviewProductImg {
 	height: 250px;
 	margin-left: 140px;
 }
+
 #deliveryStatus, #successPwd, #successPhoneNumber,
 	#successCellPhoneNumber, #successEmail, #successAddr, #successRefund,
 	#checkOrder {
@@ -1194,6 +1361,7 @@
 </head>
 
 <body>
+
 	<!-- Loader Start -->
 
 	<!-- Loader End -->
@@ -1347,10 +1515,11 @@
 							</li>
 
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="pills-profile-tab"
-									data-bs-toggle="pill" data-bs-target="#pills-profile"
-									type="button" role="tab" aria-controls="pills-profile"
-									aria-selected="false">
+								<button class="nav-link" id="pills-inquiry-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-inquiry"
+									type="button" role="tab" aria-controls="pills-inquiry"
+									aria-selected="false"
+									onclick="location.href='/cs/viewInquiry';">
 									<i data-feather="help-circle"></i>1:1문의내역
 								</button>
 							</li>
@@ -1612,11 +1781,11 @@
 													<div class="product-footer">
 														<div class="product-detail">
 															<a href="/detail/${item.productId }">
-																<h5 class="name">${item.productName }</h5>
+																<h5 class="name wishItemName">${item.productName }</h5>
 															</a>
 
 
-															<h5 class="price">
+															<h5 class="price wishItemPrice">
 																<span class="theme-color"> <fmt:formatNumber
 																		value="${item.sellingPrice }" type="NUMBER" /> 원
 																</span>
@@ -1687,7 +1856,6 @@
 									</div>
 									<div class="order-contain orderHistory">
 										<div class="order-box dashboard-bg-box">
-											${orderList }
 											<c:forEach var="order" items="${orderList }">
 												<div class="product-order-detail" id="productOrderDetail">
 													<c:choose>
@@ -2329,7 +2497,7 @@
 																	type="date" /></td>
 															<td>${cl.couponName }</td>
 															<td>${cl.couponNumber }</td>
-															<td><fmt:formatDate value="${cl.obtainedDate }"
+															<td><fmt:formatDate value="${cl.expirationDate }"
 																	type="date" /></td>
 															<td><fmt:formatDate value="${cl.usedDate }"
 																	type="date" /></td>
@@ -2400,11 +2568,11 @@
 											</span>
 										</div>
 									</div>
-									${reviewList }
 									<div class="row g-4">
 										<div class="container mt-3">
 											<c:forEach var="review" items="${reviewList }">
-												<table class="table table-borderless reviewTable">
+												<table class="table table-borderless reviewTable"
+													id="${review.productId}">
 													<tbody>
 														<tr>
 															<td><a href="/detail/${review.productId }"> <c:choose>
@@ -2428,7 +2596,7 @@
 																	onclick="selectReview(${review.postNo})">수정</button></td>
 															<td><button type="button"
 																	class="btn theme-bg-color btn-md text-white delReview"
-																	onclick="delReview();">삭제</button></td>
+																	onclick="delReview(${review.postNo }, '${review.productId }');">삭제</button></td>
 														</tr>
 
 														<tr>
@@ -2451,10 +2619,6 @@
 								</div>
 							</div>
 						</div>
-					</div>
-				</div>
-			</div>
-		</div>
 	</section>
 	<!-- User Dashboard Section End -->
 
@@ -2558,9 +2722,9 @@
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
-
-				<div class="modal-body modifyReview">
-					<!--  <table class="table mb-0 productInfo">
+				<div class="viewModifyReview"></div>
+				<!--  	<div class="modal-body modifyReview">
+					<table class="table mb-0 productInfo">
 						<tbody>
 							<tr>
 								<td class="product-detail">
@@ -2591,22 +2755,15 @@
 							<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>
 							상품에 하자가 있는 경우에만 교환이 가능합니다.
 						</div>
-					</div>-->
-					<div class="form-floating mb-4 theme-form-floating">
-						사진첨부<input type="text" class="form-control" id="exchangeReason"
-							value="상품 하자" name="reason" readonly="readonly" />
-						<div class="deliverMsg">
-							<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>
-							상품에 하자가 있는 경우에만 교환이 가능합니다.
-						</div>
 					</div>
 				</div>
+				<div class="uploadFile"></div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary btn-md"
-						data-bs-dismiss="modal">닫기</button>
+						data-bs-dismiss="modal" onclick="btnCancel();">닫기</button>
 					<button type="button" class="btn theme-bg-color btn-md text-white"
-						onclick="">수정</button>
-				</div>
+						onclick="updateReview()">수정</button>
+				</div>-->
 			</div>
 		</div>
 	</div>
