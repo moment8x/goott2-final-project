@@ -41,8 +41,7 @@ public class ReviewDAOImpl implements ReviewDAO {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("memberId", memberId);
 		params.put("productId", productId);
-		
-		return session.selectList(ns + ".getPruchaseRecord", params);
+		return session.selectList(ns + ".getPurchaseRecord", params);
 	}
 
 	@Override

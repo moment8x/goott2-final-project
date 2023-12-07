@@ -15,7 +15,7 @@ public class DeleteNonMemberSchedule {
 	@Inject
 	private NonShoppingCartDAO ncDao;
 	
-	@Scheduled(cron="0 0 0/1 * * *")
+	@Scheduled(cron="0 0 0 * * *")
 	public void deleteNonMember() throws SQLException, NamingException {
 		System.out.println("만료기한이 지난 비회원 삭제");
 		ncDao.deleteNonMember();

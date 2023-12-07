@@ -1,20 +1,20 @@
-package com.project.vodto;
+package com.project.vodto.kjs;
 
 import java.sql.Timestamp;
 import java.util.List;
 
+import com.project.vodto.UploadFiles;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @ToString
-public class ReviewBoard {
+public class ReviewBoardAddPage {
 	private int postNo;
 	private String author;
 	private Timestamp createdDate;
@@ -28,4 +28,5 @@ public class ReviewBoard {
 	private char isDelete;
 	private List<UploadFiles> fileList;
 	private List<String> deleteFileList;
+	private int page;
 }

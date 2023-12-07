@@ -90,5 +90,98 @@
 	<!-- ==============================================================================================  -->
 	<!-- ============================================ 진솔 ============================================  -->
 	
+	<select id="totalProductsCount" resultType="int">
+		SELECT count(product_id) FROM products
+	</select>
+	<select id="getCategoryChild" resultType="com.project.vodto.ProductCategory">
+		SELECT c.*
+		FROM categories c
+		INNER JOIN category_paths p
+		ON c.id = p.descendant
+		WHERE p.﻿ancestor = #{categoryKey} AND p.depth = 1
+	</select>
+	<select id="getSearchProductsList" resultType="com.project.vodto.kjs.AdminStockListVO">
+		SELECT @rownum:=@rownum+1 AS no, p.product_id, p.product_name, p.current_quantity,
+				category.id as category_key, category.name as category_name,
+        		(SELECT product_image FROM product_images pi WHERE pi.product_id = p.product_id LIMIT 1) as product_image,
+        		p.consumer_price,
+				(SELECT SUM(product_quantity) FROM detailed_order_items doi WHERE doi.product_id = p.product_id) as sales_volume
+		FROM products p
+		INNER JOIN categories category
+		ON category.id = p.category_key
+		INNER JOIN (SELECT @rownum:=0) AS r
+		<where>
+			<choose>
+				<when test='searchKey.equals("productId")'>
+					p.product_id = #{searchValue}
+				</when>
+				<when test='searchKey.equals("categoryName")'>
+					category.name LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey.equals("categoryKey")'>
+					category.id = #{searchValue}
+				</when>
+				<when test='searchKey.equals("ISBN")'>
+					p.isbn = #{searchValue}
+				</when>
+				<when test='searchKey.equals("authorTranslator")'>
+					p.author_translator LIKE CONCAT('%', #{searchValue}, '%') OR p.original_author LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey.equals("illustrator")'>
+					p.illustrator LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey.equals("publisher")'>
+					p.publisher LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey.equals("publicationDate")'>
+					p.publication_date = #{publicationDate}
+				</when>
+				<otherwise>
+					REPLACE(p.product_name, ' ', '') LIKE CONCAT('%', #{searchValue}, '%')
+				</otherwise>
+			</choose>
+			<if test='bestSellerStatus == 0'>
+				AND p.best_seller_status = 0
+			</if>
+			<if test='bestSellerStatus == 1'>
+				AND p.best_seller_status = 1
+			</if>
+			<if test='categoryKey != null and !categoryKey.equals("") and childCategory == 1'>
+				AND p.category_key LIKE CONCAT('%', #{categoryKey}, '%')
+			</if>
+			<if test='(categoryKey != null and !categoryKey.equals("")) and (childCategory == 0 or childCategory.equals(""))'>
+				AND p.category_key = #{categoryKey}
+			</if>
+			<if test='startDate != null and !startDate.equals("") and endDate != null and !endDate.equals("")'>
+				AND DATE_FORMAT(p.publication_date, '%Y-%m-%d') BETWEEN STR_TO_DATE(#{startDate}, '%Y-%m-%d') AND STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+			</if>
+		</where>
+		ORDER BY no DESC
+	</select>
+	<update id="updateStock" parameterType="java.util.List">
+		UPDATE products SET current_quantity = 
+		CASE
+			<foreach collection="list" item="item">
+				WHEN product_id = #{item.productId}
+				THEN #{item.newQuantity}
+			</foreach>
+		END
+		WHERE product_id IN
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item.productId}
+		</foreach>
+	</update>
+	<select id="getSoldOutProducts" resultType="com.project.vodto.kjs.AdminStockListVO">
+		SELECT @rownum:=@rownum+1 AS no, p.product_id, p.product_name, p.current_quantity,
+				category.id as category_key, category.name as category_name,
+        		(SELECT product_image FROM product_images pi WHERE pi.product_id = p.product_id LIMIT 1) as product_image,
+        		p.consumer_price,
+				(SELECT SUM(product_quantity) FROM detailed_order_items doi WHERE doi.product_id = p.product_id) as sales_volume
+		FROM products p
+		INNER JOIN categories category
+		ON category.id = p.category_key
+		INNER JOIN (SELECT @rownum:=0) AS r
+		WHERE p.current_quantity = 0
+	</select>
 	<!-- ==============================================================================================  -->
 </mapper>

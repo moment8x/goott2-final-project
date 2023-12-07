@@ -41,6 +41,7 @@ import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.exchangeDTO;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
+import com.project.vodto.kjy.SnsRegisterInfo;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -808,8 +809,7 @@ public class MemberServiceImpl implements MemberService {
 				newFileName = file.getNewFileName();
 			}
 		}
-		;
-
+		
 		// 회원 가입 - 회원 가입
 		if (mDao.insertMember(member) == 1) {
 			// 배송지 설정
@@ -877,7 +877,19 @@ public class MemberServiceImpl implements MemberService {
 		return result;
 	}
 
-	// --------------------------------------- 김진솔 끝
-	// ----------------------------------------
+	@Override
+	public boolean snsSignUp(SnsRegisterInfo snsInfo) throws SQLException, NamingException {
+		System.out.println("sns가입");
+		if (snsInfo.getEmail() != null) {
+		 	// 네이버
+			
+		} else {
+			// 카카오
+		}
+		
+		return false;
+	}
+	
+	// --------------------------------------- 김진솔 끝 ----------------------------------------
 
 }
