@@ -112,22 +112,29 @@ function changeRatingProductInfo(data) {
     <section>
         <div class="container-fluid-lg">
             <div class="title">
-                <h2>Browse by Categories</h2>
+                <h2>바로 가기</h2>
                 <span class="title-leaf">
                     <svg class="icon-width">
                         <use xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                     </svg>
                 </span>
-                <p>Top Categories Of The Week</p>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="slider-9">
                         <div>
+                            <a href="/login/" class="category-box wow fadeInUp" data-wow-delay="0.15s">
+                                <div>
+                                    <img src="/resources/assets/images/login.png" class="blur-up lazyload" alt="">
+                                    <h5>로그인</h5>
+                                </div>
+                            </a>
+                        </div>
+                        <div>
                             <a href="shop-left-sidebar.html" class="category-box wow fadeInUp">
                                 <div>
-                                    <img src="/resources/assets/svg/1/vegetable.svg" class="blur-up lazyload" alt="">
-                                    <h5>Vegetables & Fruit</h5>
+                                    <img src="/resources/assets/images/invoice.png" class="blur-up lazyload" alt="">
+                                    <h5>주문내역 조회</h5>
                                 </div>
                             </a>
                         </div>
@@ -135,8 +142,8 @@ function changeRatingProductInfo(data) {
                         <div>
                             <a href="shop-left-sidebar.html" class="category-box wow fadeInUp" data-wow-delay="0.05s">
                                 <div>
-                                    <img src="/resources/assets/svg/1/cup.svg" class="blur-up lazyload" alt="">
-                                    <h5>Beverages</h5>
+                                    <img src="/resources/assets/images/shopping-cart.png" class="blur-up lazyload" alt="">
+                                    <h5>장바구니</h5>
                                 </div>
                             </a>
                         </div>
@@ -144,26 +151,18 @@ function changeRatingProductInfo(data) {
                         <div>
                             <a href="shop-left-sidebar.html" class="category-box wow fadeInUp" data-wow-delay="0.1s">
                                 <div>
-                                    <img src="/resources/assets/svg/1/meats.svg" class="blur-up lazyload" alt="">
-                                    <h5>Meats & Seafood</h5>
+                                    <img src="/resources/assets/images/customer-care.png" class="blur-up lazyload" alt="">
+                                    <h5>고객센터</h5>
                                 </div>
                             </a>
                         </div>
 
-                        <div>
-                            <a href="shop-left-sidebar.html" class="category-box wow fadeInUp" data-wow-delay="0.15s">
-                                <div>
-                                    <img src="/resources/assets/svg/1/breakfast.svg" class="blur-up lazyload" alt="">
-                                    <h5>Breakfast</h5>
-                                </div>
-                            </a>
-                        </div>
 
                         <div>
-                            <a href="shop-left-sidebar.html" class="category-box wow fadeInUp" data-wow-delay="0.2s">
+                            <a href="/etc/notice" class="category-box wow fadeInUp" data-wow-delay="0.2s">
                                 <div>
-                                    <img src="/resources/assets/svg/1/frozen.svg" class="blur-up lazyload" alt="">
-                                    <h5>Frozen Foods</h5>
+                                    <img src="/resources/assets/images/notice.png"" class="blur-up lazyload" alt="">
+                                    <h5>공지사항</h5>
                                 </div>
                             </a>
                         </div>
@@ -785,27 +784,6 @@ function changeRatingProductInfo(data) {
     </div>
     <!-- Location Modal End -->
 
-
-    <!-- Cookie Bar Box Start -->
-    <div class="cookie-bar-box">
-        <div class="cookie-box">
-            <div class="cookie-image">
-                <img src="/resources/assets/images/cookie-bar.png" class="blur-up lazyload" alt="">
-                <h2>쿠키 허용</h2>
-            </div>
-
-            <div class="cookie-contain">
-                <h5 class="text-content">더 좋은 사이트를 만들기 위해 쿠키를 사용합니다.</h5>
-            </div>
-        </div>
-
-        <div class="button-group">
-            <button class="btn privacy-button">쿠키 정책 거절</button>
-            <button class="btn ok-button">쿠키 허용</button>
-        </div>
-    </div>
-    <!-- Cookie Bar Box End -->
-
     <!-- Deal Box Modal Start -->
     <div class="modal fade theme-modal deal-modal" id="deal-box" tabindex="-1" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -895,6 +873,8 @@ function changeRatingProductInfo(data) {
         </div>
     </div>
     <!-- Tap to top end -->
+    
+    <jsp:include page="./footer.jsp"></jsp:include>
 
     <!-- Bg overlay Start -->
     <div class="bg-overlay"></div>

@@ -1,6 +1,9 @@
 package com.project.vodto.kjy;
 
 import java.sql.Timestamp;
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +18,7 @@ import lombok.ToString;
 @ToString
 public class Products {
 	private String productId;
+	private String beforeProductId;
 	private String productName;
 	private int consumerPrice;
 	private int supplyPrice;
@@ -38,5 +42,6 @@ public class Products {
 	private String categoryKey;
 	private int currentQuantity;
 	private String productImage;
+	private List<String> productImages;
 	
 }
