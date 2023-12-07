@@ -1,15 +1,9 @@
 package com.project.controller.kkb.admin;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.project.service.AdminProductsService;
-import com.project.vodto.kjs.AdminProductsSearchVO;
-import com.project.vodto.kjs.AdminUpdateStockVO;
-import java.io.IOException;
-import java.util.ArrayList;
-
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
@@ -21,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -29,15 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.project.service.AdminProductsService;
-import com.project.service.kjs.upload.UploadFileService;
-import com.project.service.kjs.upload.UploadFileServiceImpl;
 import com.project.service.kjy.UploadFileServiceNotuf;
 import com.project.vodto.UploadFiles;
+import com.project.vodto.kjs.AdminProductsSearchVO;
+import com.project.vodto.kjs.AdminUpdateStockVO;
 import com.project.vodto.kjs.ProductImage;
 import com.project.vodto.kjy.Categories;
 import com.project.vodto.kjy.Products;
-import java.util.HashMap;
-
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,8 +38,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/admin/products")
 public class AdminProductsController {
 	
-	@Inject
-	private AdminProductsService adminProductsService;
+	private final AdminProductsService adminProductsService;
 	
 	// ----------------------------- 김상희 -----------------------------
 	@GetMapping("/dashBoardMain")
@@ -67,11 +57,8 @@ public class AdminProductsController {
 	
 	// ----------------------------------------------------------------
 	// ----------------------------- 김재용 -----------------------------
-	@Inject
-	private final AdminProductsService adminProductsService;
 	
-	@Inject
-	private UploadFileServiceNotuf fileServiceNotuf;
+	private final UploadFileServiceNotuf fileServiceNotuf;
 	
 	@ResponseBody
 	@RequestMapping("/getAllProducts")

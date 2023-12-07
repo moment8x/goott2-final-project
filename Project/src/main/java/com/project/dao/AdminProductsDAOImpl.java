@@ -1,31 +1,24 @@
 package com.project.dao;
 
 
-import org.apache.ibatis.session.SqlSession;
-import org.springframework.stereotype.Repository;
-
-import com.project.vodto.ProductCategory;
-import com.project.vodto.kjs.AdminStockListVO;
-import com.project.vodto.kjs.AdminUpdateStockVO;
-import com.project.vodto.kjs.AdminProductsSearchVO;
-import com.project.vodto.ksh.AdminProductsList;
-
-import lombok.RequiredArgsConstructor;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.project.vodto.kjy.Products;
+import com.project.vodto.ProductCategory;
 import com.project.vodto.UploadFiles;
+import com.project.vodto.kjs.AdminProductsSearchVO;
+import com.project.vodto.kjs.AdminStockListVO;
+import com.project.vodto.kjs.AdminUpdateStockVO;
 import com.project.vodto.kjs.ProductImage;
 import com.project.vodto.kjy.Categories;
+import com.project.vodto.kjy.Products;
+import com.project.vodto.ksh.AdminProductsList;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Repository
@@ -44,7 +37,7 @@ public class AdminProductsDAOImpl implements AdminProductsDAO {
 	
 	public List<AdminProductsList> getAllProducts(String sellingProducts) {
 		return ses.selectList(ns+".getAllProducts");
-	
+	}
 	// ----------------------------------------------------------------
 	// ----------------------------- 김재용 -----------------------------
 	

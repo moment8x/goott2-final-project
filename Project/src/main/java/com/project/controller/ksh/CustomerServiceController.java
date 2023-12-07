@@ -1,7 +1,6 @@
 package com.project.controller.ksh;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,8 +8,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,13 +17,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.project.vodto.ksh.PagingInfo;
 import com.project.service.kjs.upload.UploadFileService;
 import com.project.service.ksh.inquiry.InquiryService;
 import com.project.vodto.CustomerInquiry;
 import com.project.vodto.UploadFiles;
 import com.project.vodto.kjy.Memberkjy;
 import com.project.vodto.ksh.CustomerInquiryDTO;
+import com.project.vodto.ksh.PagingInfo;
 
 @Controller
 @RequestMapping(value = "/cs/*")
@@ -56,15 +53,15 @@ public class CustomerServiceController {
 	}
 
 	@RequestMapping(value = "uploadFile", method = RequestMethod.POST) // 서버
-	public @ResponseBody List<UploadFiles> uploadFile(HttpServletRequest request, MultipartFile uploadFile) {
+	public @ResponseBody UploadFiles uploadFile(HttpServletRequest request, MultipartFile uploadFile) {
 		// 1. 파일이 저장될 경로 확인
 		System.out.println("안녕요");
-		List<UploadFiles> files = null;
+		UploadFiles files = null;
 		String realPath = request.getSession().getServletContext().getRealPath("resources/inquiryUploads");
 		try {
 			// 2. 서비스단에 데이터 전송
 			files = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(),
-					uploadFile.getContentType(), uploadFile.getBytes(), realPath, fileList);
+					uploadFile.getContentType(), uploadFile.getBytes(), realPath);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
