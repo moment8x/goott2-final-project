@@ -226,8 +226,8 @@ function orderCancel(){
 	//	let totalRefundAmount = ${detailOrder.totalAmount} //취소하는 상품의 할인전금액
 		let actualRefundAmount = $('#refundAmount').text().replace(",", "").replace("원", ""); // 할인후 금액(돌려줄 환불액)
 		
-		console.log("환불포인트" + usedPoint)
-		console.log("환불 적립금" + usedReward)
+	//	console.log("환불포인트" + usedPoint)
+	//	console.log("환불 적립금" + usedReward)
 		console.log("환불금액 " + actualRefundAmount)
 	//	console.log("총 환불금액" + totalRefundAmount)
 		
