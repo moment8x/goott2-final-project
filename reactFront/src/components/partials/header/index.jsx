@@ -62,34 +62,42 @@ const Header = ({ className = 'custom-class' }) => {
              ${menuType === 'horizontal' && width > breakpoints.xl ? 'py-1' : 'md:py-6 py-3'}
         `}
       >
-        <div className="flex justify-between items-center h-full">
+        <div className='flex justify-between items-center h-full'>
           {/* For Vertical  */}
 
           {menuType === 'vertical' && (
-            <div className="flex items-center md:space-x-4 space-x-2 rtl:space-x-reverse">
+            <div className='flex items-center md:space-x-4 space-x-2 rtl:space-x-reverse'>
               {collapsed && width >= breakpoints.xl && (
-                <button className="text-xl text-slate-900 dark:text-white" onClick={() => setMenuCollapsed(!collapsed)}>
-                  {isRtl ? <Icon icon="akar-icons:arrow-left" /> : <Icon icon="akar-icons:arrow-right" />}
+                <button className='text-xl text-slate-900 dark:text-white' onClick={() => setMenuCollapsed(!collapsed)}>
+                  {isRtl ? <Icon icon='akar-icons:arrow-left' /> : <Icon icon='akar-icons:arrow-right' />}
                 </button>
               )}
               {width < breakpoints.xl && <Logo />}
               {/* open mobile menu handlaer*/}
               {width < breakpoints.xl && width >= breakpoints.md && (
-                <div className="cursor-pointer text-slate-900 dark:text-white text-2xl" onClick={handleOpenMobileMenu}>
-                  <Icon icon="heroicons-outline:menu-alt-3" />
+                <div className='cursor-pointer text-slate-900 dark:text-white text-2xl' onClick={handleOpenMobileMenu}>
+                  <Icon icon='heroicons-outline:menu-alt-3' />
                 </div>
               )}
-              <SearchModal />
+              {/* <SearchModal /> */}
+              <a
+                className='cursor-pointer text-slate-900 dark:text-white text-2xl'
+                href='http://localhost:8081/'
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                <Icon icon='heroicons:computer-desktop' />
+              </a>
             </div>
           )}
           {/* For Horizontal  */}
           {menuType === 'horizontal' && (
-            <div className="flex items-center space-x-4 rtl:space-x-reverse">
+            <div className='flex items-center space-x-4 rtl:space-x-reverse'>
               <Logo />
               {/* open mobile menu handlaer*/}
               {width <= breakpoints.xl && (
-                <div className="cursor-pointer text-slate-900 dark:text-white text-2xl" onClick={handleOpenMobileMenu}>
-                  <Icon icon="heroicons-outline:menu-alt-3" />
+                <div className='cursor-pointer text-slate-900 dark:text-white text-2xl' onClick={handleOpenMobileMenu}>
+                  <Icon icon='heroicons-outline:menu-alt-3' />
                 </div>
               )}
             </div>
@@ -97,16 +105,16 @@ const Header = ({ className = 'custom-class' }) => {
           {/*  Horizontal  Main Menu */}
           {menuType === 'horizontal' && width >= breakpoints.xl ? <HorizentalMenu /> : null}
           {/* Nav Tools  */}
-          <div className="nav-tools flex items-center lg:space-x-6 space-x-3 rtl:space-x-reverse">
+          <div className='nav-tools flex items-center lg:space-x-6 space-x-3 rtl:space-x-reverse'>
             {/* <Language /> */}
             {/* <SwitchDark /> */}
             {/* <MonoChrome /> */}
             {/* {width >= breakpoints.md && <Message />} */}
-            {width >= breakpoints.md && <Notification />}
+            {/* {width >= breakpoints.md && <Notification />} */}
             {width >= breakpoints.md && <Profile />}
             {width <= breakpoints.md && (
-              <div className="cursor-pointer text-slate-900 dark:text-white text-2xl" onClick={handleOpenMobileMenu}>
-                <Icon icon="heroicons-outline:menu-alt-3" />
+              <div className='cursor-pointer text-slate-900 dark:text-white text-2xl' onClick={handleOpenMobileMenu}>
+                <Icon icon='heroicons-outline:menu-alt-3' />
               </div>
             )}
           </div>

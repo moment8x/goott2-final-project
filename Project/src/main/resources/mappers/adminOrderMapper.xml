@@ -2462,6 +2462,8 @@
 			ON 			h.order_no = p.order_no
 			INNER JOIN  detailed_order_items d
 			ON 			h.order_no = d.order_no
+			INNER JOIN  bank_transfers b
+            ON			p.payment_number = b.payment_number
 			SET 		h.delivery_status = 
 							CASE WHEN h.delivery_status = '입금전' or h.delivery_status = '출고완료'
 								 THEN '결제완료' 
@@ -2476,6 +2478,11 @@
 		            		CASE WHEN p.payment_status = '입금전' or p.payment_status = '출고완료'
 		            			 THEN '결제완료' 
 		            			 ELSE p.payment_status
+	            			END,
+            			p.actual_payment_amount = 
+		            		CASE WHEN p.payment_status = '입금전' 
+		            			 THEN b.amount_to_pay
+		            			 ELSE actual_payment_amount
 	            			END
 			WHERE		d.order_no IN 
 						<foreach collection="list" item="orderNo" open="(" close=")" separator=",">
@@ -2689,6 +2696,11 @@
 		            p.payment_status = 
 	            		CASE WHEN p.payment_status = '결제완료'
 	            			 THEN '입금전' 
+	            			 ELSE p.payment_status 
+            			END,
+           			p.actual_payment_amount =
+           				CASE WHEN p.payment_status = '결제완료'
+	            			 THEN 0 
 	            			 ELSE p.payment_status 
             			END
 		WHERE		d.order_no IN 

@@ -481,7 +481,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		List<PendingCancelInfoResponse> methodCardList = cancelInfoList
 				.stream().filter(order -> !order.getPaymentMethod().equals("bkt"))
 				.collect(Collectors.toList());
-	    
+			    
 		if(!methodBankList.isEmpty()) {
 			/* 취소 테이블 insert */
 			if(adminOrderDao.saveProductCancel(methodCardList) <= 0) {
@@ -498,6 +498,8 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		                .findFirst()
 		                .ifPresent(request -> info.setCancelId(request.getCancelId()));
 		        });	
+				refundInfoList.removeIf(info -> info.getCancelId() == null);
+				
 				/* 환불 테이블 insert */
 				result = adminOrderDao.saveProductCancelRefund(refundInfoList);
 			}
@@ -556,10 +558,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		List<PendingCancelInfoResponse> methodCardList = cancelInfoList
 				.stream().filter(order -> !order.getPaymentMethod().equals("bkt"))
 				.collect(Collectors.toList());
-		
-		System.out.println("methodBankList : " + methodBankList.size());
-		System.out.println("methodCardList : " + methodCardList.size());
-		
+				
 		if(!methodBankList.isEmpty()) {
 			/* 취소 테이블 insert */
 			if(adminOrderDao.saveOrderCancel(methodCardList) <= 0) {
@@ -578,11 +577,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 			            matchingCard -> info.setCancelId(matchingCard.getCancelId())
 			        )
 				);
-			
 				refundInfoList.removeIf(info -> info.getCancelId() == null);
-	//					refundInfoList.removeIf(info -> methodCardList.stream()
-	//							.noneMatch(request -> info.getCancelId().equals(request.getCancelId()))
-	//			);
 				
 				/* 환불 테이블 insert */
 				result = adminOrderDao.saveOrderCancelRefund(refundInfoList);
