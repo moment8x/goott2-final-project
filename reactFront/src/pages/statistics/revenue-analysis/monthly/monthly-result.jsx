@@ -86,7 +86,7 @@ const COLUMNS = [
   },
 ];
 
-const DailyResult = ({ title = '일별 매출내역', data }) => {
+const MonthlyResult = ({ title = '월별 매출내역', data }) => {
   const columns = useMemo(() => COLUMNS, []);
 
   const tableInstance = useTable(
@@ -266,4 +266,4 @@ const DailyResult = ({ title = '일별 매출내역', data }) => {
   );
 };
 
-export default memo(DailyResult);
+export default memo(MonthlyResult);

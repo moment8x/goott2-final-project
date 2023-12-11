@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import DailyReport from './daily-revenue';
-import DailyResult from './daily-result';
+import WeeklyReport from './weekly-revenue';
+import WeeklyResult from './weekly-result';
 import RevenueChart from '../chart/revenue-chart';
+import IncomeFluctuation from './weekly-fluctuation';
 
-const DailyInfo = () => {
+const WeeklyInfo = () => {
   const [data, setData] = useState([]);
 
   return (
     <div className='space-y-5'>
-      <DailyReport setData={setData} data={data} />
+      <WeeklyReport setData={setData} data={data} />
       <div className='rounded-lg bg-white p-1'>
         <RevenueChart data={data} />
       </div>
-      <DailyResult data={data} />
+      <IncomeFluctuation data={data} />
+      <WeeklyResult data={data} />
       <Outlet />
     </div>
   );
 };
 
-export default DailyInfo;
+export default WeeklyInfo;

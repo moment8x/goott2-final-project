@@ -337,7 +337,14 @@
 			        </choose>
 				</where>
 				GROUP BY 		p.product_id
-				ORDER BY 		salesQuantity DESC
+				ORDER BY 		<choose>
+									<when test='isTotalSalesRanking == true'>
+						         		totalSales DESC
+						         	</when>
+						         	<when test='isTotalSalesRanking == false'>
+						         		salesQuantity DESC
+						         	</when>
+								</choose>
 		) sq, (SELECT @rank := 0) ra <if test="limit != 0 "> LIMIT #{limit}</if>;
 	</select>
 	
@@ -360,7 +367,8 @@
 								SUM(s.quantity) 'paymentQuantity',
 								COUNT(r.product_id) refundQuantity,
 								SUM(s.quantity) - COUNT(r.product_id) salesQuantity, 
-								p.selling_price sellingPrice
+								p.selling_price sellingPrice,
+								p.selling_price * (SUM(s.quantity) - COUNT(r.product_id)) totalSales
 				FROM 			(
 									SELECT		order_no,
 												product_id, 
@@ -419,8 +427,15 @@
 			        </choose>	
 				</where>
 				GROUP BY 		p.product_id
-				ORDER BY 		salesQuantity DESC
-		) sq, (SELECT @rank := 0) ra <if test="limit != 0 "> LIMIT #{limit}</if>;
+				ORDER BY 		<choose>
+									<when test='isTotalSalesRanking == true'>
+						         		totalSales DESC
+						         	</when>
+						         	<when test='isTotalSalesRanking == false'>
+						         		salesQuantity DESC
+						         	</when>
+								</choose>
+		) sq, (SELECT @rank := 0) ra <if test="limit != 0 "> LIMIT #{limit}</if>
 	</select>
 	
 	<!-- 상품 분석(취소/반품 순위) -->
@@ -443,7 +458,7 @@
 								p.current_quantity currentQuantity, 
 								SUM(s.quantity) paymentQuantity,
 								COUNT(r.product_id) refundQuantity,
-		                        CONCAT(FORMAT((COUNT(r.product_id) / SUM(s.quantity) * 100), 0), '%') returnRate,
+		                        COALESCE((COUNT(r.product_id) / SUM(s.quantity) * 100),0) returnRate,
 								p.selling_price * (SUM(s.quantity) - COUNT(r.product_id)) totalSales
 				FROM 			(
 									SELECT		order_no,
@@ -562,7 +577,7 @@
 				</where>
 				GROUP BY 		sh.product_id
 				ORDER BY 		quantity DESC
-		) sq, (SELECT @rank := 0) ra <if test="limit != 0 "> LIMIT #{limit}</if>;
+		) sq, (SELECT @rank := 0) ra <if test="limit != 0 "> LIMIT #{limit}</if>
 	</select>
 	
 	<!-- 상품 분석(관심 상품 분석) -->
@@ -573,14 +588,16 @@
 								sq.productName,
 								sq.sellingPrice,
 								sq.paymentQuantity,
-								sq.currentQuantity
+								sq.currentQuantity,
+								sq.quantity
 		FROM(
 				SELECT			wl.product_id productId, 
 								wl.product_image productImage,
 								wl.product_name productName, 
 								wl.selling_price sellingPrice, 
 								wl.current_quantity currentQuantity,
-								COALESCE(SUM(s.sales_quantity),0) paymentQuantity
+								COALESCE(SUM(s.sales_quantity),0) paymentQuantity,
+								wl.quantity
 				FROM 			(
 									SELECT		@payment_time := DATE(IF(pa.payment_method = 'bkt', b.payment_time, pa.payment_time)) payment_time,
 												d.order_no,
@@ -599,7 +616,7 @@
 								) s
 		        RIGHT JOIN		(
 									SELECT		w.product_id,
-												COUNT(w.product_id) count, 
+												COUNT(w.product_id) quantity, 
 												i.product_image,
 												p.product_name, 
 												p.selling_price, 
@@ -633,8 +650,8 @@
 			        </choose>	
 				</where>
 				GROUP BY 		wl.product_id
-				ORDER BY 		wl.count DESC
-		) sq, (SELECT @rank := 0) ra;
+				ORDER BY 		quantity DESC
+		) sq, (SELECT @rank := 0) ra <if test="limit != 0 "> LIMIT #{limit}</if>
 	</select>
 	
 </mapper>

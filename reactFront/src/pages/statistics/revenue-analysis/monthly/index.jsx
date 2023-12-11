@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import DailyReport from './daily-revenue';
-import DailyResult from './daily-result';
 import RevenueChart from '../chart/revenue-chart';
+import MonthlyResult from './monthly-result';
+import MonthlyReport from './monthly-revenue';
 
-const DailyInfo = () => {
+const MonthlyInfo = () => {
   const [data, setData] = useState([]);
 
   return (
     <div className='space-y-5'>
-      <DailyReport setData={setData} data={data} />
+      <MonthlyReport setData={setData} data={data} />
       <div className='rounded-lg bg-white p-1'>
-        <RevenueChart data={data} />
+        <RevenueChart data={data} xaxisType={'category'} />
       </div>
-      <DailyResult data={data} />
+      <MonthlyResult data={data} />
       <Outlet />
     </div>
   );
 };
 
-export default DailyInfo;
+export default MonthlyInfo;

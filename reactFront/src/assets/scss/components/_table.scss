@@ -1,10 +1,14 @@
 .table-th {
-  @apply text-slate-600 dark:text-slate-300 text-xs  font-semibold  uppercase py-5 px-6 ltr:text-left rtl:text-right;
+  @apply text-slate-600 dark:text-slate-300 text-sm uppercase font-bold py-5 px-6 text-center;
 }
 
 .table-td {
-  @apply text-slate-600 dark:text-slate-300 text-sm font-normal capitalize px-6 py-4   border-slate-100 dark:border-slate-700;
+  @apply text-slate-600 dark:text-slate-300 text-sm font-normal capitalize px-6 py-4   border-slate-100 dark:border-slate-700 font-medium;
   // @apply text-slate-600 dark:text-slate-300 text-sm font-normal capitalize px-6 py-5   border-slate-100 dark:border-slate-700;
+}
+
+.table-basic-td {
+  @apply text-slate-600 dark:text-slate-300 text-sm font-normal capitalize px-6 py-4   border-slate-100 dark:border-slate-700 text-center font-medium;
 }
 
 .table-checkbox {

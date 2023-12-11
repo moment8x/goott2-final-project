@@ -7,14 +7,14 @@ import lombok.Setter;
 @Setter
 public class RevenueResponse {
 	private String date;
-	private String orderCount;
-	private String itemCount;
-	private String totalPurchaseAmount;
-	private String shippingFee;
-	private String coupon;
-	private String reward;
-	private String point;
-	private String totalPaymentAmount;
-	private String totalRefundAmount;
-	private String netSales;
+	private int orderCount;
+	private int itemCount;
+	private int totalPurchaseAmount;
+	private int shippingFee;
+	private int coupon;
+	private int reward;
+	private int point;
+	private int totalPaymentAmount;
+	private int totalRefundAmount;
+	private int netSales;
 }

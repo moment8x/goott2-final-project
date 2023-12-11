@@ -3,97 +3,39 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Flatpickr from 'react-flatpickr';
 
-const DailyReport = ({ setDailyList, setSearchedInfo }) => {
+const AggregationReport = ({ setData, data }) => {
   const [picker, setPicker] = useState();
   const [picker2, setPicker2] = useState();
 
-  // useEffect(() => {
-  //   fetch('http://localhost:8081/admin/statistics/daily?dateStart&dateEnd', { method: 'GET' })
-  //     .then((res) => res.json())
-  //     .then((res) => {
-  //       console.log('res:', res);
-  //       setDailyReport(res.dailyList);
-  //     })
-  //     .catch((error) => {
-  //       console.error('Error :', error);
-  //     });
-  // }, []);
+  useEffect(() => {
+    fetch('http://localhost:8081/admin/statistics/revenue?dateStart&dateEnd', { method: 'GET' })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log('res:', res);
+        setData(res.revenueList);
+      })
+      .catch((error) => {
+        console.error('Error :', error);
+      });
+  }, []);
 
   // 검색 버튼
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch('http://localhost:8081/admin/statistics/daily?dateStart&dateEnd', { method: 'GET' })
+    fetch('http://localhost:8081/admin/statistics/revenue?dateStart&dateEnd', { method: 'GET' })
       .then((res) => res.json())
       .then((res) => {
         console.log('res:', res);
-        setDailyList(res.dailyList);
+        setData(res.revenueList);
       })
       .catch((error) => {
         console.error('Error :', error);
       });
   };
 
-  const [searchMember, setSearchMember] = useState({
-    ageStart: '',
-    ageEnd: '',
-    registrationDateStart: '',
-    registrationDateEnd: '',
-    dateOfBirthStart: '',
-    dateOfBirthEnd: '',
-    name: '',
-    email: '',
-    memberId: '',
-    membershipGrade: '',
-    phoneNumber: '',
-    cellPhoneNumber: '',
-    gender: '',
-    address: '',
-    detailedAddress: '',
-    orderAmountStart: '',
-    orderAmountEnd: '',
-    actualPaymentAmountStart: '',
-    actualPaymentAmountEnd: '',
-    orderCountStart: '',
-    orderCountEnd: '',
-    actualOrderCountStart: '',
-    actualOrderCountEnd: '',
-    orderDateStart: '',
-    orderDateEnd: '',
-    paymentDateStart: '',
-    paymentDateEnd: '',
-    orderItem: '',
-    totalRewardsStart: '',
-    totalRewardsEnd: '',
-    totalPointsStart: '',
-    totalPointsEnd: '',
-    lastLoginDateStart: '',
-    lastLoginDateEnd: '',
-    dormantAccount: 'N',
-  });
-
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   fetch(' http://localhost:8081/admin/members/search', {
-  //     // http://localhost:8081/
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json; charset=utf-8',
-  //     },
-  //     body: JSON.stringify(searchMember),
-  //   })
-  //     .then((res) => {
-  //       console.log('res:', res);
-  //       return res.json();
-  //     })
-  //     .then((res) => {
-  //       console.log('res2:', res);
-  //       setSearchedInfo(res.memberList);
-  //     });
-  // };
-
   return (
     <div>
-      <Card title='일별 매출' noborder className='font-bold'>
+      <Card title='매출 집계(판매 이익)' noborder className='font-bold'>
         <div className='overflow-x-auto '>
           <div className='inline-block min-w-full align-middle'>
             <div className='overflow-hidden '>
@@ -141,4 +83,4 @@ const DailyReport = ({ setDailyList, setSearchedInfo }) => {
   );
 };
 
-export default DailyReport;
+export default AggregationReport;

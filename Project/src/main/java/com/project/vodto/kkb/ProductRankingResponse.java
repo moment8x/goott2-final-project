@@ -14,7 +14,7 @@ public class ProductRankingResponse {
 	private int currentQuantity;
 	private int paymentQuantity;
 	private int refundQuantity;
-	private String returnRate;
+	private float returnRate;
 	private int salesQuantity;
 	private int totalSales;
 }

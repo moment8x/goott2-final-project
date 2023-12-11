@@ -8,85 +8,57 @@ import { useTable, useRowSelect, useSortBy, usePagination } from 'react-table';
 
 const COLUMNS = [
   {
-    Header: '일자',
-    accessor: 'date',
+    Header: '순위',
+    accessor: 'rank',
     Cell: (row) => {
       return <span>{row?.cell?.value}</span>;
     },
   },
   {
-    Header: '주문수',
-    accessor: 'orderCount',
+    Header: '상품코드',
+    accessor: 'productId',
+    Cell: (row) => {
+      return <span>{row?.cell?.value}</span>;
+    },
+  },
+  {
+    Header: '',
+    accessor: 'productImage',
+    Cell: (row) => {
+      return <img src={row?.cell?.value} width='40' />;
+    },
+  },
+  {
+    Header: '상품명',
+    accessor: 'productName',
+    Cell: (row) => {
+      return <span>{row?.cell?.value}</span>;
+    },
+  },
+  {
+    Header: '판매가',
+    accessor: 'sellingPrice',
     Cell: (row) => {
       return <span>{(row?.cell?.value).toLocaleString('ko-KR')}</span>;
     },
   },
   {
-    Header: '품목수',
-    accessor: 'itemCount',
+    Header: '결제수량',
+    accessor: 'paymentQuantity',
     Cell: (row) => {
       return <span>{(row?.cell?.value).toLocaleString('ko-KR')}</span>;
     },
   },
   {
-    Header: '상품구매금액',
-    accessor: 'totalPurchaseAmount',
-    Cell: (row) => {
-      return <span>{(row?.cell?.value).toLocaleString('ko-KR')}</span>;
-    },
-  },
-  {
-    Header: '배송비',
-    accessor: 'shippingFee',
-    Cell: (row) => {
-      return <span>{(row?.cell?.value).toLocaleString('ko-KR')}</span>;
-    },
-  },
-  {
-    Header: '쿠폰',
-    accessor: 'coupon',
-    Cell: (row) => {
-      return <span>{(row?.cell?.value).toLocaleString('ko-KR')}</span>;
-    },
-  },
-  {
-    Header: '적립금',
-    accessor: 'reward',
-    Cell: (row) => {
-      return <span>{(row?.cell?.value).toLocaleString('ko-KR')}</span>;
-    },
-  },
-  {
-    Header: '포인트',
-    accessor: 'point',
-    Cell: (row) => {
-      return <span>{(row?.cell?.value).toLocaleString('ko-KR')}</span>;
-    },
-  },
-  {
-    Header: '결제합계',
-    accessor: 'totalPaymentAmount',
-    Cell: (row) => {
-      return <span>{(row?.cell?.value).toLocaleString('ko-KR')}</span>;
-    },
-  },
-  {
-    Header: '환불합계',
-    accessor: 'totalRefundAmount',
-    Cell: (row) => {
-      return <span>{(row?.cell?.value).toLocaleString('ko-KR')}</span>;
-    },
-  },
-  {
-    Header: '순매출',
-    accessor: 'netSales',
+    Header: '재고',
+    accessor: 'currentQuantity',
     Cell: (row) => {
       return <span>{(row?.cell?.value).toLocaleString('ko-KR')}</span>;
     },
   },
 ];
 
-const DailyResult = ({ title = '일별 매출내역', data }) => {
+const WishlistResult = ({ title = '관심상품 순위 내역', data }) => {
   const columns = useMemo(() => COLUMNS, []);
 
   const tableInstance = useTable(
@@ -168,9 +140,11 @@ const DailyResult = ({ title = '일별 매출내역', data }) => {
                             <td
                               {...cell.getCellProps()}
                               className={`${
-                                index == 0
+                                index < 3
                                   ? 'table-td cursor-pointer text-center'
-                                  : 'table-td cursor-pointer text-right pl-0 pr-14'
+                                  : index == 3
+                                  ? 'table-td cursor-pointer text-left pr-0'
+                                  : 'table-td cursor-pointer text-right pr-10'
                               }`}
                             >
                               {cell.render('Cell')}
@@ -266,4 +240,4 @@ const DailyResult = ({ title = '일별 매출내역', data }) => {
   );
 };
 
-export default memo(DailyResult);
+export default memo(WishlistResult);

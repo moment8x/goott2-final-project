@@ -8,8 +8,16 @@ import lombok.Getter;
 public class StatisticsCond {
 	private Date dateStart;
 	private Date dateEnd;
-	private int limit;
+	private int limit = 0;
 	private boolean isReturnRateRanking;
+	private boolean isTotalSalesRanking;
+	
+	private StatisticsCond(Date dateStart, Date dateEnd, boolean isTotalSalesRanking, int limit) {
+		this.dateStart = dateStart;
+		this.dateEnd = dateEnd;
+		this.limit = limit;
+		this.isTotalSalesRanking = isTotalSalesRanking;
+	}
 	
 	private StatisticsCond(Date dateStart, Date dateEnd, int limit, boolean isReturnRateRanking) {
 		this.dateStart = dateStart;
@@ -49,16 +57,54 @@ public class StatisticsCond {
 				Date.valueOf(dateEnd),
 				limit);
 	}
+	
+	public static StatisticsCond create(StatisticsCond cond, int limit) {		
+			
+			return new StatisticsCond(
+					cond.getDateStart(), 
+					cond.getDateEnd(),
+					limit);
+	}
 
 	public static StatisticsCond create(String dateStart, String dateEnd, int limit, boolean isReturnRateRanking) {
 	
-	dateStart = dateStart.equals("") ? "0000-01-01" : dateStart;
-	dateEnd = dateEnd.equals("") ? "9999-12-31" : dateEnd;
+		dateStart = dateStart.equals("") ? "0000-01-01" : dateStart;
+		dateEnd = dateEnd.equals("") ? "9999-12-31" : dateEnd;
+		
+		return new StatisticsCond(
+				Date.valueOf(dateStart), 
+				Date.valueOf(dateEnd),
+				limit,
+				isReturnRateRanking);
+	}
 	
-	return new StatisticsCond(
-			Date.valueOf(dateStart), 
-			Date.valueOf(dateEnd),
-			limit,
-			isReturnRateRanking);
-}
+	public static StatisticsCond create(StatisticsCond cond, int limit, boolean isReturnRateRanking) {
+
+		return new StatisticsCond(
+				cond.getDateStart(), 
+				cond.getDateEnd(),
+				limit,
+				isReturnRateRanking);
+	}
+	
+	public static StatisticsCond create(String dateStart, String dateEnd, boolean isTotalSalesRanking, int limit) {
+		
+		dateStart = dateStart.equals("") ? "0000-01-01" : dateStart;
+		dateEnd = dateEnd.equals("") ? "9999-12-31" : dateEnd;
+		
+		return new StatisticsCond(
+				Date.valueOf(dateStart), 
+				Date.valueOf(dateEnd),
+				isTotalSalesRanking,
+				limit);
+	}
+	
+	public static StatisticsCond create(StatisticsCond cond, boolean isTotalSalesRanking, int limit) {
+		
+		return new StatisticsCond(
+				cond.getDateStart(), 
+				cond.getDateEnd(),
+				isTotalSalesRanking,
+				limit);
+	}
 }

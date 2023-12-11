@@ -25,15 +25,15 @@ const SidebarLogo = ({ menuHover }) => {
       
       `}
     >
-      <Link to="admin/home">
-        <div className="flex items-center space-x-4">
-          <div className="logo-icon">
-            {!isDark && !isSemiDark ? <img src={MobileLogo} alt="" /> : <img src={MobileLogoWhite} alt="" />}
+      <Link to='admin/home'>
+        <div className='flex items-center space-x-4'>
+          <div className='logo-icon'>
+            {!isDark && !isSemiDark ? <img src={MobileLogo} alt='' /> : <img src={MobileLogoWhite} alt='' />}
           </div>
 
           {(!collapsed || menuHover) && (
             <div>
-              <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Deer Books</h1>
+              <h1 className='text-xl font-semibold text-slate-900 dark:text-slate-100'>Dear Books</h1>
             </div>
           )}
         </div>

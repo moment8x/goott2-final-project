@@ -45,14 +45,14 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 		List<UserStorageResponse> cartRankingTop10 = adminStatisticsDAO.findCartInfo(todayTop10);
 		List<ProductRankingResponse> returnRankingTop5Quantity = adminStatisticsDAO.findReturnRanking(weekTop5Quantity);
 		List<ProductRankingResponse> returnRankingTop5Rate = adminStatisticsDAO.findReturnRanking(weekTop5Rate);
-		List<CategoryRankingResponse> CategoryRankingLastMonthTop5 = adminStatisticsDAO.findCategoryRanking(lastMonthTop5);
+		List<CategoryRankingResponse> categoryRankingLastMonthTop5 = adminStatisticsDAO.findCategoryRanking(lastMonthTop5);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("productRankingTop10", productRankingTop10);
 		result.put("cartRankingTop10", cartRankingTop10);
 		result.put("returnRankingTop5Quantity", returnRankingTop5Quantity);
 		result.put("returnRankingTop5Rate", returnRankingTop5Rate);
-		result.put("CategoryRankingLastMonthTop5", CategoryRankingLastMonthTop5);
+		result.put("categoryRankingLastMonthTop5", categoryRankingLastMonthTop5);
 		
 		return result;
 	}
@@ -63,10 +63,10 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 	@Override
 	public Map<String, Object> getDaliyReport(StatisticsCond statisticsCond) {
 		
-		List<RevenueResponse> daliyList = adminStatisticsDAO.findDaliyReport(statisticsCond);
+		List<RevenueResponse> dailyList = adminStatisticsDAO.findDaliyReport(statisticsCond);
 		
 		Map<String, Object> result = new HashMap<>();
-		result.put("daliyList", daliyList);
+		result.put("dailyList", dailyList);
 		
 		return result;
 	}
@@ -87,10 +87,10 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 	@Override
 	public Map<String, Object> getMonthlyReport(StatisticsCond statisticsCond) {
 		
-		List<RevenueResponse> monthList = adminStatisticsDAO.findMonthlyReport(statisticsCond);
+		List<RevenueResponse> monthlyList = adminStatisticsDAO.findMonthlyReport(statisticsCond);
 		
 		Map<String, Object> result = new HashMap<>();
-		result.put("monthList", monthList);
+		result.put("monthlyList", monthlyList);
 		
 		return result;
 	}
@@ -99,10 +99,10 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 	@Override
 	public Map<String, Object> getRevenueReport(StatisticsCond statisticsCond) {
 		
-		List<AggregateResponse> RevenueList = adminStatisticsDAO.findRevenueReport(statisticsCond);
+		List<AggregateResponse> revenueList = adminStatisticsDAO.findRevenueReport(statisticsCond);
 		
 		Map<String, Object> result = new HashMap<>();
-		result.put("RevenueList", RevenueList);
+		result.put("revenueList", revenueList);
 		
 		return result;
 	}
@@ -113,10 +113,17 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 	@Override
 	public Map<String, Object> getProductRanking(StatisticsCond statisticsCond) {
 		
-		List<ProductRankingResponse> ProductRankingList = adminStatisticsDAO.findProductRanking(statisticsCond);
+		StatisticsCond salesQuantityTop10 = StatisticsCond.create(statisticsCond, false, 10);
+		StatisticsCond totalSalesTop10 = StatisticsCond.create(statisticsCond, true, 10);
+		
+		List<ProductRankingResponse> productRankingList = adminStatisticsDAO.findProductRanking(statisticsCond);
+		List<ProductRankingResponse> salesQuantityRanking = adminStatisticsDAO.findProductRanking(salesQuantityTop10);
+		List<ProductRankingResponse> totalSalesRanking = adminStatisticsDAO.findProductRanking(totalSalesTop10);
 		
 		Map<String, Object> result = new HashMap<>();
-		result.put("ProductRankingList", ProductRankingList);
+		result.put("productRankingList", productRankingList);
+		result.put("salesQuantityList", salesQuantityRanking);
+		result.put("totalSalesList", totalSalesRanking);
 		
 		return result;
 	}
@@ -125,10 +132,17 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 	@Override
 	public Map<String, Object> getCategoryRanking(StatisticsCond statisticsCond) {
 		
+		StatisticsCond salesQuantityTop10 = StatisticsCond.create(statisticsCond, false, 10);
+		StatisticsCond totalSalesTop10 = StatisticsCond.create(statisticsCond, true, 10);
+		
 		List<CategoryRankingResponse> categoryRankingList = adminStatisticsDAO.findCategoryRanking(statisticsCond);
+		List<CategoryRankingResponse> salesQuantityRanking = adminStatisticsDAO.findCategoryRanking(salesQuantityTop10);
+		List<CategoryRankingResponse> totalSalesRanking = adminStatisticsDAO.findCategoryRanking(totalSalesTop10);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("categoryRankingList", categoryRankingList);
+		result.put("salesQuantityList", salesQuantityRanking);
+		result.put("totalSalesList", totalSalesRanking);
 		
 		return result;
 	}
@@ -137,10 +151,17 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 	@Override
 	public Map<String, Object> getReturnRanking(StatisticsCond statisticsCond) {
 		
+		StatisticsCond refundQuantityTop10 = StatisticsCond.create(statisticsCond, 10, false);
+		StatisticsCond returnRateTop10 = StatisticsCond.create(statisticsCond, 10, true);
+		
 		List<ProductRankingResponse> returnRankingList = adminStatisticsDAO.findReturnRanking(statisticsCond);
+		List<ProductRankingResponse> refundQuantityRanking = adminStatisticsDAO.findReturnRanking(refundQuantityTop10);
+		List<ProductRankingResponse> returnRateRanking = adminStatisticsDAO.findReturnRanking(returnRateTop10);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("returnRankingList", returnRankingList);
+		result.put("refundQuantityRanking", refundQuantityRanking);
+		result.put("returnRateRanking", returnRateRanking);
 		
 		return result;
 	}
@@ -149,10 +170,14 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 	@Override
 	public Map<String, Object> getCartInfo(StatisticsCond statisticsCond) {
 		
+		StatisticsCond cartTop10 = StatisticsCond.create(statisticsCond, 10);
+		
 		List<UserStorageResponse> cartInfoList = adminStatisticsDAO.findCartInfo(statisticsCond);
+		List<UserStorageResponse> cartTop10List = adminStatisticsDAO.findCartInfo(cartTop10);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("cartInfoList", cartInfoList);
+		result.put("cartTop10List", cartTop10List);
 		
 		return result;
 	}
@@ -161,10 +186,14 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 	@Override
 	public Map<String, Object> getWishlistInfo(StatisticsCond statisticsCond) {
 		
+		StatisticsCond WishlistTop10 = StatisticsCond.create(statisticsCond, 10);
+		
 		List<UserStorageResponse> wishlistInfoList = adminStatisticsDAO.findWishlistInfo(statisticsCond);
+		List<UserStorageResponse> WishlistTop10List = adminStatisticsDAO.findWishlistInfo(WishlistTop10);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("wishlistInfoList", wishlistInfoList);
+		result.put("WishlistTop10List", WishlistTop10List);
 		
 		return result;
 	}

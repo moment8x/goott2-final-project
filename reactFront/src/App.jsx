@@ -9,13 +9,18 @@ const StatisticsDashboard = lazy(() => import('./pages/statistics/dashboard'));
 const MemberInfo = lazy(() => import('./pages/members/search/index'));
 const MemberInfoModal = lazy(() => import('./pages/members/search/member-modal'));
 const SearchedMember = lazy(() => import('./pages/members/search/member-result'));
-const DailyReport = lazy(() => import('./pages/statistics/revenue-analysis/daily/index'));
 const ProductDashboard = lazy(() => import('./pages/dashboard/Product'));
 const ProductInfo = lazy(() => import('./pages/products/search/index'));
 const ProductRegister = lazy(() => import('./pages/products/register/index'));
-
-// const WeeklyReport = lazy(() => import('./pages/statistics/revenue-analysis/weekly'));
-// const MonthlyReport = lazy(() => import('./pages/statistics/revenue-analysis/monthly'));
+const DailyReport = lazy(() => import('./pages/statistics/revenue-analysis/daily/index'));
+const WeeklyReport = lazy(() => import('./pages/statistics/revenue-analysis/weekly/index'));
+const MonthlyReport = lazy(() => import('./pages/statistics/revenue-analysis/monthly'));
+const RevenueAggregation = lazy(() => import('./pages/statistics/revenue-analysis/aggregation/index'));
+const ProductRanking = lazy(() => import('./pages/statistics/product-analysis/products/index'));
+const CategoryRanking = lazy(() => import('./pages/statistics/product-analysis/categories/index'));
+const ReturnRanking = lazy(() => import('./pages/statistics/product-analysis/returns/index'));
+const CartAnalysis = lazy(() => import('./pages/statistics/product-analysis/cart/index'));
+const WishlistAnalysis = lazy(() => import('./pages/statistics/product-analysis/wishlist/index'));
 
 const Login = lazy(() => import('./pages/auth/login'));
 const Register = lazy(() => import('./pages/auth/register'));
@@ -68,14 +73,14 @@ function App() {
           <Route path='admin/products/register' element={<ProductRegister />} />
           <Route path='admin/statistics/dashboard' element={<StatisticsDashboard />} />
           <Route path='admin/statistics/daily' element={<DailyReport />} />
-          {/* <Route path='admin/statistics/weekly' element={<WeeklyReport />} />
+          <Route path='admin/statistics/weekly' element={<WeeklyReport />} />
           <Route path='admin/statistics/monthly' element={<MonthlyReport />} />
           <Route path='admin/statistics/revenue' element={<RevenueAggregation />} />
           <Route path='admin/statistics/products' element={<ProductRanking />} />
           <Route path='admin/statistics/categories' element={<CategoryRanking />} />
           <Route path='admin/statistics/returns' element={<ReturnRanking />} />
           <Route path='admin/statistics/cart' element={<CartAnalysis />} />
-          <Route path='admin/statistics/wishlist' element={<WishlistAnalysis />} /> */}
+          <Route path='admin/statistics/wishlist' element={<WishlistAnalysis />} />
         </Route>
         <Route path='/*' element={<Error />} />
       </Routes>
