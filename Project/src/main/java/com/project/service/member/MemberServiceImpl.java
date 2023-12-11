@@ -405,8 +405,8 @@ public class MemberServiceImpl implements MemberService {
 		result.put("couponsHistory", couponsHistory);
 		result.put("cancelOrder", cancelOrder);
 
-		int updateReward = 0; // 취소시 적립금 비교해서 업데이트해줘야할 적립금 금액
-		int updatePoint = 0; // 취소시 포인트 비교해서 업데이트해줘야할 포인트 점수
+		int refundReward = 0; // 취소시 적립금 비교해서 업데이트해줘야할 적립금 금액
+		int refundPoint = 0; // 취소시 포인트 비교해서 업데이트해줘야할 포인트 점수
 		int refundAmount = 0; // 취소시 환불 금액
 		int cancelProductPrice = cancelOrder.getProductPrice(); // 취소할 상품 금액
 		int couponDiscount = cancelOrder.getCouponDiscount(); // 상품당 적용한 쿠폰 할인 금액
@@ -423,7 +423,7 @@ public class MemberServiceImpl implements MemberService {
 //						취소할 상품금액 - 쿠폰 할인에서 시작
 
 						result.put("calcRefund", calcRefund(cancelProductPrice, couponDiscount, cancelPrice,
-								updateReward, updatePoint, refundAmount, detailOrderInfo));
+								refundReward, refundPoint, refundAmount, detailOrderInfo));
 //						
 //						사용한 포인트 = 0 이라면 // 사용한 포인트가 없다
 //						사용한 포인트도, 적립금도 없다면 상품금액만큼 돌려줌
@@ -459,8 +459,8 @@ public class MemberServiceImpl implements MemberService {
 			result.put("status", "noCoupon");
 			// 부분취소의 경우
 //			취소할 상품금액에서 시작
-			result.put("calcRefund", calcRefund(cancelProductPrice, couponDiscount, cancelPrice, updateReward,
-					updatePoint, refundAmount, detailOrderInfo));
+			result.put("calcRefund", calcRefund(cancelProductPrice, couponDiscount, cancelPrice, refundReward,
+					refundPoint, refundAmount, detailOrderInfo));
 		}
 		return result;
 
@@ -468,7 +468,7 @@ public class MemberServiceImpl implements MemberService {
 
 	// 부분취소시 환불 포인트, 적립금, 금액 계산
 	private Map<String, Object> calcRefund(int cancelProductPrice, int couponDiscount, int cancelPrice,
-			int updateReward, int updatePoint, int refundAmount, DetailOrderInfo detailOrderInfo) {
+			int refundReward, int refundPoint, int refundAmount, DetailOrderInfo detailOrderInfo) {
 		Map<String, Object> result = new HashMap<String, Object>();
 
 //		사용한 적립금 > 0 //적립금을 사용했다
@@ -477,20 +477,21 @@ public class MemberServiceImpl implements MemberService {
 			if (detailOrderInfo.getUsedReward() > cancelPrice) {
 //				적립금 - 취소상품금액 = 차액 
 //				>> usedReward 차액 업데이트, 환불금액 없음
-				updateReward = detailOrderInfo.getUsedReward() - cancelPrice;
-				result.put("updateReward", updateReward);
-				result.put("updatePoint", updatePoint);
+				refundReward = detailOrderInfo.getUsedReward() - cancelPrice;
+				result.put("refundReward", refundReward);
+				result.put("refundPoint", refundPoint);
 				result.put("refundAmount", refundAmount);
 			} else {
-//				적립금을 사용하지 않았다면
+				// 적립금이 취소할 상품 금액보다 작다면
 //				취소상품금액 - 사용 적립금 = 차액 환불
 //				usedReward 0 업데이트
 				refundAmount = cancelPrice - detailOrderInfo.getUsedReward();
-				result.put("updateReward", updateReward);
-				result.put("updatePoint", updatePoint);
+				refundReward = detailOrderInfo.getUsedReward();
+				result.put("refundReward", refundReward);
+				result.put("refundPoint", refundPoint);
 				result.put("refundAmount", refundAmount);
 			}
-//		사용한 적립금 = 0 이라면 // 사용한 적립금이 없다
+//		사용한 적립금 = 0 이라면 사용한 적립금이 없다
 		} else if (detailOrderInfo.getUsedReward() == 0) {
 			// 적립금이 없으니까 포인트 체크
 			// 사용한 포인트 > 0 // 포인트를 사용했다
@@ -499,24 +500,25 @@ public class MemberServiceImpl implements MemberService {
 				if (detailOrderInfo.getUsedPoints() > cancelPrice) {
 					// 포인트 - 취소상품금액 = 차액
 					// >> usedPoint 차액 업데이트, 환불금액 없음
-					updatePoint = detailOrderInfo.getUsedPoints() - cancelPrice;
-					result.put("updateReward", updateReward);
-					result.put("updatePoint", updatePoint);
+					refundPoint = detailOrderInfo.getUsedPoints() - cancelPrice;
+					result.put("refundReward", refundReward);
+					result.put("refundPoint", refundPoint);
 					result.put("refundAmount", refundAmount);
 				} else {
-//					포인트를 사용하지 않았다면
+					//취소할 상품 금액이 포인트보다 크다면
 //					취소상품금액 - 사용 포인트 = 차액 환불
 //					usedPoint 0 업데이트
 					refundAmount = cancelPrice - detailOrderInfo.getUsedPoints();
-					result.put("updateReward", updateReward);
-					result.put("updatePoint", updatePoint);
+					refundPoint = detailOrderInfo.getUsedPoints();
+					result.put("refundReward", refundReward);
+					result.put("refundPoint", refundPoint);
 					result.put("refundAmount", refundAmount);
 				}
 			} else if (detailOrderInfo.getUsedPoints() == 0) {
 				// 적립금도 포인트도 없다면 모두 0, 환불금액은 상품금액
 				refundAmount = cancelPrice;
-				result.put("updateReward", updateReward);
-				result.put("updatePoint", updatePoint);
+				result.put("refundReward", refundReward);
+				result.put("refundPoint", refundPoint);
 				result.put("refundAmount", refundAmount);
 			}
 		}
@@ -592,9 +594,9 @@ public class MemberServiceImpl implements MemberService {
 				}
 				System.out.println(tmpCancel.toString());
 				// 실 결제금액 업데이트
-				if (mDao.updateActualAmount(tmpCancel.getOrderNo(), tmpCancel.getActualRefundAmount(), detailOrderInfo.getPaymentMethod()) != 0) {
-					System.out.println("실 결제금액 업데이트 완");
-				}
+//				if (mDao.updateActualAmount(tmpCancel.getOrderNo(), tmpCancel.getActualRefundAmount(), detailOrderInfo.getPaymentMethod()) != 0) {
+//					System.out.println("실 결제금액 업데이트 완");
+//				}
 
 //				// 환불계좌정보 업데이트
 				if (mDao.updateRefundAccount(memberId, tmpCancel) != 0) {

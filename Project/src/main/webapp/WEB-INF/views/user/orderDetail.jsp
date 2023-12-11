@@ -55,40 +55,61 @@
 	href="/resources/assets/css/style.css">
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<script
+   src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="text/javascript">
 
-let newZipNoA = "";
-let newAddrA = "";
-let newDetailAddrA = "";
+//카카오 주소검색
+function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
+    new daum.Postcode({
+        oncomplete: function(data) {
+           console.log(data)
+           
+            // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
 
-//도로명주소API 
-function goPopup(zipNo, addr , detailAddr) {
-	newZipNoA = zipNo;
-	newAddrA = addr;
-	newDetailAddrA = detailAddr;
-	// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
-	var pop = window.open("jusoPopup", "pop","width=570,height=420, scrollbars=yes, resizable=yes");
+            // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+            // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+            let addr = ''; // 주소 변수
+            let extraAddr = ''; // 참고항목 변수
 
-	// 모바일 웹인 경우, 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrMobileLinkUrl.do)를 호출하게 됩니다.
-	//var pop = window.open("/popup/jusoPopup.jsp","pop","scrollbars=yes, resizable=yes"); 
+            //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+            if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                addr = data.roadAddress;
+            } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                addr = data.jibunAddress;
+            }
+
+            // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+            if(data.userSelectedType === 'R'){
+                // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                    extraAddr += data.bname;
+                }
+                // 건물명이 있고, 공동주택일 경우 추가한다.
+                if(data.buildingName !== '' && data.apartment === 'Y'){
+                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+                // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                if(extraAddr !== ''){
+                    extraAddr = ' (' + extraAddr + ')';
+                }
+                // 조합된 참고항목을 해당 필드에 넣는다.
+                document.getElementById(`\${extraAddress}`).value = extraAddr;
+            
+            } else {
+                document.getElementById(`\${extraAddress}`).value = '';
+            }
+
+            // 우편번호와 주소 정보를 해당 필드에 넣는다.
+            document.getElementById(`\${zipCode}`).value = data.zonecode;
+            document.getElementById(`\${userAddr}`).value = addr;
+            // 커서를 상세주소 필드로 이동한다.
+            document.getElementById(`\${detailAddr}`).focus();
+        }
+    }).open();
 }
-/** API 서비스 제공항목 확대 (2017.02) **/
- 
-function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
-		roadAddrPart2, engAddr, jibunAddr, zipNo, admCd, rnMgtSn, bdMgtSn,
-		detBdNmList, bdNm, bdKdcd, siNm, sggNm, emdNm, liNm, rn, udrtYn,
-		buldMnnm, buldSlno, mtYn, lnbrMnnm, lnbrSlno, emdNo) {
-	// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
 
-	//배송지 변경 주소찾기
-	let newZipNo = document.querySelector(newZipNoA)
-		newZipNo.value = zipNo;
-	let newAddr = document.querySelector(newAddrA)
-		newAddr.value = roadAddrPart1;
-	let newAddrDetail = document.querySelector(newDetailAddrA)
-		newAddrDetail.value = addrDetail
-
-}
 $(function () {
 	let orderTime = $('.detailOrderOrderTime').text().substring(0,21)
 	$('.detailOrderOrderTime').text(orderTime)
@@ -294,7 +315,7 @@ function orderCancel(){
 		
 }
 
-	//취소창에서 상품 선택하고 수량 입력하면 환불 계산
+	//상품 선택하고 수량 입력하면 환불 계산
 	function selectOrderCancel(className, amountId, rewardId, pointId) {
 		let orderNo = `${detailOrder.orderNo}`;
 	    let orderQty = `${orderQty}` // 총 주문 수량
@@ -304,7 +325,6 @@ function orderCancel(){
  		let selectQty = []
  		let detailedOrderId = []
  		let refundAmount = 0
- 		console.log("반품")
 	    
  		$('.totalCancelQty').text("선택한 상품 수량 : " + totalQty + "권")
  		console.log('총 수량:', totalQty);
@@ -372,8 +392,8 @@ function orderCancel(){
 	 		  			console.log("부분취소한당")
 
 	 		  			refundAmount += data.calcRefund.refundAmount
-	 		  			let refundReward = data.calcRefund.updateReward
-	 		  			let refundPoint = data.calcRefund.updatePoint
+	 		  			let refundReward = data.calcRefund.refundReward
+	 		  			let refundPoint = data.calcRefund.refundPoint
 	 		  			
 	 		  			//환불금액
 	 			  		$(`#\${amountId}`).text(refundAmount.toLocaleString()+ "원")		  				
@@ -923,7 +943,6 @@ function editRturnAccount() {
 											<div class="summery-header d-block">
 												<h3>결제정보</h3>
 											</div>
-											${detailOrder }
 											<ul class="summery-contain pb-0 border-bottom-0">
 												<li class="pb-0">
 													<h4 class="infoTitle">배송비 :</h4>
@@ -986,7 +1005,7 @@ function editRturnAccount() {
 													<h4 class="fw-bold">결제금액</h4> <c:choose>
 														<c:when test="${detailOrder.paymentMethod eq 'bkt' }">
 															<h4 class="fw-bold">
-																<fmt:formatNumber value="${bankTransfer.amountToPay }"
+																<fmt:formatNumber value="${bankTransfer.amountToPay}"
 																	type="NUMBER" />
 																원
 															</h4>
@@ -1005,7 +1024,6 @@ function editRturnAccount() {
 
 											<c:choose>
 												<c:when test="${detailOrder.paymentMethod eq 'bkt' }">
-												${bankTransfer }
 													<ul class="summery-contain pb-0 border-bottom-0">
 														<li class="pb-0">
 															<h4 class="infoTitle">결제수단 :</h4> <c:if
@@ -1017,11 +1035,6 @@ function editRturnAccount() {
 														<li class="pb-0">
 															<h4 class="infoTitle">결제 상태 :</h4>
 															<h4 class="infoContent">${detailOrder.paymentStatus }</h4>
-														</li>
-
-														<li class="pb-0">
-															<h4 class="infoTitle">입금 은행 :</h4>
-															<h4 class="infoContent">${bankTransfer.bankName }</h4>
 														</li>
 
 														<li class="pb-0">
@@ -1135,7 +1148,7 @@ function editRturnAccount() {
 
 					<div>
 						<button type="button" class="btn theme-bg-color btn-md text-white"
-							onclick="goPopup('#editZipNo', '#editAddr', '#editAddrDetail');">주소
+							onclick="sample6_execDaumPostcode('editZipNo', 'editAddr', 'editAddrDetail', 'editExtraAddress');">주소
 							검색</button>
 					</div>
 
@@ -1156,6 +1169,12 @@ function editRturnAccount() {
 							value="${detailOrder.detailedShippingAddress }"
 							id="editAddrDetail" name="detailAddress" placeholder="상세주소" /><label
 							for="editAddrDetail">상세주소</label>
+					</div>
+					
+					<div class="form-floating mb-4 theme-form-floating">
+						<input type="text" class="form-control"
+							id="editExtraAddress" name="detailAddress" placeholder="참고항목" /><label
+							for="editExtraAddress">참고항목</label>
 					</div>
 
 					<div class="form-floating mb-4 theme-form-floating">
@@ -1524,7 +1543,7 @@ function editRturnAccount() {
 				<div class="modal-body">
 					<input class="checkbox_animated check-box" type="checkbox"
 						name="order" id="selectAllReturnOrder"
-						onclick="selectAllReturn();" onchange="selectOrderCancel();" /> <label
+						onclick="selectAllReturn();"/> <label
 						class="form-check-label" for="selectAllReturnOrder"><span>전체선택</span></label>
 					<c:forEach var="order" items="${detailOrderInfo }">
 						<table class="table mb-0 productInfo">
@@ -1617,7 +1636,8 @@ function editRturnAccount() {
 						</div>
 					</div>
 
-					<h4>회수 주소</h4>
+					<h4>회수 주소 
+					<i data-feather="edit" class="me-2" onclick="sample6_execDaumPostcode('returnZipNo', 'returnAddr', 'returnDetailAddr', 'returnExtraAddress');"></i></h4>
 					<ul class="summery-contain pb-0 border-bottom-0">
 						<li class="pb-0 refundList"><input type="text"
 							class="form-control" value="${detailOrder.zipCode }"
@@ -1631,18 +1651,15 @@ function editRturnAccount() {
 							class="form-control"
 							value="${detailOrder.detailedShippingAddress }"
 							id="returnDetailAddr" name="detailedShippingAddress" /></li>
+							
+						<li class="pb-0 refundList"><input type="text"
+							class="form-control"
+							value="${detailOrder.detailedShippingAddress }" id="returnExtraAddress" /></li>
 
 						<li class="pb-0 refundList"><input type="text"
 							class="form-control" value="${detailOrder.deliveryMessage }"
 							id="returnMsg" name="deliveryMessage" placeholder="메세지" /></li>
 
-						<li class="pb-0 refundList">
-							<button
-								class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
-								onclick="goPopup('#returnZipNo', '#returnAddr', '#returnDetailAddr');">
-								<i data-feather="edit" class="me-2"></i> 배송지 변경
-							</button>
-						</li>
 					</ul>
 
 
@@ -1919,7 +1936,8 @@ function editRturnAccount() {
 						</div>
 					</div>
 
-					<h4>회수 주소</h4>
+					<h4>회수 주소 <i data-feather="edit" class="me-2" 
+							onclick="sample6_execDaumPostcode('collectZipNo', 'collectAddr', 'collecDetailAddr', 'collecExtraAddress');"></i></h4>
 					<ul class="summery-contain pb-0 border-bottom-0">
 						<li class="pb-0 refundList"><input type="text"
 							class="form-control" value="${detailOrder.zipCode }"
@@ -1933,22 +1951,20 @@ function editRturnAccount() {
 							class="form-control"
 							value="${detailOrder.detailedShippingAddress }"
 							id="collecDetailAddr" name="detailedShippingAddress" /></li>
+							
+						<li class="pb-0 refundList"><input type="text"
+							class="form-control" id="collecExtraAddress"/></li>
 
 						<li class="pb-0 refundList"><input type="text"
 							class="form-control" value="${detailOrder.deliveryMessage }"
 							id="collecMsg" name="collecMsg" placeholder="메세지" /></li>
-
-						<li class="pb-0 refundList">
-							<button
-								class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3 collecBtn"
-								onclick="goPopup('#collectZipNo', '#collectAddr', '#collecDetailAddr');">
-								<i data-feather="edit" class="me-2"></i> 배송지 변경
-							</button>
-						</li>
 					</ul>
 
-					<h4>교환 받을 주소</h4>
-					<ul class="summery-contain pb-0 border-bottom-0">
+					<h4>교환 받을 주소 
+						<i data-feather="edit" class="me-2" 
+							onclick="sample6_execDaumPostcode('exchangeZipNo', 'exchangeAddr', 'exchangeDetailAddr', 'exchangeExtraAddress');"></i>
+					</h4>
+					<ul class="summery-contain pb-0 border-bottom-0">	
 						<li class="pb-0 refundList"><input type="text"
 							class="form-control" value="${detailOrder.zipCode }"
 							id="exchangeZipNo" name="exchangeZipNo" readonly /></li>
@@ -1961,21 +1977,15 @@ function editRturnAccount() {
 							class="form-control"
 							value="${detailOrder.detailedShippingAddress }"
 							id="exchangeDetailAddr" name="exchangeDetailAddr" /></li>
+							
+						<li class="pb-0 refundList"><input type="text"
+							class="form-control"
+							value="${detailOrder.detailedShippingAddress }" id="exchangeExtraAddress"/></li>
 
 						<li class="pb-0 refundList"><input type="text"
 							class="form-control" value="${detailOrder.deliveryMessage}"
 							id="exchangeMsg" name="exchangeMsg" placeholder="메세지" /></li>
-
-						<li class="pb-0 refundList">
-							<button
-								class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
-								onclick="goPopup('#exchangeZipNo', '#exchangeAddr', '#exchangeDetailAddr');">
-								<i data-feather="edit" class="me-2"></i> 배송지 변경
-							</button>
-						</li>
 					</ul>
-
-
 
 				</div>
 				<div class="modal-footer">

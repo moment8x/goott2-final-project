@@ -181,7 +181,7 @@
 			console.log(productId + "좋아요")
 
 			$.ajax({
-				url : '/list/likeProduct',
+				url : '/wish/likeProduct',
 				type : 'POST',
 				data : {
 					"productId" : productId,
@@ -206,7 +206,7 @@
 			console.log(productId + "싫어요")
 
 			$.ajax({
-				url : '/list/disLikeProduct',
+				url : '/wish/disLikeProduct',
 				type : 'POST',
 				data : {
 					"productId" : productId,

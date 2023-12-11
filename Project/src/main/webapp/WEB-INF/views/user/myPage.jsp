@@ -59,78 +59,61 @@
 	src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
 <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
 
+<script
+	src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
 <script type="text/javascript">
 
-	//도로명주소API 
-	function goPopup() {
-		// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
-		var pop = window.open("jusoPopup", "pop",
-				"width=570,height=420, scrollbars=yes, resizable=yes");
+function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
+    new daum.Postcode({
+        oncomplete: function(data) {
+        	console.log(data)
+        	
+            // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+        	$('#modifyAddress').show()
 
-		// 모바일 웹인 경우, 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrMobileLinkUrl.do)를 호출하게 됩니다.
-		//var pop = window.open("/popup/jusoPopup.jsp","pop","scrollbars=yes, resizable=yes"); 
-	}
-	/** API 서비스 제공항목 확대 (2017.02) **/
-	function jusoCallBack(roadFullAddr, roadAddrPart1, addrDetail,
-			roadAddrPart2, engAddr, jibunAddr, zipNo, admCd, rnMgtSn, bdMgtSn,
-			detBdNmList, bdNm, bdKdcd, siNm, sggNm, emdNm, liNm, rn, udrtYn,
-			buldMnnm, buldSlno, mtYn, lnbrMnnm, lnbrSlno, emdNo) {
-		// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
+            // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+            // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+            let addr = ''; // 주소 변수
+            let extraAddr = ''; // 참고항목 변수
 
-		//회원정보 수정 주소찾기
-		let newZipNo = null;
-		let newAddr = null
-		let newAddrDetail = null
-		
-		if(document.querySelector("#zipNo")){
-			newZipNo = document.querySelector("#zipNo")
-			newZipNo.value = zipNo;
-		}
-		if(document.querySelector("#userAddr")){
-			newAddr = document.querySelector("#userAddr")
-			newAddr.value = roadAddrPart1;
-		}
-		if(document.querySelector("#addrDetail")){
-			newAddrDetail = document.querySelector("#addrDetail")
-			newAddrDetail.value = addrDetail
-		}
-		
-		// 배송주소록 추가 주소찾기
-		let addZipNo = null
-		let addAddr = null
-		let addAddrDetail = null
+            //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+            if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                addr = data.roadAddress;
+            } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                addr = data.jibunAddress;
+            }
 
-		if(document.querySelector("#addZipNo")){
-			addZipNo = document.querySelector("#addZipNo")
-			addZipNo.value = zipNo;
-		}
-		if(document.querySelector("#addAddr")){
-			addAddr = document.querySelector("#addAddr")
-			addAddr.value = roadAddrPart1;
-		}
-		if(document.querySelector("#addAddrDetail")){
-			addAddrDetail = document.querySelector("#addAddrDetail")
-			addAddrDetail.value = addrDetail
-		}
-		
-		//배송주소록 수정 주소찾기
-		let shippingZipNoModify = null
-		let shippingAddrModify = null
-		let shippingDetailAddrModify = null
+            // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+            if(data.userSelectedType === 'R'){
+                // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                    extraAddr += data.bname;
+                }
+                // 건물명이 있고, 공동주택일 경우 추가한다.
+                if(data.buildingName !== '' && data.apartment === 'Y'){
+                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+                // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                if(extraAddr !== ''){
+                    extraAddr = ' (' + extraAddr + ')';
+                }
+                // 조합된 참고항목을 해당 필드에 넣는다.
+                document.getElementById(`\${extraAddress}`).value = extraAddr;
+            
+            } else {
+                document.getElementById(`\${extraAddress}`).value = '';
+            }
 
-		if(document.querySelector("#shippingZipNoModify")){
-			shippingZipNoModify = document.querySelector("#shippingZipNoModify")
-			shippingZipNoModify.value = zipNo;
-		}
-		if(document.querySelector("#shippingAddrModify")){
-			shippingAddrModify = document.querySelector("#shippingAddrModify")
-			shippingAddrModify.value = roadAddrPart1;
-		}
-		if(document.querySelector("#shippingDetailAddrModify")){
-			shippingDetailAddrModify = document.querySelector("#shippingDetailAddrModify")
-			shippingDetailAddrModify.value = addrDetail
-		}
-	}
+            // 우편번호와 주소 정보를 해당 필드에 넣는다.
+            document.getElementById(`\${zipCode}`).value = data.zonecode;
+            document.getElementById(`\${userAddr}`).value = addr;
+            // 커서를 상세주소 필드로 이동한다.
+            document.getElementById(`\${detailAddr}`).focus();
+        }
+    }).open();
+}
 	
 	let IMP = window.IMP;      // 생략 가능
 	IMP.init("imp54017066"); // 예: imp00000000
@@ -157,9 +140,9 @@
 	                			async : false,
 	                			success : function(data) {
 	                				console.log(data);
-	                				if(data == true){
-	                					location.href = "/user/myPage"
-	                				}
+	                			//	if(data == true){
+	                			//		location.href = "/user/myPage"
+	                			//	}
 	                			},
 	                			error : function() {
 	                			}
@@ -212,6 +195,14 @@
 			duplicateCellPhone();
 		})
 		
+		$("#file").on('change',function(){
+		  let fileName = $("#file").val();
+		  $(".upload-name").val(fileName);
+		});
+		
+		$('.modifyProfileBtn').click(function () {
+			$('.cover-icon.filebox').show()
+		})
 		
 		//주문 상태별 조회
 		$("select[id=orderStatusKeyword]").change(function(){
@@ -319,7 +310,7 @@
 	
 	//프로필사진 업로드
 	function uploadProfile() {
-		let fileInput = document.getElementById("uploadProfile")
+		let fileInput = document.getElementById("file")
 		let file = fileInput.files[0]
 		
 		if(file){
@@ -570,7 +561,7 @@
 	function outputShippingAddr(addr) {
 		console.log("id", "${sessionScope.loginMember}");
 		let output = `<button type="button" class="btn theme-bg-color btn-md text-white"
-			onclick="goPopup();">주소 찾기</button>`
+			onclick="sample6_execDaumPostcode('shippingZipNoModify', 'shippingAddrModify', 'shippingDetailAddrModify', 'shippingExtraAddress');">주소 찾기</button>`
 		output += `<div class="col-xxl-6">`
 		output += `<div class="form-floating theme-form-floating">`
 		output += `<input type="text" class="form-control" id="shippingZipNoModify"
@@ -594,6 +585,14 @@
 			id="shippingDetailAddrModify"
 			value="\${addr.detailAddress}" />`
 		output += `<label for="shippingDetailAddrModify">상세주소</label>`
+		output += `</div>`
+		output += `</div>`
+		
+		output += `<div class="col-xxl-12">`
+		output += `<div class="form-floating theme-form-floating">`
+		output += `<input type="text" class="form-control"
+			id="shippingExtraAddress"/>`
+		output += `<label for="shippingExtraAddress">참고항목</label>`
 		output += `</div>`
 		output += `</div>`
 			
@@ -1196,14 +1195,59 @@
 
 </script>
 <style>
-.wishItemName, .wishItemPrice{
+.modifyProfileBtn{
+	background-color: #E0EFEC;
+	width: 100px;
+	height: 30px;
+	border: none;
+	border-radius: 50px;
+	margin-left: 125px;
+}
+.filebox{
+	margin-top: 10px;
+	padding-left: 65px;
+}
+.filebox .upload-name {
+    display: inline-block;
+    height: 40px;
+    padding: 0 10px;
+    vertical-align: middle;
+    border: 1px solid #dddddd;
+    width: 78%;
+    color: #999999;
+}
+
+.filebox label, .profileBtn {
+    display: inline-block;
+    padding: 10px 20px;
+    color: #fff;
+    vertical-align: middle;
+    background-color: #999999;
+    cursor: pointer;
+    height: 40px;
+    margin-left: 10px;
+    border: none;
+    margin-top: 10px;
+}
+
+.filebox input[type="file"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+}
+
+.wishItemName, .wishItemPrice {
 	text-align: center;
 }
+
 #writeInquiry {
 	margin-left: 800px;
 }
 
-.reviewStar {
+.reviewStar, #modifyAddress {
 	display: none;
 }
 
@@ -1237,7 +1281,7 @@
 
 .newPhoneNumberEdit, .newEmailEdit, .newCellPhoneNumberEdit,
 	.editNewUserPwd, .editRefund, #successPwd, #successPhoneNumber,
-	#successCellPhoneNumber, #successEmail {
+	#successCellPhoneNumber, #successEmail, .filebox{
 	display: none;
 }
 
@@ -1445,16 +1489,18 @@
 													class="blur-up lazyload update_img" alt="" />
 											</c:when>
 											<c:otherwise>
-												<img src="/resources/assets/images/profile/${memberImg}"
+												<img src="/resources/profileUpload/${memberImg}"
 													class="blur-up lazyload update_img" alt="" />
 											</c:otherwise>
 										</c:choose>
 									</div>
 								</div>
-								<div class="cover-icon">
-									<input type="file" onchange="readURL(this,0)"
-										id="uploadProfile" /> <input type="button" value="등록"
-										onclick="uploadProfile();" />
+								<button class="modifyProfileBtn">변경</button>	
+								<div class="cover-icon filebox">
+								    <input class="upload-name" value="첨부파일" placeholder="첨부파일">
+								    <label for="file">파일찾기</label> 
+									<input type="file" onchange="readURL(this,0)" id="file" /> 
+									<button class="profileBtn" onclick="uploadProfile();"> 등록</button>			
 								</div>
 
 								<div class="profile-name">
@@ -2166,38 +2212,57 @@
 														</form>
 
 														<form class="row g-4" action="modifyUser" method="post">
-															<div class="col-12">
-																<button type="button"
-																	class="btn theme-bg-color btn-md text-white"
-																	onclick="goPopup();">주소 찾기</button>
-
-															</div>
 
 															<div class="col-12">
 																<div class="form-floating theme-form-floating">
-																	<input type="text" class="form-control" id="zipNo"
-																		name="zipCode" value="${userInfo.zipCode}"
-																		placeholder="우편번호" readonly /> <label for="zipNo">우편번호</label>
+																	<input type="button"
+																		class="btn theme-bg-color btn-md text-white"
+																		onclick="sample6_execDaumPostcode('modifyZipNo', 'modifyUserAddr', 'modifyDetailAddr', 'modifyExtraAddress')"
+																		value="주소 찾기"><br>
 																</div>
 															</div>
 
 															<div class="col-12">
 																<div class="form-floating theme-form-floating">
-																	<input type="text" class="form-control" id="userAddr"
+																	<input type="text" id="modifyZipNo"
+																		value="${userInfo.zipCode}" name="zipCode"
+																		class="form-control" placeholder="우편번호" readonly><label
+																		for="modifyZipNo">우편번호</label>
+																</div>
+															</div>
+
+
+															<div class="col-12">
+																<div class="form-floating theme-form-floating">
+																	<input type="text" id="modifyUserAddr" class="form-control"
 																		name="address" value="${userInfo.address}"
-																		placeholder="주소" readonly /> <label for="userAddr">주소</label>
+																		placeholder="주소" readonly>
+																	<label for="modifyAddr">주소</label>
 																</div>
 															</div>
 
 															<div class="col-12">
 																<div class="form-floating theme-form-floating">
-																	<input type="text" class="form-control" id="addrDetail"
-																		name="detailedAddress"
-																		value="${userInfo.detailedAddress}" placeholder="상세주소" />
-																	<label for="addrDetail">상세주소</label>
+																	<input type="text" id="modifyDetailAddr"
+																		class="form-control" name="detailedAddress"
+																		value="${userInfo.detailedAddress}" placeholder="상세주소"><label
+																		for="modifyDetailAddr">상세주소</label>
+																</div>
+															</div>
+
+															<div class="col-12">
+																<div class="form-floating theme-form-floating">
+																	<input type="text" id="modifyExtraAddress"
+																		class="form-control" placeholder="참고항목"><label
+																		for="modifyExtraAddress">참고항목</label>
+																</div>
+															</div>
+
+															<div class="col-12" id="modifyAddress">
+																<div class="form-floating theme-form-floating">
 																	<div id="successAddr">
 																		<button class="btn theme-bg-color btn-md text-white"
-																			type="submit">변경</button>
+																			type="submit">주소 변경</button>
 																	</div>
 																</div>
 															</div>
@@ -2672,7 +2737,7 @@
 
 					<div>
 						<button type="button" class="btn theme-bg-color btn-md text-white"
-							onclick="goPopup();">주소 검색</button>
+							onclick="sample6_execDaumPostcode('addZipNo', 'addAddr', 'addAddrDetail', 'addExtraAddress');">주소 검색</button>
 					</div>
 
 					<div class="form-floating mb-4 theme-form-floating">
@@ -2690,6 +2755,12 @@
 						<input type="text" class="form-control addAddrDetail"
 							id="addAddrDetail" name="detailAddress" placeholder="상세 주소" /><label
 							for="addAddrDetail">상세주소</label>
+					</div>
+					
+					<div class="form-floating mb-4 theme-form-floating">
+						<input type="text" class="form-control"
+							id="addExtraAddress" placeholder="참고 항목" /><label
+							for="addExtraAddress">참고항목</label>
 					</div>
 
 					<!-- <input class="checkbox_animated check-box" type="checkbox"
