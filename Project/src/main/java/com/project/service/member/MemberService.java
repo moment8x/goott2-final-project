@@ -106,7 +106,7 @@ public interface MemberService {
 	Map<String, Object> selectCancelOrder(String memberId, String orderNo, int detailedOrderId, int selectQty) throws SQLException, NamingException;
 	
 	//출고전, 입금전 주문취소하기
-	boolean cancelOrder(CancelDTO tmpCancel, String memberId) throws SQLException, NamingException;
+	 Map<String, Object>  cancelOrder(CancelDTO tmpCancel, String memberId) throws SQLException, NamingException;
 	
 	//배송완료시 반품하기
 	boolean returnOrder(ReturnOrder ro, String memberId) throws SQLException, NamingException;

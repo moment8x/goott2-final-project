@@ -95,18 +95,19 @@ $(function () {
 	
 	let icOrderTime = $('.infoContent.detailOrderOrderTime').text().substring(0,21)
 	$('.infoContent.detailOrderOrderTime').text(icOrderTime)
-		
-	$(".checkbox_animated.check-box.selectOrderCancel").change(function(){
-		if ($('.checkbox_animated.check-box.selectOrderCancel:checked').length == $('.checkbox_animated.check-box.selectOrderCancel').length) {
-			console.log("모두 체크됨")
-			$("input[name=order]").prop("checked", true);
-		}
-	});	
+
 })
 
+//개별 체크박스 누르면 전체선택 체크
+function isChecked(className) {
+	if ($(`.checkbox_animated.check-box.\${className}:checked`).length == $(`.checkbox_animated.check-box.\${className}`).length) {
+		console.log("모두 체크됨")
+		$("input[name=order]").prop("checked", true);
+	}
+}
+
 //교환 신청 버튼 누르면
-function applyExchange() {
-	$("input[name='order']:checked").each(function () {
+function applyExchange() {	
 		//회수주소
 		let returnZipNo = $('#collectZipNo').val();
 		let returnAddr = $('#collectAddr').val()
@@ -119,14 +120,25 @@ function applyExchange() {
 		let exchangeDetailAddr = $('#exchangeDetailAddr').val()
 		let exchangeMsg = $('#exchangeMsg').val()
 		
-		let detailedOrderId = Number($(this).val());
-		let orderNo = '${detailOrder.orderNo}';
+		let detailedOrderId = []
+		let selectQty = []
+		let orderNo = `${detailOrder.orderNo}`;
 		let exchangeReason = $('#exchangeReason').val()
 		
+		$('.form-control.cancelQty').each(function() {
+		 let qty = $(this).val()
+			if(qty != 0){
+	 			selectQty.push(qty) 				
+			}
+	 	})
+		
+	$(".checkbox_animated.check-box.selectExchange:checked").each(function() {
+		detailedOrderId.push($(this).val())
 		$.ajax({
 			url : '/user/applyExchange', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-			data : {
+			contentType: 'application/json',
+			data : JSON.stringify({
 				returnZipNo,
 				returnAddr,
 				returnDetailAddr,
@@ -138,8 +150,8 @@ function applyExchange() {
 				detailedOrderId,
 				orderNo,
 				exchangeReason
-			},
-			dataType : '',
+			}),
+			dataType : 'text',
 			async : false,
 			success : function(data) {
 				console.log(data);
@@ -157,7 +169,6 @@ function applyExchange() {
 
 //반품 신청 버튼 누르면
 function applyReturn() {
-	$("input[name='order']:checked").each(function () { 
 	let refundBank = $('#returnBank').text();
 	let refundAccount = $('#returnAccount').text();
 	let accountHolder = $('#returnHolder').text();
@@ -165,36 +176,53 @@ function applyReturn() {
 	let addr = $('#returnAddr').val()
 	let detailAddr = $('#returnDetailAddr').val()
 	let returnReason = $('#returnReason').val()
-	let detailedOrderId = Number($(this).val());
+	let detailedOrderId = []
+	let selectQty = []
+	let couponName = []
 	let orderNo = '${detailOrder.orderNo}';
 	let returnMsg = $('#returnMsg').val()
-
-	$.ajax({
-		url : '/user/returnOrder', // 데이터를 수신받을 서버 주소
-		type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-		data : {
-			refundBank,
-			refundAccount,
-			accountHolder,
-			zipNo,
-			addr,
-			detailAddr,
-			returnReason,
-			detailedOrderId,
-			orderNo
-		},
-		dataType : '',
-		async : false,
-		success : function(data) {
-			console.log(data);
-			if(data == 'success'){
-				location.reload()
+	
+	 $('.form-control.cancelQty').each(function() {
+			 let qty = $(this).val()
+	 			if(qty != 0){
+		 			selectQty.push(qty) 				
+	 			}
+		 })
+		 
+		  $('.refundCoupon').each(function () {
+			 couponName.push($(this).text())
+		})
+	
+	$(".checkbox_animated.check-box.selectReturn:checked").each(function() {
+		detailedOrderId.push($(this).val())
+		console.log(detailedOrderId)
+		$.ajax({
+			url : '/user/returnOrder', // 데이터를 수신받을 서버 주소
+			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+			contentType: 'application/json',
+			data : JSON.stringify({
+				refundBank,
+				refundAccount,
+				accountHolder,
+				zipNo,
+				addr,
+				detailAddr,
+				returnReason,
+				detailedOrderId,
+				orderNo
+			}),
+			dataType : 'text',
+			async : false,
+			success : function(data) {
+				console.log(data);
+				if(data == 'success'){
+					location.reload()
+				}
+			},
+			error : function(error) {
+				console.log(error)
 			}
-		},
-		error : function(error) {
-			console.log(error)
-		}
-	});
+		});
 	})
 }
 
@@ -204,56 +232,58 @@ function orderCancel(){
 	let reason = $('#cancelReason').val();
     if (reason.trim() === '') {
         alert('사유를 입력해주세요.');
-     }
-
-//	$("input[name='order']:checked").each(function () {
-//		let cancelReason = $('#cancelReason').val();
-//		let totalQty = calculateTotalQuantity()
-//		let orderQty = `${orderQty}`
-	//	let usedPoint = `${detailOrder.usedPoints}` //사용한 포인트
-	//	let usedReward = `${detailOrder.usedReward}` //사용한 적립금
-	//	let selectQty = $('.form-control.cancelQty').val()
-		
-	//	let detailedOrderId = Number($(this).val());
-	//	let reason = $('#cancelReason').val()
-	//	let amount = Number($('#refundAmount').text().replace(",", "").replace("원", ""))
-	//	let refundPointUsed = 0
-	//	let refundRewardUsed = 0
+        return false;
+     }		
 		let orderNo = `${detailOrder.orderNo}`;
 		let refundBank = $('#changeRefundBank').text();
 		let refundAccount = $('#changeRefundAccount').text();
 		let accountHolder = $('#changeAccountHolder').text();
-	//	let totalRefundAmount = ${detailOrder.totalAmount} //취소하는 상품의 할인전금액
 		let actualRefundAmount = $('#refundAmount').text().replace(",", "").replace("원", ""); // 할인후 금액(돌려줄 환불액)
-		
-	//	console.log("환불포인트" + usedPoint)
-	//	console.log("환불 적립금" + usedReward)
-		console.log("환불금액 " + actualRefundAmount)
-	//	console.log("총 환불금액" + totalRefundAmount)
+		let selectQty = []
+		let detailedOrderId = []
+		let couponName = []
 		
 		 $('.form-control.cancelQty').each(function() {
- 			selectQty = $(this).val()
-		
+			 let qty = $(this).val()
+	 			if(qty != 0){
+		 			selectQty.push(qty) 				
+	 			}
+		 })
+		 
+		  $('.refundCoupon').each(function () {
+			 couponName.push($(this).text())
+		})
+		 
+		$(".checkbox_animated.check-box.selectOrderCancel:checked").each(function() {
+			detailedOrderId.push($(this).val())
+			
 		console.log("selectQty" + selectQty)	
-	
+		console.log("detailedOrderId" +detailedOrderId)
+		console.log("actualRefundAmount" +actualRefundAmount)
+		
 		$.ajax({
 			url : '/user/cancelOrder', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
-			data : {
+			contentType: 'application/json',
+			data : JSON.stringify({
 				orderNo,
 				refundBank,
 				refundAccount,
 				accountHolder,
 				actualRefundAmount,
-				selectQty
-			},
-			dataType : 'text',
+				selectQty,
+				detailedOrderId,
+				reason
+			}),
+			dataType : 'json',
 			async : false,
 			success : function(data) {
 				console.log(data);
-				if(data == 'success'){
-					alert("취소가 완료 되었습니다.")
-					location.reload()
+				if(data.status == 'success'){
+					//if(data.remainingQuantity != 0){
+					//	$('.text-title.remainingQuantity').text("취소 수량 : " + data.remainingQuantity)
+						location.reload()
+				//	}
 				}
 			},
 			error : function(error) {
@@ -261,39 +291,49 @@ function orderCancel(){
 			}
 		});
 	})
-
+		
 }
 
 	//취소창에서 상품 선택하고 수량 입력하면 환불 계산
-	function selectOrderCancel(detailedOrderId) {
+	function selectOrderCancel(className, amountId, rewardId, pointId) {
 		let orderNo = `${detailOrder.orderNo}`;
 	    let orderQty = `${orderQty}` // 총 주문 수량
-	    let actualAmount = `${detailOrder.actualPaymentAmount}` // 카드 실결제금액
-	    let bktActualAmount = `${bankTransfer.amountToPay}` // 무통장 실결제금액
+	    let actualAmount = Number(${detailOrder.actualPaymentAmount}) // 카드 실결제금액
+	    let bktActualAmount = Number(${bankTransfer.amountToPay}) // 무통장 실결제금액
 	    let totalQty = calculateTotalQuantity(); //입력한 총 수량		
- 		let selectQty = 0;
+ 		let selectQty = []
+ 		let detailedOrderId = []
  		let refundAmount = 0
+ 		console.log("반품")
 	    
- 		$('.totalCancelQty').text("취소 상품 수량 : " + totalQty + "권")
+ 		$('.totalCancelQty').text("선택한 상품 수량 : " + totalQty + "권")
  		console.log('총 수량:', totalQty);
  		
  		 $('.form-control.cancelQty').each(function() {
- 			selectQty = $(this).val()
+ 			let qty = $(this).val()
+ 			if(qty != 0){
+	 			selectQty.push(qty) 				
+ 			}
+ 		})
 	 		 console.log(selectQty)
 	 		 
+	 	$(`.checkbox_animated.check-box.\${className}:checked`).each(function() {	 
+	 		detailedOrderId.push($(this).val())
+	 		console.log(detailedOrderId)
 	 		$.ajax({
 	 		      url: "/user/calcRefundAmount", // 데이터를 수신받을 서버 주소
 	 		      type: "post", // 통신방식(GET, POST, PUT, DELETE)
-	 		      data: {
-	 		    	  detailedOrderId, 
+	 		      contentType: 'application/json',
+	 		      data: JSON.stringify({
+	 		    	 detailedOrderId, 
 	 		    	  orderNo,
 	 		    	  selectQty
-	 		      },
+	 		      }),
 	 		      dataType: "json",
 	 		      async: false,
 	 		      success: function (data) {
 	 		        console.log(data);
-	 		        
+	 		       
 	 		        let paymentMethod = "${detailOrder.paymentMethod}" // 결제수단
 	 		       	let usedCouponName = $('.infoContent.usedCoupon').text() //사용한 쿠폰이름
 	 		       	let usedReward = ${detailOrder.usedReward} // 사용한 적립금
@@ -303,31 +343,31 @@ function orderCancel(){
 	 		  		 //개별취소시 쿠폰환불이 가능한지
 	 		  		 $.each(data.couponsHistory, function(i, elt){
 	 			  		 if(data.status == "okCoupon"){
-	 			  			  $('#refundCoupon').text(elt.couponName)
+	 			  			  $('.refundCoupon').text(elt.couponName)
 	 			  		  }else if(data.status == "noCoupon"){
-	 			  			$('#refundCoupon').text("없음")
+	 			  			$('.refundCoupon').text("없음")
 	 			  		  }	  		
 	 		  		 })
 	 		  		 
 	 		  		//전체선택 체크박스 체크되고 총 취소상품 수량이랑 총 주문 수량이랑 일치한다면 => 전체취소
-	 		  		if($("#selectAllOrder").is(":checked") && totalQty == orderQty){
+	 		  		if($(".checkbox_animated.check-box.selectAll").is(":checked") && totalQty == orderQty){
 	 		  			console.log("전체취소한당")
 	 		  			//쿠폰
 	 		  			if(data.couponsHistory == null){
-	 		  				$('#refundCoupon').text("없음")
+	 		  				$('.refundCoupon').text("없음")
 	 		  			}else{
-	 		  				$('#refundCoupon').text(usedCouponName)			
+	 		  				$('.refundCoupon').text(usedCouponName)			
 	 		  			}
 	 		  			//환불금액
 	 		  			if(paymentMethod == "bkt"){
-	 			  			$('#refundAmount').text(bktActualAmount.toLocaleString()+ "원")		  				
+	 			  			$(`#\${amountId}`).text(bktActualAmount.toLocaleString()+ "원")		  				
 	 		  			}else{
-	 		  				$('#refundAmount').text(actualAmount.toLocaleString()+ "원")		
+	 		  				$(`#\${amountId}`).text(actualAmount.toLocaleString()+ "원")		
 	 		  			}
 	 		  			//적립금
-	 		  			$('#refundReward').text(usedReward.toLocaleString()+ "원")
+	 		  			$(`#\${rewardId}`).text(usedReward.toLocaleString()+ "원")
 	 		  			//포인트
-	 		  			 $('#refundPoint').text(usedPoint.toLocaleString()+ "점") 
+	 		  			 $(`#\${pointId}`).text(usedPoint.toLocaleString()+ "점") 
 	 		  		}else{
 	 		  			console.log("부분취소한당")
 
@@ -336,24 +376,28 @@ function orderCancel(){
 	 		  			let refundPoint = data.calcRefund.updatePoint
 	 		  			
 	 		  			//환불금액
-	 			  		$('#refundAmount').text(refundAmount.toLocaleString()+ "원")		  				
+	 			  		$(`#\${amountId}`).text(refundAmount.toLocaleString()+ "원")		  				
 	 		  			//적립금
-	 		  			$('#refundReward').text(refundReward.toLocaleString()+ "원")
+	 		  			$(`#\${rewardId}`).text(refundReward.toLocaleString()+ "원")
 	 		  			//포인트
-	 		  			 $('#refundPoint').text(refundPoint.toLocaleString()+ "점") 
+	 		  			 $(`#\${pointId}`).text(refundPoint.toLocaleString()+ "점") 
 	 		  		}
-	 		  		
-	 		  		if(selectQty > data.cancelOrder.productQuantity){
-	 		  			alert("주문 수량보다 많이 입력 할 수 없습니다.")
-	 		  			$('.totalCancelQty').text("취소 상품 수량 : " + 0)
-	 		  			$('#refundAmount').text("0 원")
-	 		  		}	  		  
+	 		  		for(let i = 0; i < selectQty.length; i++){
+		 		  		if(selectQty[i] > data.cancelOrder.productQuantity){
+		 		  			console.log(i)
+		 		  			console.log(selectQty[i])
+		 		  			console.log(data.cancelOrder.productQuantity)
+		 		  			alert("주문 수량보다 많이 입력 할 수 없습니다.")
+		 		  			$('.totalCancelQty').text("취소 상품 수량 : " + 0)
+		 		  			$(`#\${amountId}`).text("0 원")
+		 		  		}	  		  	 		  			
+	 		  		}
 	 		      },
 	 		      error: function (error) {
 	 		    	  console.log(error);
 	 		      },
 	 		    });
- 		 })
+	 	})
 	}
 	
 	//환불 예정 포인트, 적립금 구하기
@@ -436,13 +480,12 @@ function editBasicShippingAddress() {
 }
 
 //취소 주문한 상품 전체선택
-function selectAll() {
-	if($("#selectAllOrder").is(':checked')) {
+function selectAll(id) {
+	if($(`#\${id}`).is(':checked')) {
 		$("input[name=order]").prop("checked", true);
 	} else {
 		$("input[name=order]").prop("checked", false);
 	}
-	
 }
 
 function selectAllReturn() {
@@ -685,13 +728,13 @@ function editRturnAccount() {
 													<div class="product-detail">
 														<ul>
 															<c:choose>
-																<c:when test="${productNameLength <= 5}">
+																<c:when test="${productNameLength <= 7}">
 																	<li class="name"><a
 																		href="/detail/${order.productId }" id="productName">${order.productName }</a></li>
 																</c:when>
 																<c:otherwise>
 																	<li class="name"><a
-																		href="/detail/${order.productId }" id="productName">${fn:substring(order.productName, 0, 5)}...</a></li>
+																		href="/detail/${order.productId }" id="productName">${fn:substring(order.productName, 0, 7)}...</a></li>
 																</c:otherwise>
 															</c:choose>
 														</ul>
@@ -710,9 +753,8 @@ function editRturnAccount() {
 
 											<td class="name">
 												<h4 class="table-title text-content">수량</h4>
-
 												<h4 class="text-title">${order.productQuantity }</h4>
-
+												<h4 class="text-title remainingQuantity"></h4>
 											</td>
 											<c:choose>
 												<c:when
@@ -746,7 +788,7 @@ function editRturnAccount() {
 														<div>${order.productInvoiceNumber }</div>
 													</td>
 												</c:when>
-												<c:when test="${order.productStatus eq '취소' }">
+												<c:when test="${order.productStatus eq '주문취소' }">
 													<td class="name">
 														<h4 class="table-title text-content">상품상태</h4>
 														<h5>${order.productStatus }</h5>
@@ -1213,8 +1255,8 @@ function editRturnAccount() {
 				</div>
 
 				<div class="modal-body">
-					<input class="checkbox_animated check-box" type="checkbox"
-						name="order" id="selectAllOrder" onclick="selectAll();"
+					<input class="checkbox_animated check-box selectAll" type="checkbox"
+						name="order" id="selectAllOrder" onclick="selectAll('selectAllOrder');"
 						 /> <label
 						class="form-check-label" for="selectAllOrder"><span>전체선택</span></label>
 					<c:forEach var="order" items="${detailOrderInfo }">
@@ -1230,8 +1272,8 @@ function editRturnAccount() {
 														<input
 															class="checkbox_animated check-box selectOrderCancel"
 															type="checkbox" value="${order.detailedOrderId }"
-															name="order"
-															id="selectOrderCancel" />
+															name="order" onchange="isChecked('selectOrderCancel')"
+															id="${order.productId }" />
 														<a href="/detail/${order.productId }"
 															class="product-image"> <img
 															src="${order.productImage }" id="cancelOrderImg"
@@ -1243,8 +1285,8 @@ function editRturnAccount() {
 														<input
 															class="checkbox_animated check-box selectOrderCancel"
 															type="checkbox" value="${order.detailedOrderId }"
-															 name="order"
-															id="selectOrderCancelWithNoImg" />
+															 name="order" onchange="isChecked('selectOrderCancel')"
+															id="${order.productId }" />
 														<a href="/detail/${order.productId }"
 															class="product-image"> <img
 															src="/resources/assets/images/noimage.jpg"
@@ -1285,7 +1327,7 @@ function editRturnAccount() {
 										<td class="name">
 											<h4 class="table-title text-content">수량</h4> <input
 											type="text" class="form-control cancelQty" id="cancelQty"
-											onchange="selectOrderCancel(${order.detailedOrderId });"/>
+											onchange="selectOrderCancel('selectOrderCancel', 'refundAmount', 'refundReward', 'refundPoint');" value="0"/>
 
 										</td>
 
@@ -1446,7 +1488,7 @@ function editRturnAccount() {
 								<h4>환불 예정 쿠폰</h4>
 
 								<div class="couponsHistory">
-									<span id="refundCoupon"></span>
+									<span class="refundCoupon"></span>
 								</div>
 
 							</c:if></li>
@@ -1457,7 +1499,7 @@ function editRturnAccount() {
 					<button type="button" class="btn btn-secondary btn-md"
 						data-bs-dismiss="modal">닫기</button>
 					<button type="button" class="btn theme-bg-color btn-md text-white"
-						onclick="orderCancel();" data-bs-dismiss="modal">취소</button>
+						onclick="return orderCancel();">취소</button>
 				</div>
 			</div>
 		</div>
@@ -1465,7 +1507,7 @@ function editRturnAccount() {
 	<!-- 주문 취소 modal box end -->
 
 	<!-- 반품 modal box start -->
-	<div class="modal fade theme-modal" id="return-order" tabindex="-1"
+	<div class="modal fade theme-modal selectAll" id="return-order" tabindex="-1"
 		aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div
 			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
@@ -1494,9 +1536,9 @@ function editRturnAccount() {
 												<c:choose>
 													<c:when test="${order.productImage != '' }">
 														<input
-															class="checkbox_animated check-box selectOrderCancel"
+															class="checkbox_animated check-box selectReturn"
 															type="checkbox" value="${order.detailedOrderId }"
-															onchange="selectOrderCancel();" name="order"
+															name="order" onchange="isChecked('selectReturn')"
 															id="selectOrderCancel" />
 														<a href="/detail/${order.productId }"
 															class="product-image"> <img
@@ -1507,9 +1549,9 @@ function editRturnAccount() {
 													</c:when>
 													<c:otherwise>
 														<input
-															class="checkbox_animated check-box selectOrderCancel"
+															class="checkbox_animated check-box selectReturn"
 															type="checkbox" value="${order.detailedOrderId }"
-															onchange="selectOrderCancel();" name="order"
+															name="order" onchange="isChecked('selectReturn')"
 															id="selectOrderCancelWithNoImg" />
 														<a href="/detail/${order.productId }"
 															class="product-image"> <img
@@ -1551,7 +1593,7 @@ function editRturnAccount() {
 										<td class="name">
 											<h4 class="table-title text-content">수량</h4> <input
 											type="text" class="form-control cancelQty" id="cancelQty"
-											value="0" />
+											value="0" onchange="selectOrderCancel('selectReturn', 'refundAmountOfReturn', 'refundRewardOfReturn', 'refundPointOfReturn');" />
 
 										</td>
 
@@ -1713,27 +1755,42 @@ function editRturnAccount() {
 					<ul class="summery-contain pb-0 border-bottom-0">
 
 						<li class="pb-0 refundList">
-							<h4>환불 금액</h4> <span id="returnRefundAmount"> 원 </span>
+							<h4>환불 금액</h4> <span id="refundAmountOfReturn"></span>
 
 						</li>
 
-						<c:if test="${detailOrder.usedPoints != 0 }">
-							<li class="pb-0 refundList">
-								<h4>환불 포인트</h4> <span id="returnRefundPoint"> </span>
-							</li>
-						</c:if>
-
-						<c:if test="${detailOrder.usedReward != 0 }">
-							<li class="pb-0 refundList">
-								<h4>환불 적립금</h4> <span id="returnRefundReward"> </span>
-							</li>
-						</c:if>
+						<c:choose>
+							<c:when test="${detailOrder.usedPoints != 0 }">
+								<li class="pb-0 refundList">
+									<h4>환불 포인트</h4> <span id="refundPointOfReturn"> </span>
+								</li>
+							</c:when>
+							<c:otherwise>
+								<li class="pb-0 refundList">
+									<h4>환불 포인트</h4> <span id="refundPointOfReturn">0점</span>
+								</li>
+							</c:otherwise>
+						</c:choose>
+						
+						<c:choose>
+							<c:when test="${detailOrder.usedReward != 0 }">
+								<li class="pb-0 refundList">
+									<h4>환불 적립금</h4> <span id="refundRewardOfReturn"> </span>
+								</li>
+							</c:when>
+							<c:otherwise>
+								<li class="pb-0 refundList">
+									<h4>환불 적립금</h4> <span id="refundRewardOfReturn">0원</span>
+								</li>
+							</c:otherwise>
+						</c:choose>
+						
 						<li class="pb-0 refundList"><c:if
 								test="${couponHistory != null}">
 								<h4>환불 예정 쿠폰</h4>
 
 								<div class="couponsHistory">
-									<span>${couponsHistory.couponName }</span> <span>${couponsHistory.couponDiscount }원</span>
+									<span class="refundCoupon"></span>
 								</div>
 
 							</c:if></li>
@@ -1758,7 +1815,7 @@ function editRturnAccount() {
 			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">반품</h5>
+					<h5 class="modal-title" id="exampleModalLabel">교환</h5>
 
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close">
@@ -1767,10 +1824,10 @@ function editRturnAccount() {
 				</div>
 
 				<div class="modal-body">
-					<input class="checkbox_animated check-box" type="checkbox"
-						name="order" id="selectAllReturnOrder"
-						onclick="selectAllReturn();" onchange="selectOrderCancel();" /> <label
-						class="form-check-label" for="selectAllReturnOrder"><span>전체선택</span></label>
+					<input class="checkbox_animated check-box selectAll" type="checkbox"
+						name="order" id="selectAllExchangeOrder"
+						onclick="selectAll('selectAllExchangeOrder');"/> <label
+						class="form-check-label" for="selectAllExchangeOrder"><span>전체선택</span></label>
 					<c:forEach var="order" items="${detailOrderInfo }">
 						<table class="table mb-0 productInfo">
 							<c:if test="${order.productStatus == '배송완료'}">
@@ -1781,9 +1838,9 @@ function editRturnAccount() {
 												<c:choose>
 													<c:when test="${order.productImage != '' }">
 														<input
-															class="checkbox_animated check-box selectOrderCancel"
+															class="checkbox_animated check-box selectExchange"
 															type="checkbox" value="${order.detailedOrderId }"
-															onchange="selectOrderCancel();" name="order"
+															onchange="isChecked('selectExchange')" name="order"
 															id="selectOrderCancel" />
 														<a href="/detail/${order.productId }"
 															class="product-image"> <img
@@ -1794,9 +1851,9 @@ function editRturnAccount() {
 													</c:when>
 													<c:otherwise>
 														<input
-															class="checkbox_animated check-box selectOrderCancel"
+															class="checkbox_animated check-box selectExchange"
 															type="checkbox" value="${order.detailedOrderId }"
-															onchange="selectOrderCancel();" name="order"
+															onchange="isChecked('selectExchange')" name="order"
 															id="selectOrderCancelWithNoImg" />
 														<a href="/detail/${order.productId }"
 															class="product-image"> <img
