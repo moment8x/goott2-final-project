@@ -29,7 +29,7 @@
 			) AS i
 		ON p.product_id = i.product_id
 		WHERE p.best_seller_status = 1
-		ORDER BY p.publication_date DESC LIMIT 4
+		ORDER BY RAND(), p.publication_date DESC LIMIT 4
 	</select>
 	<select id="getRelatedProduct" resultType="com.project.vodto.kjs.RelatedProductDTO">
 		SELECT p.product_id, p.product_name, i.product_image, r.rating, p.consumer_price, p.selling_price, c.name as category
@@ -44,5 +44,11 @@
 		GROUP BY p.product_id
 		ORDER BY (CASE WHEN p.publisher = #{publisher} THEN 1 ELSE 2 END), p.publication_date DESC
 		LIMIT #{count}
+	</select>
+	<select id="getProductRatingCount" resultType="com.project.vodto.kjs.ProductRatingCountVO">
+		SELECT rating, count(rating) as count
+		FROM review_board
+		WHERE product_id = #{productId} AND is_delete = 'N'
+		GROUP BY rating;
 	</select>
 </mapper>

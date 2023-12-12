@@ -7,7 +7,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +22,7 @@ import com.project.vodto.PagingInfo;
 import com.project.vodto.kjs.BestSellerVO;
 import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ProductImage;
+import com.project.vodto.kjs.ProductRatingCountVO;
 import com.project.vodto.kjs.RelatedProductDTO;
 import com.project.vodto.kjs.ReviewBoardDTO;
 
@@ -36,7 +36,7 @@ public class ProductDetailController {
 	private ReviewService rService;
     
     @RequestMapping("{productId}")
-	public String getDetailPage(@PathVariable("productId") String productId, @RequestParam(value="page", defaultValue = "1") int page, Model model, HttpServletRequest req) throws Exception {
+	public String getDetailPage(@PathVariable("productId") String productId, @RequestParam(value="page", defaultValue = "1") int page, Model model) throws Exception {
 		
 		// 이미지 정보를 제외한 product info
     	DisPlayedProductDTO product = pdService.getProductInfo(productId);
@@ -48,6 +48,8 @@ public class ProductDetailController {
 		Map<String, Object> map = rService.getReviewList(productId, page);
 		// 관련 상품 조회
 		List<RelatedProductDTO> relatedProduct = pdService.getRelatedProduct(productId, product.getPublisher(), product.getCategoryKey());
+		// 해당 상품 별점 별 인원수 조회
+		List<ProductRatingCountVO> ratingCount = pdService.getProductRatingCount(productId);
 		
 		@SuppressWarnings("unchecked")
 		List<ReviewBoardDTO> reviewList = (List<ReviewBoardDTO>)map.get("reviewList");
@@ -59,6 +61,7 @@ public class ProductDetailController {
 		model.addAttribute("reviewList", reviewList);
 		model.addAttribute("pagingInfo", pagingInfo);
 		model.addAttribute("related", relatedProduct);
+		model.addAttribute("ratingCount", ratingCount);
 		
 		return "detail";
     }

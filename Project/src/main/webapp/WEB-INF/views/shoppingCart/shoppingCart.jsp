@@ -62,7 +62,7 @@
 					alert("재고량(" + maxium + ")보다 높은 수를 입력하실 수 없습니다.");
 				} else {
 					digitize(prod);
-					$('#total' + prod).html("&#8361;" + addComma(price * $('#' + prod).val()));
+					$('#total' + prod).html(addComma(price * $('#' + prod).val()) + "원");
 					
 					updateQTY(prod, $(this).val());
 				}
@@ -118,6 +118,7 @@
 			let output3 = "";
 			let subtotal = 0;
 			let total = 0;
+			let shipping = 0;
 			if (data.status === "success") {
 				let items = data.list.items;
 				isLogin = data.isLogin;
@@ -141,10 +142,10 @@
 					output += `<li class="text-content"><span class="text-title">Quantity</span> - 500 g</li>`;
 					// 가격
 					output += `<td class="price"><h4 class="table-title text-content">Price</h4>`;
-					output += '<h5>&#8361;' + item.sellingPrice.toLocaleString('ko-KR')
-					output += '<del class="text-content">&#8361;' + item.consumerPrice.toLocaleString('ko-KR') + '</del></h5>';
-					output += '<h6 class="theme-color">You Save : &#8361;'
-					output += (item.consumerPrice - item.sellingPrice).toLocaleString('ko-KR') + '</h6></td>';
+					output += '<h5>' + item.sellingPrice.toLocaleString('ko-KR') + "원"
+					output += '<del class="text-content">' + item.consumerPrice.toLocaleString('ko-KR') + '원</del></h5>';
+					output += '<h6 class="theme-color">You Save : '
+					output += (item.consumerPrice - item.sellingPrice).toLocaleString('ko-KR') + '원</h6></td>';
 					// QTY
 					if (item.currentQuantity >  0) {
 						output += `<td class="quantity"><h4 class="table-title text-content">Qty</h4>`;
@@ -167,17 +168,12 @@
 					}
 					// 해당 아이템 최종 가격
 					output += `<td class="subtotal"><h4 class="table-title text-content">Total</h4>`;
-					output += `<h5 id="\${'total' + item.productId}" class="subtotal calc_total">&#8361;`;
-					output += (item.sellingPrice * item.quantity).toLocaleString('ko-KR') + '</h5></td>';
-					// 완성 전 주석 처리
+					output += `<h5 id="\${'total' + item.productId}" class="subtotal calc_total">`;
+					output += (item.sellingPrice * item.quantity).toLocaleString('ko-KR') + '원</h5></td>';
+					
 					output += '<td class="save-remove" style="min-width:20px;"><h4 class="table-title text-content">Action</h4>';
 					output += `<button class="remove close_button" onclick="deleteItem(this);" value="\${item.productId}">`
 					output += '<i class="fa-regular fa-trash-can"></i></button></td></tr>';
-					// 완성 전에는 주석 풀고 냅두기
-					//output += `<td class="save-remove"><h4 class="table-title text-content">Action</h4>`;
-					//output += `<a class="save notifi-wishlist" href="javascript:void(0)">Save for later</a>`;
-					//output += `<button class="remove close_button" onclick="deleteItem(this);" value="\${item.productId}">Remove</button></td></tr>`;
-					
 					// 아오 ㅠㅠ
 					if (item.currentQuantity > 0) {
 						buyInfo.push({
@@ -190,24 +186,35 @@
 					buy();
 				});
 				
-				total = subtotal + 3000;
+				if (subtotal < 10000) {
+					shipping = 3000;
+				}
+				total = subtotal + shipping;
 				
 				output2 += '<div class="coupon-cart"><h6 class="text-content mb-2">Coupon Apply</h6>';
 				output2 += '<div class="mb-3 coupon-box input-group">';
 				output2 += '<input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Enter Coupon Code Here...">';
 				output2 += '<button class="btn-apply">Apply</button></div></div>';
-				output2 += `<ul><li><h4>Subtotal</h4><h4 class="price" id="subtotal">&#8361;` + addComma(subtotal) + `</h4></li>`;
+				output2 += `<ul><li><h4>Subtotal</h4><h4 class="price" id="subtotal">` + addComma(subtotal) + `원</h4></li>`;
 				output2 += '<li><h4>Coupon Discount</h4><h4 class="price">(-) 0.00</h4></li>';
-				output2 += '<li class="align-items-start"><h4>Shipping</h4><h4 class="price text-end" id="shipping">&#8361;3,000</h4>';
+				output2 += '<li class="align-items-start"><h4>Shipping</h4><h4 class="price text-end" id="shipping">' + addComma(shipping) + '원</h4>';
 				output2 += '</li></ul>';
-				
 			} else if (data.status === "none") {
-				output += `<div>등록된 상품이 없습니다.</div>`;
-				output += `<div><button>로그인 하기</button></div>`;
+				output += '<div>등록된 상품이 없습니다.</div>';
+				output += '<div><button onclick="location.href=\'/login/\'">로그인 하기</button></div>';
+				
+				output2 += '<div class="coupon-cart"><h6 class="text-content mb-2">Coupon Apply</h6>';
+				output2 += '<div class="mb-3 coupon-box input-group">';
+				output2 += '<input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Enter Coupon Code Here...">';
+				output2 += '<button class="btn-apply">Apply</button></div></div>';
+				output2 += `<ul><li><h4>Subtotal</h4><h4 class="price" id="subtotal">0원</h4></li>`;
+				output2 += '<li><h4>Coupon Discount</h4><h4 class="price">(-) 0.00</h4></li>';
+				output2 += '<li class="align-items-start"><h4>Shipping</h4><h4 class="price text-end" id="shipping">0원</h4>';
+				output2 += '</li></ul>';
 			}
 			
 			output3 += '<li class="list-total border-top-0"><h4>Total (USD)</h4>';
-			output3 += '<h4 class="price theme-color" id="total_amount">&#8361;' + addComma(total) + '</h4></li>';
+			output3 += '<h4 class="price theme-color" id="total_amount">' + addComma(total) + '원</h4></li>';
 			
 			$('.tbody').html(output);
 			$('.summery-contain').html(output2);
@@ -244,7 +251,7 @@
 			}
 		}
 		function digitizeNormal(price) {
-			price = price.substr(1);
+			price = price.substr(0, price.lastIndexOf("원") - 1);
 			
 			if(price.indexOf(",") != -1){
 				price = price.replace(/(,)/g, "");
@@ -258,7 +265,7 @@
 			if (parseInt($('#' + prod).val()) < stock) {
 				digitize(prod);
 				$('#' + prod).val(Number($('#' + prod).val()) + 1);
-				$('#total' + prod).html("&#8361;" + addComma(price * $('#' + prod).val()));
+				$('#total' + prod).html(addComma(price * $('#' + prod).val()) + "원");
 				
 				$.each(buyInfo, function(i, info) {
 					if (info.productId === prod) {
@@ -274,7 +281,7 @@
 			if ($('#' + prod).val() > 0) {
 				digitize(prod);
 				$('#' + prod).val($('#' + prod).val() - 1);
-				$('#total' + prod).html("&#8361;" + addComma(price * $('#' + prod).val()));
+				$('#total' + prod).html(addComma(price * $('#' + prod).val()) + "원");
 				
 				$.each(buyInfo, function(i, info) {
 					if (info.productId === prod) {
@@ -321,7 +328,7 @@
 				temp = digitizeNormal(temp);
 				sum += Number(temp);
 			}
-			$('#subtotal').html("&#8361;" + addComma(sum));
+			$('#subtotal').html(addComma(sum) + "원");
 		}
 		
 		// 총 결제액(total amount)
@@ -331,7 +338,7 @@
 			subtotal = Number(digitizeNormal(subtotal));
 			shippingPay = Number(digitizeNormal(shippingPay));
 			
-			$('#total_amount').html("&#8361;" + addComma(subtotal + shippingPay));
+			$('#total_amount').html(addComma(subtotal + shippingPay) + "원");
 		}
 		
 		// 단일 아이템 삭제

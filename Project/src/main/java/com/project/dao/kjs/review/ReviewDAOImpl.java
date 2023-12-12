@@ -122,8 +122,8 @@ public class ReviewDAOImpl implements ReviewDAO {
 	}
 
 	@Override
-	public int insertRatings(Ratings ratings) throws SQLException, NamingException {
-		return session.insert(ns + ".insertRatings", ratings);
+	public int insertRatings(Ratings rating) throws SQLException, NamingException {
+		return session.insert(ns + ".insertRatings", rating);
 	}
 
 	@Override

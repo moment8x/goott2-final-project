@@ -7,8 +7,6 @@ import javax.naming.NamingException;
 
 import org.springframework.stereotype.Repository;
 
-import com.project.vodto.BankTransfer;
-import com.project.vodto.CouponLog;
 import com.project.vodto.Member;
 import com.project.vodto.PointLog;
 import com.project.vodto.RewardLog;
@@ -30,6 +28,7 @@ import com.project.vodto.jmj.exchangeDTO;
 import com.project.vodto.jmj.MyPageReview;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
+import com.project.vodto.kjs.TermsOfSignUpVO;
 
 @Repository
 public interface MemberDAO {
@@ -269,6 +268,8 @@ public interface MemberDAO {
 	int updateProfile(String memberId, String newFileName) throws SQLException, NamingException;
 	// 기본 배송지 설정
 	int insertShipping(ShippingAddrDTO shipping) throws SQLException, NamingException;
+	// 약관 가져오기
+	List<TermsOfSignUpVO> getTerms() throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
 
 	

@@ -96,11 +96,13 @@
       
       // 리뷰 작성하려 할 시 검증!
       $("form").click(function(e) {
+    	  console.log("chk");
          if (${sessionScope.loginMember == null}) {
             if (window.confirm("회원만 리뷰 등록이 가능합니다. 로그인 페이지로 이동하시겠습니까?")) {
                location.href="/login/";
             } else {
-               return false;
+            	$("#floatingTextarea2").attr("readonly", true);
+				return false;
             }
          } else {
             $.ajax({
@@ -112,9 +114,14 @@
                dataType : "json",
                async : false,
                success : function(data) {
-                  console.log("success", data);
+                  if (data) {
+                	  $("#floatingTextarea2").attr("readonly", false);
+                  } else {
+                	  $("#floatingTextarea2").attr("readonly", true);
+                  }
                }, error : function(data) {
                   console.log("error", data);
+                  $("#floatingTextarea2").attr("readonly", true);
                }
             });
          }
@@ -136,19 +143,19 @@
 						fileList,
 						deleteFileList
 				}
-				console.log("sendData",sendData);
 				$.ajax({
 					url : "/review/saveReview",
 					type : "POST",
 					contentType : "application/json",
 					data : JSON.stringify(sendData),
+					dataType : "JSON",
 					async : false,
 					success : function(data) {
-						console.log("업로드성공", data);
 						if (data != null) 
 							fileList = [];
 							deleteFileList = [];
 							showUploadedFile(key);
+							showRatingBox(ratingCount);
 					}, error : function(data) {
 						console.log("업로드 실패", data);
 					}
@@ -158,6 +165,30 @@
 			}
 		});
 	});
+	
+	// rating-box 그리기
+	function showRatingBox(ratingCount) {
+		let output = "<ul>";
+		let index = 0;
+		console.log("ratingCount", ratingCount);
+		for (let i = 0; i < 5; i++) {
+			if (ratingCount[index].rating == i + 1) {
+				let percent = ratingCount[index].count / ${product.participationCount} * 100;
+				console.log("percent",percent);
+				output += '<li><div class="rating-list"><h5>' + (i + 1) +' Star</h5><div class="progress">';
+				output += '<div class="progress-bar" role="progressbar" style="width: ' + percent + '%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">'
+										+ percent + '%</div>';
+				output += '</div></div></li>';
+				index++;
+			} else {
+				output += '<li><div class="rating-list"><h5>' + (i + 1) +' Star</h5><div class="progress">';
+				output += '<div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">0%</div>';
+				output += '</div></div></li>';
+			}
+		}
+		output += '</ul>';
+		$('.rating-box').html(output);
+	}
 	
 	// 관련 상품 장바구니 추가
 	function addCartRelated(productId) {
@@ -260,7 +291,6 @@
 		dataType: "JSON",
 		async: false,
 		success: function(data) {
-           console.log("success", data);
            showReview(data);
            paging(data.pagingInfo);
            changeStar();
@@ -336,7 +366,6 @@
 					processData : false,   // text데이터에 대해 쿼리스트링 처리를 하지 않겠다.  default = true
 					contentType : false,   // application/x-www-form-urlencoded 처리 안함.(인코딩 하지 않음)  default = true
 					success : function(data) {
-						console.log("업로드성공", data);
 						if (data != null) {
 							fileList.push(data);
 							showUploadedFile(key);
@@ -441,22 +470,23 @@
 			fileList,
 			deleteFileList
 		}
-      $.ajax({
-         url : "/review/update",
-         type : "POST",
-         contentType : "application/json",
-         data : JSON.stringify(sendData),
-         dataType : "JSON",
-         async : false,
-         success : function(data) {
-            console.log("success", data);
-            showReview(data);
-            paging(data.pagingInfo);
-         }, error : function(data) {
-            console.log("err", data);
-         }
-      });
-   }
+		$.ajax({
+			url : "/review/update",
+			type : "POST",
+			contentType : "application/json",
+			data : JSON.stringify(sendData),
+			dataType : "JSON",
+			async : false,
+			success : function(data) {
+				console.log("update", data);
+				showReview(data);
+				paging(data.pagingInfo);
+				showRatingBox(data.ratingCount);
+			}, error : function(data) {
+				console.log("err", data);
+			}
+		});
+   	}
    
    // 리뷰 수정 중 취소 시
    function updateCancel(index, postNo, author, content, rating) {
@@ -501,9 +531,9 @@
          dataType: "JSON",
          async: false,
          success: function(data) {
-            console.log("delete", data);
             showReview(data);
             paging(data.pagingInfo);
+            showRatingBox(data.ratingCount);
          }, error: function(data) {
             console.log("err", data);
          }
@@ -602,7 +632,6 @@
          dataType: "JSON",
          async: false,
          success: function(data) {
-            console.log(data);
             if (data.status === "success") {
                alert("장바구니 등록 완료");
                newCart(data.cartItems);
@@ -649,8 +678,23 @@
    
 	// 페이지 나갈 시
 	window.onbeforeunload = function (e) {
-		console.log("beforeunload 실행");
-		window.navigator.sendBeacon('/review/refreshFile');
+		let sendData = {
+				fileList
+		}
+		$.ajax({
+			url : "/review/refreshFile",
+			type : "POST",
+			contentType : "application/json",
+			data : JSON.stringify(fileList),
+			dataType : "JSON",
+			async : true,
+			success : function(data) {
+				console.log("OK");
+			}, error : function(data) {
+				console.log("err");
+			}
+		});
+		//window.navigator.sendBeacon('/review/refreshFile');
 	};
 	
 	// form버튼으로 페이지 이동 시
@@ -1053,7 +1097,37 @@
                                                    
                                                    <div class="rating-box">
                                                       <ul>
-                                                         <li>
+                                                      	<c:set var="i" value="0"/>
+                                                      	<c:forEach begin="1" end="5" step="1" varStatus="status">
+                                                      		<c:choose>
+                                                      			<c:when test="${ratingCount[i].rating == status.count}">
+                                                      				<li>
+                                                      					<div class="rating-list">
+                                                      						<h5>${status.count} Star</h5>
+                                                      						<div class="progress">
+                                                      							<div class="progress-bar" role="progressbar"
+																				style="width: ${ratingCount[i].count / product.participationCount * 100}%" aria-valuenow="100"
+																				aria-valuemin="0" aria-valuemax="100">${ratingCount[i].count / product.participationCount * 100}%</div>
+																			</div>
+																		</div>
+																	</li>
+																	<c:set var="i" value="${i + 1}"/>
+                                                      			</c:when>
+                                                      			<c:otherwise>
+                                                      				<li>
+                                                      					<div class="rating-list">
+                                                      						<h5>${status.count} Star</h5>
+                                                      						<div class="progress">
+                                                      							<div class="progress-bar" role="progressbar"
+																				style="width: 0%" aria-valuenow="100"
+																				aria-valuemin="0" aria-valuemax="100">0%</div>
+																			</div>
+																		</div>
+																	</li>
+                                                      			</c:otherwise>
+                                                      		</c:choose>
+                                                      	</c:forEach>
+                                                         <!-- <li>
                                                             <div class="rating-list">
                                                                <h5>5 Star</h5>
                                                                <div class="progress">
@@ -1102,7 +1176,7 @@
                                                                   aria-valuemin="0" aria-valuemax="100">24%</div>
                                                                </div>
                                                             </div>
-                                                         </li>
+                                                         </li> -->
                                                       </ul>
                                                    </div>
                                                 </div>
@@ -1296,31 +1370,6 @@
             <div class="col-xxl-3 col-xl-4 col-lg-5 d-none d-lg-block wow fadeInUp">
                <div class="right-sidebar-box">
                   <div class="vendor-box">
-                     <div class="verndor-contain">
-                        <div class="vendor-image">
-                           <img src="/resources/assets/images/product/vendor.png"
-                              class="blur-up lazyload" alt="">
-                        </div>
-                        
-                        <div class="vendor-name">
-                           <h5 class="fw-500">Noodles Co.</h5>
-                           
-                           <div class="product-rating mt-1">
-                              <ul class="rating">
-                                 <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                 <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                 <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                 <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                 <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
-                              </ul>
-                              <span>(36 Reviews)</span>
-                           </div>
-                        </div>
-                     </div>
-                     <p class="vendor-detail">Noodles & Company is an American
-                        fast-casual restaurant that offers international and American
-                        noodle dishes and pasta.</p>
-                     
                      <div class="vendor-list">
                         <ul>
                            <li>
@@ -1350,27 +1399,6 @@
                      <div class="category-menu">
                         <h3>베스트 셀러</h3>
                         <ul class="product-list product-right-sidebar border-0 p-0 best-seller"></ul>
-                     </div>
-                  </div>
-               
-                  <!-- Banner Section -->
-                  <div class="ratio_156 pt-25">
-                     <div class="home-contain">
-                        <img src="/resources/assets/images/vegetable/banner/8.jpg"
-                           class="bg-img blur-up lazyload" alt="">
-                        <div class="home-detail p-top-left home-p-medium">
-                           <div>
-                              <h6 class="text-yellow home-banner">Seafood</h6>
-                              <h3 class="text-uppercase fw-normal">
-                                 <span class="theme-color fw-bold">Freshes</span> Products
-                              </h3>
-                              <h3 class="fw-light">every hour</h3>
-                              <button onclick="location.href = 'shop-left-sidebar.html';"
-                                 class="btn btn-animation btn-md fw-bold mend-auto">
-                                 Shop Now <i class="fa-solid fa-arrow-right icon"></i>
-                              </button>
-                           </div>
-                        </div>
                      </div>
                   </div>
                </div>

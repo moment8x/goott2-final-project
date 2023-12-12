@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -34,7 +35,11 @@
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
     <script>
+    	let fileName = "";
     	let checkDuplication = false;
+    	let isValidServiceTerms = false;
+    	let isValidPrivacyTerms = false;
+    	
     	let isValidId = false;
     	
     	let checkedPasswordFormat = false;
@@ -46,8 +51,8 @@
     	let isValidPhone1 = false;
     	let isValidPhone2 = false;
     	let isValidPhone3 = false;
-    	let isValidCellPhone1 = false;
     	let isValidCellPhone2 = false;
+    	let isValidCellPhone3 = false;
     	let isValidBirth = false;
     	let isValidZipCode = false;
     	let isValidAddress = false;
@@ -56,6 +61,95 @@
     	IMP.init("imp77460302") // 예: 'imp00000000a'
     	
     	$(function () {
+    		$('#submit-btn').click(function (e) {
+    			let snsSign = window.location.search;
+    			if (snsSign != "") {
+	    			snsSign = snsSign.split("?")[1];
+	    			if (snsSign.includes("snsSignUp")) {
+	    				snsSign = snsSign.split("snsSignUp=")[1].charAt(0);
+	    			}
+    			}
+        		if (isValid()) {
+        			if (snsSign != 1) {
+	    	    		let sendData = {
+	    	    			"memberId" : $('#memberId').val(),
+	    	    			"password" : $('#password').val(),
+	    	    			"name" : $('#name').val(),
+	    	    			"email" : $('#email').val(),
+	    	    			"phoneNumber1" : $('#phone-number1').val(),
+	    	    			"phoneNumber2" : $('#phone-number2').val(),
+	    	    			"phoneNumber3" : $('#phone-number3').val(),
+	    	    			"cellPhoneNumber1" : $('#cell-phone-number1').val(),
+	    	    			"cellPhoneNumber2" : $('#cell-phone-number2').val(),
+	    	    			"cellPhoneNumber3" : $('#cell-phone-number3').val(),
+	    	    			"dateOfBirth" : $('#dateOfBirth').val(),
+	    	    			"gender" : $('input[name=gender]:checked').val(),
+	    	    			"zipCode" : $('#zipCode').val(),
+	    	    			"address" : $('#address').val(),
+	    	    			"detailedAddress" : $('#detailedAddress').val(),
+	    	    			"baseAddr" : $('input[name=baseAddr]:checked').val(),
+	    	    			"refundBank" : $('#refundBank').val(),
+	    	    			"refundAccount" : $('#refundAccount').val(),
+	    	    			fileList
+	    	    		}
+        			} else {
+        				let sendData = {
+    	    	    		"memberId" : "${id}",
+    	    	    		"password" : $('#password').val(),
+    	    	    		"name" : $('#name').val(),
+    	    	    		"email" : $('#email').val(),
+    	    	    		"cellPhoneNumber" : "${mobile}",
+    	    	    		"dateOfBirth" : $('#dateOfBirth').val(),
+    	    	    		"gender" : $('input[name=gender]:checked').val(),
+    	    	    		"zipCode" : $('#zipCode').val(),
+    	    	    		"address" : $('#address').val(),
+    	    	    		"detailedAddress" : $('#detailedAddress').val(),
+    	    	    		"baseAddr" : $('input[name=baseAddr]:checked').val(),
+    	    	    		"refundBank" : $('#refundBank').val(),
+    	    	    		"refundAccount" : $('#refundAccount').val(),
+    	    	    		fileList
+    	    	    	}
+        			}
+    	    		$.ajax({
+    	    			url : "/register/signUp",
+    	    			type : "POST",
+    	    			contentType : "application/json",
+    	    			data : JSON.stringify(sendData),
+    	    			dataType : "TEXT",
+    	    			async : false,
+    	    			success : function(data) {
+    	    			}, error : function(data) {
+    	    				console.log("err", data);
+    	    			}
+    	    		});
+        		}
+    		});
+    		
+    		$('#sendMail').click(function (e) {
+        		if ($('#email').val() != '') {
+        			// 이메일 전송
+        			$.ajax({
+        				url : "/register/sendMail",
+        				type : "GET",
+        				data : {
+        					"email" : $('#email').val()
+        				},
+        				dataType : "text",
+        				async : false,
+        				success : function(data) {
+        					if (data == "success") {
+        						alert('메일을 발송했습니다.');
+        					}
+        				}, error : function(data) {
+        					console.log("error", data);
+        					alert('메일 발송에 실패했습니다.');
+        				}
+        			});
+        		} else {
+    				alert('이메일 주소를 기입하고 인증 버튼을 눌러주세요');
+    			}
+    		});
+    		
     		// 아이디 유효성 검사
 	    	$('#memberId').on('blur', function () {
 	    		let regType1 = /^[A-Za-z0-9]{4,13}$/;	// 4~13글자의 영문자, 숫자만 입력 가능 정규식
@@ -134,33 +228,36 @@
     		// 전화번호1 유효성 검사
     		$('#phone-number1').on('blur', function() {
     			let regNumber = /^[0-9]{2,4}$/;
-    			if (!regNumber.test($(this).val())) {
-    				$('#phone-number').parent().next().html('');
+    			if (regNumber.test($(this).val())) {
+    				$('#phone-number1').parent().next().html('');
     				isValidPhone1 = true;
     			} else {
-    				$('#phone-number').parent().next().html('숫자만 입력이 가능합니다.');
+    				$('#phone-number1').parent().next().html('숫자만 입력이 가능합니다.');
+    				notValidCss("phone-number1");
     				isValidPhone1 = false;
     			}
     		});
     		// 전화번호2 유효성 검사
     		$('#phone-number2').on('blur', function() {
     			let regNumber = /^[0-9]{3,4}$/;
-    			if (!regNumber.test($(this).val())) {
+    			if (regNumber.test($(this).val())) {
     				$('#phone-number2').parent().next().html('');
     				isValidPhone2 = true;
     			} else {
     				$('#phone-number2').parent().next().html('숫자만 입력이 가능합니다.');
+    				notValidCss("phone-number2");
     				isValidPhone2 = false;
     			}
     		});
     		// 전화번호3 유효성 검사
     		$('#phone-number3').on('blur', function() {
     			let regNumber = /^[0-9]{4}$/;
-    			if (!regNumber.test($(this).val())) {
+    			if (regNumber.test($(this).val())) {
     				$('#phone-number3').parent().next().html('');
     				isValidPhone3 = true;
     			} else {
     				$('#phone-number3').parent().next().html('숫자만 입력이 가능합니다.');
+    				notValidCss("phone-number3");
     				isValidPhone3 = false;
     			}
     		});
@@ -168,23 +265,25 @@
     		// 휴대폰 번호1 유효성 검사
     		$('#cell-phone-number1').on('blur', function() {
     			let regNumber = /^[0-9]{3,4}$/;
-    			if (!regNumber.test($(this).val())) {
+    			if (regNumber.test($(this).val())) {
     				$('#cell-phone-number1').parent().next().html('');
-    				isValidCellPhone1 = true;
+    				isValidCellPhone2 = true;
     			} else {
     				$('#cell-phone-number1').parent().next().html('숫자만 입력이 가능합니다.');
-    				isValidCellPhone1 = false;
+    				notValidCss("cell-phone-number1");
+    				isValidCellPhone2 = false;
     			}
     		});
     		// 휴대폰 번호2 유효성 검사
     		$('#cell-phone-number2').on('blur', function() {
     			let regNumber = /^[0-9]{4}$/;
-    			if (!regNumber.test($(this).val())) {
+    			if (regNumber.test($(this).val())) {
     				$('#cell-phone-number2').parent().next().html('');
-    				isValidCellPhone2 = true;
+    				isValidCellPhone3 = true;
     			} else {
     				$('#cell-phone-number2').parent().next().html('숫자만 입력이 가능합니다.');
-    				isValidCellPhone2 = false;
+    				notValidCss("cell-phone-number2");
+    				isValidCellPhone3 = false;
     			}
     		});
     		
@@ -225,23 +324,22 @@
     		});
     		$(".upFileArea").on("drop", function(evt) {
     			evt.preventDefault();
-    			
     			let files = evt.originalEvent.dataTransfer.files;
     			for (let i = 0; i < 1/*files.length*/; i++) {
     				let form = new FormData();
     				form.append("uploadFile", files[i]);	// 파일의 이름을 컨트롤러단의 MultipartFile 객체명과 맞춘다.
-    				
+    				form.append("fileName", fileName);
     				$.ajax({
     					url : "/register/uploadFile",
     					type : "post",
     					data : form,
     					dataType : "json",
     					async : false,
-    					processData : false,	// text데이터에 대해 쿼리스트링 처리를 하지 않겠다.  default = true
-    					contentType : false,	// application/x-www-form-urlencoded 처리 안함.(인코딩 하지 않음)  default = true
+    					processData : false,   // text데이터에 대해 쿼리스트링 처리를 하지 않겠다.  default = true
+    					contentType : false,   // application/x-www-form-urlencoded 처리 안함.(인코딩 하지 않음)  default = true
     					success : function(data) {
-    						console.log("업로드성공", data);
     						if (data != null) {
+    							fileName = data.newFileName;
     							showUploadedFile(data);
     						}
     					}, error : function(data) {
@@ -250,7 +348,67 @@
     				});
     			}
     		});
+    		
+    		// 약관 동의
+    		$("#service-terms").click(function(e) {
+    			if (document.getElementById('service-terms').checked) {
+    				isValidServiceTerms = true;
+    			} else {
+    				isValidServiceTerms = false;
+    			}
+    		});
+    		// 개인정보처리 동의
+    		$("#privacy-terms").click(function(e) {
+    			if (document.getElementById('privacy-terms').checked) {
+    				isValidPrivacyTerms = true;
+    			} else {
+    				isValidPrivacyTerms = false;
+    			}
+    		});
     	});
+    	
+    	// 회원가입하기
+    	/*function signUp() {
+    		console.log("1");
+    		if (isValid()) {
+    			console.log("2");
+	    		let sendData = {
+	    				"memberId" : $('#memberId').val(),
+	    				"password" : $('#password').val(),
+	    				"name" : $('#name').val(),
+	    				"email" : $('#email').val(),
+	    				"phoneNumber1" : $('#phone-number1').val(),
+	    				"phoneNumber2" : $('#phone-number2').val(),
+	    				"phoneNumber3" : $('#phone-number3').val(),
+	    				"cellPhoneNumber1" : $('#cell-phone-number1').val(),
+	    				"cellPhoneNumber2" : $('#cell-phone-number2').val(),
+	    				"cellPhoneNumber3" : $('#cell-phone-number3').val(),
+	    				"dateOfBirth" : $('#dateOfBirth').val(),
+	    				"gender" : $('input[name=gender]:checked').val(),
+	    				"zipCode" : $('#zipCode').val(),
+	    				"address" : $('#address').val(),
+	    				"detailedAddress" : $('#detailedAddress').val(),
+	    				"baseAddr" : $('input[name=baseAddr]:checked').val(),
+	    				"refundBank" : $('#refundBank').val(),
+	    				"refundAccount" : $('#refundAccount').val(),
+	    				fileList
+	    		}
+	    		console.log("3");
+	    		$.ajax({
+	    			url : "/reginster/signUp",
+	    			type : "POST",
+	    			contentType : "application/json",
+	    			data : JSON.stringify(sendData),
+	    			dataType : "JSON",
+	    			async : false,
+	    			success : function(data) {
+	    				console.log("gg");
+	    			}, error : function(data) {
+	    				console.log("err", data);
+	    			}
+	    		});
+    		}
+    	}*/
     	
     	// 이메일 인증하기
     	function sendMail() {
@@ -265,7 +423,6 @@
     				dataType : "JSON",
     				async : false,
     				success : function(data) {
-    					console.log("success", data);
     					if (data.status = "success") {
     						alert('메일을 발송했습니다.');
     					}
@@ -284,12 +441,11 @@
     			url : "/register/confirmCode",
     			type : "GET",
     			data : {
-    				"emailCode" : $('#email-code').val();
+    				"emailCode" : $('#email-code').val()
     			},
-    			dataType : "JSON",
+    			dataType : "text",
     			async : false,
     			success : function(data) {
-    				console.log("success", data);
     				if (data === "pass") {
     					isValidEmailCode = true;
     				}
@@ -343,21 +499,34 @@
     	// 회원가입 유효성검사 통과 여부
     	function isValid() {
     		let result = false;
-    		if (isValidId && isValidPassword && isValidName && isValidBirth && isValidZipCode && isValidAddress) {
-    			if (isValidEmailCode) {
-	    			if ((isValidPhone1 && isValidPhone2 isValidPhone3) || (isValidCellPhone1 && isValidCellPhone2)) {
-	    				alert("유효성 검사 통과, 회원가입 가능");
-	    				result = true;
+    		if (isValidServiceTerms && isValidPrivacyTerms) {
+	    		if (isValidId && isValidPassword && isValidName && isValidBirth && isValidZipCode && isValidAddress) {
+	    			if (isValidEmailCode) {
+		    			if ((isValidPhone1 && isValidPhone2 && isValidPhone3) || (isValidCellPhone2 && isValidCellPhone3)) {
+		    				alert("유효성 검사 통과, 회원가입 가능");
+		    				result = true;
+		    			} else {
+		    				alert("전화번호 또는 핸드폰 번호는 필수입니다.");
+		    				document.getElementById("phone-number1").focus();
+		    			}
 	    			} else {
-	    				alert("전화번호 또는 핸드폰 번호는 필수입니다.");
-	    				document.getElementById("phoneNumber1").focus();
+	    				alert("이메일 인증은 필수입니다.");
+	    				document.getElementById("email").focus();
 	    			}
-    			} else {
-    				alert("이메일 인증은 필수입니다.");
-    				document.getElementById("email").focus();
-    			}
+	    		} else if (${name.length > 0}) {
+	    			isValidId = true;
+	    			isValidName = true;
+	    			isValidBirth = true;
+	    			isValidCellphone2 = true;
+	    			isValidCellphone3 = true;
+	    			isValidEmailCode = true;
+	    		} else {
+	    			alert("필수 항목은 모두 입력해주세요");
+	    			document.getElementById("memberId").focus();
+	    		}
     		} else {
-    			alert("필수 항목은 모두 입력해주세요");
+    			alert("약관에 동의를 해주세요.");
+    			document.getElementById("service-terms").focus();
     		}
     		return result;
     	}
@@ -396,8 +565,22 @@
     	
     	// 페이지 나갈 시
     	window.onbeforeunload = function (e) {
-    		console.log("beforeunload 실행");
-	 		window.navigator.sendBeacon('/register/refreshFile');
+    		let sendData = {
+    				"fileName" : fileName
+    		}
+    		$.ajax({
+    			url : "/review/refreshFile",
+    			type : "POST",
+    			data : JSON.stringify(sendData),
+    			contentType : "application/json",
+    			dataType : "JSON",
+    			async : true,
+    			success : function(data) {
+    			}, error : function(data) {
+    				console.log("err");
+    			}
+    		});
+	 		//window.navigator.sendBeacon('/register/refreshFile');
    		};
    		    	
     	// form버튼으로 페이지 이동 시
@@ -406,8 +589,15 @@
     	});
     </script>
     <style>
-    	.phone-number > input {
-    		
+    	.terms {
+    		padding : 10px;
+    		background-color: #f8f8f8;
+    		border-radius: 10px;
+    	}
+    	textarea {
+    		resize : none;
+    		width: 100%;
+    		min-height: 250px;
     	}
     </style>
 </head>
@@ -486,36 +676,59 @@
         <div class="container-fluid-lg w-100">
             <div class="row">
                 <div class="col-xxl-6 col-xl-5 col-lg-6 d-lg-block d-none ms-auto">
-                    <div class="image-contain">
+                	<!-- 약관 동의 -->
+                	<div class="terms">
+	                	<div>
+	                		<p>이용약관</p>
+	                		<textarea>${terms[0].termsContent}</textarea>
+	                	</div>
+	                	<div>
+	                		<input type="checkbox" id="service-terms" value="Y"/>
+	                		<label for="service-terms">위 내용에 동의합니다.</label>
+	                	</div>
+	                	<br/><br/>
+	                	<div>
+	                		<p>개인정보처리</p>
+	                		<textarea>${terms[1].termsContent}</textarea>
+	                	</div>
+	                	<div>
+	                		<input type="checkbox" id="privacy-terms" value="Y"/>
+	                		<label for="service-terms">위 내용에 동의합니다.</label>
+	                	</div>
+                	</div>
+                    <!-- <div class="image-contain">
                         <img src="/resources/assets/images/inner-page/sign-up.png" class="img-fluid" alt="">
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="col-xxl-4 col-xl-5 col-lg-6 col-sm-8 mx-auto">
                     <div class="log-in-box">
                         <div class="log-in-title">
-                            <h3>Welcome To Fastkart</h3>
-                            <h4>Create New Account</h4>
+                            <h3>디어북스</h3>
+                            <h4>계정 만들기</h4>
                         </div>
 						
 						<!-- Login Form -->
                         <div class="input-box">
-                            <form class="row g-4" action="/register/signUp" method="POST" onsubmit="return isValid();" enctype="multipart/form-data">
+                            <!-- <form class="row g-4" action="/register/signUp" method="POST" onsubmit="return isValid();" enctype="multipart/form-data"> -->
+                            <form class="row g-4" id="form">
                             	<!-- 아이디 -->
-                                <div class="col-12">
-                                    <div class="form-floating theme-form-floating">
-                                        <input type="text" class="form-control" id="memberId" name="memberId" placeholder="ID">
-                                        <label for="memberId">*ID</label>
-                                    </div>
-                                    <div class="validation"></div>
-                                </div>
-                                
+                            	<c:if test="${name != ''}">
+                            		<div class="col-12">
+										<div class="form-floating theme-form-floating">
+											<input type="text" class="form-control" id="memberId" name="memberId" placeholder="ID">
+											<label for="memberId">*아이디</label>
+										</div>
+										<div class="validation"></div>
+									</div>
+                            	</c:if>
+                            	
                                 <!-- 비밀번호 -->
                                 <div class="col-12">
                                     <div class="form-floating theme-form-floating">
                                         <input type="password" class="form-control" id="password" name="password"
                                             placeholder="Password">
-                                        <label for="password">*Password</label>
+                                        <label for="password">*비밀번호</label>
                                     </div>
                                     <div class="validation"></div>
                                 </div>
@@ -529,27 +742,48 @@
                                 </div>
                                 
                                 <!-- 이름 -->
-								<div class="col-12">
-                                    <div class="form-floating theme-form-floating">
-                                        <input type="text" class="form-control" id="name" name="name" placeholder="Full Name">
-                                        <label for="name">*Full Name</label>
-                                    </div>
-                                    <div class="validation"></div>
-                                </div>
-                                
+                                <div class="col-12">
+	                                <c:choose>
+	                                	<c:when test="${name != ''}">
+			                                    <div class="form-floating theme-form-floating">
+			                                        <input type="text" class="form-control" id="name" name="name" placeholder="Full Name" value="${name}" readonly>
+			                                        <label for="name">*이름</label>
+			                                    </div>
+			                                    <div class="validation"></div>
+	                                	</c:when>
+	                                	<c:otherwise>
+			                                    <div class="form-floating theme-form-floating">
+			                                        <input type="text" class="form-control" id="name" name="name" placeholder="Full Name">
+			                                        <label for="name">*이름</label>
+			                                    </div>
+			                                    <div class="validation"></div>
+	                                	</c:otherwise>
+	                                </c:choose>
+								</div>
+								
                                 <!-- 이메일 -->
                                 <div class="col-12">
-                                    <div class="form-floating theme-form-floating">
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email Address">
-                                        <label for="email">*Email Address</label>
-                                    </div>
-                                    <button onclick="sendMail();">인증하기</button>
-                                    <div class="form-floating theme-form-floating">
-                                    	<input type="text" class="form-control" id="email-code" placeholder="인증 코드 입력">
-                                    	<label for="email-code">인증코드 입력</label>
-                                    	<button onclick="confirmCode();">확인</button>
-                                    </div>
-                                    <div class="validation"></div>
+                                	<c:choose>
+                                		<c:when test="${email != ''}">
+                                			<div class="form-floating theme-form-floating">
+		                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email Address" value="${email}" readonly>
+		                                        <label for="email">*이메일</label>
+		                                    </div>
+                                		</c:when>
+                                		<c:otherwise>
+                                			<div class="form-floating theme-form-floating">
+		                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email Address">
+		                                        <label for="email">*이메일</label>
+		                                    </div>
+		                                    <button type="button" id="sendMail">인증하기</button>
+		                                    <div class="form-floating theme-form-floating">
+		                                    	<input type="text" class="form-control" id="email-code" placeholder="인증 코드 입력">
+		                                    	<label for="email-code">인증코드 입력</label>
+		                                    	<button type="button" onclick="confirmCode();">확인</button>
+		                                    </div>
+		                                    <div class="validation"></div>
+                                		</c:otherwise>
+                                	</c:choose>
                                 </div>
                                 
                                 <!-- 전화번호 -->
@@ -565,22 +799,44 @@
                                 
                                 <!-- 핸드폰 번호 -->
 								<div class="col-12">
-                                    <div class="form-floating theme-form-floating phone-number" id="cell-phone-number">
-                                        <input type="text" class="form-control" id="cell-phone-number1" name="cellPhoneNumber1" style="width:30%; display:inline;">&nbsp;-&nbsp;
-                                        <input type="text" class="form-control" id="cell-phone-number2" name="cellPhoneNumber2" style="width:30%; display:inline;">&nbsp;-&nbsp;
-                                        <input type="text" class="form-control" id="cell-phone-number3" name="cellPhoneNumber3" style="width:30%; display:inline;">
-                                        <label for="cellPhoneNumber">핸드폰 번호</label>
-                                    </div>
-                                    <div class="validation"></div>
+									<c:choose>
+										<c:when test="${mobile != ''}">
+											<div class="form-floating theme-form-floating phone-number" id="cell-phone-number">
+		                                        <input type="text" class="form-control" id="cell-phone-number" name="cellPhoneNumber" style="width:30%; display:inline;" value="010" readonly>&nbsp;-&nbsp;
+		                                        <input type="text" class="form-control" id="cell-phone-number1" name="cellPhoneNumber1" style="width:30%; display:inline;" value="${mobile.split('-')[1]}" readonly>&nbsp;-&nbsp;
+		                                        <input type="text" class="form-control" id="cell-phone-number2" name="cellPhoneNumber2" style="width:30%; display:inline;" value="${mobile.split('-')[2]}" readonly>
+		                                        <label for="cellPhoneNumber">핸드폰 번호</label>
+		                                    </div>
+										</c:when>
+										<c:otherwise>
+											<div class="form-floating theme-form-floating phone-number" id="cell-phone-number">
+		                                        <input type="text" class="form-control" id="cell-phone-number" name="cellPhoneNumber" style="width:30%; display:inline;" value="010" readonly>&nbsp;-&nbsp;
+		                                        <input type="text" class="form-control" id="cell-phone-number1" name="cellPhoneNumber1" style="width:30%; display:inline;">&nbsp;-&nbsp;
+		                                        <input type="text" class="form-control" id="cell-phone-number2" name="cellPhoneNumber2" style="width:30%; display:inline;">
+		                                        <label for="cellPhoneNumber">핸드폰 번호</label>
+		                                    </div>
+                                    		<div class="validation"></div>
+										</c:otherwise>
+									</c:choose>
                                 </div>
                                 
                                 <!-- 생년월일 -->
 								<div class="col-12">
-                                    <div class="form-floating theme-form-floating">
-                                        <input type="text" class="form-control" id="dateOfBirth" name="dateOfBirth" placeholder="생년월일 8글자">
-                                        <label for="dateOfBirth">*생년월일</label>
-                                    </div>
-                                    <div class="validation"></div>
+	                                <c:choose>
+	                                	<c:when test="${birthday != ''}">
+	                                		<div class="form-floating theme-form-floating">
+		                                        <input type="text" class="form-control" id="dateOfBirth" name="dateOfBirth" placeholder="생년월일 8글자" value="${birthday}" readonly>
+		                                        <label for="dateOfBirth">*생년월일</label>
+		                                    </div>
+	                                	</c:when>
+	                                	<c:otherwise>
+	                                		<div class="form-floating theme-form-floating">
+		                                        <input type="text" class="form-control" id="dateOfBirth" name="dateOfBirth" placeholder="생년월일 8글자">
+		                                        <label for="dateOfBirth">*생년월일</label>
+		                                    </div>
+                                    		<div class="validation"></div>
+	                                	</c:otherwise>
+	                                </c:choose>
                                 </div>
                                 
                                 <!-- 성별 -->
@@ -621,16 +877,7 @@
                                     	<label for="baseAddr">기본 배송지로 설정</label>
                                     </div>
                                 </div>
-                                
-                                <!-- 프로필 사진 
-								<div class="col-12">
-                                    <div class="form-floating theme-form-floating">
-                                        <input type="file" class="form-control" id="profileImage" name="profileImage" placeholder="프로필 이미지">
-                                        <label for="profileImage">프로필 이미지</label>
-                                    </div>
-                                    <div class="validation"></div>
-                                </div>-->
-                                <!-- 프로필사진2 -->
+                                <!-- 프로필사진 -->
                                 <div class="col-12">
                                     <div class="form-floating theme-form-floating">
                                         <label for="profileImage">프로필 이미지</label>
@@ -642,36 +889,28 @@
                                     <div class="validation"></div>
                                 </div>
                                 
-                                <div class="col-12">
-                                	<div class="form-floating theme-form-floating" id="identify">
-		                                <button type="button"
-		                                	class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
-		                                	onclick="identify()">본인 인증</button>
-									</div>
-	                        	</div>
-                                
                                 <!-- 환불 은행 -->
                                 <div class="col-12">
                                     <div class="form-floating theme-form-floating">
                                         <select id="refundBank" name="refundBank" class="form-control">
-                                        	<option value="none">은행 선택</option>
-                                        	<option value="shinhan">신한은행</option>
-                                        	<option value="ibk">IBK기업은행</option>
-                                        	<option value="hana">하나은행</option>
-                                        	<option value="woori">우리은행</option>
-                                        	<option value="nh">NH농협은행</option>
-                                        	<option value="kdb">KDB산업은행</option>
-                                        	<option value="sc">SC제일은행</option>
-                                        	<option value="city">citybank</option>
-                                        	<option value="busan">BNK부산은행</option>
-                                        	<option value="dgb">DGB대구은행</option>
-                                        	<option value="mg">MG새마을금고</option>
-                                        	<option value="shinyeob">신협</option>
-                                        	<option value="suhyeob">수협은행</option>
-                                        	<option value="kb">KB국민은행</option>
-                                        	<option value="post">우체국예금</option>
-                                        	<option value="kakao">카카오뱅크</option>
-                                        	<option value="toss">토스</option>
+                                        	<option>은행 선택</option>
+                                        	<option>신한은행</option>
+                                        	<option>IBK기업은행</option>
+                                        	<option>하나은행</option>
+                                        	<option>우리은행</option>
+                                        	<option>NH농협은행</option>
+                                        	<option>KDB산업은행</option>
+                                        	<option>SC제일은행</option>
+                                        	<option>씨티은행</option>
+                                        	<option>BNK부산은행</option>
+                                        	<option>DGB대구은행</option>
+                                        	<option>MG새마을금고</option>
+                                        	<option>신협</option>
+                                        	<option>수협은행</option>
+                                        	<option>KB국민은행</option>
+                                        	<option>우체국예금</option>
+                                        	<option>카카오뱅크</option>
+                                        	<option>토스</option>
                                         </select>
                                         <label for="refundBank">환불 은행</label>
                                     </div>
@@ -700,7 +939,7 @@
                                 </div> -->
 
                                 <div class="col-12">
-                                    <button class="btn btn-animation w-100" type="submit">Sign Up</button>
+                                    <button type="button" id="submit-btn" class="btn btn-animation w-100">Sign Up</button>
                                 </div>
                             </form>
                         </div>

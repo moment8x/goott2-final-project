@@ -18,4 +18,9 @@ public class UploadFiles {
 	private String originalFileName;
 	private String newFileName;
 	private long fileSize;
+	
+	public UploadFiles(String originalFileName, long fileSize) {
+		this.originalFileName = originalFileName;
+		this.fileSize = fileSize;
+	}
 }

@@ -13,6 +13,7 @@ import com.project.dao.kjs.detail.ProductDetailDAO;
 import com.project.vodto.kjs.BestSellerVO;
 import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ProductImage;
+import com.project.vodto.kjs.ProductRatingCountVO;
 import com.project.vodto.kjs.RelatedProductDTO;
 
 @Service
@@ -69,6 +70,13 @@ public class ProductDetailServiceImpl implements ProductDetailService {
 			}
 		}
 		
+		return result;
+	}
+
+	@Override
+	public List<ProductRatingCountVO> getProductRatingCount(String productId) throws SQLException, NamingException {
+		List<ProductRatingCountVO> result = new ArrayList<ProductRatingCountVO>();
+		result = pdDao.getProductRatingCount(productId);
 		return result;
 	}
 }

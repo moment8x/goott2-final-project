@@ -1,10 +1,10 @@
 package com.project.service.member;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
@@ -41,6 +41,7 @@ import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.exchangeDTO;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
+import com.project.vodto.kjs.TermsOfSignUpVO;
 import com.project.vodto.kjy.SnsRegisterInfo;
 
 @Service
@@ -794,16 +795,17 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public boolean insertMember(SignUpDTO member, UploadFiles file) throws SQLException, NamingException {
+	public boolean insertMember(SignUpDTO member) throws SQLException, NamingException {
 		boolean result = false;
 		String newFileName = "";
-
-		member.setPhoneNumber(member.getPhoneNumber1() + member.getPhoneNumber2() + member.getPhoneNumber1());
-		member.setCellPhoneNumber(
-				member.getCellPhoneNumber1() + member.getCellPhoneNumber2() + member.getCellPhoneNumber3());
-
+		if (member.getCellPhoneNumber() == null || member.getCellPhoneNumber().length() < 1 ) {
+			member.setPhoneNumber(member.getPhoneNumber1() + "-" + member.getPhoneNumber2() + "-" + member.getPhoneNumber1());
+			member.setCellPhoneNumber(
+					member.getCellPhoneNumber1() + "-" + member.getCellPhoneNumber2() + "-" + member.getCellPhoneNumber3());
+		}
 		// 회원 가입 - 프로필 사진 저장
-		if (file != null) {
+		if (member.getFileList().size() > 0) {
+			UploadFiles file = new UploadFiles();
 			if (ImgMimeType.contentTypeIsImage(file.getExtension())) {
 				uDao.insertUploadImage(file);
 				newFileName = file.getNewFileName();
@@ -824,7 +826,7 @@ public class MemberServiceImpl implements MemberService {
 			shipping.setZipCode(member.getZipCode());
 			shipping.setAddress(member.getAddress());
 			shipping.setDetailAddress(member.getDetailedAddress());
-			if (member.getBasicAddr() == null) {
+			if (member.getBasicAddr() == null || member.getBasicAddr().equals("")) {
 				member.setBasicAddr("N");
 			}
 			shipping.setBasicAddr(member.getBasicAddr());
@@ -850,10 +852,9 @@ public class MemberServiceImpl implements MemberService {
 		System.out.println("sendMail 서비스");
 
 		String emailTo = email;
-		String emailFrom = "game046@naver.com";
+		String emailFrom = "lesilion@naver.com";
 		String subject = "DeerBooks 이메일 인증";
 		String message = "코드 " + code + " 를 이용하여 홈페이지에서 인증을 마치십시오";
-
 		MimeMessage mimeMsg = mailSender.createMimeMessage();
 		MimeMessageHelper mimeHelper = new MimeMessageHelper(mimeMsg);
 
@@ -882,12 +883,38 @@ public class MemberServiceImpl implements MemberService {
 		System.out.println("sns가입");
 		if (snsInfo.getEmail() != null) {
 		 	// 네이버
-			
+			// String id, String email, String mobile(-포함), String name, String birthday, String birthyear, String mobile_e164, ?? connected_at)
 		} else {
 			// 카카오
 		}
 		
 		return false;
+	}
+
+	@Override
+	public String randomId(String memberId) {
+		int leftLimit = 65;
+		int rightLimit = 122;
+		int stringLength = 10;
+		Random random = new Random();
+		StringBuilder buffer = new StringBuilder(stringLength);
+		for (int i = 0; i < stringLength; i++) {
+		    int randomLimitedInt = leftLimit + (int)(random.nextFloat() * (rightLimit - leftLimit + 1));
+		    if (randomLimitedInt != 91 || randomLimitedInt != 92 || randomLimitedInt != 93 || randomLimitedInt != 96) {
+		    	buffer.append((char) randomLimitedInt);
+		    } else {
+		    	i--;
+		    }
+		}
+		String generatedString = buffer.toString();
+		System.out.println(generatedString);
+		
+		return generatedString + memberId;
+	}
+
+	@Override
+	public List<TermsOfSignUpVO> getTerms() throws SQLException, NamingException {
+		return mDao.getTerms();
 	}
 	
 	// --------------------------------------- 김진솔 끝 ----------------------------------------
