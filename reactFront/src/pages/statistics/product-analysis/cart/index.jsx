@@ -12,6 +12,7 @@ const CartInfo = () => {
     <div className='space-y-5'>
       <CartAnalysis setData={setData} data={data} setCartQuantity={setCartQuantity} />
       <div className='rounded-lg bg-white p-1'>
+        <h6 className='font-bold pl-6 pt-5'>통계 그래프</h6>
         <UserStorageChart cartQuantity={cartQuantity} label={'장바구니상품 TOP 10'} />
       </div>
       <CartResult data={data} />

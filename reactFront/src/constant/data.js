@@ -99,10 +99,6 @@ export const menuItems = [
             multiTitle: '일반 등록',
             multiLink: 'admin/products/register',
           },
-          {
-            multiTitle: '엑셀 등록',
-            multiLink: 'product5',
-          },
         ],
       },
       {
@@ -110,16 +106,12 @@ export const menuItems = [
         childlink: 'Level-1',
         multi_menu: [
           {
-            multiTitle: '상품 정보 일괄변경',
+            multiTitle: '상품 정보 변경',
             multiLink: 'product6',
           },
           {
-            multiTitle: '상품 엑셀 관리',
-            multiLink: 'product7',
-          },
-          {
-            multiTitle: '삭제 상품 목록',
-            multiLink: 'product8',
+            multiTitle: '상품 재고 관리',
+            multiLink: 'product6',
           },
         ],
       },
@@ -142,28 +134,12 @@ export const menuItems = [
             multiTitle: '회원 정보 조회',
             multiLink: 'admin/members/search',
           },
-          {
-            multiTitle: '주문 회원 조회',
-            multiLink: 'user4',
-          },
-          {
-            multiTitle: '구매액 상위회원 조회',
-            multiLink: 'user5',
-          },
         ],
       },
       {
         childtitle: '회원 관리',
         childlink: 'user6',
         multi_menu: [
-          {
-            multiTitle: '회원 등급별 관리',
-            multiLink: 'user7',
-          },
-          {
-            multiTitle: '회원 엑셀 등록',
-            multiLink: 'user8',
-          },
           {
             multiTitle: '회원 탈퇴 관리',
             multiLink: 'user9',
@@ -173,37 +149,6 @@ export const menuItems = [
             multiLink: 'user10',
           },
         ],
-      },
-    ],
-  },
-  {
-    title: '게시판',
-    icon: 'heroicons-outline:view-boards',
-    link: '#',
-    child: [
-      {
-        childtitle: '게시판 대시보드',
-        childlink: 'board',
-      },
-      {
-        childtitle: '게시판 관리',
-        childlink: 'board2',
-      },
-      {
-        childtitle: '게시물 관리',
-        childlink: 'board3',
-      },
-      {
-        childtitle: '1:1 문의',
-        childlink: 'board4',
-      },
-      {
-        childtitle: '운영 일지',
-        childlink: 'board5',
-      },
-      {
-        childtitle: '캘린더',
-        childlink: 'board6',
       },
     ],
   },

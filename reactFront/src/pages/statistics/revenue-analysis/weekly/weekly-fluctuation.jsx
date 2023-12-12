@@ -5,7 +5,7 @@ const IncomeFluctuation = ({ data }) => {
   console.log('Fluctuation data: ', data);
   return (
     <div>
-      <Card title='증감 추이' noborder className='font-bold'>
+      {/* <Card title='증감 추이' noborder className='font-bold'>
         <div className='overflow-x-auto '>
           <div className='inline-block min-w-full align-middle'>
             <div className='overflow-hidden '>
@@ -25,7 +25,7 @@ const IncomeFluctuation = ({ data }) => {
                   </tr>
                 </thead>
                 <tbody className='bg-white '>
-                  {/* <tr>
+                  <tr>
                     <td className='table-basic-td'>{data[0].date}</td>
                     <td className='table-basic-td'>{data[0].totalPaymentAmount}</td>
                     <td className='table-basic-td' rowSpan='2'>
@@ -47,13 +47,13 @@ const IncomeFluctuation = ({ data }) => {
                     <td className='table-basic-td'>{data[1].totalPaymentAmount}</td>
                     <td className='table-basic-td'>{data[1].totalRefundAmount}</td>
                     <td className='table-basic-td'>{data[1].netSales}</td>
-                  </tr> */}
+                  </tr>
                 </tbody>
               </table>
             </div>
           </div>
         </div>
-      </Card>
+      </Card> */}
     </div>
   );
 };

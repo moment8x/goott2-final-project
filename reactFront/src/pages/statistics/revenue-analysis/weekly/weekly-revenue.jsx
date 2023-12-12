@@ -3,7 +3,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Flatpickr from 'react-flatpickr';
 
-const WeeklyReport = ({ setData, data }) => {
+const WeeklyReport = ({ setData }) => {
   const [picker, setPicker] = useState();
   const [picker2, setPicker2] = useState();
 

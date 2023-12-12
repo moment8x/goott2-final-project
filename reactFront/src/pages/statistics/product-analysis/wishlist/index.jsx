@@ -12,6 +12,7 @@ const WishlistInfo = () => {
     <div className='space-y-5'>
       <WishlistAnalysis setData={setData} data={data} setWishlistQuantity={setWishlistQuantity} />
       <div className='rounded-lg bg-white p-1'>
+        <h6 className='font-bold pl-6 pt-5'>통계 그래프</h6>
         <UserStorageChart wishlistQuantity={wishlistQuantity} label={'관심상품 TOP 10'} />
       </div>
       <WishlistResult data={data} />

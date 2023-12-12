@@ -3,7 +3,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Flatpickr from 'react-flatpickr';
 
-const WishlistAnalysis = ({ setData, data }) => {
+const WishlistAnalysis = ({ setWishlistQuantity, setData, data }) => {
   const [picker, setPicker] = useState();
   const [picker2, setPicker2] = useState();
 
@@ -13,7 +13,7 @@ const WishlistAnalysis = ({ setData, data }) => {
       .then((res) => {
         console.log('res:', res);
         setData(res.wishlistInfoList);
-        setData(res.WishlistTop10List);
+        setWishlistQuantity(res.WishlistTop10List);
       })
       .catch((error) => {
         console.error('Error :', error);
@@ -28,7 +28,7 @@ const WishlistAnalysis = ({ setData, data }) => {
       .then((res) => {
         console.log('res:', res);
         setData(res.wishlistInfoList);
-        setData(res.WishlistTop10List);
+        setWishlistQuantity(res.WishlistTop10List);
       })
       .catch((error) => {
         console.error('Error :', error);
