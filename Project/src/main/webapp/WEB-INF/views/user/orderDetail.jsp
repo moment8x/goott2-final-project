@@ -325,6 +325,12 @@ function orderCancel(){
  		let selectQty = []
  		let detailedOrderId = []
  		let refundAmount = 0
+ 		let productStatus = []
+ 		
+	    $('.productStatus').each(function() {
+ 		    productStatus.push($(this).text());
+ 		});
+	    console.log(productStatus)
 	    
  		$('.totalCancelQty').text("선택한 상품 수량 : " + totalQty + "권")
  		console.log('총 수량:', totalQty);
@@ -379,10 +385,14 @@ function orderCancel(){
 	 		  				$('.refundCoupon').text(usedCouponName)			
 	 		  			}
 	 		  			//환불금액
-	 		  			if(paymentMethod == "bkt"){
-	 			  			$(`#\${amountId}`).text(bktActualAmount.toLocaleString()+ "원")		  				
-	 		  			}else{
-	 		  				$(`#\${amountId}`).text(actualAmount.toLocaleString()+ "원")		
+	 		  			for(let i = 0; i < productStatus.length; i++){
+		 		  			if(productStatus[i] != "입금전" && paymentMethod == "bkt"){
+		 			  			$(`#\${amountId}`).text(bktActualAmount.toLocaleString()+ "원")		  				
+		 		  			}else if(productStatus[i] != "입금전" && paymentMethod != "bkt"){
+		 		  				$(`#\${amountId}`).text(actualAmount.toLocaleString()+ "원")		
+		 		  			}else if(productStatus[i] == "입금전"){
+		 		  				$(`#\${amountId}`).text("0 원")
+		 		  			}	  				
 	 		  			}
 	 		  			//적립금
 	 		  			$(`#\${rewardId}`).text(usedReward.toLocaleString()+ "원")
@@ -395,23 +405,29 @@ function orderCancel(){
 	 		  			let refundReward = data.calcRefund.refundReward
 	 		  			let refundPoint = data.calcRefund.refundPoint
 	 		  			
-	 		  			//환불금액
-	 			  		$(`#\${amountId}`).text(refundAmount.toLocaleString()+ "원")		  				
+	 		  			for(let i = 0; i < productStatus.length; i++){
+		 		  			if(productStatus[i] != "입금전"){
+			 		  			//환불금액
+			 			  		$(`#\${amountId}`).text(refundAmount.toLocaleString()+ "원")		  					
+		 		  			}else{
+		 		  				$(`#\${amountId}`).text("0 원")	 		  				
+	 		  				}
+	 		  			}
 	 		  			//적립금
 	 		  			$(`#\${rewardId}`).text(refundReward.toLocaleString()+ "원")
 	 		  			//포인트
 	 		  			 $(`#\${pointId}`).text(refundPoint.toLocaleString()+ "점") 
 	 		  		}
-	 		  		for(let i = 0; i < selectQty.length; i++){
-		 		  		if(selectQty[i] > data.cancelOrder.productQuantity){
-		 		  			console.log(i)
-		 		  			console.log(selectQty[i])
-		 		  			console.log(data.cancelOrder.productQuantity)
-		 		  			alert("주문 수량보다 많이 입력 할 수 없습니다.")
-		 		  			$('.totalCancelQty').text("취소 상품 수량 : " + 0)
-		 		  			$(`#\${amountId}`).text("0 원")
-		 		  		}	  		  	 		  			
-	 		  		}
+	 		  	//	for(let i = 0; i < selectQty.length; i++){
+		 		//  		if(selectQty[i] > data.cancelOrder.productQuantity){
+		 		//  			console.log(i)
+		 		//  			console.log(selectQty[i])
+		 		//  			console.log(data.cancelOrder.productQuantity)
+		 		 // 			alert("주문 수량보다 많이 입력 할 수 없습니다.")
+		 		//  			$('.totalCancelQty').text("취소 상품 수량 : " + 0)
+		 		//  			$(`#\${amountId}`).text("0 원")
+		 		 // 		}	  		  	 		  			
+	 		  	//	}
 	 		      },
 	 		      error: function (error) {
 	 		    	  console.log(error);
@@ -1352,7 +1368,7 @@ function editRturnAccount() {
 
 										<td class="name">
 											<h4 class="table-title text-content">상품상태</h4>
-											<h5>${order.productStatus }</h5>
+											<h5 class="productStatus">${order.productStatus }</h5>
 										</td>
 
 									</tr>
@@ -1468,7 +1484,7 @@ function editRturnAccount() {
 							</ul>
 						</c:otherwise>
 					</c:choose>
-
+				
 					<ul class="summery-contain pb-0 border-bottom-0">
 
 						<li class="pb-0 refundList">

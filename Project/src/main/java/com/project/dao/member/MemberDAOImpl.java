@@ -17,6 +17,7 @@ import com.project.vodto.RewardLog;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.UploadFiles;
 import com.project.vodto.jmj.CancelDTO;
+import com.project.vodto.jmj.CancelListVO;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
@@ -375,7 +376,7 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	
 	@Override
-	public int insertCancelOrder(String productId, String reason, int amount, int detailedOrderId, String paymentMethod)
+	public int insertCancelOrder(String productId, String reason, int amount, int detailedOrderId, String paymentMethod, String memberId)
 			throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("productId", productId);
@@ -383,6 +384,7 @@ public class MemberDAOImpl implements MemberDAO {
 		params.put("amount", amount);
 		params.put("detailedOrderId", detailedOrderId);
 		params.put("paymentMethod", paymentMethod);
+		params.put("memberId", memberId);
 		
 		return ses.insert(ns + ".insertCancelOrder", params);
 	}
@@ -516,11 +518,12 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public int insertReturn(String productId, String returnReason, int detailedOrderId) throws SQLException, NamingException {
+	public int insertReturn(String productId, String returnReason, int detailedOrderId, String memberId) throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("productId", productId);
 		params.put("reason", returnReason);
 		params.put("detailedOrderId", detailedOrderId);
+		params.put("memberId", memberId);
 		
 		return ses.insert(ns + ".insertReturn", params);
 	}
@@ -778,6 +781,24 @@ public class MemberDAOImpl implements MemberDAO {
 	
 		return ses.update(ns +".updateUsedPoint", orderNo);
 	}
+	
+	@Override
+	public List<CancelListVO> getCancelOrder(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".getCancelOrder", memberId);
+	}
+	
+	@Override
+	public List<CancelListVO> getReturnList(String memberId) throws SQLException, NamingException {
+	
+		return ses.selectList(ns + ".getReturnList", memberId);
+	}
+
+	@Override
+	public List<CancelListVO> getExchangeList(String memberId) throws SQLException, NamingException {
+
+		return ses.selectList(ns + ".getExchangeList", memberId);
+	}
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
 	@Override
@@ -824,4 +845,8 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectList(ns + ".getTerms");
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+
+
+	
 }

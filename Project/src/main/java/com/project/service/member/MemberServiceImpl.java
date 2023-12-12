@@ -161,7 +161,7 @@ public class MemberServiceImpl implements MemberService {
 		for (MyPageReview review : myReview) {
 			review.setContent(review.getContent().replace("\r\n", "<br/>"));
 		}
-
+		
 		result.put("orderHistory", lst);
 		result.put("pagination", pi);
 		result.put("bankTransfer", bankTransfer);
@@ -171,6 +171,9 @@ public class MemberServiceImpl implements MemberService {
 		result.put("rewardLog", mDao.selectRewardLog(memberId));
 		result.put("couponLog", mDao.selectCouponLog(memberId));
 		result.put("myReview", mDao.selectMyreview(memberId));
+		result.put("cancelList", mDao.getCancelOrder(memberId));
+		result.put("returnList", mDao.getReturnList(memberId));
+		result.put("exchangeList", mDao.getExchangeList(memberId));
 
 		return result;
 	}
@@ -465,23 +468,41 @@ public class MemberServiceImpl implements MemberService {
 						for (String category : couponCategory) {
 							// 취소상품 카테고리키랑 쿠폰 카테고리키랑 일치한다면
 							if (cancelOrder.getCategoryKey().equals(category)) {
-								for (int i = 0; i < detailOrder.size(); i++) {
+							//	for (int i = 0; i < detailOrder.size(); i++) {
 									// 주문목록에 선택한상품이 있다면 삭제
-									if (detailOrder.get(i).getProductId().equals(cancelOrder.getProductId())) {
-										detailOrder.remove(i);
+//									if (detailOrder.get(i).getProductId().equals(cancelOrder.getProductId())) {
+//										detailOrder.remove(i);
 										System.out.println("detailOrder" + detailOrder.toString());
 										// 삭제후에 주문목록에 상품이 존재한다면
-										if (detailOrder.size() > 0) {
-											System.out.println("쿠폰환불안됨");
-											result.put("status", "noCoupon");
-										} else {
-											System.out.println("쿠폰환불됨");
-											result.put("status", "okCoupon");
+										for (int i = couponsHistory.size() - 1; i >= 0; i--) {
+											System.out.println("쿠폰히스토리 IIIIIIIII" + i);
+//											CouponHistory couponApplyProduct = couponsHistory.get(i);
+												if (couponsHistory.get(i).getCouponDiscount() > 0) {
+													if(couponsHistory.get(i).getProductId().equals(cancelOrder.getProductId())) {
+														System.out.println("쿠폰환불됨");
+														result.put("status", "okCoupon");
+														break;														
+													}else {
+														System.out.println("쿠폰환불안됨");
+														result.put("status", "noCoupon");
+													}
+												} else {
+													System.out.println("쿠폰환불안됨");
+													result.put("status", "noCoupon");
+												}										
 										}
-									}
-								}
+//									}
+//								}
 							}
 						}
+					}else if (ch.getCouponDiscount() == 0) {
+						// 쿠폰 적용을 안 한 주문이다
+						System.out.println("쿠폰환불안됨");
+						result.put("status", "noCoupon");
+						// 부분취소의 경우
+//						취소할 상품금액에서 시작
+						result.put("calcRefund", calcRefund(cancelProductPrice, couponDiscount, cancelPrice, refundReward,
+								refundPoint, refundAmount, detailOrderInfo));
 					}
 				}
 			}
@@ -593,7 +614,7 @@ public class MemberServiceImpl implements MemberService {
 
 //		// 취소테이블 인서트
 		if (mDao.insertCancelOrder(cancelOrder.getProductId(), tmpCancel.getReason(), amount, detailedOrderId,
-				detailOrderInfo.getPaymentMethod()) > 0) {
+				detailOrderInfo.getPaymentMethod(), memberId) > 0) {
 			System.out.println("취소 저장 완");
 //			// //환불테이블 인서트
 			if (mDao.insertRefund(cancelOrder.getProductId(), totalRefundAmount, tmpCancel.getActualRefundAmount(),
@@ -626,9 +647,9 @@ public class MemberServiceImpl implements MemberService {
 				}
 				System.out.println(tmpCancel.toString());
 				// 실 결제금액 업데이트
-//				if (mDao.updateActualAmount(tmpCancel.getOrderNo(), tmpCancel.getActualRefundAmount(), detailOrderInfo.getPaymentMethod()) != 0) {
-//					System.out.println("실 결제금액 업데이트 완");
-//				}
+				if (mDao.updateActualAmount(tmpCancel.getOrderNo(), tmpCancel.getActualRefundAmount(), detailOrderInfo.getPaymentMethod()) != 0) {
+					System.out.println("실 결제금액 업데이트 완");
+				}
 
 //				// 환불계좌정보 업데이트
 				if (mDao.updateRefundAccount(memberId, tmpCancel) != 0) {
@@ -711,7 +732,7 @@ public class MemberServiceImpl implements MemberService {
 		DetailOrderInfo detailOrderInfo = mDao.selectDetailOrderInfo(memberId, ro.getOrderNo()); // 해당 주문 주문상세
 		DetailOrder retrunOrder = mDao.selectCancelOrder(memberId, ro.getOrderNo(), detailedOrderId);
 
-		if (mDao.insertReturn(retrunOrder.getProductId(), ro.getReturnReason(), detailedOrderId) > 0) {
+		if (mDao.insertReturn(retrunOrder.getProductId(), ro.getReturnReason(), detailedOrderId, memberId) > 0) {
 			System.out.println("반품 인서트 완");
 			if (mDao.insertReturnShippingAddress(ro) > 0) {
 				System.out.println("회수 배송지 입력 완");

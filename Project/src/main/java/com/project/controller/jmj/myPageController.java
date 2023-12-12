@@ -51,6 +51,7 @@ import com.project.vodto.RewardLog;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.UploadFiles;
 import com.project.vodto.jmj.CancelDTO;
+import com.project.vodto.jmj.CancelListVO;
 import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
@@ -148,11 +149,18 @@ public class myPageController {
 				//작성한 리뷰
 				List<MyPageReview> reviewList = (List<MyPageReview>)map.get("myReview");
 				model.addAttribute("reviewList", reviewList);
-//				
-//				//1:1문의내역
-//				Map<String, Object> inquiryServiceMap = inquiryService.getInquiries(memberId,pageNo);
-//				List<CustomerInquiry> myInquiries = (List<CustomerInquiry>)inquiryServiceMap.get("myInquiries");
-//				model.addAttribute("myInquiries", myInquiries);
+
+				//취소 리스트
+				List<CancelListVO> cancelList = (List<CancelListVO>)map.get("cancelList");
+				model.addAttribute("cancelList", cancelList);
+				
+				//반품 리스트
+				List<CancelListVO> returnList = (List<CancelListVO>)map.get("returnList");
+				model.addAttribute("returnList", returnList);
+				
+				//교환 리스트
+				List<CancelListVO> exchangeList = (List<CancelListVO>)map.get("exchangeList");
+				model.addAttribute("exchangeList", exchangeList);
 				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

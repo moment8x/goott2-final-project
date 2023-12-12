@@ -266,13 +266,13 @@
 	</select>
 	
 	<insert id="insertCancelOrder">
-		insert into cancellations(product_id, reason, amount, processing_status, refund_status, completion_time, detailed_order_id) 
+		insert into cancellations(product_id, reason, amount, processing_status, refund_status, completion_time, detailed_order_id, member_id) 
 		<choose>
 			<when test="paymentMethod != null and paymentMethod.equals('bkt')">			
-				values (#{productId},#{reason}, #{amount},'취소완료','Y',now(), #{detailedOrderId})
+				values (#{productId},#{reason}, #{amount},'취소완료','Y',now(), #{detailedOrderId}, #{memberId})
 			</when>
 			<otherwise>
-				values (#{productId},#{reason}, #{amount},'취소완료','N', now(),#{detailedOrderId})
+				values (#{productId},#{reason}, #{amount},'취소완료','N', now(),#{detailedOrderId}, #{memberId})
 			</otherwise>
 		</choose>
 	</insert>
@@ -354,8 +354,8 @@
 	</update>
 	
 	<insert id="insertReturn">
-		insert into returns(product_id, reason, processing_status, detailed_order_id) 
-		values(#{productId},#{reason},'반품신청',#{detailedOrderId})
+		insert into returns(product_id, reason, processing_status, detailed_order_id, member_id) 
+		values(#{productId},#{reason},'반품신청',#{detailedOrderId}, #{memberId})
 	</insert>
 	
 	<insert id="insertReturnShippingAddress">
@@ -530,6 +530,40 @@
 	<update id="updateUsedPoint">
 		update payments set used_points = 0 where order_no = #{orderNo}
 	</update>
+	
+	<select id="getCancelOrder" resultType="com.project.vodto.jmj.CancelListVO">
+		SELECT p.product_image, prod.product_name, c.cancel_id, c.amount, c.request_time, c.processing_status, c.detailed_order_id, c.product_id
+      FROM products prod,(SELECT * FROM product_images GROUP BY product_id) p, cancellations c
+        where c.member_id = #{memberId}
+        and prod.product_id = c.product_id
+        and c.product_id = p.product_id 
+        order by c.request_time desc;
+	</select>
+	
+	<select id="getReturnList" resultType="com.project.vodto.jmj.CancelListVO">
+		SELECT p.product_image, prod.product_name, r.product_id, r.returns_id, r.request_time, r.processing_status, r.detailed_order_id,
+		rsa.return_shipping_address_zip_no, rsa.return_shipping_address_addr, rsa.return_shipping_address_detail_addr, 
+		rsa.return_shipping_address_return_msg
+      	FROM products prod,(SELECT * FROM product_images GROUP BY product_id) p, returns r, return_shipping_address rsa
+        where r.member_id = #{memberId} and processing_status = '반품신청'
+        and prod.product_id = r.product_id
+        and r.product_id = p.product_id 
+        and rsa.returns_id = r.returns_id
+        order by r.request_time desc;
+	</select>
+	
+	<select id="getExchangeList" resultType="com.project.vodto.jmj.CancelListVO">
+		SELECT p.product_image, prod.product_name, r.product_id, r.returns_id, r.request_time, r.processing_status, r.detailed_order_id,
+		rsa.return_shipping_address_zip_no, rsa.return_shipping_address_addr, rsa.return_shipping_address_detail_addr, 
+		rsa.return_shipping_address_return_msg, rsa.exchange_shipping_address_exchange_msg, exchange_shipping_address_zip_no,
+		rsa.exchange_shipping_address_addr, rsa.exchange_shipping_address_detail_addr
+      	FROM products prod,(SELECT * FROM product_images GROUP BY product_id) p, returns r, return_shipping_address rsa
+        where r.member_id = #{memberId} and processing_status = '교환신청'
+        and prod.product_id = r.product_id
+        and r.product_id = p.product_id 
+        and rsa.returns_id = r.returns_id
+        order by r.request_time desc;
+	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">
 		SELECT member_id FROM member WHERE member_id = #{memberId}  

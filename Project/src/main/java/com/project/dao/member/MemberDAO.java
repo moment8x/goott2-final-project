@@ -13,6 +13,7 @@ import com.project.vodto.RewardLog;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.UploadFiles;
 import com.project.vodto.jmj.CancelDTO;
+import com.project.vodto.jmj.CancelListVO;
 import com.project.vodto.jmj.ChangeShippingAddr;
 import com.project.vodto.jmj.CouponHistory;
 import com.project.vodto.jmj.DetailOrder;
@@ -135,7 +136,7 @@ public interface MemberDAO {
 	DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId) throws SQLException, NamingException;
 	
 	//취소테이블 인서트
-	int insertCancelOrder(String productId, String reason,int amount, int detailedOrderId, String paymentMethod) throws SQLException, NamingException;
+	int insertCancelOrder(String productId, String reason,int amount, int detailedOrderId, String paymentMethod, String memberId) throws SQLException, NamingException;
 	
 	//취소할경우 디테일 상품상태 업데이트
 	int updateDetailProductStatus(int detailedOrderId) throws SQLException, NamingException;
@@ -180,7 +181,7 @@ public interface MemberDAO {
 	int updatedeliveryStatus(String memberId, String orderNo) throws SQLException, NamingException;
 	
 	//반품 인서트
-	int insertReturn(String productId, String returnReason, int detailedOrderId) throws SQLException, NamingException;
+	int insertReturn(String productId, String returnReason, int detailedOrderId, String memberId) throws SQLException, NamingException;
 	
 	//반품 회수지 인서트
 	int insertReturnShippingAddress(ReturnOrder ro) throws SQLException, NamingException;
@@ -274,6 +275,15 @@ public interface MemberDAO {
 	
 	//포인트 환불시 사용 포인트 0으로 업데이트
 	int updateUsedPoint(String orderNo) throws SQLException, NamingException;
+	
+	//해당 유저의 취소 리스트 가져오기
+	List<CancelListVO> getCancelOrder(String memberId) throws SQLException, NamingException;
+	
+	//해당 유저의 반품 리스트 가져오기
+	List<CancelListVO> getReturnList(String memberId) throws SQLException, NamingException;
+	
+	//해당 유저의 교환 리스트 가져오기
+	List<CancelListVO> getExchangeList(String memberId) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -290,11 +300,6 @@ public interface MemberDAO {
 	List<TermsOfSignUpVO> getTerms() throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
 	
-	
-	
-	
-	
-
 
 	
 }
