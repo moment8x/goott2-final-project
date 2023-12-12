@@ -1,6 +1,7 @@
 package com.project.vodto;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,4 +26,6 @@ public class ReviewBoard {
 	private int rating;
 	private String productId;
 	private char isDelete;
+	private List<UploadFiles> fileList;
+	private List<String> deleteFileList;
 }

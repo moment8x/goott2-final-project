@@ -108,24 +108,33 @@
 		resultType="com.project.vodto.ksh.CompleteOrder">
 		<choose>
 			<when test="orderNo != null">
-				select o.recipient_name, o.recipient_phone_number, o.shipping_address,
-				o.detailed_shipping_address, p.order_no, p.payment_method,
+				select o.recipient_name, o.recipient_phone_number,
+				o.shipping_address,
+				o.detailed_shipping_address, p.order_no,
+				p.payment_method,
 				p.card_name,
-				p.total_amount, IFNULL(b.amount_to_pay, 0) AS amount_to_pay,
+				p.total_amount, IFNULL(b.amount_to_pay,
+				0) AS amount_to_pay,
 				p.actual_payment_amount, p.shipping_Fee from
-				payments p left outer join bank_transfers b on p.order_no = b.order_no inner
-				join order_history o on p.order_no = o.order_no where p.order_no =
+				payments p left outer join bank_transfers b on p.order_no =
+				b.order_no inner
+				join order_history o on p.order_no = o.order_no
+				where p.order_no =
 				#{orderNo};
 			</when>
 			<otherwise>
 				select n.non_recipient_name, n.non_recipient_phone_number,
 				n.non_shipping_address, n.non_detailed_shipping_address,
 				p.non_order_no, p.payment_method, p.card_name,
-				p.total_amount, IFNULL(b.amount_to_pay, 0) AS amount_to_pay,
+				p.total_amount,
+				IFNULL(b.amount_to_pay, 0) AS amount_to_pay,
 				p.actual_payment_amount, p.shipping_Fee from
-				payments p left outer join bank_transfers b on p.non_order_no =
-				b.non_order_no inner join non_order_history n on p.non_order_no =
-				n.non_order_no where p.non_order_no = #{nonOrderNo};
+				payments p left outer
+				join bank_transfers b on p.non_order_no =
+				b.non_order_no inner join
+				non_order_history n on p.non_order_no =
+				n.non_order_no where
+				p.non_order_no = #{nonOrderNo};
 			</otherwise>
 		</choose>
 	</select>
@@ -159,18 +168,22 @@
 		<choose>
 			<when test="nonOrderNo != null">
 				INSERT INTO bank_transfers (non_order_no,
-				payment_number, payer_name, amount_to_pay, payment_time)
+				payment_number, payer_name, amount_to_pay, payment_time,
+				deposited_account)
 				VALUES(#{nonOrderNo},
-				#{paymentNumber}, #{recipientName},
-				#{amountToPay}, #{paymentTime})
+				#{paymentNumber},
+				#{recipientName},
+				#{amountToPay}, #{paymentTime},
+				#{depositedAccount})
 			</when>
 			<otherwise>
 				INSERT INTO bank_transfers (order_no,
 				payment_number,
-				payer_name, amount_to_pay, payment_time)
+				payer_name, amount_to_pay, payment_time, deposited_account)
 				VALUES(#{orderNo},
 				#{paymentNumber},
-				#{recipientName}, #{amountToPay}, #{paymentTime})
+				#{recipientName}, #{amountToPay},
+				#{paymentTime}, #{depositedAccount})
 			</otherwise>
 		</choose>
 	</insert>
@@ -220,18 +233,26 @@
 		<choose>
 			<when test="orderNo != null">
 				select
-				d.product_price, d.product_quantity, p.product_name, i.product_image from
-				detailed_order_items d inner join products p on d.product_id =
-				p.product_id inner join product_images i on d.product_id =
-				i.product_id where d.order_no = #{orderNo} and d.product_id =
+				d.product_price, d.product_quantity,
+				p.product_name, i.product_image from
+				detailed_order_items d inner
+				join products p on d.product_id =
+				p.product_id inner join
+				product_images i on d.product_id =
+				i.product_id where d.order_no =
+				#{orderNo} and d.product_id =
 				#{productId} limit 1;
 			</when>
 			<otherwise>
 				select
-				d.product_price, d.product_quantity, p.product_name, i.product_image from
-				detailed_order_items d inner join products p on d.product_id =
-				p.product_id inner join product_images i on d.product_id =
-				i.product_id where d.non_order_no = #{nonOrderNo} and d.product_id =
+				d.product_price, d.product_quantity, p.product_name,
+				i.product_image from
+				detailed_order_items d inner join products p on
+				d.product_id =
+				p.product_id inner join product_images i on
+				d.product_id =
+				i.product_id where d.non_order_no = #{nonOrderNo} and
+				d.product_id =
 				#{productId} limit 1;
 			</otherwise>
 		</choose>
@@ -336,5 +357,15 @@
 		accumulated_payment + #{actualPaymentAmount} where member_id =
 		#{memberId}
 	</update>
+
+	<delete id="deleteFromShoppingCart"
+		parameterType="java.util.Map">
+		DELETE FROM shopping_cart WHERE product_id IN
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item.productId}
+		</foreach>
+		AND member_id=#{memberId}
+	</delete>
 
 </mapper>

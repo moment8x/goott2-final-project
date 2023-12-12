@@ -5,8 +5,10 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
+import com.project.vodto.kjs.BestSellerVO;
 import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ProductImage;
+import com.project.vodto.kjs.RelatedProductDTO;
 
 public interface ProductDetailService {
 	// 이미지 제외 정보 조회
@@ -15,4 +17,8 @@ public interface ProductDetailService {
 	List<ProductImage> getProductImages(String productId) throws SQLException, NamingException;
 	// 카테고리 조회
 	List<String> getCategory(String categoryKey) throws SQLException, NamingException;
+	// 베스트셀러 n개 조회
+	List<BestSellerVO> getBestSeller() throws SQLException, NamingException;
+	// 관련 도서 n개 조회
+	List<RelatedProductDTO> getRelatedProduct(String productId, String publisher, String categoryKey) throws SQLException, NamingException;
 }

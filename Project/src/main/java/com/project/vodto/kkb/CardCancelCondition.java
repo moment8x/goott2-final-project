@@ -5,7 +5,7 @@ import java.sql.Date;
 import lombok.Getter;
 
 @Getter
-public class DepositCondition {
+public class CardCancelCondition {
 	private String orderNo;
 	private String productOrderNo;
 	private String invoiceNumber;
@@ -23,13 +23,16 @@ public class DepositCondition {
 	private String categoryKey;
 	private Date orderTimeStart;
 	private Date orderTimeEnd;
-	private Date confirmDateStart;
-	private Date confirmDateEnd;
+	private Date paymentTimeStart;
+	private Date paymentTimeEnd;
+	private Date requestTimeStart;
+	private Date requestTimeEnd;
 	
-	private DepositCondition(String orderNo, String productOrderNo, String invoiceNumber, String name, String memberId,
-			String email, String cellPhoneNumber, String phoneNumber, String payerName, String recipientName,
-			String recipientPhoneNumber, String shippingAddress, String productName, String productId,
-			String categoryKey, Date orderTimeStart, Date orderTimeEnd, Date confirmDateStart, Date confirmDateEnd) {
+	public CardCancelCondition(String orderNo, String productOrderNo, String invoiceNumber, String name,
+			String memberId, String email, String cellPhoneNumber, String phoneNumber, String payerName,
+			String recipientName, String recipientPhoneNumber, String shippingAddress, String productName,
+			String productId, String categoryKey, Date orderTimeStart, Date orderTimeEnd, Date paymentTimeStart,
+			Date paymentTimeEnd, Date requestTimeStart, Date requestTimeEnd) {
 		this.orderNo = orderNo;
 		this.productOrderNo = productOrderNo;
 		this.invoiceNumber = invoiceNumber;
@@ -47,21 +50,26 @@ public class DepositCondition {
 		this.categoryKey = categoryKey;
 		this.orderTimeStart = orderTimeStart;
 		this.orderTimeEnd = orderTimeEnd;
-		this.confirmDateStart = confirmDateStart;
-		this.confirmDateEnd = confirmDateEnd;
+		this.paymentTimeStart = paymentTimeStart;
+		this.paymentTimeEnd = paymentTimeEnd;
+		this.requestTimeStart = requestTimeStart;
+		this.requestTimeEnd = requestTimeEnd;
 	}
 	
-	public static DepositCondition create(String orderNo, String productOrderNo, String invoiceNumber, String name, String memberId,
+	public static CardCancelCondition create(String orderNo, String productOrderNo, String invoiceNumber, String name, String memberId,
 			String email, String cellPhoneNumber, String phoneNumber, String payerName, String recipientName,
 			String recipientPhoneNumber, String shippingAddress, String productName, String productId,
-			String categoryKey, String orderTimeStart, String orderTimeEnd, String confirmDateStart, String confirmDateEnd) {
+			String categoryKey, String orderTimeStart, String orderTimeEnd, String requestTimeStart, 
+			String requestTimeEnd, String paymentTimeStart, String paymentTimeEnd) {
 		
 		orderTimeStart = orderTimeStart.equals("") ? "0000-01-01" : orderTimeStart;
 		orderTimeEnd = orderTimeEnd.equals("") ? "9999-12-31" : orderTimeEnd;
-		confirmDateStart = confirmDateStart.equals("") ? "0000-01-01" : confirmDateStart;
-		confirmDateEnd = confirmDateEnd.equals("") ? "9999-12-31" : confirmDateEnd;
+		requestTimeStart = requestTimeStart.equals("") ? "0000-01-01" : requestTimeStart;
+		requestTimeEnd = requestTimeEnd.equals("") ? "9999-12-31" : requestTimeEnd;
+		paymentTimeStart = paymentTimeStart.equals("") ? "0000-01-01" : paymentTimeStart;
+		paymentTimeEnd = paymentTimeEnd.equals("") ? "9999-12-31" : paymentTimeEnd;
 		
-		return new DepositCondition(
+		return new CardCancelCondition(
 				orderNo, 
 				productOrderNo, 
 				invoiceNumber, 
@@ -79,7 +87,10 @@ public class DepositCondition {
 				categoryKey, 
 				Date.valueOf(orderTimeStart), 
 				Date.valueOf(orderTimeEnd), 
-				Date.valueOf(confirmDateStart), 
-				Date.valueOf(confirmDateEnd));
+				Date.valueOf(requestTimeStart), 
+				Date.valueOf(requestTimeEnd),
+				Date.valueOf(paymentTimeStart), 
+				Date.valueOf(paymentTimeEnd));
 	}
+
 }

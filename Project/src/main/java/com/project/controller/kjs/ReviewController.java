@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +28,7 @@ import com.project.service.kjs.upload.UploadFileService;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.ReviewBoard;
 import com.project.vodto.UploadFiles;
+import com.project.vodto.kjs.ReviewBoardAddPage;
 import com.project.vodto.kjs.ReviewBoardDTO;
 import com.project.vodto.kjy.Memberkjy;
 
@@ -39,51 +41,44 @@ public class ReviewController {
 	@Inject
 	ReviewService rService;
 	
-	List<UploadFiles> fileList = new ArrayList<UploadFiles>();
-	List<String> deleteFileList = new ArrayList<String>();
+//	List<UploadFiles> fileList = new ArrayList<UploadFiles>();
+//	List<String> deleteFileList = new ArrayList<String>();
 	
 	@RequestMapping("uploadFile")
-	public @ResponseBody List<UploadFiles> uploadFile(HttpServletRequest request, MultipartFile uploadFile) {
+	public @ResponseBody UploadFiles uploadFile(HttpServletRequest request, MultipartFile uploadFile) {
 		// 1. 파일이 저장될 경로 확인
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
-		
+		UploadFiles file = null;
 		try {
 			// 2. 서비스단에 데이터 전송
-			fileList = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(), 
-						uploadFile.getContentType(), uploadFile.getBytes(), realPath, fileList);
+			file = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(), 
+						uploadFile.getContentType(), uploadFile.getBytes(), realPath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return fileList;
+		
+		return file;
 	}
-	
-//	@RequestMapping(value="deleteUploadFile", method=RequestMethod.POST)
-//	public @ResponseBody List<UploadFiles> deleteUploadedFile(HttpServletRequest request, @RequestParam("thumbFileName") String thumbFileName) {
-//		// 1. 파일이 저장된 경로 확인
-//		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
-//		// 2. 서비스단에 삭제할 파일 데이터 전송
-//		try {
-//			fileList = ufService.deleteUploadedFile(fileList, realPath, thumbFileName);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		return fileList;
-//	}
+	/*
 	@RequestMapping(value="deleteUploadFile", method=RequestMethod.POST)
-	public @ResponseBody List<UploadFiles> deleteUploadedFile(HttpServletRequest request, @RequestParam("thumbFileName") String thumbFileName) {
-		List<UploadFiles> result = null;
+	public @ResponseBody Map<String, Object> deleteUploadedFile(HttpServletRequest request, @RequestParam("thumbFileName") String thumbFileName,
+			@RequestBody List<UploadFiles> fileList, @RequestBody List<String> deleteFileList) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		List<UploadFiles> list = null;
 		thumbFileName = thumbFileName.replace("/", "\\");
 		// 1. deleteFileList에 삭제할 파일 등록
 		String newFileName = thumbFileName.replace("thumb_", "");
 		deleteFileList.add(newFileName);
 		// 2. fileList - deleteFileList 해서 남은 값만 return
-		result = calcFileList();
+		list = calcFileList(fileList, deleteFileList);
+		result.put("fileList", fileList);
+		result.put("deleteFileList", deleteFileList);
 		
 		return result;
 	}
-	
+	*/
 	// fileList - deleteFileList 해서 남은 값만 return
-	private List<UploadFiles> calcFileList() {
+	private List<UploadFiles> calcFileList(List<UploadFiles> fileList, List<String> deleteFileList) {
 		List<UploadFiles> result = fileList;
 		for (int i = 0; i < fileList.size(); i++) {
 			for (String deleteFile : deleteFileList) {
@@ -97,28 +92,26 @@ public class ReviewController {
 		return result;
 	}
 	
-	@RequestMapping("saveReview")
-	public void saveReview(ReviewBoard review, HttpServletRequest request) {
+	@RequestMapping(value="saveReview", method=RequestMethod.POST)
+	public ResponseEntity<String> saveReview(HttpServletRequest request, @RequestBody ReviewBoard review) {
+		System.out.println("review : " + review);
 		// 회원 아이디 가져오기, 작성자 등록
 		HttpSession session = request.getSession();
 		String memberId = ((Memberkjy)session.getAttribute("loginMember")).getMemberId();
 		review.setAuthor(memberId);
 		// 업로드 파일 삭제 관련
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
-		
 		// 리뷰 및 업로드된 이미지(uploadFileSeq) 저장
 		try {
-			rService.saveReview(review, calcFileList());
-			ufService.deleteUploadedFile(deleteFileList, realPath);
+			rService.saveReview(review, calcFileList(review.getFileList(), review.getDeleteFileList()));
+			ufService.deleteUploadedFile(review.getDeleteFileList(), realPath);
 		} catch (SQLException | NamingException | IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		fileList.clear();
-		deleteFileList.clear();
+		return new ResponseEntity<String>("success", HttpStatus.OK);
 	}
 	
-	@RequestMapping("refreshFile")
+	/*@RequestMapping("refreshFile")
 	public void refreshFile(HttpServletRequest request) {
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
 		try {
@@ -131,19 +124,16 @@ public class ReviewController {
 							ufService.deleteFile(file.getNewFileName(), realPath);
 						}
 				}
-				fileList.clear();
-				deleteFileList.clear();
 			}
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	@RequestMapping("isValid")
 	public ResponseEntity<Boolean> isValid(HttpServletRequest request, @RequestParam("productId") String productId) {
 		ResponseEntity<Boolean> result = null;
 		boolean isValid = false;
-		
 		// 아이디 가져오기
 		HttpSession session = request.getSession();
 		if (session.getAttribute("loginMember") != null) {
@@ -186,6 +176,7 @@ public class ReviewController {
 		ResponseEntity<Map<String, Object>> result = null;
 		Map<String, Object> map = new HashMap<String, Object>();
 		ReviewBoardDTO review = null;
+		List<UploadFiles> fileList = new ArrayList<UploadFiles>();
 		
 		HttpSession session = request.getSession();
 		String memberId = ((Memberkjy)session.getAttribute("loginMember")).getMemberId();
@@ -200,13 +191,13 @@ public class ReviewController {
 				
 				map.put("review", review);
 				map.put("status", "success");
+				map.put("fileList", fileList);
 			} else {
 				// 다른 ID. 리뷰 수정X
 				map.put("status", "block");
 			}
 			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.OK);
 		} catch (SQLException | NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			map.put("status", "error");
 			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.BAD_REQUEST);
@@ -216,15 +207,13 @@ public class ReviewController {
 	}
 	
 	@RequestMapping(value="update", method=RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> updateReview(HttpServletRequest request, @RequestParam("postNo") int postNo,
-			@RequestParam("rating") int rating, @RequestParam("content") String content,
-			@RequestParam("productId") String productId, @RequestParam("page") int page) {
+	public ResponseEntity<Map<String, Object>> updateReview(HttpServletRequest request, @RequestBody ReviewBoardAddPage review) {
 		ResponseEntity<Map<String, Object>> result = null;
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
-		
+		System.out.println("update review : " + review);
 		try {
-			if (rService.updateReview(postNo, content, rating, calcFileList(), deleteFileList, realPath, productId)) {
-				result = getDetailPage(productId, page, request);
+			if (rService.updateReview(review.getPostNo(), review.getContent(), review.getRating(), calcFileList(review.getFileList(), review.getDeleteFileList()), review.getDeleteFileList(), realPath, review.getProductId())) {
+				result = getDetailPage(review.getProductId(), review.getPage(), request);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

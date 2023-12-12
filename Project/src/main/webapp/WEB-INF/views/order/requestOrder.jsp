@@ -53,39 +53,35 @@
       $('#discountAmount').text(discountAmount.toLocaleString('ko-KR'));
       $('#subTotal').text(totalAmount.toLocaleString('ko-KR'));
       $('#shippingFee').text(shippingFee.toLocaleString('ko-KR'));
-   	  console.log(itemLen);
+   	
       for(i=0; i<itemLen; i++) {
     	  let localePrice = (Number($('#productPrice'+i).text())).toLocaleString('ko-KR');
     	  $('#productPrice'+i).text(localePrice);
       }
       for (i=0; i<$('.categoryKeys').length; i++) {   // 쿠폰 갯수만큼 돌아라
-         console.log(productCategories);
+         
          j=0;
          couponProduct = [];
          couponIndex[i] = new Object();
          productCategories.forEach(function(item, index){   // 상품 갯수만큼 돌아라
             if(($('#categoryKey'+i).val().indexOf(item)) != -1 || $('#categoryKey'+i).val().indexOf('ALL') != -1) {
                // 일치하는 카테고리 존재
-               console.log("쿠폰카테고리",$('#categoryKey'+i).val());
-               console.log("상품카테고리",item);
+              
                $('#couponSelect').attr('style', 'display:');
                $('#couponShow').text("쿠폰 선택");
                $('#categoryKey'+i).attr('style','display:');
                if(($('#categoryKey'+i).val().indexOf(item)) != -1) {
-               console.log("야호");
                   couponIndex[i].no = i;
                   couponIndex[i].name = $('#categoryKey'+i).text();
                   couponIndex[i].index = [];
                   couponProduct[j] = index;
                   couponIndex[i].index = couponProduct.slice();
                   j++;
-                  console.log(couponIndex);
+                  
                }
             } else {   // 일치하지 않으면
-               console.log($('#categoryKey'+i).val());
-               console.log(item);
+               
                couponIndex[i].name = $('#categoryKey'+i).text();
-               console.log("되나?")
             }
          })
       }
@@ -119,16 +115,16 @@
          let couponDiscountAmount = Number($('#discountAmount'+selectedIndex).text());
             //if (discountMethod == "P") {
                // 그 상품에만 적용
-               console.log(couponIndex.length);
+              
                for(let i = 0; i<couponIndex.length; i++) {
                console.log(couponIndex[i]);
                   if(selectedIndex == couponIndex[i].no) {
                      for(let k = 0; k < couponIndex[i].index.length; k++) {   
                      couponAmount += Math.round(((Number($('#productPrice'+couponIndex[i].index[k]).text().replaceAll(",",""))*Number($('#productQty'+couponIndex[i].index[k]).text())) * (couponDiscountAmount/100)) / 10) * 10;
-                     console.log(couponAmount);
+                    
                      }
                      $('#categoryKey'+selectedIndex).css("display","none");
-                     console.log("오잉?",'#categoryKey'+selectedIndex);
+                     //console.log("오잉?",'#categoryKey'+selectedIndex);
                   }
                }
                //couponDiscountAmount = Math.floor((totalAmount - (totalAmount * (discountAmount/100)))/10)*10;
@@ -151,15 +147,40 @@
 
   		if($("option:selected", this).text() == "직접입력") {
   			$('#directInput').attr('style', 'display:');
-  			console.log("hi");
+  			
   		} else {
   			$('#directInput').attr('style', 'display:none');	
   		}
   		});
       
-      
+      $("#bktBank").on("change", function(){
+
+    		if($("option:selected", this).text() == "입금할 은행을 선택해주세요.") {
+    			$('#showBktBank').attr('style', 'display:none');	
+    		} else {
+    			$('#showBktBank').attr('style', 'display:');
+    			$('#showBktBank').text($("option:selected", this).text()+' 123-456-789012');			
+    		}
+   		});      
    });
    
+   function checkBank() {
+	   if($("select[name=bktBank] option:selected").text() == "입금할 은행을 선택해주세요.") {
+		   $('#bktSms').removeAttr('value');
+		   alert("입금하실 은행을 선택하시고 체크해 주세요.");
+		   $("input:checkbox[name='bktSms']").prop("checked", false);   
+	   } else {
+		   if( $("input:checkbox[name='bktSms']").prop("checked")){
+			   
+		   	$('#bktSms').val('sms');
+		   } else {
+			   $('#bktSms').removeAttr('value');
+		   }
+		   // 체크된 체크박스의 value만 제출 데이터에 포함되고 체크 해제된 체크박스의 value는 아예 누락됩니다. 
+		   // 또한 value를 지정하지 않은 경우의 기본 값은 문자열 on입니다.
+	   }
+	   console.log($('#bktSms').val());	// 체크하면 sms, 아니면 on
+   }
    
    
    function packData() {
@@ -179,14 +200,14 @@
          $('#addRecipientContact').val($('#recipientContact').text());
       
       
-      console.log($('#selectedCoupon').find("button").length);
+      
       if($('#selectedCoupon').find("button").length > 0) {
          
       for (i=0; i<$('#selectedCoupon').find("button").length; i++) {
          
          let couponNumber = $('#selectedCoupon').find("button:eq("+i+")").text().split("-")[1];
          
-         console.log(couponNumber);
+         
          couponNumbers[i] = couponNumber;
          
       }
@@ -201,15 +222,12 @@
       }
       
       if($("select[name=deliveryMessage] option:selected").text() == "직접입력") {
-    	  console.log('여기오냐');
+    	 
     	  deliveryMessage = $('#directInput').val();
       } else {
     	  deliveryMessage = $("select[name=deliveryMessage] option:selected").text();
       }
-      console.log(deliveryMessage);
-      console.log(createName);
-      console.log(products);
-      console.log(couponNumbers);
+      
    }
    
    
@@ -240,12 +258,14 @@
    function checkPayMethod() {
 	   let payNo = "";
 	   let objAmountToPay = 0;
+	   if($('#checkTerms').prop('checked')){
+		   
+	   
       if ($("input[name='payMethod']").is(':checked')) {
          // 전체 radio 중에서 하나라도 체크되어 있는지 확인
          // 아무것도 선택안되어있으면, false
          let payMethod = $("input[name='payMethod']:checked").val();
          if($('#payToAmount').text() == '0') {	// 포인트랑 적립금만 사용해서 결제할 때
-        	 console.log("?");
 				payMethod = "ptr";	
 	        	 payNo = "ptr_"
 		                  + ((String(new Date().getTime())).substring(1));
@@ -259,7 +279,7 @@
 				}
          // score의 라디오 중 체크된 것의 값만 가져옴
          // 아무것도 선택안되어있으면, undefined
-         console.log(payMethod);
+
          if (payMethod == "bkt"  || payMethod == "ptr") { 
             packData();
             obj = {
@@ -274,6 +294,8 @@
                "actualPaymentAmount" : 0, // 실 결제 금액(무통장입금과 재화결제(포인트, 적립금)은 default 0)
                "recipientName" : $("#recipient").text(),
                "phoneNumber" : $('#recipientContact').text(),
+               "depositedAccount" : $("#bktBank").val(),
+               "bktSms" : $('#bktSms').val(),
                products,
                couponNumbers,
                orderHistory : {
@@ -285,7 +307,7 @@
              		  "deliveryMessage" : deliveryMessage,
                }
             };
-            console.log(obj);
+       
                      
             $.ajax({
                url : "/pay/output",
@@ -295,9 +317,9 @@
                async : false,
                success : function(result) {
                   isPaid = true;
-                  console.log(result);
+                 
                   if (isPaid) {
-                     // 주문 완료 페이지에 필요한 것 - 작업중!!!!!!!!!!!!!
+                     // 주문 완료 페이지에 필요한 것
                      $("#requestOrder").submit();
                   }
                   // alert("결제 완료");
@@ -311,6 +333,9 @@
             kg_pay();
          }
       }
+   } else {
+	   alert('약관에 동의해주시기 바랍니다.');
+   }
    }
 
    function changeAddr() {
@@ -649,46 +674,7 @@
 													</div>
 												</div>
 
-												<!--  <div class="col-xxl-6 col-lg-12 col-md-6">
-                                                    <div class="delivery-address-box">
-                                                        <div>
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="radio" name="jack"
-                                                                    id="flexRadioDefault2" checked="checked">
-                                                            </div>
-
-                                                            <div class="label">
-                                                                <label>Office</label>
-                                                            </div>
-
-                                                            <ul class="delivery-address-detail">
-                                                                <li>
-                                                                    <h4 class="fw-500">Jack Jennas</h4>
-                                                                </li>
-
-                                                                <li>
-                                                                    <p class="text-content"><span
-                                                                            class="text-title">Address
-                                                                            :</span>Nakhimovskiy R-N / Lastovaya Ul.,
-                                                                        bld. 5/A, appt. 12
-                                                                    </p>
-                                                                </li>
-
-                                                                <li>
-                                                                    <h6 class="text-content"><span
-                                                                            class="text-title">Pin Code :</span>
-                                                                        +380</h6>
-                                                                </li>
-
-                                                                <li>
-                                                                    <h6 class="text-content mb-0"><span
-                                                                            class="text-title">Phone
-                                                                            :</span> + 380 (0564) 53 - 29 - 68</h6>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>-->
+												
 											</div>
 										</div>
 									</div>
@@ -705,7 +691,7 @@
 										<div class="checkout-title">
 											<h4>할인수단</h4>
 										</div>
-										<div>${requestScope.couponInfos }</div>
+										
 
 										<div class="checkout-detail">
 											<div class="row g-4">
@@ -821,53 +807,7 @@
 													</div>
 												</div>
 
-												<!--  <div class="col-xxl-6">
-                                       <div class="delivery-option">
-                                          <div class="delivery-category">
-                                             <div class="shipment-detail">
-                                                <div
-                                                   class="form-check mb-0 custom-form-check show-box-checked">
-                                                   <input class="form-check-input" type="radio"
-                                                      name="standard" id="future"> <label
-                                                      class="form-check-label" for="future">Future
-                                                      Delivery Option</label>
-                                                </div>
-                                             </div>
-                                          </div>
-                                       </div>
-                                    </div>-->
-
-												<!-- <div class="col-12 future-box">
-                                       <div class="future-option">
-                                          <div class="row g-md-0 gy-4">
-                                             <div class="col-md-6">
-                                                <div class="delivery-items">
-                                                   <div>
-                                                      <h5 class="items text-content">
-                                                         <span>3 Items</span>@ $693.48
-                                                      </h5>
-                                                      <h5 class="charge text-content">
-                                                         Delivery Charge $34.67
-                                                         <button type="button" class="btn p-0"
-                                                            data-bs-toggle="tooltip" data-bs-placement="top"
-                                                            title="Extra Charge">
-                                                            <i class="fa-solid fa-circle-exclamation"></i>
-                                                         </button>
-                                                      </h5>
-                                                   </div>
-                                                </div>
-                                             </div>
-
-                                             <div class="col-md-6">
-                                                <form class="form-floating theme-form-floating date-box">
-                                                   <input type="date" class="form-control"> <label>Select
-                                                      Date</label>
-                                                </form>
-                                             </div>
-                                             
-                                          </div>
-                                       </div>
-                                    </div>-->
+												
 											</div>
 										</div>
 									</div>
@@ -901,17 +841,7 @@
 															</div>
 														</div>
 													</div>
-													<div id="flush-collapseFour"
-														class="accordion-collapse collapse show"
-														data-bs-parent="#accordionFlushExample">
-														<div class="accordion-body">
-															<p class="cod-review">
-																Pay digitally with SMS Pay Link. Cash may not be
-																accepted in COVID restricted areas. <a
-																	href="javascript:void(0)">Know more.</a>
-															</p>
-														</div>
-													</div>
+													
 												</div>
 
 												<div class="accordion-item">
@@ -926,65 +856,7 @@
 															</div>
 														</div>
 													</div>
-													<div id="flush-collapseOne"
-														class="accordion-collapse collapse"
-														data-bs-parent="#accordionFlushExample">
-														<div class="accordion-body">
-															<div class="row g-2">
-																<div class="col-12">
-																	<div class="payment-method">
-																		<div
-																			class="form-floating mb-lg-3 mb-2 theme-form-floating">
-																			<input type="text" class="form-control" id="credit2"
-																				placeholder="Enter Credit & Debit Card Number">
-																			<label for="credit2">Enter Credit & Debit
-																				Card Number</label>
-																		</div>
-																	</div>
-																</div>
-
-																<div class="col-xxl-4">
-																	<div
-																		class="form-floating mb-lg-3 mb-2 theme-form-floating">
-																		<input type="text" class="form-control" id="expiry"
-																			placeholder="Enter Expiry Date"> <label
-																			for="expiry">Expiry Date</label>
-																	</div>
-																</div>
-
-																<div class="col-xxl-4">
-																	<div
-																		class="form-floating mb-lg-3 mb-2 theme-form-floating">
-																		<input type="text" class="form-control" id="cvv"
-																			placeholder="Enter CVV Number"> <label
-																			for="cvv">CVV Number</label>
-																	</div>
-																</div>
-
-																<div class="col-xxl-4">
-																	<div
-																		class="form-floating mb-lg-3 mb-2 theme-form-floating">
-																		<input type="password" class="form-control"
-																			id="password" placeholder="Enter Password"> <label
-																			for="password">Password</label>
-																	</div>
-																</div>
-
-																<div class="button-group mt-0">
-																	<ul>
-																		<li>
-																			<button class="btn btn-light shopping-button">Cancel</button>
-																		</li>
-
-																		<li>
-																			<button class="btn btn-animation">Use This
-																				Card</button>
-																		</li>
-																	</ul>
-																</div>
-															</div>
-														</div>
-													</div>
+													
 												</div>
 
 												<div class="accordion-item">
@@ -999,77 +871,7 @@
 															</div>
 														</div>
 													</div>
-													<div id="flush-collapseTwo"
-														class="accordion-collapse collapse"
-														data-bs-parent="#accordionFlushExample">
-														<div class="accordion-body">
-															<h5 class="text-uppercase mb-4">Select Your Bank</h5>
-															<div class="row g-2">
-																<div class="col-md-6">
-																	<div class="custom-form-check form-check">
-																		<input class="form-check-input mt-0" type="radio"
-																			id="bank1"> <label class="form-check-label"
-																			for="bank1">Industrial & Commercial Bank</label>
-																	</div>
-																</div>
-
-																<div class="col-md-6">
-																	<div class="custom-form-check form-check">
-																		<input class="form-check-input mt-0" type="radio"
-																			id="bank2"> <label class="form-check-label"
-																			for="bank2">Agricultural Bank</label>
-																	</div>
-																</div>
-
-																<div class="col-md-6">
-																	<div class="custom-form-check form-check">
-																		<input class="form-check-input mt-0" type="radio"
-																			id="bank3"> <label class="form-check-label"
-																			for="bank3">Bank of America</label>
-																	</div>
-																</div>
-
-																<div class="col-md-6">
-																	<div class="custom-form-check form-check">
-																		<input class="form-check-input mt-0" type="radio"
-																			id="bank4"> <label class="form-check-label"
-																			for="bank4">Construction Bank Corp.</label>
-																	</div>
-																</div>
-
-																<div class="col-md-6">
-																	<div class="custom-form-check form-check">
-																		<input class="form-check-input mt-0" type="radio"
-																			id="bank5"> <label class="form-check-label"
-																			for="bank5">HSBC Holdings</label>
-																	</div>
-																</div>
-
-																<div class="col-md-6">
-																	<div class="custom-form-check form-check">
-																		<input class="form-check-input mt-0" type="radio"
-																			id="bank6"> <label class="form-check-label"
-																			for="bank6">JPMorgan Chase & Co.</label>
-																	</div>
-																</div>
-
-																<div class="col-12">
-																	<div class="select-option">
-																		<div class="form-floating theme-form-floating">
-																			<select class="form-select theme-form-select"
-																				aria-label="Default select example">
-																				<option value="hsbc">HSBC Holdings</option>
-																				<option value="loyds">Lloyds Banking Group</option>
-																				<option value="natwest">Nat West Group</option>
-																				<option value="Barclays">Barclays</option>
-																				<option value="other">Others Bank</option>
-																			</select> <label>Select Other Bank</label>
-																		</div>
-																	</div>
-																</div>
-															</div>
-														</div>
-													</div>
+													
 												</div>
 
 												<div class="accordion-item">
@@ -1084,59 +886,43 @@
 															</div>
 														</div>
 													</div>
-													<div id="flush-collapseThree"
+													  <div id="flush-collapseThree"
 														class="accordion-collapse collapse"
 														data-bs-parent="#accordionFlushExample">
 														<div class="accordion-body">
-															<h5 class="text-uppercase mb-4">Select Your Wallet</h5>
+															<h5 class="text-uppercase mb-4"></h5>
 															<div class="row">
-																<div class="col-md-6">
-																	<div class="custom-form-check form-check">
-																		<label class="form-check-label" for="amazon"><input
-																			class="form-check-input mt-0" type="radio"
-																			id="amazon">Amazon Pay</label>
-																	</div>
-																</div>
-
-																<div class="col-md-6">
-																	<div class="custom-form-check form-check">
-																		<input class="form-check-input mt-0" type="radio"
-																			id="gpay"> <label class="form-check-label"
-																			for="gpay">Google Pay</label>
-																	</div>
-																</div>
-
-																<div class="col-md-6">
-																	<div class="custom-form-check form-check">
-																		<input class="form-check-input mt-0" type="radio"
-																			id="airtel"> <label class="form-check-label"
-																			for="airtel">Airtel Money</label>
-																	</div>
-																</div>
-
-																<div class="col-md-6">
-																	<div class="custom-form-check form-check">
-																		<input class="form-check-input mt-0" type="radio"
-																			id="paytm"> <label class="form-check-label"
-																			for="paytm">Paytm Pay</label>
-																	</div>
-																</div>
-
-																<div class="col-md-6">
-																	<div class="custom-form-check form-check">
-																		<input class="form-check-input mt-0" type="radio"
-																			id="jio"> <label class="form-check-label"
-																			for="jio">JIO Money</label>
-																	</div>
-																</div>
-
-																<div class="col-md-6">
-																	<div class="custom-form-check form-check">
-																		<input class="form-check-input mt-0" type="radio"
-																			id="free"> <label class="form-check-label"
-																			for="free">Freecharge</label>
-																	</div>
-																</div>
+																 <!-- 은행 -->
+                                <div class="col-12">
+                                    <div class="form-floating theme-form-floating">
+                                        <select id="bktBank" name="bktBank" class="form-control">
+                                        	<option value="none">입금할 은행을 선택해주세요.</option>
+                                        	<option>신한은행</option>
+                                        	<option>IBK기업은행</option>
+                                        	<option>하나은행</option>
+                                        	<option>우리은행</option>
+                                        	<option>NH농협은행</option>
+                                        	<option>KDB산업은행</option>
+                                        	<option>SC제일은행</option>
+                                        	<option>씨티은행</option>
+                                        	<option>BNK부산은행</option>
+                                        	<option>DGB대구은행</option>
+                                        	<option>MG새마을금고</option>
+                                        	<option>신협</option>
+                                        	<option>수협은행</option>
+                                        	<option>KB국민은행</option>
+                                        	<option>우체국예금</option>
+                                        	<option>카카오뱅크</option>
+                                        	<option>토스</option>
+                                        </select>
+                                        <label for="bktBank">은행</label>
+                                        <br>
+                                        <h5 id="showBktBank" style="display:none"></h5>
+                                        <br>
+                                        sms 수신 동의 여부<input type="checkbox" id="bktSms" name="bktSms" onclick="checkBank()"/>
+                                    </div>
+                                    <div class="validation"></div>
+                                </div>
 															</div>
 														</div>
 													</div>
@@ -1275,7 +1061,7 @@
 							type="button" onclick="checkPayMethod()">결제하기</button>
 						<div class="checkout-offer" id="iframeParent">
 							<label for="acc-or" class="offer-name"> 위 주문내용을 확인하였으며,
-								결제에 동의합니다. <input type="checkbox" id="acc-or"> <span
+								결제에 동의합니다. <input type="checkbox" id="checkTerms"> <span
 								class="checkmark"></span>
 							</label>
 							<iframe id="iframeSon" src="../resources/terms.txt"></iframe>
@@ -1283,13 +1069,13 @@
 						</div>
 						<!--  <button
                         class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
-                        type="button" onclick="cancelPayment()">취소하기</button>-->
+                        type="button" onclick="cancelPayment()">취소하기</button>
 						<button type="button"
 							class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
 							onclick="identify()">본인 인증</button>
 						<button type="button"
 							class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
-							onclick="packData()">테스트</button>
+							onclick="packData()">테스트</button>-->
 					</div>
 				</div>
 			</div>

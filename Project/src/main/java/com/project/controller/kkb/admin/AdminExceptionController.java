@@ -16,7 +16,7 @@ public class AdminExceptionController {
 	public MemberDto getMember(@PathVariable("id") String id) {
 		
 		if (id.equals("ex")) {
-            throw new RuntimeException("잘못된 사용자");
+            throw new RuntimeException();
         }
         
 		if (id.equals("bad")) {

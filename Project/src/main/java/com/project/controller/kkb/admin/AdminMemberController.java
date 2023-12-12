@@ -170,7 +170,7 @@ public class AdminMemberController {
 		return adminCouponService.getCouponInfo(memberId);
 	}
 	
-	/* CRM 적립금/포인트/[쿠폰]  - 쿠폰 적용 카테고리*/
+	/* CRM 적립금/포인트/[쿠폰]  - 쿠폰 적용 카테고리 */
 	@GetMapping("/{memberId}/category/{couponNumber}")
 	public Map<String, Object> checkAppliedCategory(@PathVariable("couponNumber") String couponNumber) {
 		return adminCouponService.getCategoryByCouponNo(couponNumber);
@@ -208,4 +208,8 @@ public class AdminMemberController {
 	        return new ResponseEntity<>("Failed to add member memo", HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	}
+	
+	/* CRM 회원 메모 수정 */
+	
+	/* CRM 회원 메모 삭제 */
 }

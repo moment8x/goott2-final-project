@@ -118,7 +118,7 @@ public interface MemberDAO {
 	int updateDetailOrderAddr(DetailOrderInfo updateDetailOrderAddr, String memberId) throws SQLException, NamingException;
 	
 	//주문상세 쿠폰내역
-	List<CouponHistory> getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException;
+	CouponHistory getCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException;
 	
 	// 무통장 주문 내역 가져오기
 	GetBankTransfer getBankTransfer(String orderNo, String memberId) throws SQLException, NamingException;
@@ -136,7 +136,7 @@ public interface MemberDAO {
 	DetailOrder selectCancelOrder(String memberId, String orderNo, int detailedOrderId) throws SQLException, NamingException;
 	
 	//취소테이블 인서트
-	int insertCancelOrder(String productId, String reason,int totalRefundAmount, int detailedOrderId, String paymentMethod) throws SQLException, NamingException;
+	int insertCancelOrder(String productId, String reason,int amount, int detailedOrderId, String paymentMethod) throws SQLException, NamingException;
 	
 	//취소할경우 디테일 상품상태 업데이트
 	int updateDetailProductStatus(int detailedOrderId) throws SQLException, NamingException;
@@ -145,7 +145,7 @@ public interface MemberDAO {
 	int updateRefundAccount(String memberId, CancelDTO tmpCancel) throws SQLException, NamingException;
 	
 	//환불테이블 인서트
-	int insertRefund(String productId, CancelDTO tmpCancel, String paymentMethod, int amountAfterDiscount, int amountBeforeDiscount) throws SQLException, NamingException;
+	int insertRefund(String productId, int totalRefundAmount, int actualRefundAmount, int refundRewardUsed, int refundPointUsed, int refundCouponDiscount) throws SQLException, NamingException;
 	
 	//취소시 사용한 적립금이 있다면 적립금 로그 인서트
 	int insertRewardLog(String memberId, CancelDTO tmpCancel, int totalReward) throws SQLException, NamingException;
@@ -245,6 +245,18 @@ public interface MemberDAO {
 	
 	//작성한 리뷰 한개 가져오기
 	MyPageReview selectMyReview(String memberId, int postNo) throws SQLException, NamingException;
+	
+	//작성한 리뷰 업로드 파일 가져오기
+	List<UploadFiles> selectMyReviewUf(String memberId, int postNo) throws SQLException, NamingException;
+	
+	//주문에 적용한 쿠폰 카테고리 가져오기
+	List<String> selectCouponCategoryKey(String orderNo, String memberId) throws SQLException, NamingException;
+	
+	//쿠폰사용금액 합치지 않은 쿠폰내역
+	List<CouponHistory> getOrderCouponsHistory(String memberId, String orderNo) throws SQLException, NamingException;
+	
+	//디테일오더 아이디 가져오기
+	int selectDetailOrderId(String productId, String orderNo) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -261,6 +273,8 @@ public interface MemberDAO {
 
 	
 	
+
+
 
 	
 }

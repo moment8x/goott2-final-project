@@ -16,13 +16,13 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class AdminInquiryServiceImpl implements AdminInquiryService {
 	
-	private final AdminInquiryDAO adminInquiryRepository;
+	private final AdminInquiryDAO adminInquiryDao;
 	
 	/* 1:1 문의 조회 */
 	@Override
 	public Map<String, Object> getInquiryInfo(InquiryCondition inquiryCond) {
 		
-		List<InquiryResponse> inquiryList = adminInquiryRepository.findInquiryByInfo(inquiryCond);
+		List<InquiryResponse> inquiryList = adminInquiryDao.findInquiryByInfo(inquiryCond);
 	
 		Map<String, Object> result = new HashMap<>();
 		result.put("inquiryList", inquiryList);

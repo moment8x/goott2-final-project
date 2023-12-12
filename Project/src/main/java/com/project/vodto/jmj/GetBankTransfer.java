@@ -20,5 +20,5 @@ public class GetBankTransfer {
 	private String payerName;
 	private String depositedAccount; //입금계좌
 	private Timestamp paymentTime; //무통장 입금 시간
-	private int amountToPay;
+	private int amountToPay; // 입금해야할 금액(실결제액)
 }

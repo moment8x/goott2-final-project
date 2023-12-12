@@ -5,16 +5,16 @@
 
 <mapper namespace="com.project.mappers.adminShoppingCartMapper">
  	<select id="selectCartInfo" resultType="CartResponse">
-		SELECT s.registration_date, 
-			   p.product_name, 
-		       p.current_quantity, 
-		       s.quantity, 
-		       p.selling_price, 
-		       CEILING(p.selling_price * 0.05 * s.quantity) reward  
-		FROM shopping_cart s
-		INNER JOIN products p
-		ON s.product_id = p.product_id
-		WHERE s.member_id = #{memberID}
-		ORDER BY s.registration_date DESC
+		SELECT 		s.registration_date, 
+			   		p.product_name, 
+		       		p.current_quantity, 
+		       		s.quantity, 
+		       		p.selling_price, 
+		       		CEILING(p.selling_price * 0.05 * s.quantity) reward  
+		FROM 		shopping_cart s
+		INNER JOIN  products p
+		ON 			s.product_id = p.product_id
+		WHERE 		s.member_id = #{memberID}
+		ORDER BY 	s.registration_date DESC
 	</select> 
 </mapper>

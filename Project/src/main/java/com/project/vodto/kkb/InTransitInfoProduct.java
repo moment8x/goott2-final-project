@@ -1,28 +1,28 @@
-package com.project.service.kkb.admin;
-
-import com.project.vodto.kkb.DepositProductResponse;
+package com.project.vodto.kkb;
 
 import lombok.Getter;
 
 @Getter
-public class DepositProduct {
+public class InTransitInfoProduct {
 	private String productOrderNo;
 	private String productName;
 	private String productId;
 	private int productQuantity;
 	
-	private DepositProduct(String productOrderNo, String productName, String productId, int productQuantity) {
+	public InTransitInfoProduct(String productOrderNo, String productName, String productId, int productQuantity) {
+		super();
 		this.productOrderNo = productOrderNo;
 		this.productName = productName;
 		this.productId = productId;
 		this.productQuantity = productQuantity;
 	}
 	
-	public static DepositProduct from(DepositProductResponse order) {
-		return new DepositProduct(
+	public static InTransitInfoProduct from(InTransitNoResponse order) {
+		return new InTransitInfoProduct(
 				order.getProductOrderNo(),
 				order.getProductName(),
 				order.getProductId(),
 				order.getProductQuantity());
 	}
+
 }

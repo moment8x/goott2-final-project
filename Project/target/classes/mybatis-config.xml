@@ -31,11 +31,26 @@
 		<typeAlias type="com.project.vodto.kkb.CouponAppliedCategory" alias="CouponAppliedCategory" />
 		<typeAlias type="com.project.vodto.kkb.MemoListResponse" alias="MemoListResponse" />
 		<typeAlias type="com.project.vodto.kkb.CartResponse" alias="CartResponse" />
-		<typeAlias type="com.project.vodto.kkb.DepositNoResponse" alias="DepositNoResponse" />
-		<typeAlias type="com.project.vodto.kkb.DepositProductResponse" alias="DepositProductResponse" />
-		<typeAlias type="com.project.vodto.kkb.DepositCancelInfoResponse" alias="DepositCancelInfoResponse" />
-		<typeAlias type="com.project.vodto.kkb.ReadyNoResponse" alias="ReadyNoResponse" />
-		<typeAlias type="com.project.vodto.kkb.ReadyProductResponse" alias="ReadyProductResponse" />
+		<typeAlias type="com.project.vodto.kkb.PendingNoResponse" alias="PendingNoResponse" />
+		<typeAlias type="com.project.vodto.kkb.PendingProductResponse" alias="PendingProductResponse" />
+		<typeAlias type="com.project.vodto.kkb.PendingCancelInfoResponse" alias="PendingCancelInfoResponse" />
+		<typeAlias type="com.project.vodto.kkb.PreparationNoResponse" alias="PreparationNoResponse" />
+		<typeAlias type="com.project.vodto.kkb.PreparationProductResponse" alias="PreparationProductResponse" />
+		<typeAlias type="com.project.vodto.kkb.InTransitNoResponse" alias="InTransitNoResponse" />
+		<typeAlias type="com.project.vodto.kkb.InTransitProductResponse" alias="InTransitProductResponse" />
+		<typeAlias type="com.project.vodto.kkb.InTransitProductNoResponse" alias="InTransitProductNoResponse" />
+		<typeAlias type="com.project.vodto.kkb.DeliveredNoResponse" alias="DeliveredNoResponse" />
+		<typeAlias type="com.project.vodto.kkb.DeliveredProductResponse" alias="DeliveredProductResponse" />
+		<typeAlias type="com.project.vodto.kkb.DeliveredProductNoResponse" alias="DeliveredProductNoResponse" />
+		<typeAlias type="com.project.vodto.kkb.PendingCancelResponse" alias="PendingCancelResponse" />
+		<typeAlias type="com.project.vodto.kkb.CancelResponse" alias="CancelResponse" />
+		<typeAlias type="com.project.vodto.kkb.ExchangeResponse" alias="ExchangeResponse" />
+		<typeAlias type="com.project.vodto.kkb.ReturnResponse" alias="ReturnResponse" />
+		<typeAlias type="com.project.vodto.kkb.RefundResponse" alias="RefundResponse" />
+		<typeAlias type="com.project.vodto.kkb.CardCancelResponse" alias="CardCancelResponse" />
+		<typeAlias type="com.project.vodto.kkb.OrderStatus" alias="OrderStatus" />
+		<typeAlias type="com.project.vodto.kkb.CouponCount" alias="CouponCount" />
+		<typeAlias type="com.project.vodto.kkb.CheckedCoupons" alias="CheckedCoupons" />
 		<typeAlias type="com.project.vodto.Product" alias="product" />
 		<typeAlias type="com.project.vodto.Board" alias="Board" />
 	</typeAliases>

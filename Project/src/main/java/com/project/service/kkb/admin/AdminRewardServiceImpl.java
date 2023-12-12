@@ -16,13 +16,13 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class AdminRewardServiceImpl implements AdminRewardService {
 	
-	private final AdminRewardDAO adminRewardRepository;
+	private final AdminRewardDAO adminRewardDao;
 	
 	@Override
 	public Map<String, Object> getRewardInfo(String memberId) {
 		
-		RewardInfoResponse rewardInfo = adminRewardRepository.findRewardInfoById(memberId);
-		List<RewardListResponse> rewardList = adminRewardRepository.findRewardListById(memberId);
+		RewardInfoResponse rewardInfo = adminRewardDao.findRewardInfoById(memberId);
+		List<RewardListResponse> rewardList = adminRewardDao.findRewardListById(memberId);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("rewardInfo", rewardInfo);

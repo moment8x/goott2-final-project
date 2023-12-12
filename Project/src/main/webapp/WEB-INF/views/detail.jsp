@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
    pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -54,6 +55,8 @@
 <script>
 	let page = 1;
 	let lastPage = 1;
+	let fileList = [];
+	let deleteFileList = [];
 	
    $(function () {
       $('.single-item').slick();
@@ -118,7 +121,99 @@
       });
       
       pagination();
-   });
+      getBestSeller();
+      
+		$('#submit-btn').click(function(e) {
+			//let productId = ${product.productId}
+			//let rating = $('input[name=rating]:checked').val();
+			//let content = $('#floatingTextarea2').val();
+			let key = "insert";
+			if (isValid()) {
+				let sendData = {
+						"productId" : "${product.productId}",
+						"rating" : $('input[name=rating]:checked').val(),
+						"content" : $('#floatingTextarea2').val(),
+						fileList,
+						deleteFileList
+				}
+				console.log("sendData",sendData);
+				$.ajax({
+					url : "/review/saveReview",
+					type : "POST",
+					contentType : "application/json",
+					data : JSON.stringify(sendData),
+					async : false,
+					success : function(data) {
+						console.log("업로드성공", data);
+						if (data != null) 
+							fileList = [];
+							deleteFileList = [];
+							showUploadedFile(key);
+					}, error : function(data) {
+						console.log("업로드 실패", data);
+					}
+				});
+			} else {
+				alert("실패");
+			}
+		});
+	});
+	
+	// 관련 상품 장바구니 추가
+	function addCartRelated(productId) {
+		$.ajax({
+			url: "/shoppingCart/insert",
+			type: "POST",
+			data: {
+				productId : productId,
+				quantity : 1
+			},
+			dataType: "JSON",
+			async: false,
+			success: function(data) {
+				if (data.status === "success") {
+					alert("장바구니 등록 완료");
+					newCart(data.cartItems);
+				} else if (data.status === "exist") {
+					alert("기존에 장바구니에 존재하는 상품입니다.");
+				}
+			}, error: function(data) {
+				console.log(data);
+			}
+		});
+	}
+	
+	// 베스트셀러 최신 4개
+	function getBestSeller() {
+		$.ajax({
+			url : "/detail/bestSeller",
+			type : "GET",
+			dataType : "JSON",
+			async : false,
+			success : function(data) {
+				printBestSeller(data);
+			}, error : function(data) {
+				console.log("BS error", data);
+			}
+		});
+	}
+	
+	function printBestSeller(items) {
+		output = '';
+		for (let item of items) {
+			let sellingPrice = item.sellingPrice;
+			sellingPrice = sellingPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+			output += '<li>';
+			output += '<div class="offer-product">';
+			output += '<a href="/detail/' + item.productId + '" class="offer-image">';
+			output += '<img src="' + item.productImage + '"></a>';
+			output += '<div class="offer-detail"><div>';
+			output += '<a href="/detail/' + item.productId + '">';
+			output += '<h6 class="name">' + item.productName + '</h6></a>';
+			output += '<h6 class="price theme-color">' + sellingPrice + '원</h6></div></div></div></li>';
+		}
+		$('.best-seller').html(output);
+	}
 	
 	// 페이지 이동 버튼 클릭 시 이벤트 함수
 	function pagination() {
@@ -218,64 +313,50 @@
 		pagination();
 	}
    
-   // 첨부파일 함수
-   function uploadFiles() {
-      $(".upFileArea").on("dragenter dragover", function(e) {
-         e.preventDefault();
-      });
-      $(".upFileArea").on("drop", function(e) {
-         e.preventDefault();
-         
-         let key = $(this).attr("id").split("-")[0];
-         let files = e.originalEvent.dataTransfer.files;
-         for (let i = 0; i < files.length; i++) {
-            let form = new FormData();
-            form.append("uploadFile", files[i]);   // 파일의 이름을 컨트롤러단의 MultipartFile 객체명과 맞춘다.
-            
-            $.ajax({
-               url : "/review/uploadFile",
-               type : "post",
-               data : form,
-               dataType : "json",
-               async : false,
-               processData : false,   // text데이터에 대해 쿼리스트링 처리를 하지 않겠다.  default = true
-               contentType : false,   // application/x-www-form-urlencoded 처리 안함.(인코딩 하지 않음)  default = true
-               success : function(data) {
-                  console.log("업로드성공", data);
-                  if (data != null) {
-                     showUploadedFile(key, data);
-                  }
-               }, error : function(data) {
-                  console.log("업로드 실패", data);
-               }
-            });
-         }
-      });
-   }
+	// 첨부파일 함수
+	function uploadFiles() {
+		$(".upFileArea").on("dragenter dragover", function(e) {
+			e.preventDefault();
+		});
+		$(".upFileArea").on("drop", function(e) {
+			e.preventDefault();
+			
+			let key = $(this).attr("id").split("-")[0];
+			let files = e.originalEvent.dataTransfer.files;
+			for (let i = 0; i < files.length; i++) {
+				let form = new FormData();
+				
+				form.append("uploadFile", files[i]);   // 파일의 이름을 컨트롤러단의 MultipartFile 객체명과 맞춘다.
+				$.ajax({
+					url : "/review/uploadFile",
+					type : "post",
+					data : form,
+					dataType : "json",
+					async : false,
+					processData : false,   // text데이터에 대해 쿼리스트링 처리를 하지 않겠다.  default = true
+					contentType : false,   // application/x-www-form-urlencoded 처리 안함.(인코딩 하지 않음)  default = true
+					success : function(data) {
+						console.log("업로드성공", data);
+						if (data != null) {
+							fileList.push(data);
+							showUploadedFile(key);
+						}
+					}, error : function(data) {
+						console.log("업로드 실패", data);
+					}
+				});
+			}
+		});
+	}
    
    // 업로드 파일 삭제 시 실행할 이벤트
    function uploadFileDelete() {
       $('.u-img').on('click', function(e) {
          e.stopPropagation();
          let key = $(this).parent().parent().attr("id").split("-")[0];
-         let thumbFileName = $(this).prev().attr("src").split("/resources/uploads")[1];
-         $.ajax({
-            url : "/review/deleteUploadFile",
-            type : "POST",
-            data : {
-               "thumbFileName" : thumbFileName
-            },
-            dataType : "JSON",
-            async : false,
-            success: function(data) {
-               console.log("success", data); 
-               if (data != null) {
-                  showUploadedFile(key, data);
-               }
-            }, error: function(data) {
-               console.log("err", data);
-            }
-         });
+         let thumbFileName = $(this).prev().attr("src").split("/resources/uploads")[1].replaceAll("/", "\\");
+         deleteFileList.push(thumbFileName);
+         showUploadedFile(key);
       });
    }
    
@@ -297,10 +378,11 @@
             console.log("success", data);
             if (data.status === "success") {
                // 리뷰 수정 시작
+               fileList = data.fileList;
                openReviewWriter(index, data.review);
                uploadFiles();
                changeStar();
-               showUploadedFile("update", data.review.images);
+               showUploadedFile("update");
             } else {
                alert("작성자만 수정 가능합니다.");
                return false;
@@ -345,23 +427,25 @@
       $('#review-' + index + ' div.product-rating').html(output2);
    }
    
-   // 리뷰 수정 완료 시
-   function updateReview(index, postNo) {
-      //let author = $('#review-' + index + ' div.name').text();
-      let rating = $('#review-' + index + ' input:radio[name="updateRating"]:checked').val();
-      let content = $('#review-' + index + ' div.reply textarea').val();
-      let productId = "${product.productId}";
+	// 리뷰 수정 완료 시
+	function updateReview(index, postNo) {
+		let rating = $('#review-' + index + ' input:radio[name="updateRating"]:checked').val();
+		let content = $('#review-' + index + ' div.reply textarea').val();
+		let productId = "${product.productId}";
+		let sendData = {
+			"postNo" : postNo,
+			"rating" : rating,
+			"content" : content,
+			"productId" : productId,
+			"page" : page,
+			fileList,
+			deleteFileList
+		}
       $.ajax({
          url : "/review/update",
          type : "POST",
-         data : {
-            "postNo" : postNo,
-            //"author" : author,
-            "rating" : rating,
-            "content" : content,
-            "productId" : productId,
-            "page" : page
-         },
+         contentType : "application/json",
+         data : JSON.stringify(sendData),
          dataType : "JSON",
          async : false,
          success : function(data) {
@@ -398,6 +482,8 @@
       
       $('#review-' + index + ' div.reply').html(output);
       $('#review-' + index + ' div.product-rating').html(output2);
+      fileList = [];
+      deleteList = [];
    }
    
    // 리뷰 삭제 클릭 시
@@ -538,85 +624,69 @@
       return result;
    }
    
-   // 업로드 된 파일 표시       
-   function showUploadedFile(key, json) {
-      let output = "";
-      let index = 0;
-      for(let data of json){
-         let name = data.thumbnailFileName.replaceAll("\\", "/");
-         output += `<span><img src='../resources/uploads\${name}'/><i class="fa-solid fa-circle-xmark u-img" style="color: #fc1d1d;"></i></span>`;
-         index++;
-      }
-      if (key === "insert") {
-         $('#insert-uploadFiles').html(output);
-      } else if (key === "update") {
-         $('#update-uploadFiles').html(output);
-      }
-      uploadFileDelete();
-   }
+	// 업로드 된 파일 표시
+	function showUploadedFile(key) {
+		let output = "";
+		let deleteList = [];
+		for (let deleteData of deleteFileList) {
+			deleteList.push(deleteData.split("thumb_")[1]);
+		}
+		for (let data of fileList){
+			let newFileName = data.newFileName;
+			newFileName = newFileName.substring(newFileName.lastIndexOf("\\") + 1);
+			if (deleteList.includes(newFileName) === false) {
+				let name = data.thumbnailFileName.replace("\\", "/");
+				output += `<span><img src='../resources/uploads\${name}'/><i class="fa-solid fa-circle-xmark u-img" style="color: #fc1d1d;"></i></span>`;
+			}
+		}
+		if (key === "insert") {
+			$('#insert-uploadFiles').html(output);
+		} else if (key === "update") {
+			$('#update-uploadFiles').html(output);
+		}
+		uploadFileDelete();
+	}
    
-   // 페이지 나갈 시
-   window.onbeforeunload = function (e) {
-      console.log("beforeunload 실행");
-       window.navigator.sendBeacon('/review/refreshFile');
-   };
-             
-   // form버튼으로 페이지 이동 시
-   $(document).on("submit", "form", function (e) {
-      window.onbeforeunload = null;
-   });
+	// 페이지 나갈 시
+	window.onbeforeunload = function (e) {
+		console.log("beforeunload 실행");
+		window.navigator.sendBeacon('/review/refreshFile');
+	};
+	
+	// form버튼으로 페이지 이동 시
+	$(document).on("submit", "form", function (e) {
+		window.onbeforeunload = null;
+	});
 </script>
    
 <style type="text/css">
-	.flip-card {
-	   background-color: transparent;
-	   width: 390px;
-	   height: 570px;
-	   perspective: 1000px;
-	   display: flex;
-	   margin: auto;
-	}
-	
-	.flip-card-inner {
-	   position: relative;
-	   width: 100%;
-	   height: 100%;
-	   text-align: center;
-	   transition: transform 0.6s;
-	   transform-style: preserve-3d;
-	   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-	   z-index: -1;
-	}
-	
-	.flip-card:hover .flip-card-inner {
-	   transform: rotateY(180deg);
-	}
-	
-	.flip-card-front, .flip-card-back {
-	   position: absolute;
-	   width: 100%;
-	   height: 100%;
-	   -webkit-backface-visibility: hidden;
-	   backface-visibility: hidden;
-	}
-	
-	.flip-card-front {
-	   background-color: #bbb;
-	   color: black;
-	}
-	
-	.flip-card-back {
-	   background-color: #2980b9;
-	   color: white;
-	   transform: rotateY(180deg);
-	}
-	
 	.upFileArea {
 	   width: 100%;
 	   height: 200px;
 	   border: 1px solid black;
 	}
-	
+	.rating {
+		position : relative;
+		width : 86.75px;
+		padding : 0;
+	}
+	.rating-fill {
+		position : absolute;
+		padding : 0;
+		z-index : 99;
+		display : flex;
+		top : 0;
+		left : 0;
+		overflow : hidden;
+	}
+	.rating-base {
+		z-index : 1;
+		padding : 0;
+		position : absolute;
+		top : 0;
+		left : 0;
+		display : flex;
+	}
 	.star-rating input{
 	   display: none;
 	}
@@ -632,48 +702,48 @@
 
 </head>
 <body>
-   <jsp:include page="./header.jsp"></jsp:include>
+	<jsp:include page="./header.jsp"></jsp:include>
    
-   <div class="container">
+   	<div class="container">
    
-   <!-- mobile fix menu start -->
-   <div class="mobile-menu d-md-none d-block mobile-cart">
-      <ul>
-         <li class="active">
-            <a href="index.html">
-               <i class="iconly-Home icli"></i>
-               <span>Home</span>
-            </a>
-         </li>
-         <li class="mobile-category">
-            <a href="javascript:void(0)">
-               <i class="iconly-Category icli js-link"></i>
-               <span>Category</span>
-               </a>
-            </li>
-            <li>
-               <a href="search.html" class="search-box">
-                  <i class="iconly-Search icli"></i>
-                  <span>Search</span>
-               </a>
-            </li>
-            <li>
-               <a href="wishlist.html" class="notifi-wishlist">
-                  <i class="iconly-Heart icli"></i>
-                  <span>My Wish</span>
-               </a>
-            </li>
-            <li>
-               <a href="cart.html">
-                  <i class="iconly-Bag-2 icli fly-cate"></i>
-                  <span>Cart</span>
-               </a>
-            </li>
-      </ul>
-   </div>
-   <!-- mobile fix menu end -->
-   <!-- Breadcrumb Section Start -->
-   <section class="breadscrumb-section pt-0">
+   	<!-- mobile fix menu start -->
+   	<div class="mobile-menu d-md-none d-block mobile-cart">
+      	<ul>
+         	<li class="active">
+	            <a href="index.html">
+               	<i class="iconly-Home icli"></i>
+               	<span>Home</span>
+            	</a>
+         	</li>
+         	<li class="mobile-category">
+				<a href="javascript:void(0)">
+					<i class="iconly-Category icli js-link"></i>
+					<span>Category</span>
+				</a>
+			</li>
+			<li>
+				<a href="search.html" class="search-box">
+					<i class="iconly-Search icli"></i>
+					<span>Search</span>
+				</a>
+			</li>
+			<li>
+				<a href="wishlist.html" class="notifi-wishlist">
+					<i class="iconly-Heart icli"></i>
+					<span>My Wish</span>
+				</a>
+			</li>
+			<li>
+				<a href="cart.html">
+					<i class="iconly-Bag-2 icli fly-cate"></i>
+					<span>Cart</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+	<!-- mobile fix menu end -->
+	<!-- Breadcrumb Section Start -->
+	<section class="breadscrumb-section pt-0">
       <div class="container-fluid-lg">
          <div class="row">
             <div class="col-12">
@@ -740,19 +810,28 @@
                            <h6 class="offer-top">30% Off</h6>
                            <h2 class="name">${product.productName}</h2>
                            <div class="price-rating">
-                            <h3 class="theme-color price">${product.sellingPrice}원
-                                 <del class="text-content">${product.consumerPrice}원</del>
+                            <h3 class="theme-color price"><fmt:formatNumber value="${product.sellingPrice}" pattern="#,###" />원
+                                 <del class="text-content"><fmt:formatNumber value="${product.consumerPrice}" pattern="#,###" />원</del>
                                  <span class="offer theme-color">(10% off)</span>
                               </h3>
                               <div class="product-rating custom-rate">
-                                 <ul class="rating">
-                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                    <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
-                                 </ul>
-                                 <span class="review">23개 리뷰</span>
+								<div class="rating">
+									<ul class="rating-base">
+	                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+	                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+	                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+	                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+	                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+									</ul>
+									<ul class="rating-fill" style="width : ${product.rating * 20}%">
+	                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+	                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li> 
+	                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+	                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+										<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+	                                </ul>
+								</div>
+								<span class="review">${product.participationCount}개의 리뷰</span>
                               </div>
                            </div>
                            <div class="author">
@@ -947,20 +1026,29 @@
                                              <div class="row g-4">
                                                 <div class="col-xl-6">
                                                    <div class="review-title">
-                                                      <h4 class="fw-500">Customer reviews</h4>
+                                                      <h4 class="fw-500">구매 후기</h4>
                                                    </div>
                                                    
                                                    <div class="d-flex">
                                                       <div class="product-rating">
-                                                         <ul class="rating">
-                                                            <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                                            <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                                            <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                                            <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
-                                                            <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
-                                                         </ul>
+                                                         <div class="rating">
+															<ul class="rating-base">
+							                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+							                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+							                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+							                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+							                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+															</ul>
+															<ul class="rating-fill" style="width : ${product.rating * 20}%">
+							                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+							                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li> 
+							                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+							                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+																<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+							                                </ul>
+														</div>
                                                       </div>
-                                                      <h6 class="ms-3">4.2 Out Of 5</h6>
+                                                      <h6 class="ms-3">${product.rating} / 5</h6>
                                                    </div>
                                                    
                                                    <div class="rating-box">
@@ -1024,7 +1112,8 @@
                                                       <h4 class="fw-500">Add a review</h4>
                                                    </div>
                                                    
-                                                   <form action="/review/saveReview" method="POST" enctype="multipart/form-data" onsubmit="return isValid();">
+                                                   <!-- <form action="/review/saveReview" method="POST" enctype="multipart/form-data" onsubmit="return isValid();"> -->
+                                                   <form id="review-form">
                                                       <input type="hidden" name="productId" value="${product.productId }">
                                                      <div class="row g-4">
                                                         <!-- 평점 넣기 -->
@@ -1054,13 +1143,6 @@
                                                               <label for="floatingTextarea2">Write Your Comment</label>
                                                            </div>
                                                         </div>
-                                                        <!-- 이미지 넣기 -->
-                                                        <!-- <div class="col-md-12">
-                                                           <div class="form-floating theme-form-floating">
-                                                              <input type="url" class="form-control" id="review1" placeholder="Give your review a title">
-                                                              <label for="review1">Review Title</label>
-                                                           </div>
-                                                         </div> -->
                                                          
                                                          <div class="col-md-12">
                                                            <div class="form-floating theme-form-floating">
@@ -1074,7 +1156,7 @@
                                                          
                                                          <div class="col-md-12">
                                                             <div class="form-floating theme-form-floating">
-                                                               <button class="btn" style="background-color: #198754; color: #fff;">리뷰 달기</button>
+                                                               <button class="btn" type="button" id="submit-btn" style="background-color: #198754; color: #fff;">리뷰 달기</button>
                                                             </div>
                                                          </div>
                                                       </div>
@@ -1266,85 +1348,8 @@
                   <!-- Trending Product -->
                   <div class="pt-25">
                      <div class="category-menu">
-                        <h3>Trending Products</h3>
-                        
-                        <ul class="product-list product-right-sidebar border-0 p-0">
-                           <li>
-                              <div class="offer-product">
-                                 <a href="product-left-thumbnail.html" class="offer-image">
-                                    <img
-                                       src="/resources/assets/images/vegetable/product/23.png"
-                                       class="img-fluid blur-up lazyload" alt="">
-                                 </a>
-                                 
-                                 <div class="offer-detail">
-                                    <div>
-                                       <a href="product-left-thumbnail.html">
-                                          <h6 class="name">Meatigo Premium Goat Curry</h6>
-                                       </a>
-                                       <span>450 G</span>
-                                       <h6 class="price theme-color">$ 70.00</h6>
-                                    </div>
-                                 </div>
-                              </div>
-                           </li>
-                           <li>
-                              <div class="offer-product">
-                                 <a href="product-left-thumbnail.html" class="offer-image">
-                                    <img
-                                       src="/resources/assets/images/vegetable/product/24.png"
-                                       class="blur-up lazyload" alt="">
-                                 </a>
-                                 <div class="offer-detail">
-                                    <div>
-                                       <a href="product-left-thumbnail.html">
-                                          <h6 class="name">Dates Medjoul Premium Imported</h6>
-                                       </a>
-                                       <span>450 G</span>
-                                       <h6 class="price theme-color">$ 40.00</h6>
-                                    </div>
-                                 </div>
-                              </div>
-                           </li>
-                           <li>
-                              <div class="offer-product">
-                                 <a href="product-left-thumbnail.html" class="offer-image">
-                                    <img
-                                       src="/resources/assets/images/vegetable/product/25.png"
-                                       class="blur-up lazyload" alt="">
-                                 </a>
-                                 
-                                 <div class="offer-detail">
-                                    <div>
-                                       <a href="product-left-thumbnail.html">
-                                          <h6 class="name">Good Life Walnut Kernels</h6>
-                                       </a>
-                                       <span>200 G</span>
-                                       <h6 class="price theme-color">$ 52.00</h6>
-                                    </div>
-                                 </div>
-                              </div>
-                           </li>
-                           <li class="mb-0">
-                              <div class="offer-product">
-                                 <a href="product-left-thumbnail.html" class="offer-image">
-                                    <img
-                                       src="/resources/assets/images/vegetable/product/26.png"
-                                       class="blur-up lazyload" alt="">
-                                 </a>
-                                 
-                                 <div class="offer-detail">
-                                    <div>
-                                       <a href="product-left-thumbnail.html">
-                                          <h6 class="name">Apple Red Premium Imported</h6>
-                                       </a>
-                                       <span>1 KG</span>
-                                       <h6 class="price theme-color">$ 80.00</h6>
-                                    </div>
-                                 </div>
-                              </div>
-                           </li>
-                        </ul>
+                        <h3>베스트 셀러</h3>
+                        <ul class="product-list product-right-sidebar border-0 p-0 best-seller"></ul>
                      </div>
                   </div>
                
@@ -1390,543 +1395,92 @@
             <div class="row">
                <div class="col-12">
                   <div class="slider-6_1 product-wrapper">
-                     <div>
-                        <div class="product-box-3 wow fadeInUp">
-                           <div class="product-header">
-                              <div class="product-image">
-                                 <a href="product-left.htm"> <img
-                                    src="/resources/assets/images/cake/product/11.png"
-                                    class="img-fluid blur-up lazyload" alt="">
-                                 </a>
-
-                                 <ul class="product-option">
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="View"><a href="javascript:void(0)"
-                                       data-bs-toggle="modal" data-bs-target="#view"> <i
-                                          data-feather="eye"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Compare"><a href="compare.html"> <i
-                                          data-feather="refresh-cw"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Wishlist"><a href="wishlist.html"
-                                       class="notifi-wishlist"> <i data-feather="heart"></i>
-                                    </a></li>
-                                 </ul>
-                              </div>
-                           </div>
-
-                           <div class="product-footer">
-                              <div class="product-detail">
-                                 <span class="span-name">Cake</span> <a
-                                    href="product-left-thumbnail.html">
-                                    <h5 class="name">Chocolate Chip Cookies 250 g</h5>
-                                 </a>
-                                 <div class="product-rating mt-2">
-                                    <ul class="rating">
-                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                    </ul>
-                                    <span>(5.0)</span>
-                                 </div>
-                                 <h6 class="unit">500 G</h6>
-                                 <h5 class="price">
-                                    <span class="theme-color">$10.25</span>
-                                    <del>$12.57</del>
-                                 </h5>
-                                 <div class="add-to-cart-box bg-white">
-                                    <button class="btn btn-add-cart addcart-button">
-                                       Add <span class="add-icon bg-light-gray"> <i
-                                          class="fa-solid fa-plus"></i>
-                                       </span>
-                                    </button>
-                                    <div class="cart_qty qty-box">
-                                       <div class="input-group bg-white">
-                                          <button type="button" class="qty-left-minus bg-gray"
-                                             data-type="minus" data-field="">
-                                             <i class="fa fa-minus" aria-hidden="true"></i>
-                                          </button>
-                                          <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="1">
-                                          <button type="button" class="qty-right-plus bg-gray"
-                                             data-type="plus" data-field="">
-                                             <i class="fa fa-plus" aria-hidden="true"></i>
-                                          </button>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-
-                     <div>
-                        <div class="product-box-3 wow fadeInUp" data-wow-delay="0.05s">
-                           <div class="product-header">
-                              <div class="product-image">
-                                 <a href="product-left-thumbnail.html"> <img
-                                    src="/resources/assets/images/cake/product/2.png"
-                                    class="img-fluid blur-up lazyload" alt="">
-                                 </a>
-
-                                 <ul class="product-option">
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="View"><a href="javascript:void(0)"
-                                       data-bs-toggle="modal" data-bs-target="#view"> <i
-                                          data-feather="eye"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Compare"><a href="compare.html"> <i
-                                          data-feather="refresh-cw"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Wishlist"><a href="wishlist.html"
-                                       class="notifi-wishlist"> <i data-feather="heart"></i>
-                                    </a></li>
-                                 </ul>
-                              </div>
-                           </div>
-                           <div class="product-footer">
-                              <div class="product-detail">
-                                 <span class="span-name">Vegetable</span> <a
-                                    href="product-left-thumbnail.html">
-                                    <h5 class="name">Fresh Bread and Pastry Flour 200 g</h5>
-                                 </a>
-                                 <div class="product-rating mt-2">
-                                    <ul class="rating">
-                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                       <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
-                                    </ul>
-                                    <span>(4.0)</span>
-                                 </div>
-                                 <h6 class="unit">250 ml</h6>
-                                 <h5 class="price">
-                                    <span class="theme-color">$08.02</span>
-                                    <del>$15.15</del>
-                                 </h5>
-                                 <div class="add-to-cart-box bg-white">
-                                    <button class="btn btn-add-cart addcart-button">
-                                       Add <span class="add-icon bg-light-gray"> <i
-                                          class="fa-solid fa-plus"></i>
-                                       </span>
-                                    </button>
-                                    <div class="cart_qty qty-box">
-                                       <div class="input-group bg-white">
-                                          <button type="button" class="qty-left-minus bg-gray"
-                                             data-type="minus" data-field="">
-                                             <i class="fa fa-minus" aria-hidden="true"></i>
-                                          </button>
-                                          <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="1">
-                                          <button type="button" class="qty-right-plus bg-gray"
-                                             data-type="plus" data-field="">
-                                             <i class="fa fa-plus" aria-hidden="true"></i>
-                                          </button>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-
-                     <div>
-                        <div class="product-box-3 wow fadeInUp" data-wow-delay="0.1s">
-                           <div class="product-header">
-                              <div class="product-image">
-                                 <a href="product-left-thumbnail.html"> <img
-                                    src="/resources/assets/images/cake/product/3.png"
-                                    class="img-fluid blur-up lazyload" alt="">
-                                 </a>
-
-                                 <ul class="product-option">
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="View"><a href="javascript:void(0)"
-                                       data-bs-toggle="modal" data-bs-target="#view"> <i
-                                          data-feather="eye"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Compare"><a href="compare.html"> <i
-                                          data-feather="refresh-cw"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Wishlist"><a href="wishlist.html"
-                                       class="notifi-wishlist"> <i data-feather="heart"></i>
-                                    </a></li>
-                                 </ul>
-                              </div>
-                           </div>
-
-                           <div class="product-footer">
-                              <div class="product-detail">
-                                 <span class="span-name">Vegetable</span> <a
-                                    href="product-left-thumbnail.html">
-                                    <h5 class="name">Peanut Butter Bite Premium Butter
-                                       Cookies 600 g</h5>
-                                 </a>
-                                 <div class="product-rating mt-2">
-                                    <ul class="rating">
-                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                       <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
-                                       <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
-                                       <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
-                                       <li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
-                                    </ul>
-                                    <span>(2.4)</span>
-                                 </div>
-                                 <h6 class="unit">350 G</h6>
-                                 <h5 class="price">
-                                    <span class="theme-color">$04.33</span>
-                                    <del>$10.36</del>
-                                 </h5>
-                                 <div class="add-to-cart-box bg-white">
-                                    <button class="btn btn-add-cart addcart-button">
-                                       Add <span class="add-icon bg-light-gray"> <i
-                                          class="fa-solid fa-plus"></i>
-                                       </span>
-                                    </button>
-                                    <div class="cart_qty qty-box">
-                                       <div class="input-group bg-white">
-                                          <button type="button" class="qty-left-minus bg-gray"
-                                             data-type="minus" data-field="">
-                                             <i class="fa fa-minus" aria-hidden="true"></i>
-                                          </button>
-                                          <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="1">
-                                          <button type="button" class="qty-right-plus bg-gray"
-                                             data-type="plus" data-field="">
-                                             <i class="fa fa-plus" aria-hidden="true"></i>
-                                          </button>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-
-                     <div>
-                        <div class="product-box-3 wow fadeInUp" data-wow-delay="0.15s">
-                           <div class="product-header">
-                              <div class="product-image">
-                                 <a href="product-left-thumbnail.html"> <img
-                                    src="/resources/assets/images/cake/product/4.png"
-                                    class="img-fluid blur-up lazyload" alt="">
-                                 </a>
-
-                                 <ul class="product-option">
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="View"><a href="javascript:void(0)"
-                                       data-bs-toggle="modal" data-bs-target="#view"> <i
-                                          data-feather="eye"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Compare"><a href="compare.html"> <i
-                                          data-feather="refresh-cw"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Wishlist"><a href="wishlist.html"
-                                       class="notifi-wishlist"> <i data-feather="heart"></i>
-                                    </a></li>
-                                 </ul>
-                              </div>
-                           </div>
-
-                           <div class="product-footer">
-                              <div class="product-detail">
-                                 <span class="span-name">Snacks</span> <a
-                                    href="product-left-thumbnail.html">
-                                    <h5 class="name">SnackAmor Combo Pack of Jowar Stick
-                                       and Jowar Chips</h5>
-                                 </a>
-                                 <div class="product-rating mt-2">
-                                    <ul class="rating">
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                    </ul>
-                                    <span>(5.0)</span>
-                                 </div>
-                                 <h6 class="unit">570 G</h6>
-                                 <h5 class="price">
-                                    <span class="theme-color">$12.52</span>
-                                    <del>$13.62</del>
-                                 </h5>
-                                 <div class="add-to-cart-box bg-white">
-                                    <button class="btn btn-add-cart addcart-button">
-                                       Add <span class="add-icon bg-light-gray"> <i
-                                          class="fa-solid fa-plus"></i>
-                                       </span>
-                                    </button>
-                                    <div class="cart_qty qty-box">
-                                       <div class="input-group bg-white">
-                                          <button type="button" class="qty-left-minus bg-gray"
-                                             data-type="minus" data-field="">
-                                             <i class="fa fa-minus" aria-hidden="true"></i>
-                                          </button>
-                                          <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="1">
-                                          <button type="button" class="qty-right-plus bg-gray"
-                                             data-type="plus" data-field="">
-                                             <i class="fa fa-plus" aria-hidden="true"></i>
-                                          </button>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-
-                     <div>
-                        <div class="product-box-3 wow fadeInUp" data-wow-delay="0.2s">
-                           <div class="product-header">
-                              <div class="product-image">
-                                 <a href="product-left-thumbnail.html"> <img
-                                    src="/resources/assets/images/cake/product/5.png"
-                                    class="img-fluid blur-up lazyload" alt="">
-                                 </a>
-
-                                 <ul class="product-option">
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="View"><a href="javascript:void(0)"
-                                       data-bs-toggle="modal" data-bs-target="#view"> <i
-                                          data-feather="eye"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Compare"><a href="compare.html"> <i
-                                          data-feather="refresh-cw"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Wishlist"><a href="wishlist.html"
-                                       class="notifi-wishlist"> <i data-feather="heart"></i>
-                                    </a></li>
-                                 </ul>
-                              </div>
-                           </div>
-
-                           <div class="product-footer">
-                              <div class="product-detail">
-                                 <span class="span-name">Snacks</span> <a
-                                    href="product-left-thumbnail.html">
-                                    <h5 class="name">Yumitos Chilli Sprinkled Potato Chips
-                                       100 g</h5>
-                                 </a>
-                                 <div class="product-rating mt-2">
-                                    <ul class="rating">
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star"></i></li>
-                                       <li><i data-feather="star"></i></li>
-                                    </ul>
-                                    <span>(3.8)</span>
-                                 </div>
-                                 <h6 class="unit">100 G</h6>
-                                 <h5 class="price">
-                                    <span class="theme-color">$10.25</span>
-                                    <del>$12.36</del>
-                                 </h5>
-                                 <div class="add-to-cart-box bg-white">
-                                    <button class="btn btn-add-cart addcart-button">
-                                       Add <span class="add-icon bg-light-gray"> <i
-                                          class="fa-solid fa-plus"></i>
-                                       </span>
-                                    </button>
-                                    <div class="cart_qty qty-box">
-                                       <div class="input-group bg-white">
-                                          <button type="button" class="qty-left-minus bg-gray"
-                                             data-type="minus" data-field="">
-                                             <i class="fa fa-minus" aria-hidden="true"></i>
-                                          </button>
-                                          <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="1">
-                                          <button type="button" class="qty-right-plus bg-gray"
-                                             data-type="plus" data-field="">
-                                             <i class="fa fa-plus" aria-hidden="true"></i>
-                                          </button>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-
-                     <div>
-                        <div class="product-box-3 wow fadeInUp" data-wow-delay="0.25s">
-                           <div class="product-header">
-                              <div class="product-image">
-                                 <a href="product-left-thumbnail.html"> <img
-                                    src="/resources/assets/images/cake/product/6.png"
-                                    class="img-fluid blur-up lazyload" alt="">
-                                 </a>
-
-                                 <ul class="product-option">
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="View"><a href="javascript:void(0)"
-                                       data-bs-toggle="modal" data-bs-target="#view"> <i
-                                          data-feather="eye"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Compare"><a href="compare.html"> <i
-                                          data-feather="refresh-cw"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Wishlist"><a href="wishlist.html"
-                                       class="notifi-wishlist"> <i data-feather="heart"></i>
-                                    </a></li>
-                                 </ul>
-                              </div>
-                           </div>
-
-                           <div class="product-footer">
-                              <div class="product-detail">
-                                 <span class="span-name">Vegetable</span> <a
-                                    href="product-left-thumbnail.html">
-                                    <h5 class="name">Fantasy Crunchy Choco Chip Cookies</h5>
-                                 </a>
-                                 <div class="product-rating mt-2">
-                                    <ul class="rating">
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star"></i></li>
-                                    </ul>
-                                    <span>(4.0)</span>
-                                 </div>
-
-                                 <h6 class="unit">550 G</h6>
-
-                                 <h5 class="price">
-                                    <span class="theme-color">$14.25</span>
-                                    <del>$16.57</del>
-                                 </h5>
-                                 <div class="add-to-cart-box bg-white">
-                                    <button class="btn btn-add-cart addcart-button">
-                                       Add <span class="add-icon bg-light-gray"> <i
-                                          class="fa-solid fa-plus"></i>
-                                       </span>
-                                    </button>
-                                    <div class="cart_qty qty-box">
-                                       <div class="input-group bg-white">
-                                          <button type="button" class="qty-left-minus bg-gray"
-                                             data-type="minus" data-field="">
-                                             <i class="fa fa-minus" aria-hidden="true"></i>
-                                          </button>
-                                          <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="1">
-                                          <button type="button" class="qty-right-plus bg-gray"
-                                             data-type="plus" data-field="">
-                                             <i class="fa fa-plus" aria-hidden="true"></i>
-                                          </button>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-
-                     <div>
-                        <div class="product-box-3 wow fadeInUp" data-wow-delay="0.3s">
-                           <div class="product-header">
-                              <div class="product-image">
-                                 <a href="product-left-thumbnail.html"> <img
-                                    src="/resources/assets/images/cake/product/7.png"
-                                    class="img-fluid" alt="">
-                                 </a>
-
-                                 <ul class="product-option">
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="View"><a href="javascript:void(0)"
-                                       data-bs-toggle="modal" data-bs-target="#view"> <i
-                                          data-feather="eye"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Compare"><a href="compare.html"> <i
-                                          data-feather="refresh-cw"></i>
-                                    </a></li>
-
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Wishlist"><a href="wishlist.html"
-                                       class="notifi-wishlist"> <i data-feather="heart"></i>
-                                    </a></li>
-                                 </ul>
-                              </div>
-                           </div>
-
-                           <div class="product-footer">
-                              <div class="product-detail">
-                                 <span class="span-name">Vegetable</span> <a
-                                    href="product-left-thumbnail.html">
-                                    <h5 class="name">Fresh Bread and Pastry Flour 200 g</h5>
-                                 </a>
-                                 <div class="product-rating mt-2">
-                                    <ul class="rating">
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star" class="fill"></i></li>
-                                       <li><i data-feather="star"></i></li>
-                                       <li><i data-feather="star"></i></li>
-                                    </ul>
-                                    <span>(3.8)</span>
-                                 </div>
-
-                                 <h6 class="unit">1 Kg</h6>
-
-                                 <h5 class="price">
-                                    <span class="theme-color">$12.68</span>
-                                    <del>$14.69</del>
-                                 </h5>
-                                 <div class="add-to-cart-box bg-white">
-                                    <button class="btn btn-add-cart addcart-button">
-                                       Add <span class="add-icon bg-light-gray"> <i
-                                          class="fa-solid fa-plus"></i>
-                                       </span>
-                                    </button>
-                                    <div class="cart_qty qty-box">
-                                       <div class="input-group bg-white">
-                                          <button type="button" class="qty-left-minus bg-gray"
-                                             data-type="minus" data-field="">
-                                             <i class="fa fa-minus" aria-hidden="true"></i>
-                                          </button>
-                                          <input class="form-control input-number qty-input"
-                                             type="text" name="quantity" value="1">
-                                          <button type="button" class="qty-right-plus bg-gray"
-                                             data-type="plus" data-field="">
-                                             <i class="fa fa-plus" aria-hidden="true"></i>
-                                          </button>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
+                     <c:forEach var="item" items="${related}">
+	                     <div>
+	                        <div class="product-box-3 wow fadeInUp">
+	                           <div class="product-header">
+	                              <div class="product-image">
+	                                 <a href="/detail/${item.productId}"> <img
+	                                    src="${item.productImage}"
+	                                    class="img-fluid blur-up lazyload" alt="">
+	                                 </a>
+	
+	                                 <ul class="product-option">
+	                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+	                                       title="View"><a href="javascript:void(0)"
+	                                       data-bs-toggle="modal" data-bs-target="#view"> <i
+	                                          data-feather="eye"></i>
+	                                    </a></li>
+	
+	                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+	                                       title="Compare"><a href="compare.html"> <i
+	                                          data-feather="refresh-cw"></i>
+	                                    </a></li>
+	
+	                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
+	                                       title="Wishlist"><a href="wishlist.html"
+	                                       class="notifi-wishlist"> <i data-feather="heart"></i>
+	                                    </a></li>
+	                                 </ul>
+	                              </div>
+	                           </div>
+	
+	                           <div class="product-footer">
+	                              <div class="product-detail">
+	                                 <span class="span-name">${item.category}</span> <a
+	                                    href="/detail/${item.productId}">
+	                                    <h5 class="name">${item.productName}</h5>
+	                                 </a>
+	                                 <div class="product-rating mt-2">
+	                                    <div class="rating">
+											<ul class="rating-base">
+			                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+			                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+			                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+			                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+			                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
+											</ul>
+											<ul class="rating-fill" style="width : ${item.rating * 20}%">
+			                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+			                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li> 
+			                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+			                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+												<li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
+			                                </ul>
+										</div>
+	                                    <span>(${item.rating})</span>
+	                                 </div>
+	                                 <h6 class="unit"></h6>
+	                                 <h5 class="price">
+	                                    <span class="theme-color"><fmt:formatNumber value="${item.sellingPrice}" pattern="#,###" />원</span>
+	                                    <del><fmt:formatNumber value="${item.consumerPrice}" pattern="#,###" />원</del>
+	                                 </h5>
+	                                 <div class="add-to-cart-box bg-white">
+	                                    <button class="btn btn-add-cart addcart-button" onclick="addCartRelated('${item.productId}');">
+	                                       Add <span class="add-icon bg-light-gray"> <i
+	                                          class="fa-solid fa-plus"></i>
+	                                       </span>
+	                                    </button>
+	                                    <div class="cart_qty qty-box">
+	                                       <div class="input-group bg-white">
+	                                          <button type="button" class="qty-left-minus bg-gray"
+	                                             data-type="minus" data-field="">
+	                                             <i class="fa fa-minus" aria-hidden="true"></i>
+	                                          </button>
+	                                          <input class="form-control input-number qty-input"
+	                                             type="text" name="quantity" value="1">
+	                                          <button type="button" class="qty-right-plus bg-gray"
+	                                             data-type="plus" data-field="">
+	                                             <i class="fa fa-plus" aria-hidden="true"></i>
+	                                          </button>
+	                                       </div>
+	                                    </div>
+	                                 </div>
+	                              </div>
+	                           </div>
+	                        </div>
+	                     </div>
+                     </c:forEach>
                   </div>
                </div>
             </div>

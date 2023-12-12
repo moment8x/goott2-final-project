@@ -8,6 +8,7 @@ import { useTable, useRowSelect, useSortBy, usePagination } from 'react-table';
 import MemberInfoModal from './member-modal';
 import Layout from './member-modal-detail/Layout';
 import Sidebar from '@/components/partials/sidebar';
+import { Symbols } from 'recharts';
 
 const COLUMNS = [
   {
@@ -199,7 +200,8 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
       .then((res) => res.json())
       .then((res) => {
         console.log('res:', res);
-        setTotalMember(res.total);
+        setTotalMember(() => res.total);
+        console.log('totalMember : ', totalMember);
       });
   }, []);
 

@@ -19,6 +19,7 @@ public class Board {
    private Timestamp createdDate;
    private String title;
    private String content;
+   private int categoryId;
    private int ref;
    private int step;
    private int ref_order;

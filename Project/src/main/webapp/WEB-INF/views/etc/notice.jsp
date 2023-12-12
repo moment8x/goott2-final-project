@@ -145,20 +145,14 @@
                     <div class="title-header option-title">
                       <h5>공지 사항</h5>
                       <form class="d-inline-flex">
-                        <a
-                          href="create-role.html"
-                          class="align-items-center btn btn-theme d-flex"
-                        >
+                        <a href="create-role.html" class="align-items-center btn btn-theme d-flex" >
                           <i data-feather="plus"></i>Add Role
                         </a>
                       </form>
                     </div>
                     <div>
                       <div class="table-responsive">
-                        <table
-                          id="table_id"
-                          class="table role-table all-package theme-table"
-                        >
+                        <table id="table_id" class="table role-table all-package theme-table" >
                           <thead>
                             <tr>
                               <th>이벤트/공지사항</th>
@@ -167,12 +161,22 @@
                               <th>수정 및 삭제</th>
                             </tr>
                           </thead>
-
+                          
+                          <c:forEach items="${list }" var="board" >
                           <tbody>
                             <tr>
-                              <td>1</td>
-                              <td>Dummy</td>
-                              <td>3 weeks ago</td>
+                            <c:choose>
+	                            <c:when test="${board.categoryId == 3 }">
+        	                      <td>공지사항</td>
+    	                        </c:when>
+    	                        <c:otherwise>
+    	                        	<td>이벤트</td>
+    	                        </c:otherwise>
+                            </c:choose>
+                            
+                              <td><a href="/etc/readNotice?no=${board.postNo }">${board.title }</a></td>
+                              <td>${board.createdDate }</td>
+                           
                               <td>
                                 <ul>
                                   <li>
@@ -182,86 +186,7 @@
                                   </li>
 
                                   <li>
-                                    <a
-                                      href="javascript:void(0)"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#exampleModalToggle"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                    </a>
-                                  </li>
-                                </ul>
-                              </td>
-                            </tr>
-
-                            <tr>
-                              <td>2</td>
-                              <td>Self</td>
-                              <td>3 weeks ago</td>
-                              <td>
-                                <ul>
-                                  <li>
-                                    <a href="javascript:void(0)">
-                                      <i class="ri-pencil-line"></i>
-                                    </a>
-                                  </li>
-
-                                  <li>
-                                    <a
-                                      href="javascript:void(0)"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#exampleModalToggle"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                    </a>
-                                  </li>
-                                </ul>
-                              </td>
-                            </tr>
-
-                            <tr>
-                              <td>3</td>
-                              <td>Dummy</td>
-                              <td>3 weeks ago</td>
-                              <td>
-                                <ul>
-                                  <li>
-                                    <a href="javascript:void(0)">
-                                      <i class="ri-pencil-line"></i>
-                                    </a>
-                                  </li>
-
-                                  <li>
-                                    <a
-                                      href="javascript:void(0)"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#exampleModalToggle"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                    </a>
-                                  </li>
-                                </ul>
-                              </td>
-                            </tr>
-
-                            <tr>
-                              <td>4</td>
-                              <td>Author</td>
-                              <td>3 weeks ago</td>
-                              <td>
-                                <ul>
-                                  <li>
-                                    <a href="javascript:void(0)">
-                                      <i class="ri-pencil-line"></i>
-                                    </a>
-                                  </li>
-
-                                  <li>
-                                    <a
-                                      href="javascript:void(0)"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#exampleModalToggle"
-                                    >
+                                    <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#exampleModalToggle" >
                                       <i class="ri-delete-bin-line"></i>
                                     </a>
                                   </li>
@@ -269,6 +194,7 @@
                               </td>
                             </tr>
                           </tbody>
+                          </c:forEach>
                         </table>
                   		<button onclick="validAdmin();" id="writeBtn" type="button" class="btn btn-primary">글 작성</button>
                       </div>
@@ -284,7 +210,7 @@
         </div>
       </div>
       <!-- Page Body End -->
-
+      
       <!-- Modal Start -->
       <div
         class="modal fade"
@@ -474,8 +400,6 @@
     <script src="/resources/boardAssets/js/scrollbar/simplebar.js"></script>
     <script src="/resources/boardAssets/js/scrollbar/custom.js"></script>
 
-    <!-- customizer js -->
-    <script src="/resources/boardAssets/js/customizer.js"></script>
 
     <!-- Sidebar js -->
     <script src="/resources/boardAssets/js/config.js"></script>

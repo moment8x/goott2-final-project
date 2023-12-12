@@ -19,7 +19,6 @@
 			$(".grid-option ul li").on("click", function() {
 				let clickedClass = $(this).attr("class").split("active")[0];
 
-				console.log("클릭한 리스트 항목의 클래스: " + clickedClass);
 				useState(clickedClass);
 
 			});
@@ -83,9 +82,7 @@
 	}
 
 	function parse(data) {
-		console.log(data);
 		$.each(data.listProduct, function(i, product) {
-			console.log(i);
 			if(product.productImage != null){
 			$('#pImage' + (i+1)).attr("src",product.productImage);				
 			} else {
@@ -98,7 +95,6 @@
 			$('#page' + (i+1)).html(product.pageCount+"p");
 			$('#sPrice'+ (i+1)).html(product.sellingPrice.toLocaleString()+"원");
 			$('#cPrice'+ (i+1)).html(product.consumerPrice.toLocaleString()+"원");
-		console.log($('#pImage' + (i+1)).attr("src"));
 		})
 
 	}
@@ -579,6 +575,10 @@
 
 
 	<jsp:include page="../footer.jsp"></jsp:include>
+
+    <script src="/resources/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/resources/assets/js/bootstrap/bootstrap-notify.min.js"></script>
+    <script src="/resources/assets/js/bootstrap/popper.min.js"></script>
 
 
 </body>

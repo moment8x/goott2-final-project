@@ -7,17 +7,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DepositProductResponse {
+public class DeliveredProductNoResponse {
 	private Timestamp orderTime;
-	private String orderNo;
 	private String productOrderNo;
 	private String name;
 	private String memberId;
+	private String productInvoiceNumber;
+	private Timestamp invoiceInputDate;
 	private String productName;
 	private String productId;
 	private int productQuantity;
-	private int productPrice;
-	private int depositAmount;
-	private String bankName;
 	private String deliveryMessage;
 }

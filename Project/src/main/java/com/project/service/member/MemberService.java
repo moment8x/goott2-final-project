@@ -21,6 +21,7 @@ import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.MyPageReview;
 import com.project.vodto.kjs.SignUpDTO;
+import com.project.vodto.kjy.SnsRegisterInfo;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.exchangeDTO;
 
@@ -102,7 +103,7 @@ public interface MemberService {
 	Map<String, Object> searchOrderStatus(String memberId, GetOrderStatusSearchKeyword keyword, int pageNo) throws SQLException, NamingException;
 	
 	//취소할 주문 선택
-	Map<String, Object> selectCancelOrder(String memberId, String orderNo, int detailedOrderId) throws SQLException, NamingException;
+	Map<String, Object> selectCancelOrder(String memberId, String orderNo, int detailedOrderId, int selectQty) throws SQLException, NamingException;
 	
 	//출고전, 입금전 주문취소하기
 	boolean cancelOrder(CancelDTO tmpCancel, String memberId) throws SQLException, NamingException;
@@ -120,7 +121,7 @@ public interface MemberService {
 	boolean addShoppingCart(String memberId, String productId) throws SQLException, NamingException;
 	
 	//리뷰 한개 가져오기
-	MyPageReview selectMyReview(String memberId, int postNo) throws SQLException, NamingException;
+	Map<String, Object> selectMyReview(String memberId, int postNo) throws SQLException, NamingException;
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -131,6 +132,8 @@ public interface MemberService {
 	void sendEmail(String email, String code) throws MessagingException;
 	// 코드 검증
 	boolean confirmCode(String sessionCode, String userCode);
+	// sns 회원가입
+	boolean snsSignUp(SnsRegisterInfo snsInfo) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
 
 }

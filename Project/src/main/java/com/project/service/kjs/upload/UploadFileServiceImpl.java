@@ -29,18 +29,15 @@ public class UploadFileServiceImpl implements UploadFileService {
 	UploadDAO uDao;
 	
 	@Override
-	public List<UploadFiles> uploadFile(String originalFileName, long size, String contentType, byte[] data,
-			String realPath, List<UploadFiles> fileList) throws IOException {
+	public UploadFiles uploadFile(String originalFileName, long size, String contentType, byte[] data,
+			String realPath) throws IOException {
 		
 		UploadFiles uf = null;
 		
 		// 새 파일 업로드.
 		uf = uploadNewFile(originalFileName, size, contentType, data, realPath);
-		if (uf != null) {
-			fileList.add(uf);
-		}
 		
-		return fileList;
+		return uf;
 	}
 	
 //	@Override
@@ -161,6 +158,7 @@ public class UploadFileServiceImpl implements UploadFileService {
 	@Override
 	public void deleteUploadedFile(List<String> deleteFileList, String realPath) throws IOException {
 		for (String deleteFile : deleteFileList) {
+			deleteFile = deleteFile.replace("thumb_", "");
 			deleteFile(deleteFile, realPath);
 		}
 	}

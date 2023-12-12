@@ -54,24 +54,26 @@ public class OrderServiceImpl implements OrderService {
 			}
 			if (od.insertNewPayment(pd) > 0) { // 결제
 				System.out.println("결제 테이블 저장");
-				if (pd.getOrderHistory() != null) { // 회원 주문내역
-					pd.getOrderHistory().setDeliveryStatus(pd.getPaymentStatus());
-					pd.getOrderHistory().setOrderNo(pd.getOrderNo());
-					pd.getOrderHistory().setMemberId(pd.getMemberId());
-					this.saveOrderHistory(pd.getOrderHistory());
-					orderHistory = true;
-				} else { // 비회원 주문내역
-					pd.getNonOrderHistory().setNonDeliveryStatus(pd.getPaymentStatus());
-					pd.getNonOrderHistory().setNonOrderNo(pd.getNonOrderNo());
-					this.saveNonOrderHistory(pd.getNonOrderHistory());
-					orderHistory = true;
-				}
+            if (pd.getOrderHistory() != null) { // 회원 주문내역
+               pd.getOrderHistory().setDeliveryStatus(pd.getPaymentStatus());
+               pd.getOrderHistory().setOrderNo(pd.getOrderNo());
+               pd.getOrderHistory().setMemberId(pd.getMemberId());
+               this.saveOrderHistory(pd.getOrderHistory());
+               orderHistory = true;
+            } else { // 비회원 주문내역
+               pd.getNonOrderHistory().setNonDeliveryStatus(pd.getPaymentStatus());
+               pd.getNonOrderHistory().setNonOrderNo(pd.getNonOrderNo());
+               this.saveNonOrderHistory(pd.getNonOrderHistory());
+               orderHistory = true;
+            }
 				if (orderHistory) {
 					if (od.saveDetailItems(itemList) > 0) { // 주문 상세
 						System.out.println("주문 상세 테이블 저장");
 						if (pd.getPaymentNumber().contains("bkt")) {
+							pd.setDepositedAccount(pd.getDepositedAccount()+" 123-456-789012");
 							if (od.saveBankTransfer(pd) > 0) {
 								System.out.println("무통장 입금 테이블 저장");
+								System.out.println(od.deleteShoppingCart(pd, itemList));
 							}
 						}
 
@@ -87,10 +89,28 @@ public class OrderServiceImpl implements OrderService {
 			if (od.insertNewPayment(pd) > 0) { // 결제
 				System.out.println("결제완료!" + pd.toString());
 				System.out.println(itemList.toString());
-				if (od.saveDetailItems(itemList) > 0) { // 주문 상세
-					System.out.println("주문 상세 테이블 저장");
-					if (updateDiscountMethod(pd, itemList)) {
-						result = true;
+				if (pd.getOrderHistory() != null) { // 회원 주문내역
+					pd.getOrderHistory().setDeliveryStatus(pd.getPaymentStatus());
+					pd.getOrderHistory().setOrderNo(pd.getOrderNo());
+					pd.getOrderHistory().setMemberId(pd.getMemberId());
+					if (this.saveOrderHistory(pd.getOrderHistory())) {
+						orderHistory = true;
+					}
+				} else { // 비회원 주문내역
+					pd.getNonOrderHistory().setNonDeliveryStatus(pd.getPaymentStatus());
+					pd.getNonOrderHistory().setNonOrderNo(pd.getNonOrderNo());
+					if (this.saveNonOrderHistory(pd.getNonOrderHistory())) {
+						orderHistory = true;
+					}
+				}
+				if (orderHistory) {
+					if (od.saveDetailItems(itemList) > 0) { // 주문 상세
+						System.out.println("주문 상세 테이블 저장");
+						if (updateDiscountMethod(pd, itemList)) {
+							System.out.println(od.deleteShoppingCart(pd, itemList));
+							result = true;
+						
+						}
 					}
 				}
 			}
@@ -175,7 +195,7 @@ public class OrderServiceImpl implements OrderService {
 													+ itemList.get(j).getCouponDiscount());
 
 											couponDiscount += calcAmount;// 테스트땜에 주석처리함 다시
-																			// 풀어야해!!!!!!!!!!!!!!!!!!!!!!!!!!!
+											// 풀어야해!!!!!!!!!!!!!!!!!!!!!!!!!!!
 											// couponDiscount = 0;
 										}
 
@@ -272,16 +292,13 @@ public class OrderServiceImpl implements OrderService {
 				item.setCalculatedPrice(item.getProductPrice() * item.getProductQuantity());
 			}
 
-			if(completeOrder.getTotalAmount() < 10000) {
+			if (completeOrder.getTotalAmount() < 10000) {
 				System.out.println("10000원 미만 상품");
-			} else
-			if (completeOrder.getActualPaymentAmount() != 0) {	// 무통장, 재화 제외
+			} else if (completeOrder.getActualPaymentAmount() != 0) { // 무통장, 재화 제외
 				completeOrder
 						.setDiscountAmount(completeOrder.getTotalAmount() - completeOrder.getActualPaymentAmount());
-			} else {	// 무통장, 재화
-				
+			} else { // 무통장, 재화
 				completeOrder.setDiscountAmount(completeOrder.getTotalAmount() - completeOrder.getAmountToPay());
-				System.out.println("ptr일 때 : " + completeOrder.getAmountToPay());
 			}
 			paymentDetail.put("detailOrderItem", itemDetail);
 			paymentDetail.put("paymentHistory", completeOrder);
@@ -305,10 +322,10 @@ public class OrderServiceImpl implements OrderService {
 		// 배송지, 결제 관련 정보 가져오기 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!추가 수정 필요
 		completeOrder = od.getPaymentHistory(orderNo);
 		System.out.println(completeOrder.toString());
-//		completeOrder.setRecipientName(oh.getRecipientName());
-//		completeOrder.setRecipientPhoneNumber(oh.getRecipientPhoneNumber());
-//		completeOrder.setShippingAddress(oh.getShippingAddress());
-//		completeOrder.setDetailedShippingAddress(oh.getDetailedShippingAddress());
+//      completeOrder.setRecipientName(oh.getRecipientName());
+//      completeOrder.setRecipientPhoneNumber(oh.getRecipientPhoneNumber());
+//      completeOrder.setShippingAddress(oh.getShippingAddress());
+//      completeOrder.setDetailedShippingAddress(oh.getDetailedShippingAddress());
 		if (completeOrder != null) {
 			System.out.println(completeOrder.toString());
 			List<CompleteOrderItem> itemDetail = od.getDetailOrderItem(orderNo, productId);
@@ -331,44 +348,44 @@ public class OrderServiceImpl implements OrderService {
 		return paymentDetail;
 	}
 
-//	@Override
-//	public Map<String, Object> getPaymentDetail(OrderHistory oh, List<String> productId) throws Exception {
-//		Map<String, Object> paymentDetail = new HashMap<String, Object>();
-//		// 결제 가져오기
-//		System.out.println(oh.toString());
-//		
-//		CompleteOrder completeOrder = null;
-//		// 상품 id 가져오기
-//		productId = od.getProductIds(oh.getOrderNo());
-//		System.out.println(productId);
-//		
-//		// 배송지, 결제 관련 정보 가져오기 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!추가 수정 필요
-//		completeOrder = od.getPaymentHistory(oh.getOrderNo());
-//		System.out.println(completeOrder.toString());
-////		completeOrder.setRecipientName(oh.getRecipientName());
-////		completeOrder.setRecipientPhoneNumber(oh.getRecipientPhoneNumber());
-////		completeOrder.setShippingAddress(oh.getShippingAddress());
-////		completeOrder.setDetailedShippingAddress(oh.getDetailedShippingAddress());
-//		if (completeOrder != null) {
-//			System.out.println(completeOrder.toString());
-//			List<CompleteOrderItem> itemDetail = od.getDetailOrderItem(oh.getOrderNo(), productId);
-//			for(CompleteOrderItem item : itemDetail) {
-//				item.setCalculatedPrice(item.getProductPrice()*item.getProductQuantity());
-//			}
-//			if(completeOrder.getActualPaymentAmount()!=0) {
-//				completeOrder.setDiscountAmount(completeOrder.getTotalAmount()-completeOrder.getActualPaymentAmount());
-//			} else {
-//				completeOrder.setDiscountAmount(completeOrder.getTotalAmount()-completeOrder.getAmountToPay());
-//				System.out.println("ptr일 때 : "+completeOrder.getAmountToPay());
-//			}
-//			
-//			paymentDetail.put("detailOrderItem", itemDetail);
-//			paymentDetail.put("paymentHistory", completeOrder);
-//			System.out.println(paymentDetail.toString());
-//		}
-//		;
-//		return paymentDetail;
-//	}
+//   @Override
+//   public Map<String, Object> getPaymentDetail(OrderHistory oh, List<String> productId) throws Exception {
+//      Map<String, Object> paymentDetail = new HashMap<String, Object>();
+//      // 결제 가져오기
+//      System.out.println(oh.toString());
+//      
+//      CompleteOrder completeOrder = null;
+//      // 상품 id 가져오기
+//      productId = od.getProductIds(oh.getOrderNo());
+//      System.out.println(productId);
+//      
+//      // 배송지, 결제 관련 정보 가져오기 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!추가 수정 필요
+//      completeOrder = od.getPaymentHistory(oh.getOrderNo());
+//      System.out.println(completeOrder.toString());
+////      completeOrder.setRecipientName(oh.getRecipientName());
+////      completeOrder.setRecipientPhoneNumber(oh.getRecipientPhoneNumber());
+////      completeOrder.setShippingAddress(oh.getShippingAddress());
+////      completeOrder.setDetailedShippingAddress(oh.getDetailedShippingAddress());
+//      if (completeOrder != null) {
+//         System.out.println(completeOrder.toString());
+//         List<CompleteOrderItem> itemDetail = od.getDetailOrderItem(oh.getOrderNo(), productId);
+//         for(CompleteOrderItem item : itemDetail) {
+//            item.setCalculatedPrice(item.getProductPrice()*item.getProductQuantity());
+//         }
+//         if(completeOrder.getActualPaymentAmount()!=0) {
+//            completeOrder.setDiscountAmount(completeOrder.getTotalAmount()-completeOrder.getActualPaymentAmount());
+//         } else {
+//            completeOrder.setDiscountAmount(completeOrder.getTotalAmount()-completeOrder.getAmountToPay());
+//            System.out.println("ptr일 때 : "+completeOrder.getAmountToPay());
+//         }
+//         
+//         paymentDetail.put("detailOrderItem", itemDetail);
+//         paymentDetail.put("paymentHistory", completeOrder);
+//         System.out.println(paymentDetail.toString());
+//      }
+//      ;
+//      return paymentDetail;
+//   }
 
 	@Override
 	public List<OrderInfo> getProductInfo(List<String> productId) throws Exception {

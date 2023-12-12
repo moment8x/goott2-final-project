@@ -120,7 +120,6 @@ public class ReviewServiceImpl implements ReviewService {
 		reviewList = rDao.getReviewList(productId, pagingInfo);
 		
 		if (reviewList != null) {
-			
 			for (ReviewBoardDTO review : reviewList) {
 				// review가 이미지를 몇개 가지고 있는지 확인
 				int getCountImage = rDao.getCountImages(review.getPostNo());
@@ -185,7 +184,6 @@ public class ReviewServiceImpl implements ReviewService {
 			throws SQLException, NamingException {
 		boolean result = false;
 		if (rDao.updateReview(postNo, content, rating) == 1) {
-			
 			// fileList에 값이 있으면 이미지도 수정!
 			if (calcFileList.size() > 0) {
 				for (UploadFiles file : calcFileList) {
@@ -206,6 +204,7 @@ public class ReviewServiceImpl implements ReviewService {
 			}
 			if (deleteFileList.size() > 0) {
 				for (String deleteFile : deleteFileList) {
+					deleteFile = deleteFile.replace("thumb_", "");
 					if (ufService.isExist(deleteFile)) {
 						int uploadFilesSeq = uDao.selectUploadFile(deleteFile);
 						if (ruDao.deleteImage(uploadFilesSeq) == 1) {
