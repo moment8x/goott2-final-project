@@ -389,7 +389,7 @@ public class AdminOrderController {
 	public ResponseEntity<String> setProductCancel(
 			@RequestBody List<ProductCancelRequest> productOrderNoList) {	
 		
-		int result = adminOrderService.editProductCancel(productOrderNoList);
+		int result = adminOrderService.getOrdersByStatus(productOrderNoList);
 		
 		if (result > 0) {
 	        return new ResponseEntity<>("Order cancellation by item update successful", HttpStatus.CREATED);
