@@ -268,7 +268,7 @@ function makePageButton(paging) {
                                             <c:forEach var="category" items="${categories }" varStatus="loop">  
                                                 <li>
                                                     <div class="form-check ps-0 m-0 category-list-box key-category">
-                                                        <input class="checkbox_animated" type="checkbox" id="categories${loop.index }" value="${category.categorykey }">
+                                                        <input class="checkbox_animated" type="checkbox" id="categories${loop.index }" value="${category.categoryKey }">
                                                         <label class="form-check-label" for="categories${loop.index }">
                                                             <span class="name">${category.categoryName }</span>
                                                             <span class="number">${category.categoryCount }</span>

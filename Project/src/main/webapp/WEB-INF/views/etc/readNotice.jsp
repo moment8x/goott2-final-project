@@ -85,7 +85,101 @@
 	
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+	    <!-- latest js -->
+    <script src="/resources/boardAssets/js/jquery-3.6.0.min.js"></script>
 <script>
+	let fileList = [];
+	$(function() {
+		$("#fileUpload").on("change", function() {
+			console.log(this.files.length);
+			if(this.files.length <= 3){
+				if((fileList.length + this.files.length) <= 3 ){
+				for(let i = 0; i < this.files.length; i++){		        	
+				let image = new FormData();
+				image.append('replyImages', this.files[i]);
+				console.log("FormData contents:", this.files[i]);
+					$.ajax({
+						url: '/etc/replyUploadImage',
+						type: 'POST',
+						data: image,
+						contentType: false,
+						processData: false,
+						success: function (data) {
+							console.log('파일 업로드가 성공적으로 완료되었습니다.');
+			                fileList.push(data);
+			                console.log(fileList);
+			                showFileList();
+			            },
+			            error: function (error) {
+			            	console.log('파일 업로드 중 오류가 발생했습니다.');
+			            }
+			        });
+				}
+				} else {
+					window.alert("파일은 최대 3개까지만 올리실 수 있습니다.");
+				}
+		    } else {
+		    	window.alert("파일은 3개까지만 올리실 수 있습니다.");
+		  	}
+		});
+		
+		$("#myModal").on("dragover", function(e) {
+		    e.preventDefault();
+		    e.stopPropagation();
+		});
+
+		$("#myModal").on("dragenter", function(e) {
+		    e.preventDefault();
+		    e.stopPropagation();
+		});
+		
+		$("#inputImages, #myModal").on("drop", function(e) {
+			e.preventDefault(); 
+			e.stopPropagation();
+			
+			let files = e.originalEvent.dataTransfer.files;
+			if(files.length <= 3){
+				if((fileList.length + files.length) <= 3 ){
+				for(let i = 0; i < files.length; i++){		        	
+				let image = new FormData();
+				image.append('replyImages', files[i]);
+					$.ajax({
+						url: '/etc/replyUploadImage',
+						type: 'POST',
+						data: image,
+						contentType: false,
+						processData: false,
+						success: function (data) {
+							console.log('파일 업로드가 성공적으로 완료되었습니다.');
+			                fileList.push(data);
+			                console.log(fileList);
+			                showFileList();
+			            },
+			            error: function (error) {
+			            	console.log('파일 업로드 중 오류가 발생했습니다.');
+			            }
+			        });
+				}
+				} else {
+					window.alert("파일은 최대 3개까지만 올리실 수 있습니다.");
+				}
+		    } else {
+		    	window.alert("파일은 3개까지만 올리실 수 있습니다.");
+		  	}
+		});
+	})
+
+	function showFileList() {
+		$("#fileListDiv").empty();
+		 for (let file of fileList) {
+		        let imageSrc = "/resources/productImages" + file.thumbnailFileName;
+
+		        let imageElement = $("<img>").attr("src", imageSrc);
+
+		        $("#fileListDiv").append(imageElement);
+		    }
+	}
+
 	function movementNotice(state) {
 		 $.ajax({
 	         url: '/etc/moveNotice', 
@@ -123,6 +217,30 @@
 	function modalClose() {
 		$("#failModal").hide();
 	}
+	function uploadFiles(tag) {
+		console.log(tag.files);
+	} 
+	function submitForm() {
+		 let replyText = document.getElementById('replyText').value;
+		
+		 let formData = new FormData();
+		 formData.append('replyText', replyText);
+		 formData.append('replyUpload', fileList);
+		 
+		  $.ajax({
+			    url: '/etc/inputNoticeReply',
+			    type: 'POST',
+			    data: formData,
+			    contentType: false,  
+			    processData: false, 
+			    success: function (data) {
+			      console.log('댓글 및 파일 업로드가 성공적으로 완료되었습니다.');
+			    },
+			    error: function (error) {
+			      console.log('댓글 및 파일 업로드 중 오류가 발생했습니다.');
+			    }
+			  });
+	}
 </script> 
 <style>
 #title{
@@ -134,9 +252,9 @@
 	width: 100%;
 	height: 150%;
 	min-height : 400px;
-	border-bottom: solid 1px rgba(0, 0, 0, 0.2);
 	padding-bottom: 50px;
 	margin-bottom: 50px;
+	padding-top: 20px;
 }
 #listUp {
 	padding-bottom: 30px;
@@ -153,6 +271,48 @@
 #btns {
 	display: flex;
 	justify-content: space-between;
+}
+#reply{
+	border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+	height: 300px;
+	margin-bottom: 15px;
+}
+#replySubj{
+	border-bottom: 1px solid rgba(0,0,0,0.4);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+#replyBtn{
+	background-color: #0da487;
+	border: 1px solid #9EC8B9;
+	border-radius : 15px;
+	width: 100x;
+	height: 50px;
+	font-weight: bold;
+	color: white;
+	margin-bottom: 15px;
+}
+.modal-body{
+	text-align: left; margin-left: 75px; margin-bottom: 10px;
+}
+#upload img{
+	width: 60px;
+	height: 60xp;
+}
+#fileUpload {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+}
+#inputImages{
+	cursor: pointer;
+}
+textarea {
+	width: 100%; 
+	box-sizing: border-box; 
+	max-width: 100%; 
+	resize: vertical; 
 }
 </style>
   </head>
@@ -176,10 +336,16 @@
 		<div id="content">
 	       ${board.content }
 		</div>
+		<div id="reply">
+			<div id="replySubj">
+				<h2>댓글</h2>
+				<button id="replyBtn" data-bs-toggle="modal" data-bs-target="#myModal">댓글 작성</button>
+			</div>
+		</div>
 		<div id="btns">
 			<div id="listUp">
 				<a href="/etc/notice">
-				<button class="listUpBtn">목록으로 가기</button>
+				<button class="listUpBtn" >목록으로 가기</button>
 				</a>
 			</div>
 			<div id="nextAndPerv">
@@ -209,10 +375,43 @@
             </div>
         </div>
     </div>
+    
+	
+	<!-- The Modal -->
+	<div class="modal" id="myModal">
+	  <div class="modal-dialog modal-lg"">
+	    <div class="modal-content">
+	
+	      <!-- Modal Header -->
+	      <div class="modal-header">
+	        <h4 class="modal-title">댓글을 남겨보세요!</h4>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+	      </div>
+	
+	      <!-- Modal body -->
+	      <div class="modal-body">
+	        <div ><h3>댓글작성</h3></div>
+	        	<textarea rows="10" cols="90" name="replyText"></textarea>
+	        	<div><h3>파일 업로드</h3></div>
+	        	<div id="upload">
+	        		<input type="file" id="fileUpload" multiple="multiple" name="replyImages"/>
+	        		<label for="fileUpload" id="inputImages"><img src="/resources/assets/images/add.png" /></label>
+	        		<div id="fileListDiv"></div>
+	        	</div>
+	      </div>
+	
+	      <!-- Modal footer -->
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소</button>
+	        <button type="button" class="btn btn-danger" onclick="submitForm();">등록</button>
+	      </div>
+	
+	    </div>
+	  </div>
+	</div>
 	
  
-    <!-- latest js -->
-    <script src="/resources/boardAssets/js/jquery-3.6.0.min.js"></script>
+
 
     <!-- Bootstrap js -->
     <script src="/resources/boardAssets/js/bootstrap/bootstrap.bundle.min.js"></script>
