@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -310,24 +311,41 @@ public class myPageController {
 
 	@RequestMapping(value = "duplicateUserEmail", method = RequestMethod.POST)
 	public @ResponseBody boolean duplicateUserEmail(@RequestParam("tmpEmail") String email) {
-
 		boolean result = false;
 
 		try {
-			Member newEmail = mService.duplicateUserEmail(email);
-			System.out.println("이메일 중복 검사" + newEmail);
-
-			if (newEmail != null) {// 이메일이 중복
+			if( mService.duplicateUserEmail(email)) {
 				result = true;
 			}
-
-		} catch (SQLException | NamingException e) {
-
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return result;
-
+	}
+	
+	@RequestMapping(value = "sendCode", method = RequestMethod.POST)
+	public @ResponseBody boolean sendCode(@RequestParam("email") String email, HttpServletRequest request){
+		boolean result = false;
+		try {
+			String code = (String)mService.emailSend(email).get("code");
+			request.getSession().setAttribute("code", code);
+			result = true;
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@RequestMapping(value = "checkCode", method = RequestMethod.POST)
+	public @ResponseBody boolean checkCode(@RequestParam("userCode") String userCode, HttpServletRequest request) {
+		boolean result = false;
+		String code = (String)request.getSession().getAttribute("code");
+		if(code.equals(userCode)) {
+			result = true;
+			System.out.println(userCode);
+		}
+		return result;
 	}
 
 	@RequestMapping(value = "duplicatePhoneNumber", method = RequestMethod.POST)

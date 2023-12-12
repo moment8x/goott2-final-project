@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
@@ -214,9 +215,40 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public Member duplicateUserEmail(String email) throws SQLException, NamingException {
-
-		return mDao.duplicateUserEmail(email);
+	public boolean duplicateUserEmail(String email) throws SQLException, NamingException, MessagingException {
+		boolean result = false;
+		if(mDao.duplicateUserEmail(email) != null) { //이메일이 중복
+			result = true;
+		}
+		return result;
+	}
+	
+	public Map<String, Object> emailSend(String email) throws MessagingException{
+		Map<String, Object> result = new HashMap<String, Object>();
+		String code = UUID.randomUUID().toString();
+		System.out.println("code!!!!!!!!!!!!!!!!!!!!!!!!!! : " + code);
+//		this.emailCode = code;
+		
+//		boolean result = false;
+		
+		String emailTo = email;
+		String emailFrom = "game046@naver.com";
+		String subject = "Dear Books 이메일 인증";
+		String message = "코드 " + code + " 를 입력해서 인증을 해주세요.";
+		
+		MimeMessage mimeMsg = mailSender.createMimeMessage();
+		MimeMessageHelper mimeHelper = new MimeMessageHelper(mimeMsg);
+		
+		mimeHelper.setFrom(emailFrom);
+		mimeHelper.setTo(emailTo);
+		mimeHelper.setSubject(subject);
+		mimeHelper.setText(message);
+		
+		mailSender.send(mimeMsg);
+		
+		result.put("code", code);
+		
+		return result;
 	}
 
 	@Override

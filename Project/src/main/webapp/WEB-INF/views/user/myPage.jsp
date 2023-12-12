@@ -181,7 +181,7 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 		})
 		
 		//이메일 변경시 중복검사
-		$('#newEmail').blur(function () {
+		$('#newEmail').change(function () {
 			duplicateUserEmail();
 		})
 		
@@ -202,6 +202,30 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 		
 		$('.modifyProfileBtn').click(function () {
 			$('.cover-icon.filebox').show()
+		})
+		
+		//이메일 코드체크
+		$('#checkCode').click(function () {
+			$.ajax({
+				url : '/user/checkCode', // 데이터를 수신받을 서버 주소
+				type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+				data : {
+					userCode : $('#emailCode').val()
+				},
+				dataType : 'json',
+				async : false,
+				success : function(data) {
+					console.log(data);
+					if(data){
+						$('#successEmail').show()	
+					}else if(data == false){
+						alert("코드가 일치하지 않습니다.")
+					}
+				},
+				error : function() {
+				}
+			});
+								
 		})
 		
 		//주문 상태별 조회
@@ -377,33 +401,59 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 	function duplicateUserEmail() {
 		let regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
 		let tmpEmail = $('#newEmail').val()
+	
+			$.ajax({
+				url : '/user/duplicateUserEmail', // 데이터를 수신받을 서버 주소
+				type : 'post', // 통신방식(GET, POST, PUT, DELETE)
+				data :{
+					tmpEmail
+				},
+				dataType : 'json',
+				async : false,
+				success : function(data) {
+					console.log(data);
+					if (data){
+						$('#newEmail').val('');
+						printMsg("newEmail", "newEmail", "중복된 이메일 입니다.", true)
+						$('.trueMsg').hide();
+					}else if(!regExp.test(tmpEmail)){
+						$('#newEmail').val('');
+						$('#errMsg').text("이메일 형식에 맞지 않습니다.").hide(10000)
+						//printMsg("newEmail", "newEmail", "이메일 형식에 맞지 않습니다.", true)
+						//$('.trueMsg').hide();
+					}else if(data == false && regExp.test(tmpEmail)) {
+						printMsg("", "newEmail", "", false)
+						$('#sendCodeBtn').show()
+						$('.col-12.codeCheck').show()
+					}
+				},
+				error : function() {
+				}
+			});		
+	}
+	
+	//이메일 유효성&중복검사 체크되면 코드보내기
+	function sendCode() {
+		let email = $('#newEmail').val();
+		let codeText = $('#emailCode').val()
 		
 		$.ajax({
-			url : '/user/duplicateUserEmail', // 데이터를 수신받을 서버 주소
+			url : '/user/sendCode', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
 			data :{
-				tmpEmail
+				email
 			},
 			dataType : 'json',
 			async : false,
 			success : function(data) {
-				console.log(data);
-				if(data === false && regExp.test(tmpEmail)) {
-					printMsg("", "newEmail", "", false)
-					$('#successEmail').show()
-				}else if (data){
-					$('#newEmail').val('');
-					printMsg("newEmail", "newEmail", "중복된 이메일 입니다.", true)
-					$('.trueMsg').hide();
-				}else if(!regExp.test(tmpEmail)){
-					$('#newEmail').val('');
-					printMsg("newEmail", "newEmail", "이메일 형식에 맞지 않습니다.", true)
-					$('.trueMsg').hide();
+				console.log(data);	
+				if(data){
+					alert("코드가 전송되었습니다.")
 				}
 			},
 			error : function() {
 			}
-		});
+		});		
 	}
 	
 	//전화번호 유효성 검사
@@ -1195,7 +1245,7 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 
 </script>
 <style>
-.modifyProfileBtn{
+.modifyProfileBtn {
 	background-color: #E0EFEC;
 	width: 100px;
 	height: 30px;
@@ -1203,40 +1253,42 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 	border-radius: 50px;
 	margin-left: 125px;
 }
-.filebox{
+
+.filebox {
 	margin-top: 10px;
 	padding-left: 65px;
 }
+
 .filebox .upload-name {
-    display: inline-block;
-    height: 40px;
-    padding: 0 10px;
-    vertical-align: middle;
-    border: 1px solid #dddddd;
-    width: 78%;
-    color: #999999;
+	display: inline-block;
+	height: 40px;
+	padding: 0 10px;
+	vertical-align: middle;
+	border: 1px solid #dddddd;
+	width: 78%;
+	color: #999999;
 }
 
 .filebox label, .profileBtn {
-    display: inline-block;
-    padding: 10px 20px;
-    color: #fff;
-    vertical-align: middle;
-    background-color: #999999;
-    cursor: pointer;
-    height: 40px;
-    margin-left: 10px;
-    border: none;
-    margin-top: 10px;
+	display: inline-block;
+	padding: 10px 20px;
+	color: #fff;
+	vertical-align: middle;
+	background-color: #999999;
+	cursor: pointer;
+	height: 40px;
+	margin-left: 10px;
+	border: none;
+	margin-top: 10px;
 }
 
 .filebox input[type="file"] {
-    position: absolute;
-    width: 0;
-    height: 0;
-    padding: 0;
-    overflow: hidden;
-    border: 0;
+	position: absolute;
+	width: 0;
+	height: 0;
+	padding: 0;
+	overflow: hidden;
+	border: 0;
 }
 
 .wishItemName, .wishItemPrice {
@@ -1247,7 +1299,8 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 	margin-left: 800px;
 }
 
-.reviewStar, #modifyAddress {
+.reviewStar, #modifyAddress, .col-12.codeCheck,
+	#sendCodeBtn {
 	display: none;
 }
 
@@ -1271,7 +1324,7 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 
 #deliveryStatus, #successPwd, #successPhoneNumber,
 	#successCellPhoneNumber, #successEmail, #successAddr, #successRefund,
-	#checkOrder {
+	#checkOrder, .form-floating.theme-form-floating.editEmail {
 	display: flex;
 }
 
@@ -1281,7 +1334,7 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 
 .newPhoneNumberEdit, .newEmailEdit, .newCellPhoneNumberEdit,
 	.editNewUserPwd, .editRefund, #successPwd, #successPhoneNumber,
-	#successCellPhoneNumber, #successEmail, .filebox{
+	#successCellPhoneNumber, #successEmail, .filebox {
 	display: none;
 }
 
@@ -1401,6 +1454,9 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 .btn.theme-bg-color.btn-md.text-white.modifyReview {
 	text-align: right;
 }
+#successEmail{
+	margin-top: 10px;
+}
 </style>
 </head>
 
@@ -1495,12 +1551,13 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 										</c:choose>
 									</div>
 								</div>
-								<button class="modifyProfileBtn">변경</button>	
+								<button class="modifyProfileBtn">변경</button>
 								<div class="cover-icon filebox">
-								    <input class="upload-name" value="첨부파일" placeholder="첨부파일">
-								    <label for="file">파일찾기</label> 
-									<input type="file" onchange="readURL(this,0)" id="file" /> 
-									<button class="profileBtn" onclick="uploadProfile();"> 등록</button>			
+									<input class="upload-name" value="첨부파일" placeholder="첨부파일">
+									<label for="file">파일찾기</label> <input type="file"
+										onchange="readURL(this,0)" id="file" />
+									<button class="profileBtn" onclick="uploadProfile();">
+										등록</button>
 								</div>
 
 								<div class="profile-name">
@@ -2198,16 +2255,26 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 
 															<div class="col-12 newEmailEdit">
 																<div class="form-floating theme-form-floating editEmail">
-																	<input type="email" class="form-control" id="newEmail"
+																	<input type="text" class="form-control" id="newEmail"
 																		name="email" placeholder="이메일" /> <label
 																		for="newEmail">새 이메일</label>
-																	<div id="successEmail">
-																		<i class="fa-regular fa-circle-check fa-lg"
-																			style="color: #0e997e"></i>
-																		<button class="btn theme-bg-color btn-md text-white"
-																			type="submit">변경</button>
-																	</div>
+																	<button type="button"
+																		class="btn theme-bg-color btn-md text-white"
+																		id="sendCodeBtn" onclick="sendCode();">코드전송</button>
 																</div>
+																<div id="errMsg"></div>
+																<div class="col-12 codeCheck">
+																	<input type="text" class="form-control" id="emailCode"
+																		placeholder="코드" />
+																	<button type="button"
+																		class="btn theme-bg-color btn-md text-white"
+																		id="checkCode">코드확인</button>
+																</div>
+																<div class="col-12" id="successEmail">
+																	<button class="btn theme-bg-color btn-md text-white"
+																		type="submit">변경</button>
+																</div>
+
 															</div>
 														</form>
 
@@ -2234,9 +2301,9 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 
 															<div class="col-12">
 																<div class="form-floating theme-form-floating">
-																	<input type="text" id="modifyUserAddr" class="form-control"
-																		name="address" value="${userInfo.address}"
-																		placeholder="주소" readonly>
+																	<input type="text" id="modifyUserAddr"
+																		class="form-control" name="address"
+																		value="${userInfo.address}" placeholder="주소" readonly>
 																	<label for="modifyAddr">주소</label>
 																</div>
 															</div>
@@ -2737,7 +2804,8 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 
 					<div>
 						<button type="button" class="btn theme-bg-color btn-md text-white"
-							onclick="sample6_execDaumPostcode('addZipNo', 'addAddr', 'addAddrDetail', 'addExtraAddress');">주소 검색</button>
+							onclick="sample6_execDaumPostcode('addZipNo', 'addAddr', 'addAddrDetail', 'addExtraAddress');">주소
+							검색</button>
 					</div>
 
 					<div class="form-floating mb-4 theme-form-floating">
@@ -2756,11 +2824,10 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 							id="addAddrDetail" name="detailAddress" placeholder="상세 주소" /><label
 							for="addAddrDetail">상세주소</label>
 					</div>
-					
+
 					<div class="form-floating mb-4 theme-form-floating">
-						<input type="text" class="form-control"
-							id="addExtraAddress" placeholder="참고 항목" /><label
-							for="addExtraAddress">참고항목</label>
+						<input type="text" class="form-control" id="addExtraAddress"
+							placeholder="참고 항목" /><label for="addExtraAddress">참고항목</label>
 					</div>
 
 					<!-- <input class="checkbox_animated check-box" type="checkbox"
