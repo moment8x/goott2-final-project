@@ -209,7 +209,5 @@ public class AdminMemberController {
 	    }
 	}
 	
-	/* CRM 회원 메모 수정 */
-	
 	/* CRM 회원 메모 삭제 */
 }
