@@ -21,7 +21,6 @@ import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.kjs.TermsOfSignUpVO;
-import com.project.vodto.kjy.SnsRegisterInfo;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.exchangeDTO;
 
@@ -132,8 +131,6 @@ public interface MemberService {
 	void sendEmail(String email, String code) throws MessagingException;
 	// 코드 검증
 	boolean confirmCode(String sessionCode, String userCode);
-	// sns 회원가입
-	boolean snsSignUp(SnsRegisterInfo snsInfo) throws SQLException, NamingException;
 	// 랜덤한 변수 8자리 생성
 	String randomId(String memberId);
 	// 회원가입 시 약관 가져오기
