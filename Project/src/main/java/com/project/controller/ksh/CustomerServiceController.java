@@ -8,6 +8,9 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.project.service.kjs.upload.UploadFileService;
 import com.project.service.ksh.inquiry.InquiryService;
+import com.project.service.ksh.sms.SmsService;
 import com.project.vodto.CustomerInquiry;
 import com.project.vodto.UploadFiles;
 import com.project.vodto.kjy.Memberkjy;
@@ -29,14 +33,18 @@ import com.project.vodto.ksh.PagingInfo;
 @RequestMapping(value = "/cs/*")
 public class CustomerServiceController {
 
+	@Value(value = "${my-test.phoneNumber}")
+	private String testPhone;
+	
 	@Inject
 	UploadFileService ufService;
 
 	@Inject
 	InquiryService inquiryService;
 
-	List<UploadFiles> fileList = new ArrayList<UploadFiles>();
-	List<UploadFiles> deleteFileList = new ArrayList<UploadFiles>();
+//  문자
+	@Inject
+	private SmsService smsService;
 
 	boolean update = false;
 
@@ -65,32 +73,30 @@ public class CustomerServiceController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println(fileList.toString());
+		
 		return files;
 	}
 
 	@RequestMapping("refreshFile")
-	public void refreshFile(HttpServletRequest request) {
+	public void refreshFile(HttpServletRequest request, @RequestBody CustomerInquiryDTO inquiry) {
 
 		String realPath = request.getSession().getServletContext().getRealPath("resources/inquiryUploads");
 
-		if (fileList.size() > 0) {
-			for (UploadFiles file : fileList) {
+		if (inquiry.getObjList().size() > 0) {
+			for (UploadFiles file : inquiry.getObjList()) {
 				ufService.deleteFile(file.getNewFileName(), realPath);
 			}
-			fileList.clear();
-			deleteFileList.clear();
 
 			System.out.println("리프레쉬끝");
 		}
 	}
 
 	@RequestMapping(value = "saveInquiry", method = RequestMethod.POST)
-	public String saveInquiry(CustomerInquiryDTO inquiry, HttpServletRequest request) {
+	public String saveInquiry(@RequestBody CustomerInquiryDTO inquiry, HttpServletRequest request) {
 		System.out.println(inquiry.toString());
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-
+		
 		try {
 			inquiry.setAuthor(member.getMemberId());
 			inquiryService.saveInquiry(inquiry, inquiry.getObjList());
@@ -192,15 +198,15 @@ public class CustomerServiceController {
 		int postNo = Integer.parseInt(request.getParameter("postNo"));
 		if (session.getAttribute("loginMember") != null) {
 			memberId = ((Memberkjy) session.getAttribute("loginMember")).getMemberId();
+			
 		} else {
 			model.addAttribute("isLogin", "fail");
-			return "/cs/viewInquiry";
+			return "redirect:/cs/viewInquiry";
 		}
 		try {
 			if (inquiryService.checkValidation(postNo, memberId) > 0) {
 				if (request.getParameter("postNo") != null || request.getParameter("postNo") != "") {
 					System.out.println("여기안옴?");
-					fileList.clear();
 					inquiry = inquiryService.viewDetailInquiry(memberId, postNo);
 
 					if (inquiry.getUploadFilesSeq() > 0) {
@@ -214,6 +220,7 @@ public class CustomerServiceController {
 
 					}
 					update = true;
+					System.out.println(inquiry.toString());
 					model.addAttribute("inquiry", inquiry);
 
 				}
@@ -230,9 +237,10 @@ public class CustomerServiceController {
 	}
 
 	@RequestMapping(value = "updateInquiry", method = RequestMethod.POST)
-	public String updateInquiry(@RequestBody CustomerInquiryDTO inquiry, HttpServletRequest request) {
+	public ResponseEntity<String> updateInquiry(@RequestBody CustomerInquiryDTO inquiry, HttpServletRequest request) {
 
 		System.out.println(inquiry.toString());
+		ResponseEntity<String> result = null;
 		HttpSession session = request.getSession();
 		// postNo 조작해서 넘어올 수 있으므로 체크 필요 (수정하려는 사람이 수정하려는 글의 작성자와 일치하는지)
 		try {
@@ -251,6 +259,7 @@ public class CustomerServiceController {
 					}
 					if (inquiryService.updateInquiry(inquiry, inquiry.getDeleteList(), inquiry.getObjList()) > 0) {
 						System.out.println("파일처리 무찔렀다! 와아!");
+						result = new ResponseEntity<String>("success", HttpStatus.OK);
 					}
 					;
 				}
@@ -261,7 +270,7 @@ public class CustomerServiceController {
 			e.printStackTrace();
 		}
 
-		return inquiry.getAuthor();
+		return result;
 	}
 
 	@RequestMapping(value = "delete", method = RequestMethod.GET)

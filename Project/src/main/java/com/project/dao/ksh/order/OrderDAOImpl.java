@@ -247,6 +247,18 @@ public class OrderDAOImpl implements OrderDAO {
 		List<String> productIds = ses.selectList(ns+".getProductIds", orderNo);
 		return productIds;
 	}
+
+	@Override
+	public int deleteShoppingCart(PaymentDTO pd, List<DetailOrderItem> itemList) {
+		// 결제한 상품 쇼핑 카트에서 삭제
+		Map<String, Object> map = new HashMap<>();
+		if(pd.getNonOrderHistory()!=null) {
+			map.put("memberId", pd.getNonOrderHistory().getNonMemberId());
+		}
+		map.put("memberId", pd.getMemberId());
+		map.put("list", itemList);
+		return ses.delete(ns+".deleteFromShoppingCart", map);
+	}
 	
 	
 

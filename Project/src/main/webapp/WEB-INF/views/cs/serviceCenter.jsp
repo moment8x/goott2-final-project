@@ -195,13 +195,13 @@
 					<div class="faq-contain">
 						<h2>FAQ</h2>
 						<p>
-							찾으시는 질문이 없다면 1:1 문의 접수를 이용해주세요. 신속히 처리해드리겠습니다. <a href="/cs/makeInquiry"
+							찾으시는 질문이 없다면 1:1 문의 접수를 이용해주세요.<br><a href="/cs/makeInquiry"
 								class="theme-color text-decoration-underline">contact our
 								support.</a>
 						</p>
 					</div>
 					<br>
-					<div><img src="https://miro.medium.com/v2/resize:fit:720/format:webp/0*FdLLSjLPudGd-Pt5" style="width:550px; height:800px;"></div>
+					
 				</div>
 
 				<div class="col-xl-7">
@@ -391,12 +391,7 @@
 									aria-labelledby="headingEight"
 									data-bs-parent="#accordionExample">
 									<div class="accordion-body">
-										<p>There are many variations of passages of Lorem Ipsum
-											available, but the majority have suffered alteration in some
-											form, by injected humour, or randomised words which don't
-											look even slightly believable. If you are going to use a
-											passage of Lorem Ipsum, you need to be sure there isn't
-											anything embarrassing hidden in the middle of text.</p>
+										<p>상품 쿠폰일 경우 카테고리가 일치하는 상품을 취소 시에 환원 가능합니다.</p>
 									</div>
 								</div>
 							</div>

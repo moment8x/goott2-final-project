@@ -121,7 +121,7 @@
 								<tbody>
 									<c:forEach var="inquiry" items="${requestScope.myInquiries }">
 										<tr>
-											<td onclick="detailInquiry('${inquiry.postNo}');">${inquiry.title }</td>
+											<td onclick="detailInquiry('${inquiry.postNo}');"><c:if test="${inquiry.step == 1 }"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ↳ </c:if>${inquiry.title }</td>
 											<c:choose>
 												<c:when test="${inquiry.answerStatus == 'y'}">
 													<td onclick="detailInquiry('${inquiry.postNo}');">답변완료</td>
@@ -151,6 +151,9 @@
 												</c:otherwise>
 											</c:choose>
 										</tr>
+									</c:forEach>
+									<c:forEach items="${requestScope.adminAnswer }" var="answer">
+									<c:if test=""></c:if>
 									</c:forEach>
 
 									<!--  <tr>
@@ -250,7 +253,7 @@
 					</div>
 					<!-- 요기  -->
 					<div class="pagination2">
-				<div>${requestScope.pagingInfo }</div>
+
 						<ul class="pagination">
 							<c:if test="${param.pageNo > 1 }">
 								<li class="page-item"><a class="page-link"

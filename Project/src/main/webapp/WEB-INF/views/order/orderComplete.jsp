@@ -58,12 +58,20 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <title>Insert title here</title>
 <script>
-
-
-//let noh = "${requestScope.itemList}";
-//console.log(noh);
-
-	
+$(function() {
+	itemLen = $(".product-detail").find("img").length; // 상품 종류
+	for(i=0; i<itemLen; i++) {
+  	 
+  	  $('#productPrice'+i).text((Number($('#productPrice'+i).text())).toLocaleString('ko-KR'));
+  	  $('#productSubTotal'+i).text((Number($('#productSubTotal'+i).text())).toLocaleString('ko-KR'));
+    }
+	 $("#payToAmount").text((Number($('#payToAmount').text())).toLocaleString('ko-KR'));
+	 $('#subTotal').text((Number($('#subTotal').text())).toLocaleString('ko-KR'));
+	 $('#discountAmount').text((Number($('#discountAmount').text())).toLocaleString('ko-KR'));
+     $('#shippingFee').text((Number($('#shippingFee').text())).toLocaleString('ko-KR'));
+     $('#bktAmount').text((Number($('#bktAmount').text())).toLocaleString('ko-KR'));
+    console.log(itemLen);
+});
 </script>
 </head>
 <body>
@@ -170,7 +178,7 @@
 		</div>
 	</section>
 	<!-- Breadcrumb Section End -->
-	<div>${requestScope.paymentDetail.detailOrderItem }</div>
+
 	<!-- Cart Section Start -->
 	<section class="cart-section section-b-space">
 		<div class="container-fluid-lg">
@@ -181,7 +189,7 @@
 							<table class="table mb-0">
 								<tbody>
 
-									<c:forEach var="item" items="${requestScope.paymentDetail.detailOrderItem }">
+									<c:forEach var="item" items="${requestScope.paymentDetail.detailOrderItem }" varStatus="status">
 
 
 
@@ -208,7 +216,7 @@
 
 											<td class="price">
 												<h4 class="table-title text-content">가격</h4>
-												<h6 class="theme-color">${item.productPrice}</h6>
+												<h6 class="theme-color"><span id="productPrice${status.index }">${item.productPrice}</span>원</h6>
 											</td>
 
 											<td class="quantity">
@@ -218,7 +226,7 @@
 
 											<td class="subtotal">
 												<h4 class="table-title text-content">총 금액</h4>
-												<h5>${item.calculatedPrice }</h5>
+												<h5><span id="productSubTotal${status.index }">${item.calculatedPrice }</span>원</h5>
 											</td>
 										</tr>
 									</c:forEach>
@@ -312,35 +320,35 @@
 								<ul class="summery-contain">
 									<li>
 										<h4>주문금액</h4>
-										<h4 class="price">${requestScope.paymentDetail.paymentHistory.totalAmount }원</h4>
+										<h4 class="price"><span id="subTotal">${requestScope.paymentDetail.paymentHistory.totalAmount }</span>원</h4>
 									</li>
 
 									<li>
 										<h4>할인금액</h4>
-										<h4 class="price theme-color">${requestScope.paymentDetail.paymentHistory.discountAmount }원</h4>
+										<h4 class="price theme-color"><span id="discountAmount">${requestScope.paymentDetail.paymentHistory.discountAmount }</span>원</h4>
 									</li>
 
 									<li>
 										<h4>결제수단</h4>
 										<h4 class="price text-danger">
 											${requestScope.paymentDetail.paymentHistory.paymentMethod }
-											<c:if test="${requestScope.paymentDetail.paymentHistory.paymentMethod eq 'card' }">(${requestScope.paymentDetail.paymentHistory.cardName })</c:if>
+											<c:if
+												test="${requestScope.paymentDetail.paymentHistory.paymentMethod eq 'card' }">(${requestScope.paymentDetail.paymentHistory.cardName })</c:if>
 										</h4>
 									</li>
 								</ul>
 
 								<ul class="summery-total">
 									<li class="list-total">
-										<h4>총 결제 금액</h4>
-										<c:choose>
-										<c:when test="${requestScope.paymentDetail.paymentHistory.paymentMethod eq 'bkt'}">
-										<h4 class="price">${requestScope.paymentDetail.paymentHistory.actualPaymentAmount}</h4>
-										</c:when>
-										<c:otherwise>
-										<h4 class="price">${requestScope.paymentDetail.paymentHistory.amountToPay }</h4>
-										</c:otherwise>
-										</c:choose>
+										<h4>실 결제 금액</h4>
+										<h4 class="price"><span id="payToAmount">${requestScope.paymentDetail.paymentHistory.actualPaymentAmount }</span>원</h4>
 									</li>
+									<c:if test="${requestScope.paymentDetail.paymentHistory.paymentMethod eq 'bkt'}">
+										<li class="list-total">
+										<h4>필요 입금 금액</h4>
+										<h4 class="price"><span id="bktAmount">${requestScope.paymentDetail.paymentHistory.amountToPay}</span>원</h4>										
+										</li>
+										</c:if>	
 								</ul>
 							</div>
 						</div>
@@ -376,7 +384,7 @@
 							</div>
 						</div>
 
-					<!-- <div class="col-12">
+						<!-- <div class="col-12">
 							<div class="summery-box">
 								<div class="summery-header d-block">
 									<h3>Payment Method</h3>

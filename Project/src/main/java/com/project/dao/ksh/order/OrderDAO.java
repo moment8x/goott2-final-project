@@ -60,6 +60,8 @@ public interface OrderDAO {
 	List<String> getProductIds(String orderNo) throws Exception;
 
 	int saveDetailItems(List<DetailOrderItem> itemList) throws Exception;
+
+	int deleteShoppingCart(PaymentDTO pd, List<DetailOrderItem> itemList);
 	
 	
 	

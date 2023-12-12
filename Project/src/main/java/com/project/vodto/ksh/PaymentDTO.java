@@ -45,6 +45,8 @@ public class PaymentDTO {
 	private String nonRecipientName;
 	private OrderHistory orderHistory;
 	private NonOrderHistory nonOrderHistory;
+	private String depositedAccount;
+	private String bktSms;
 	
 	
 }

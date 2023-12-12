@@ -51,13 +51,6 @@
 		<typeAlias type="com.project.vodto.kkb.OrderStatus" alias="OrderStatus" />
 		<typeAlias type="com.project.vodto.kkb.CouponCount" alias="CouponCount" />
 		<typeAlias type="com.project.vodto.kkb.CheckedCoupons" alias="CheckedCoupons" />
-		<typeAlias type="com.project.vodto.kkb.RefundNoInfo" alias="RefundNoInfo" />
-		<typeAlias type="com.project.vodto.kkb.RefundProductInfo" alias="RefundProductInfo" />
-		<typeAlias type="com.project.vodto.kkb.RevenueResponse" alias="RevenueResponse" />
-		<typeAlias type="com.project.vodto.kkb.AggregateResponse" alias="AggregateResponse" />
-		<typeAlias type="com.project.vodto.kkb.ProductRankingResponse" alias="ProductRankingResponse" />
-		<typeAlias type="com.project.vodto.kkb.CategoryRankingResponse" alias="CategoryRankingResponse" />
-		<typeAlias type="com.project.vodto.kkb.UserStorageResponse" alias="UserStorageResponse" />
 		<typeAlias type="com.project.vodto.Product" alias="product" />
 		<typeAlias type="com.project.vodto.Board" alias="Board" />
 	</typeAliases>

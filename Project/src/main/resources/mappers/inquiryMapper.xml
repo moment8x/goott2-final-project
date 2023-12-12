@@ -41,20 +41,20 @@
 
 	<select id="getInquiries"
 		resultType="com.project.vodto.CustomerInquiry">
-		select * from customer_inquiries_board where author =
-		#{memberId} order by post_no desc limit #{pi.startRowIndex}, #{pi.viewPostCntPerPage}
+		select * from customer_inquiries_board where author IN (#{memberId}, 'qwer123') 
+		order by ref desc, step asc limit #{pi.startRowIndex}, #{pi.viewPostCntPerPage}
 	</select>
 	
 	<select id="getInquiryCnt" resultType="int">
-		select count(*) as totalPostCnt from customer_inquiries_board where author = #{memberId}
+		select count(*) as totalPostCnt from customer_inquiries_board where author in (#{memberId}, 'qwer123')
 	</select>
 
 	<select id="getDetailInquiry"
 		resultType="com.project.vodto.ksh.CustomerInquiryDTO">
 		select *, count(u.upload_files_seq) AS uploadFilesSeq from
 		customer_inquiries_board b inner join customer_inquiries_uf u on
-		b.post_no = u.post_no and b.author =
-		#{memberId} and b.post_no =
+		b.post_no = u.post_no and b.author in
+		(#{memberId}, 'qwer123') and b.post_no =
 		#{postNo};
 	</select>
 
@@ -94,24 +94,10 @@
 		FROM customer_inquiries_board
 		RIGHT OUTER JOIN (SELECT '')
 		AS m_dual
-		ON post_no = #{postNo} and author = #{author};
+		ON post_no = #{postNo} and author in (#{author}, 'qwer123');
 	</select>
 
-	<insert id="insertDetailOrderItem" parameterType="java.util.Map">
-
-
-		INSERT INTO detailed_order_items
-		(non_order_no, product_id,
-		product_price, product_quantity, product_status, product_order_no)
-		VALUES
-		<foreach item="item" index="index" collection="list"
-			separator=",">
-			(#{item.nonOrderNo}, #{item.productId},
-			#{item.productPrice},#{item.productQuantity},#{item.productStatus},#{item.productOrderNo})
-		</foreach>
-
-
-	</insert>
+	
 	<delete id="deleteFiles">
 		DELETE FROM upload_files
 		WHERE new_file_name =

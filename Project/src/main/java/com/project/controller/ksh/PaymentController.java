@@ -64,8 +64,8 @@ public class PaymentController {
 	private OrderService os;
 
 //  문자
-//	@Inject
-//	private SmsService smsService;
+	@Inject
+	private SmsService smsService;
 
 	@ResponseBody
 	@RequestMapping(value = "verify/{imp_uid}")
@@ -134,10 +134,11 @@ public class PaymentController {
 					paymentDetail.put("pd", pd);
 					result = new ResponseEntity<Map<String, Object>>(paymentDetail, HttpStatus.OK); // 아작스로 돌아가서 쓸모없음
 					// 문자
-//					if (pd.getPaymentNumber().contains("bkt")) {
+//					if (pd.getPaymentNumber().contains("bkt") && pd.getBktSms().equals("sms")) {
 //						MessageDTO messageDto = new MessageDTO();
 //						messageDto.setTo(testPhone); 
-//						System.out.println(messageDto.getTo());
+//						messageDto.setContent("[deerBooks] 무통장입금 계좌 : "+pd.getDepositedAccount());
+//						System.out.println(messageDto.toString());
 //						SmsResponseDto responseDto = smsService.sendSms(messageDto);
 //						System.out.println(responseDto.getStatusCode());
 //					}

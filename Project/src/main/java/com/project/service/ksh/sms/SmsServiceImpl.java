@@ -41,7 +41,6 @@ public class SmsServiceImpl implements SmsService {
 		System.out.println(serviceId);
 		// 현재시간
         String time = Long.toString(System.currentTimeMillis());
-
 		// 헤더세팅
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);

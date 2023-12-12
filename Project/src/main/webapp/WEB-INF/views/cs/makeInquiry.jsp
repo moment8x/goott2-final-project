@@ -126,7 +126,7 @@
 								if (data != null) {
 									console.log(data);
 									addObject(data);
-									showUploadedFile(data);
+									showUploadedFile(objList);
 								}
 							},
 							error : function(data) {
@@ -139,19 +139,61 @@
 					alert("이미지 파일은 최대 3개까지만 첨부 가능합니다.");
 				}
 		});
+		
+		// 휴대폰 번호 유효성 검사
+		
+		$('#phoneNumber').on('blur', function () {
+			let regNumber = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
+			if (regNumber.test($('#phoneNumber').val())) {
+				let addHyphen = $('#phoneNumber').val().replace(/[^0-9]/g, '').replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
+				$('#phoneNumber').val(addHyphen);
+				isValidCellPhone = true;	
+			} else {
+				alert("올바른 전화번호가 아닙니다.");
+				$('#phoneNumber').val("");
+				isValidCellPhone = false;
+			}
+				
+		});
 	})
+	
+	function checkSms() {
+		console.log($("#phoneNumber").val());
+		   if($("#phoneNumber").val() == null || $("#phoneNumber").val() == "") {
+			   alert("휴대폰 번호를 입력하시고 체크해 주세요.");
+			   console.log("!");
+			   $("input:checkbox[name='inquirySms']").prop("checked", false);   
+				 
+			   $('#inquirySms').removeAttr('value');
+			   
+		   } else {
+			   if($("input:checkbox[name='inquirySms']").prop("checked")){
+				   
+			   	$('#inquirySms').val('sms');
+				   } else {
+				   $('#inquirySms').removeAttr('value');
+					   
+				   }
+			  
+				  
+			   
+			   // 체크된 체크박스의 value만 제출 데이터에 포함되고 체크 해제된 체크박스의 value는 아예 누락됩니다. 
+			   // 또한 value를 지정하지 않은 경우의 기본 값은 문자열 on입니다.
+		   }
+		   console.log($('#inquirySms').val());	// 체크하면 sms, 아니면 on
+	   }
 	
 	function addObject(data) {
 		let i = objList.length;
 	    objList[i] = new Object();
-	    objList[i] = data[0];
+	    objList[i] = data;
 	    //objList[i].thumbnailFileName = data[0].thumbnailFileName;
 	      
 		console.log(objList);
 	}
 	
 	// 업로드 된 파일 표시    	
-	function showUploadedFile(json) {
+	/* function showUploadedFile(json) {
 		console.log("newFileName", json);
 		let output = "";
 		let index = 0;
@@ -164,7 +206,27 @@
 		}
 
 		$('.insertFiles').html(output);
-	}
+	} */
+	function showUploadedFile(json) {
+	//console.log("newFileName", json);
+	let output = "";
+	let index = 0;
+	 for(let data of json){
+		let name = data.thumbnailFileName.replaceAll("\\", "/");
+		//output += "<img src='../resources/uploads" + name + "'/>";
+		output += `<div id="\${name}"><img style="pointer-events:none" src='../resources/inquiryUploads\${name}'/>`;
+		output += `<button id='\${name}\${index}' class="removeImgBtn" type="button" onclick="removeSpecificImg(this.id, '\${update}');"><img width="16" height="16" src="https://img.icons8.com/tiny-glyph/16/cancel.png" alt="cancel"/></button></div>`;
+		index++;
+	} 
+
+	/* for(let j in json) {
+		let name = j.thumbnailFileName.replaceAll("\\", "/");
+		output += "<img src='../resources/uploads" + name + "'/>";
+		output += `<div id="\${name}"><img style="pointer-events:none" src='../resources/inquiryUploads\${name}'/>`;
+		output += `<button id='\${name}\${index}' class="removeImgBtn" type="button" onclick="removeSpecificImg(this.id, '\${update}');"><img width="16" height="16" src="https://img.icons8.com/tiny-glyph/16/cancel.png" alt="cancel"/></button></div>`;
+	} */
+	$('.insertFiles').html(output);
+} 
 	
 	function enlargeImg(id) {
 		console.log(id);
@@ -195,7 +257,7 @@
 			
 			if(purpose == 'save') {
 				saveFile = true;
-				updateInquiry(saveInquiry);
+				updateInquiry("saveInquiry");
 			//$('#saveInquiry').submit();
 			} else if (purpose == 'change') { // 수정하려 할 때
 				 $('input').prop('readonly', false);
@@ -213,7 +275,7 @@
 					alert("변경 사항이 없습니다.");
 				} else {
 					saveFile = true;
-					updateInquiry();
+					updateInquiry("updateInquiry");
 					/* $('#updateInquiry').submit(); */
 				}
 			}
@@ -223,6 +285,8 @@
 	
 	function updateInquiry(text) {
 		let mapping = text;
+		console.log(mapping);
+		let asyncControl = false;
 		console.log(Number(postNo));
 		inquiry = {
 				"postNo" : Number(postNo),
@@ -233,19 +297,19 @@
 				objList,
 				deleteList,
 		}
-		console.log(inquiry);
+		if(mapping == "refreshFile") {
+			asyncControl = true;
+		} 
 		$.ajax({
 			url : "/cs/"+mapping,
 			type : "POST",
 			contentType : "application/json",
 			data : JSON.stringify(inquiry),
-			async : false,
+			async : asyncControl,
 			success : function(data) {
 				console.log("업로드성공", data);
 				if (data != null) {
 					console.log(data);
-					addObject(data);
-					showUploadedFile(data);
 				}
 			},
 			error : function(data) {
@@ -279,7 +343,8 @@
 		if(!saveFile) {
 			
 		console.log("beforeunload 실행");
- 		window.navigator.sendBeacon('/cs/refreshFile');
+		updateInquiry("refreshFile");
+ 		//window.navigator.sendBeacon('/cs/refreshFile');
  		
 		}
 	};
@@ -288,6 +353,12 @@
 		let i = deleteList.length;
 	    deleteList[i] = new Object();
 	    deleteList[i] = data;
+	    /* for(let j in objList) {
+	    	if(objList[j].newFileName.indexOf(data.newFileName.substring(12))) {
+	    		objList.splice(j,1);
+	    		console.log("여기로 안와?");
+	    	}
+	    }  */
 	    //deleteList[i].thumbnailFileName = data.thumbnailFileName;
 		console.log(deleteList);
 	}
@@ -296,6 +367,13 @@
 		console.log(id);
 		let fileName = id.slice(0, -1);
 		console.log(fileName);
+		for(let j in objList) {
+	    	if(objList[j].newFileName.indexOf(fileName.substring(12))) {
+	    		objList.splice(j,1);
+	    		console.log("여기로 안와?");
+	    		update = false;
+	    	}
+	    } 
 		$.ajax({
 			url : "/cs/removeSpecificImg",
 			type : "GET",
@@ -562,7 +640,7 @@ display:flex;
 
 
 									<c:choose>
-										<c:when test="${requestScope.inquiry != null }">
+										<c:when test="${inquiry != null && inquiry.author != 'qwer123' }">
 											<div class="dashboard-title">
 												<jsp:include page="./requestInquiry.jsp"></jsp:include>
 												<button class="btn theme-bg-color text-white m-0"
@@ -577,7 +655,14 @@ display:flex;
 												</button>
 											</div>
 										</c:when>
-
+										<c:when test="${inquiry != null && inquiry.author eq 'qwer123' }">
+										<jsp:include page="./requestInquiry.jsp"></jsp:include>
+										<button class="btn theme-bg-color text-white m-0"
+													type="button" id="button-addon1" style="float: right"
+													onclick="location.href='/cs/viewInquiry'">
+													<span>목록으로 가기</span>
+												</button>
+										</c:when>
 										<c:otherwise>
 											<div class="dashboard-title">
 												<jsp:include page="./requestInquiry.jsp"></jsp:include>

@@ -86,6 +86,15 @@ let finalTotal = 0;
 		}
 		});
 		
+		$("#bktBank").on("change", function(){
+
+    		if($("option:selected", this).text() == "입금할 은행을 선택해주세요.") {
+    			$('#showBktBank').attr('style', 'display:none');	
+    		} else {
+    			$('#showBktBank').attr('style', 'display:');
+    			$('#showBktBank').text($("option:selected", this).text()+' 123-456-789012');			
+    		}
+   		});  
 	});
 		
 		//$("#subTotal").val();
@@ -269,6 +278,24 @@ let finalTotal = 0;
 	   
 	   }
 	
+	function checkBank() {
+		   if($("select[name=bktBank] option:selected").text() == "입금할 은행을 선택해주세요.") {
+			   $('#bktSms').removeAttr('value');
+			   alert("입금하실 은행을 선택하시고 체크해 주세요.");
+			   $("input:checkbox[name='bktSms']").prop("checked", false);   
+		   } else {
+			   if( $("input:checkbox[name='bktSms']").prop("checked")){
+				   
+			   	$('#bktSms').val('sms');
+			   } else {
+				   $('#bktSms').removeAttr('value');
+			   }
+			   // 체크된 체크박스의 value만 제출 데이터에 포함되고 체크 해제된 체크박스의 value는 아예 누락됩니다. 
+			   // 또한 value를 지정하지 않은 경우의 기본 값은 문자열 on입니다.
+		   }
+		   console.log($('#bktSms').val());	// 체크하면 sms, 아니면 on
+	   }
+	
 	function checkPayMethod() {
 		 let payNo = "";
 		 let objAmountToPay = Number($('#payToAmount').text().replaceAll(",",""));
@@ -347,6 +374,12 @@ let finalTotal = 0;
 	width: 100%;
 	background-color: white;
 }
+
+.greenBtn {
+	background-color: #0da487;
+	color: white;
+	margin-top: 10px;
+}
 </style>
 </head>
 <body>
@@ -402,10 +435,10 @@ let finalTotal = 0;
 	<!-- Breadcrumb Section End -->
 	<!-- Checkout section Start -->
 	<section class="checkout-section-2 section-b-space">
-		<div>${requestScope.productInfos }</div>
+
 		<form action="nonOrderComplete" method="post" id="requestNonOrder">
 			<input type="hidden" name="nonOrderNo" id="nonOrderNo" value="">
-			
+
 			<div class="container-fluid-lg">
 				<div class="row g-sm-4 g-3">
 					<div class="col-lg-8">
@@ -423,6 +456,7 @@ let finalTotal = 0;
 										<div class="checkout-box">
 											<div class="checkout-title">
 												<h4>정보 입력</h4>
+
 											</div>
 
 											<div class="checkout-detail">
@@ -445,55 +479,64 @@ let finalTotal = 0;
 
 																<ul class="delivery-address-detail">
 																	<li>
-																		<h6 class="text-content">
 
-																			<span class="text-title">우편번호:</span><input class="form-control"
-																				name="nonZipCode" id="addZipNo" value="" readOnly>
+																		<h6 class="text-content">
+																			<span class="text-title">우편번호:</span><input
+																				class="form-control" name="nonZipCode" id="addZipNo"
+																				value="" readOnly>
 																		</h6>
 																	</li>
 
 																	<li>
 																		<h6 class="text-content">
-																			<span class="text-title"> 주소 : </span><input class="form-control"
-																				name="nonShippingAddress" id="addAddr" value="" readOnly>
+																			<span class="text-title"> 주소 : </span><input
+																				class="form-control" name="nonShippingAddress"
+																				id="addAddr" value="" readOnly>
+																			<button type="button" class="greenBtn"
+																				onclick="goPopup()">주소 찾기</button>
 
 																		</h6>
 																	</li>
 																	<li>
 																		<h6 class="text-content">
 
-																			<span class="text-title">상세주소:</span><input class="form-control"
-																				name="nonDetailedShippingAddress" id="addAddrDetail" value="">
+																			<span class="text-title">상세주소:</span><input
+																				class="form-control"
+																				name="nonDetailedShippingAddress" id="addAddrDetail"
+																				value="">
 																		</h6>
 																	</li>
-																	
-																	
+
+
 
 																	<li>
 																		<h6 class="text-content">
-																			<span class="text-title">수령인: </span> <input class="form-control"
-																				id="nonRecipientName" name="nonRecipientName">
+																			<span class="text-title">수령인: </span> <input
+																				class="form-control" id="nonRecipientName"
+																				name="nonRecipientName">
 																		</h6>
 																	</li>
 
 																	<li>
 																		<h6 class="text-content mb-0">
-																			<span class="text-title">휴대폰: </span> <input class="form-control"
-																				name="nonRecipientPhoneNumber" id="nonRecipientPhoneNumber">
+																			<span class="text-title">휴대폰: </span> <input
+																				class="form-control" name="nonRecipientPhoneNumber"
+																				id="nonRecipientPhoneNumber">
 
 																		</h6>
 																	</li>
 																	<li>
 																		<h6 class="text-content mb-0">
-																			<span class="text-title">비밀번호: </span> <input class="form-control"
-																				type="password" name="nonPassword" id="nonPassword">
+																			<span class="text-title">비밀번호: </span> <input
+																				class="form-control" type="password"
+																				name="nonPassword" id="nonPassword">
 
 																		</h6>
 																	</li>
 																	<li>
 																		<h6 class="text-content mb-0">
-																			<span class="text-title">이메일: </span> <input class="form-control"
-																				name="nonEmail" id="nonEmail">
+																			<span class="text-title">이메일: </span> <input
+																				class="form-control" name="nonEmail" id="nonEmail">
 
 																		</h6>
 																	</li>
@@ -516,7 +559,8 @@ let finalTotal = 0;
 																		</div>
 																	</li>
 																	<li><input type="text" class="form-control"
-																		id="directInput" name="directMessage" placeholder="" style="display:none"></li>
+																		id="directInput" name="directMessage" placeholder=""
+																		style="display: none"></li>
 																</ul>
 
 
@@ -524,12 +568,12 @@ let finalTotal = 0;
 															</div>
 
 														</div>
-															<button type="button" onclick="goPopup()">주소 찾기2</button>
+
 
 
 
 													</div>
-													
+
 
 													<!--  <div class="col-xxl-6 col-lg-12 col-md-6">
 													<div class="delivery-address-box">
@@ -586,7 +630,7 @@ let finalTotal = 0;
 										</div>
 										<div class="checkout-box">
 											<div class="checkout-title">
-												<h4>Delivery Option</h4>
+												<h4>할인 수단</h4>
 											</div>
 
 											<div class="checkout-detail">
@@ -599,15 +643,15 @@ let finalTotal = 0;
 																		class="form-check custom-form-check hide-check-box">
 																		<!--  <input class="form-check-input" type="radio"
 																		name="standard" id="standard" checked>-->
-																		<label class="form-check-label" for="standard">비회원 적용
-																			가능한 쿠폰이 없습니다.</label>
+																		<label class="form-check-label" for="standard">비회원
+																			적용 가능한 쿠폰이 없습니다.</label>
 																	</div>
 																</div>
 															</div>
-															
+
 														</div>
 													</div>
-													
+
 
 													<!-- <div class="container mt-3">
 
@@ -639,17 +683,16 @@ let finalTotal = 0;
 																	<div class="shipment-detail">
 																		<div
 																			class="form-check custom-form-check hide-check-box">
-																			<label
-																				class="form-check-label btn" for="standard"
-																				data-bs-toggle="collapse" href="#collapseOne">비회원 포인트와 적립금 사용이 불가합니다.
-																			</label>
+																			<label class="form-check-label btn" for="standard"
+																				data-bs-toggle="collapse" href="#collapseOne">비회원
+																				포인트와 적립금 사용이 불가합니다. </label>
 																		</div>
 																	</div>
 																</div>
 															</div>
 
 														</div>
-														
+
 
 
 
@@ -701,10 +744,10 @@ let finalTotal = 0;
 														</div>
 													</div>
 													-->
-													
+
+													</div>
 												</div>
 											</div>
-										</div>
 									</li>
 
 									<li>
@@ -717,7 +760,7 @@ let finalTotal = 0;
 										</div>
 										<div class="checkout-box">
 											<div class="checkout-title">
-												<h4>Payment Option</h4>
+												<h4>결제 수단</h4>
 											</div>
 
 											<div class="checkout-detail">
@@ -735,17 +778,7 @@ let finalTotal = 0;
 																</div>
 															</div>
 														</div>
-														<div id="flush-collapseFour"
-															class="accordion-collapse collapse show"
-															data-bs-parent="#accordionFlushExample">
-															<div class="accordion-body">
-																<p class="cod-review">
-																	Pay digitally with SMS Pay Link. Cash may not be
-																	accepted in COVID restricted areas. <a
-																		href="javascript:void(0)">Know more.</a>
-																</p>
-															</div>
-														</div>
+														
 													</div>
 
 													<div class="accordion-item">
@@ -760,65 +793,7 @@ let finalTotal = 0;
 																</div>
 															</div>
 														</div>
-														<div id="flush-collapseOne"
-															class="accordion-collapse collapse"
-															data-bs-parent="#accordionFlushExample">
-															<div class="accordion-body">
-																<div class="row g-2">
-																	<div class="col-12">
-																		<div class="payment-method">
-																			<div
-																				class="form-floating mb-lg-3 mb-2 theme-form-floating">
-																				<input type="text" class="form-control" id="credit2"
-																					placeholder="Enter Credit & Debit Card Number">
-																				<label for="credit2">Enter Credit & Debit
-																					Card Number</label>
-																			</div>
-																		</div>
-																	</div>
-
-																	<div class="col-xxl-4">
-																		<div
-																			class="form-floating mb-lg-3 mb-2 theme-form-floating">
-																			<input type="text" class="form-control" id="expiry"
-																				placeholder="Enter Expiry Date"> <label
-																				for="expiry">Expiry Date</label>
-																		</div>
-																	</div>
-
-																	<div class="col-xxl-4">
-																		<div
-																			class="form-floating mb-lg-3 mb-2 theme-form-floating">
-																			<input type="text" class="form-control" id="cvv"
-																				placeholder="Enter CVV Number"> <label
-																				for="cvv">CVV Number</label>
-																		</div>
-																	</div>
-
-																	<div class="col-xxl-4">
-																		<div
-																			class="form-floating mb-lg-3 mb-2 theme-form-floating">
-																			<input type="password" class="form-control"
-																				id="password" placeholder="Enter Password">
-																			<label for="password">Password</label>
-																		</div>
-																	</div>
-
-																	<div class="button-group mt-0">
-																		<ul>
-																			<li>
-																				<button class="btn btn-light shopping-button">Cancel</button>
-																			</li>
-
-																			<li>
-																				<button class="btn btn-animation">Use This
-																					Card</button>
-																			</li>
-																		</ul>
-																	</div>
-																</div>
-															</div>
-														</div>
+														
 													</div>
 
 													<div class="accordion-item">
@@ -833,77 +808,7 @@ let finalTotal = 0;
 																</div>
 															</div>
 														</div>
-														<div id="flush-collapseTwo"
-															class="accordion-collapse collapse"
-															data-bs-parent="#accordionFlushExample">
-															<div class="accordion-body">
-																<h5 class="text-uppercase mb-4">Select Your Bank</h5>
-																<div class="row g-2">
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="bank1"> <label class="form-check-label"
-																				for="bank1">Industrial & Commercial Bank</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="bank2"> <label class="form-check-label"
-																				for="bank2">Agricultural Bank</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="bank3"> <label class="form-check-label"
-																				for="bank3">Bank of America</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="bank4"> <label class="form-check-label"
-																				for="bank4">Construction Bank Corp.</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="bank5"> <label class="form-check-label"
-																				for="bank5">HSBC Holdings</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="bank6"> <label class="form-check-label"
-																				for="bank6">JPMorgan Chase & Co.</label>
-																		</div>
-																	</div>
-
-																	<div class="col-12">
-																		<div class="select-option">
-																			<div class="form-floating theme-form-floating">
-																				<select class="form-select theme-form-select"
-																					aria-label="Default select example">
-																					<option value="hsbc">HSBC Holdings</option>
-																					<option value="loyds">Lloyds Banking Group</option>
-																					<option value="natwest">Nat West Group</option>
-																					<option value="Barclays">Barclays</option>
-																					<option value="other">Others Bank</option>
-																				</select> <label>Select Other Bank</label>
-																			</div>
-																		</div>
-																	</div>
-																</div>
-															</div>
-														</div>
+														
 													</div>
 
 													<div class="accordion-item">
@@ -924,52 +829,33 @@ let finalTotal = 0;
 															<div class="accordion-body">
 																<h5 class="text-uppercase mb-4">Select Your Wallet</h5>
 																<div class="row">
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<label class="form-check-label" for="amazon"><input
-																				class="form-check-input mt-0" type="radio"
-																				id="amazon">Amazon Pay</label>
-																		</div>
-																	</div>
 
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="gpay"> <label class="form-check-label"
-																				for="gpay">Google Pay</label>
-																		</div>
-																	</div>
 
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="airtel"> <label class="form-check-label"
-																				for="airtel">Airtel Money</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="paytm"> <label class="form-check-label"
-																				for="paytm">Paytm Pay</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="jio"> <label class="form-check-label"
-																				for="jio">JIO Money</label>
-																		</div>
-																	</div>
-
-																	<div class="col-md-6">
-																		<div class="custom-form-check form-check">
-																			<input class="form-check-input mt-0" type="radio"
-																				id="free"> <label class="form-check-label"
-																				for="free">Freecharge</label>
-																		</div>
+																	<div class="form-floating theme-form-floating">
+																		<select id="bktBank" name="bktBank"
+																			class="form-control">
+																			<option value="none">입금할 은행을 선택해주세요.</option>
+																			<option>신한은행</option>
+																			<option>IBK기업은행</option>
+																			<option>하나은행</option>
+																			<option>우리은행</option>
+																			<option>NH농협은행</option>
+																			<option>KDB산업은행</option>
+																			<option>SC제일은행</option>
+																			<option>씨티은행</option>
+																			<option>BNK부산은행</option>
+																			<option>DGB대구은행</option>
+																			<option>MG새마을금고</option>
+																			<option>신협</option>
+																			<option>수협은행</option>
+																			<option>KB국민은행</option>
+																			<option>우체국예금</option>
+																			<option>카카오뱅크</option>
+																			<option>토스</option>
+																		</select> <label for="bktBank">은행</label> <br>
+																		<h5 id="showBktBank" style="display: none"></h5>
+																		<br> sms 수신 동의 여부<input type="checkbox"
+																			id="bktSms" name="bktSms" onclick="checkBank()" />
 																	</div>
 																</div>
 															</div>
@@ -992,20 +878,20 @@ let finalTotal = 0;
 								</div>
 								<ul class="summery-contain">
 									<c:forEach var="info" items="${requestScope.productInfos }"
-                              varStatus="status">
-                              <input type="hidden" name="products"
-                                 value="${info.productId }" />
-                              <li id="${info.productId }"><img
-                                 src="${info.productImage }"
-                                 class="img-fluid blur-up lazyloaded checkout-image" alt="">
-                                 <h4>
-                                    <span id="productName${status.index }">${info.productName }</span>
-                                    X<span id="productQty${status.index }">${info.productQuantity }</span>
-                                 </h4>
-                                 <h4 class="price">
-                                    <span id="productPrice${status.index }">${info.sellingPrice }</span>원
-                                 </h4></li>
-                           </c:forEach>
+										varStatus="status">
+										<input type="hidden" name="products"
+											value="${info.productId }" />
+										<li id="${info.productId }"><img
+											src="${info.productImage }"
+											class="img-fluid blur-up lazyloaded checkout-image" alt="">
+											<h4>
+												<span id="productName${status.index }">${info.productName }</span>
+												X<span id="productQty${status.index }">${info.productQuantity }</span>
+											</h4>
+											<h4 class="price">
+												<span id="productPrice${status.index }">${info.sellingPrice }</span>원
+											</h4></li>
+									</c:forEach>
 
 									<!-- <li><img
 										src="/resources/assets/images/vegetable/product/2.png"
@@ -1050,22 +936,24 @@ let finalTotal = 0;
 
 								<ul class="summery-total">
 									<li>
-                              <h4>총 상품 가격</h4>
-                              <h4 class="price">
-                                 <span id="subTotal">${requestScope.paymentInfo.totalAmount }</span>원
-                              </h4>
-                           </li>
+										<h4>총 상품 가격</h4>
+										<h4 class="price">
+											<span id="subTotal">${requestScope.paymentInfo.totalAmount }</span>원
+										</h4>
+									</li>
 
-                           <li>
-                              <h4>배송비</h4>
-                              <h4 class="price"><span id="shippingFee">${requestScope.paymentInfo.shippingFee }</span>원</h4>
-                           </li>
-                           <li class="list-total">
-                              <h4>총 결제 금액</h4>
-                              <h4 class="price">
-                                 <span id="payToAmount">${requestScope.paymentInfo.totalAmount }</span>원
-                              </h4>
-                           </li>
+									<li>
+										<h4>배송비</h4>
+										<h4 class="price">
+											<span id="shippingFee">${requestScope.paymentInfo.shippingFee }</span>원
+										</h4>
+									</li>
+									<li class="list-total">
+										<h4>총 결제 금액</h4>
+										<h4 class="price">
+											<span id="payToAmount">${requestScope.paymentInfo.totalAmount }</span>원
+										</h4>
+									</li>
 								</ul>
 							</div>
 
@@ -1109,9 +997,7 @@ let finalTotal = 0;
 							<button type="button"
 								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
 								onclick="identify()">본인 인증</button>-->
-							<button type="button"
-								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
-								onclick="getOrderId()">테스트</button>
+							
 						</div>
 					</div>
 				</div>
