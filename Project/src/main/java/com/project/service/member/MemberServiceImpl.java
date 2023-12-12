@@ -43,7 +43,6 @@ import com.project.vodto.jmj.exchangeDTO;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.kjs.TermsOfSignUpVO;
-import com.project.vodto.kjy.SnsRegisterInfo;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -921,19 +920,6 @@ public class MemberServiceImpl implements MemberService {
 		}
 
 		return result;
-	}
-
-	@Override
-	public boolean snsSignUp(SnsRegisterInfo snsInfo) throws SQLException, NamingException {
-		System.out.println("sns가입");
-		if (snsInfo.getEmail() != null) {
-		 	// 네이버
-			// String id, String email, String mobile(-포함), String name, String birthday, String birthyear, String mobile_e164, ?? connected_at)
-		} else {
-			// 카카오
-		}
-
-		return false;
 	}
 
 	@Override
