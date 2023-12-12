@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import com.project.vodto.kjs.BestSellerVO;
 import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ProductImage;
+import com.project.vodto.kjs.ProductRatingCountVO;
 import com.project.vodto.kjs.RelatedProductDTO;
 
 @Repository
@@ -54,5 +55,10 @@ public class ProductDetailDAOImpl implements ProductDetailDAO {
 		params.put("publisher", publisher);
 		
 		return ses.selectList(ns + ".getRelatedProduct", params);
+	}
+
+	@Override
+	public List<ProductRatingCountVO> getProductRatingCount(String productId) throws SQLException, NamingException {
+		return ses.selectList(ns + ".getProductRatingCount", productId);
 	}
 }

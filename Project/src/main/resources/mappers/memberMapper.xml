@@ -537,16 +537,16 @@
 	<insert id="insertMember">
 		<choose>
 			<when test='#{phoneNumber} != null and #{cellPhoneNumber} != null'>
-				INSERT INTO member(member_id, password, name, phone_number, cell_phone_number, date_of_birth, email, gender, zip_code, address, detailed_address) 
-				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress})
+				INSERT INTO member(member_id, password, name, phone_number, cell_phone_number, date_of_birth, email, gender, zip_code, address, detailed_address, refund_bank, refund_account) 
+				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress}, #{refund_bank}, #{refund_account})
 			</when>
 			<when test="#{phoneNumber} != null and #{cellPhoheNumber} == null">
-				INSERT INTO member(member_id, password, name, phone_number, date_of_birth, email, gender, zip_code, address, detailed_address) 
-				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress})
+				INSERT INTO member(member_id, password, name, phone_number, date_of_birth, email, gender, zip_code, address, detailed_address, refund_bank, refund_account) 
+				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress}, #{refund_bank}, #{refund_account})
 			</when>
 			<otherwise>
-				INSERT INTO member(member_id, password, name, cell_phone_number, date_of_birth, email, gender, zip_code, address, detailed_address) 
-				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress})
+				INSERT INTO member(member_id, password, name, cell_phone_number, date_of_birth, email, gender, zip_code, address, detailed_address, refund_bank, refund_account) 
+				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress}, #{refund_bank}, #{refund_account})
 			</otherwise>
 		</choose>
 	</insert>
@@ -563,5 +563,8 @@
 		INSERT INTO shipping_address(member_id, recipient, recipient_contact, zip_code, address, detail_address, basic_addr)
 		VALUES(#{memberId}, #{recipient}, #{recipientContact}, #{zipCode}, #{address}, #{detailAddress}, #{basicAddr});
 	</insert>
+	<select id="getTerms" resultType="com.project.vodto.kjs.TermsOfSignUpVO">
+		SELECT terms_type, terms_content FROM terms_and_conditions WHERE terms_type='회원가입' OR terms_type='개인정보'
+	</select>
 	<!-- =========================== 김진솔 끝 =========================== -->
 </mapper>

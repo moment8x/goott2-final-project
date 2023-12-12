@@ -1,5 +1,9 @@
 package com.project.vodto.kjs;
 
+import java.util.List;
+
+import com.project.vodto.UploadFiles;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,4 +37,5 @@ public class SignUpDTO {
 	private String refundBank;
 	private String refundAccount;
 	private String basicAddr;
+	List<UploadFiles> fileList;
 }

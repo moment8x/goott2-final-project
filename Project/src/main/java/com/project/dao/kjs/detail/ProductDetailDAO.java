@@ -8,6 +8,7 @@ import java.util.List;
 import com.project.vodto.kjs.BestSellerVO;
 import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ProductImage;
+import com.project.vodto.kjs.ProductRatingCountVO;
 import com.project.vodto.kjs.RelatedProductDTO;
 
 public interface ProductDetailDAO {
@@ -21,4 +22,6 @@ public interface ProductDetailDAO {
 	List<BestSellerVO> getBestSeller(int count) throws SQLException, NamingException;
 	// 관련 도서 n개 조회
 	List<RelatedProductDTO> getRelatedProduct(int count, String productId, String categoryKey, String publisher) throws SQLException, NamingException;
+	// 해당 상품 별점 별 인원수 조회
+	List<ProductRatingCountVO> getProductRatingCount(String productId) throws SQLException, NamingException;
 }

@@ -23,11 +23,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.project.service.kjs.detail.ProductDetailService;
 import com.project.service.kjs.review.ReviewService;
 import com.project.service.kjs.upload.UploadFileService;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.ReviewBoard;
 import com.project.vodto.UploadFiles;
+import com.project.vodto.kjs.ProductRatingCountVO;
 import com.project.vodto.kjs.ReviewBoardAddPage;
 import com.project.vodto.kjs.ReviewBoardDTO;
 import com.project.vodto.kjy.Memberkjy;
@@ -40,6 +42,8 @@ public class ReviewController {
 	UploadFileService ufService;
 	@Inject
 	ReviewService rService;
+	@Inject
+	private ProductDetailService pdService;
 	
 //	List<UploadFiles> fileList = new ArrayList<UploadFiles>();
 //	List<String> deleteFileList = new ArrayList<String>();
@@ -93,26 +97,27 @@ public class ReviewController {
 	}
 	
 	@RequestMapping(value="saveReview", method=RequestMethod.POST)
-	public ResponseEntity<String> saveReview(HttpServletRequest request, @RequestBody ReviewBoard review) {
-		System.out.println("review : " + review);
+	public ResponseEntity<List<ProductRatingCountVO>> saveReview(HttpServletRequest request, @RequestBody ReviewBoard review) {
 		// 회원 아이디 가져오기, 작성자 등록
 		HttpSession session = request.getSession();
 		String memberId = ((Memberkjy)session.getAttribute("loginMember")).getMemberId();
 		review.setAuthor(memberId);
 		// 업로드 파일 삭제 관련
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
-		// 리뷰 및 업로드된 이미지(uploadFileSeq) 저장
+		// 리뷰 및 업로드된 이미지(uploadFileSeq) 저장, 출력용 평점 조회
+		List<ProductRatingCountVO> ratingCount = new ArrayList<ProductRatingCountVO>();
 		try {
 			rService.saveReview(review, calcFileList(review.getFileList(), review.getDeleteFileList()));
 			ufService.deleteUploadedFile(review.getDeleteFileList(), realPath);
+			ratingCount = pdService.getProductRatingCount(review.getProductId());
 		} catch (SQLException | NamingException | IOException e) {
 			e.printStackTrace();
 		}
-		return new ResponseEntity<String>("success", HttpStatus.OK);
+		return new ResponseEntity<List<ProductRatingCountVO>>(ratingCount, HttpStatus.OK);
 	}
 	
-	/*@RequestMapping("refreshFile")
-	public void refreshFile(HttpServletRequest request) {
+	@RequestMapping(value="refreshFile", method=RequestMethod.POST)
+	public ResponseEntity<String> refreshFile(HttpServletRequest request, @RequestBody List<UploadFiles> fileList) {
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
 		try {
 			// 업로드 되어있는 파일이 존재
@@ -128,7 +133,8 @@ public class ReviewController {
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
 		}
-	}*/
+		return new ResponseEntity<String>("OK", HttpStatus.OK);
+	}
 	
 	@RequestMapping("isValid")
 	public ResponseEntity<Boolean> isValid(HttpServletRequest request, @RequestParam("productId") String productId) {
@@ -141,6 +147,8 @@ public class ReviewController {
 				if (rService.haveARecord(((Memberkjy)session.getAttribute("loginMember")).getMemberId(), productId)) {
 					isValid = true;
 					result = new ResponseEntity<Boolean>(isValid, HttpStatus.OK);
+				} else {
+					result = new ResponseEntity<Boolean>(isValid, HttpStatus.BAD_REQUEST); 
 				}
 			} catch (SQLException | NamingException e) {
 				e.printStackTrace();
@@ -160,9 +168,11 @@ public class ReviewController {
 		@SuppressWarnings("unchecked")
 		List<ReviewBoardDTO> reviewList = (List<ReviewBoardDTO>)map.get("reviewList");
 		PagingInfo pagingInfo = (PagingInfo)map.get("pagingInfo");
+		List<ProductRatingCountVO> ratingCount = pdService.getProductRatingCount(productId);
 		if (reviewList != null && pagingInfo != null) {
 			data.put("reviewList", reviewList);
 			data.put("pagingInfo", pagingInfo);
+			data.put("ratingCount", ratingCount);
 			result = new ResponseEntity<Map<String,Object>>(data, HttpStatus.OK);
 		} else {
 			result = new ResponseEntity<Map<String,Object>>(HttpStatus.BAD_REQUEST);
@@ -210,7 +220,6 @@ public class ReviewController {
 	public ResponseEntity<Map<String, Object>> updateReview(HttpServletRequest request, @RequestBody ReviewBoardAddPage review) {
 		ResponseEntity<Map<String, Object>> result = null;
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
-		System.out.println("update review : " + review);
 		try {
 			if (rService.updateReview(review.getPostNo(), review.getContent(), review.getRating(), calcFileList(review.getFileList(), review.getDeleteFileList()), review.getDeleteFileList(), realPath, review.getProductId())) {
 				result = getDetailPage(review.getProductId(), review.getPage(), request);
@@ -236,13 +245,17 @@ public class ReviewController {
 				if (rService.deleteReview(postNo)) {
 					data.put("status", "OK");
 					Map<String, Object> map = rService.getReviewList(productId, page);
-					
 					@SuppressWarnings("unchecked")
 					List<ReviewBoardDTO> reviewList = (List<ReviewBoardDTO>)map.get("reviewList");
 					PagingInfo pagingInfo = (PagingInfo)map.get("pagingInfo");
+					List<ProductRatingCountVO> ratingCount = new ArrayList<ProductRatingCountVO>();
+					if (reviewList != null) {
+						ratingCount = pdService.getProductRatingCount(productId);
+					}
 					if (reviewList != null && pagingInfo != null) {
 						data.put("reviewList", reviewList);
 						data.put("pagingInfo", pagingInfo);
+						data.put("ratingCount", ratingCount);
 						result = new ResponseEntity<Map<String,Object>>(data, HttpStatus.OK);
 					} else {
 						result = new ResponseEntity<Map<String,Object>>(HttpStatus.BAD_REQUEST);
