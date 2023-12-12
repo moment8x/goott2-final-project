@@ -49,6 +49,11 @@ import com.project.vodto.kkb.PreparationInfoProduct;
 import com.project.vodto.kkb.PreparationNoResponse;
 import com.project.vodto.kkb.PreparationProductResponse;
 import com.project.vodto.kkb.ProductCancelRequest;
+<<<<<<< HEAD
+=======
+import com.project.vodto.kkb.RefundNoInfo;
+import com.project.vodto.kkb.RefundProductInfo;
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 import com.project.vodto.kkb.RefundResponse;
 import com.project.vodto.kkb.ReturnResponse;
 
@@ -266,6 +271,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 				.map(ProductCancelRequest::getProductOrderNo)	
 				.collect(Collectors.toList());
 	
+<<<<<<< HEAD
 		/* 적립금 로그 테이블 update(column : reason, balance, reward) 
 		 * 회원 테이블 update(column : total_rewards, accumulated_use_reward) */
 		if(adminOrderDao.changePendingProductCancelReward(productOrderNoList) <= 0) {
@@ -280,6 +286,28 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		
 		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
 		if(adminOrderDao.changePendingProductCancel(productNoList) <= 0 ) {
+=======
+		/* 적립금 로그 테이블 insert */
+		if(adminOrderDao.savePendingProductCancelReward(productOrderNoList) > 0) {
+			/* 적립금 로그 테이블 update(column : reason, balance, reward) 
+			 * 회원 테이블 update(column : total_rewards, accumulated_use_reward) */
+			if(adminOrderDao.changePendingProductCancelReward(productOrderNoList) <= 0 ) {
+				return result;
+			}
+		}			
+		
+		/* 포인트 로그 테이블 insert */
+		if(adminOrderDao.savePendingProductCancelPoint(productOrderNoList) > 0) {
+			/* 포인트 로그 테이블 update(column : reason, balance, point) 
+			 * 회원 테이블 update(column : total_points, accumulated_use_point) */
+			if(adminOrderDao.changePendingProductCancelPoint(productOrderNoList) <= 0 ) {
+				return result;
+			}
+		}
+		
+		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
+		if(adminOrderDao.changePendingProductCancel(productOrderNoList) <= 0 ) {
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 			return result;
 		}
 		
@@ -291,6 +319,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		/* 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) 확인하기 위해 select) */
 		List<CheckedCoupons> couponList = adminOrderDao.findPendingProductCancelCoupon(orderNoList);
 		
+<<<<<<< HEAD
 		
 		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
 		adminOrderDao.changePendingProductCancelCoupon(couponList); // 적용 쿠폰 수가 0일 때만 돌려줌
@@ -301,13 +330,39 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		if(adminOrderDao.changePendingProductCancelMember(canceledCoupons) <= 0) {
 			return result;
 		}
+=======
+		if(!couponList.isEmpty()) {
+			/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
+			adminOrderDao.changePendingProductCancelCoupon(couponList); // 적용 쿠폰 수가 0일 때만 돌려줌
+		
+			/* 회원 테이블 update(column : coupon_count) */
+			List<CanceledCoupons> canceledCoupons = CanceledCoupons.convert(couponList);
+			if(adminOrderDao.changePendingProductCancelMember(canceledCoupons) <= 0) {
+				return result;
+			}
+		}		
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 		
 		/* 결제 테이블 update(column : payment_status) */
 		if(adminOrderDao.changePendingProductCancelPayments(productOrderNoList) > 0) {
 			List<PendingCancelInfoResponse> cancelInfoList = 
+<<<<<<< HEAD
 					adminOrderDao.findPendingProductCancelInfo(orderNoList);
 			
 			result = adminOrderDao.savePendingOrderCancel(cancelInfoList);
+=======
+					adminOrderDao.findPendingProductCancelInfo(productNoList);
+			
+			cancelInfoList.forEach(cancelInfo -> {
+	            productOrderNoList.stream()
+	                .filter(request -> cancelInfo.getProductOrderNo().equals(request.getProductOrderNo()))
+	                .findFirst()
+	                .ifPresent(request -> cancelInfo.setQuantity(request.getQuantity()));
+	        });	
+			
+			/* 취소 테이블 insert */
+			result = adminOrderDao.savePendingProductCancel(cancelInfoList);
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 		}
 		
 		return result;
@@ -352,6 +407,10 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 			List<PendingCancelInfoResponse> cancelInfoList = 
 					adminOrderDao.findPendingCancelInfo(orderNoList);
 			
+<<<<<<< HEAD
+=======
+			/* 취소 테이블 insert */
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 			result = adminOrderDao.savePendingOrderCancel(cancelInfoList);
 		}
 		
@@ -405,6 +464,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 				.map(ProductCancelRequest::getProductOrderNo)	
 				.collect(Collectors.toList());
 	
+<<<<<<< HEAD
 		
 		/* 적립금 로그 테이블 update(column : reason, balance, reward) 
 		 * 회원 테이블 update(column : total_rewards, accumulated_use_reward) */
@@ -420,6 +480,31 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		
 		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
 		if(adminOrderDao.changeProductCancel(productNoList) <= 0 ) {
+=======
+		/* 환불용 정보 select */
+		List<RefundProductInfo> refundInfoList = adminOrderDao.findProductRefundInfo(productOrderNoList);
+		
+		/* 적립금 로그 테이블 insert */
+		if(adminOrderDao.saveProductCancelReward(productOrderNoList) > 0 ) {
+			/* 적립금 로그 테이블 update(column : reason, balance, reward) 
+			 * 회원 테이블 update(column : total_rewards, accumulated_use_reward) */
+			if(adminOrderDao.changeProductCancelReward(productOrderNoList) <= 0) {
+				return result;
+			}
+		}
+		
+		/* 포인트 로그 테이블 insert */
+		if(adminOrderDao.saveProductCancelPoint(productOrderNoList) > 0 ) {
+			/* 포인트 로그 테이블 update(column : reason, balance, point) 
+			 * 회원 테이블 update(column : total_points, accumulated_use_point) */
+			if(adminOrderDao.changeProductCancelPoint(productOrderNoList) <= 0) {
+				return result;
+			}
+		}
+		
+		/* 주문 상세 상품 테이블 update(column : product_status, coupon_discount) */
+		if(adminOrderDao.changeProductCancel(productOrderNoList) <= 0 ) {
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 			return result;
 		}
 		
@@ -431,6 +516,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		/* 쿠폰 로그 테이블 update(돌려줄 쿠폰(count:0) 확인하기 위해 select) */
 		List<CheckedCoupons> couponList = adminOrderDao.findProductCancelCoupon(orderNoList);
 		
+<<<<<<< HEAD
 		/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
 		adminOrderDao.changeProductCancelCoupon(couponList); // 적용 쿠폰 수가 0일 때만 돌려줌
 		
@@ -449,6 +535,56 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 			result = adminOrderDao.saveProductCancel(cancelInfoList);
 		}
 		
+=======
+		if(!couponList.isEmpty()) {
+			/* 쿠폰 로그 테이블 update(column : used_date, related_order) */
+			adminOrderDao.changeProductCancelCoupon(couponList); // 적용 쿠폰 수가 0일 때만 돌려줌
+			
+			/* 회원 테이블 update(column : coupon_count) */
+			List<CanceledCoupons> canceledCoupons = CanceledCoupons.convert(couponList);
+			if(adminOrderDao.changeProductCancelMember(canceledCoupons) <= 0) {
+				return result;
+			}
+		}
+		
+		/* 결제 테이블 update(column : payment_status) */
+		if(adminOrderDao.changeProductCancelPayments(productOrderNoList) <= 0) {
+			return result;
+	    };
+	    
+	    List<PendingCancelInfoResponse> cancelInfoList = adminOrderDao.findProductCancelInfo(productNoList);
+	    
+	    List<PendingCancelInfoResponse> methodBankList = cancelInfoList
+				.stream().filter(order -> order.getPaymentMethod().equals("bkt"))
+				.collect(Collectors.toList());
+				
+		List<PendingCancelInfoResponse> methodCardList = cancelInfoList
+				.stream().filter(order -> !order.getPaymentMethod().equals("bkt"))
+				.collect(Collectors.toList());
+			    
+		if(!methodBankList.isEmpty()) {
+			/* 취소 테이블 insert */
+			if(adminOrderDao.saveProductCancel(methodCardList) <= 0) {
+				return result;
+			}
+		}
+		
+		if(!methodCardList.isEmpty()) {
+			/* 취소 테이블 insert */
+			if(adminOrderDao.saveProductCancel(cancelInfoList) > 0) {
+				refundInfoList.forEach(info -> {
+					methodCardList.stream()
+		                .filter(request -> info.getProductOrderNo().equals(request.getProductOrderNo()))
+		                .findFirst()
+		                .ifPresent(request -> info.setCancelId(request.getCancelId()));
+		        });	
+				refundInfoList.removeIf(info -> info.getCancelId() == null);
+				
+				/* 환불 테이블 insert */
+				result = adminOrderDao.saveProductCancelRefund(refundInfoList);
+			}
+		}		
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 		return result;
 	}
 	
@@ -459,6 +595,12 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		
 		int result = -1;
 		
+<<<<<<< HEAD
+=======
+		/* 환불용 정보 select */
+		List<RefundNoInfo> refundInfoList = adminOrderDao.findOrderRefundInfo(orderNoList);
+		
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 		/* 적립금 로그 테이블 insert */
 		adminOrderDao.saveOrderCancelReward(orderNoList);
 		
@@ -487,11 +629,51 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 		}
 		
 		/* 결제 테이블 update(column : payment_status) */
+<<<<<<< HEAD
 		if(adminOrderDao.changeOrderCancelPayments(orderNoList) > 0) {
 			List<PendingCancelInfoResponse> cancelInfoList = 
 					adminOrderDao.findCancelInfo(orderNoList);
 			
 			result = adminOrderDao.saveOrderCancel(cancelInfoList);
+=======
+		if(adminOrderDao.changeOrderCancelPayments(orderNoList) <= 0) {
+			return result;
+		}
+		
+		List<PendingCancelInfoResponse> cancelInfoList = adminOrderDao.findCancelInfo(orderNoList);
+		
+		List<PendingCancelInfoResponse> methodBankList = cancelInfoList
+				.stream().filter(order -> order.getPaymentMethod().equals("bkt"))
+				.collect(Collectors.toList());
+				
+		List<PendingCancelInfoResponse> methodCardList = cancelInfoList
+				.stream().filter(order -> !order.getPaymentMethod().equals("bkt"))
+				.collect(Collectors.toList());
+				
+		if(!methodBankList.isEmpty()) {
+			/* 취소 테이블 insert */
+			if(adminOrderDao.saveOrderCancel(methodCardList) <= 0) {
+				return result;
+			}
+		}
+		
+		if(!methodCardList.isEmpty()) {
+			/* 취소 테이블 insert */
+			if(adminOrderDao.saveOrderCancel(methodCardList) > 0) {
+				refundInfoList.forEach(info ->
+			    methodCardList.stream()
+			        .filter(request -> info.getProductOrderNo().equals(request.getProductOrderNo()))
+			        .findFirst()
+			        .ifPresent(
+			            matchingCard -> info.setCancelId(matchingCard.getCancelId())
+			        )
+				);
+				refundInfoList.removeIf(info -> info.getCancelId() == null);
+				
+				/* 환불 테이블 insert */
+				result = adminOrderDao.saveOrderCancelRefund(refundInfoList);
+			}
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 		}
 		
 		return result;
@@ -501,6 +683,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	@Override
 	public int getOrdersByStatus(List<ProductCancelRequest> productOrderNoList) {
 		
+<<<<<<< HEAD
 		int result = -1;
 		
 		List<OrderStatus> filterPendingByOrderNo = adminOrderDao.findOrdersStatus(productOrderNoList);
@@ -518,6 +701,44 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 			return result;
 		}
 		return result;
+=======
+		List<OrderStatus> filterPendingByOrderNo = adminOrderDao.findOrdersStatus(productOrderNoList);
+
+		List<OrderStatus> updatedList = filterPendingByOrderNo.stream()
+                .map(orderInfo -> {
+                    ProductCancelRequest request = productOrderNoList.stream()
+                            .filter(cancel -> cancel.getProductOrderNo().equals(orderInfo.getProductOrderNo()))
+                            .findFirst()
+                            .orElse(new ProductCancelRequest()); 
+                    orderInfo.setQuantity(request.getQuantity());
+
+                    return orderInfo;
+                })
+                .collect(Collectors.toList());
+		
+		List<String> pendingOrderNo = filterPendingByOrderNo(filterPendingByOrderNo);
+		List<ProductCancelRequest> pendingProductNo = filterPendingByProductNo(updatedList);
+		List<String> shippedOrderNo = filterPreShippedByOrderNo(filterPendingByOrderNo);
+		List<ProductCancelRequest> shippedProductNo = filterShippedByProductNo(updatedList);
+		 
+		if(!pendingOrderNo.isEmpty()) { 
+			editPendingOrderCancel(pendingOrderNo);
+		}
+		
+		if(!pendingProductNo.isEmpty()) { 
+			editPendingProductCancel(pendingProductNo);
+		}
+		
+		if(!shippedOrderNo.isEmpty()) { 
+			editOrderCancel(shippedOrderNo);
+		}
+		
+		if(!shippedProductNo.isEmpty()) { 
+			editProductCancel(shippedProductNo);
+		}
+		
+		return pendingOrderNo.size() + pendingProductNo.size() + shippedOrderNo.size() + shippedProductNo.size();
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 	}
 	
 	/* 주문 상세 정보 (입금전 처리 [결제완료 -> 입금전] ) 
@@ -615,12 +836,22 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 	}
 	
 	/* 결제완료 상태만 남김 (품목별 주문번호 기준)*/
+<<<<<<< HEAD
 	private List<String> filterShippedByProductNo(List<OrderStatus> orderStatusList) {
 		
 		/* 결제완료 상태인 ProductNo */
     	List<String> preShippedProductNo = orderStatusList.stream()
 				.filter(e -> e.getProductStatus().equals("결제완료") && e.getOrderNo() == null)
 				.map(OrderStatus::getProductOrderNo)
+=======
+	private List<ProductCancelRequest> filterShippedByProductNo(List<OrderStatus> orderStatusList) {
+				
+		/* 결제완료 상태인 ProductNo */
+    	List<ProductCancelRequest> preShippedProductNo = orderStatusList.stream()
+				.filter(e -> e.getProductStatus().equals("결제완료") && e.getOrderNo() == null)
+				.map(OrderStatus::getProductOrderNo)
+				.map(ProductCancelRequest::of)
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 				.collect(Collectors.toList());
 	
     	return preShippedProductNo;

@@ -28,6 +28,11 @@ import com.project.vodto.kkb.CouponCount;
 import com.project.vodto.kkb.OrderStatus;
 import com.project.vodto.kkb.PendingCancelInfoResponse;
 import com.project.vodto.kkb.ProductCancelRequest;
+<<<<<<< HEAD
+=======
+import com.project.vodto.kkb.RefundNoInfo;
+import com.project.vodto.kkb.RefundProductInfo;
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = DataSourceConfig.class)
@@ -67,6 +72,36 @@ public class AdminOrderServiceTest {
     
     @Test
     @Transactional
+<<<<<<< HEAD
+=======
+    public void testEditProductCancel() { // 전체
+    	
+    	//Given
+//    	List<String> orderNoList = Arrays.asList("O1701466461394","O1701335516842");
+    	List<ProductCancelRequest> productOrderNoList = new ArrayList<ProductCancelRequest>();
+    	ProductCancelRequest cancel1 = ProductCancelRequest.of("O1701747480059-1");
+    	cancel1.setQuantity(4);
+    	ProductCancelRequest cancel2 = ProductCancelRequest.of("O1701747480059-2");
+    	cancel2.setQuantity(2);
+    	ProductCancelRequest cancel3 = ProductCancelRequest.of("O1701662611938-1");
+    	cancel3.setQuantity(1);
+    	
+    	productOrderNoList.add(cancel1);
+    	productOrderNoList.add(cancel2);
+    	productOrderNoList.add(cancel3);
+    	
+    	
+    	//When
+    	int result = adminOrderService.editProductCancel(productOrderNoList);
+    	
+    	//Then
+    	System.out.println("result : " + result);
+    	
+    }
+    
+    @Test
+    @Transactional
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
     public void testEditPreShipped() {
 		
     	//Given
@@ -89,7 +124,11 @@ public class AdminOrderServiceTest {
     	List<String> orderNoList = Arrays.asList("O1700034153645", "O1700034426708");
     	
     	//When
+<<<<<<< HEAD
     	int result = adminOrderDao.changePendingOrderCancelReward(orderNoList);
+=======
+    	int result = adminOrderDao.savePendingOrderCancelReward(orderNoList);
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 		
     	//Then
 		System.out.println("result : " + result);
@@ -228,10 +267,17 @@ public class AdminOrderServiceTest {
 //    	("O1701466461394-1","O1701335516842-1");
     	List<ProductCancelRequest> productNoList = new ArrayList<ProductCancelRequest>();
     	ProductCancelRequest item1 = new ProductCancelRequest();
+<<<<<<< HEAD
     	item1.setProductOrderNo("O1701466461394-1");
     	item1.setQuantity(1);
     	ProductCancelRequest item2 = new ProductCancelRequest();
     	item2.setProductOrderNo("O1701335516842-1");
+=======
+    	item1.setProductOrderNo("O1700034153645-1");
+    	item1.setQuantity(1);
+    	ProductCancelRequest item2 = new ProductCancelRequest();
+    	item2.setProductOrderNo("O1700557261699-1");
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
     	item2.setQuantity(1);
     	productNoList.add(item1);
     	productNoList.add(item2);
@@ -291,6 +337,7 @@ public class AdminOrderServiceTest {
 		assertThat(result).isGreaterThan(0);
 	}
     
+<<<<<<< HEAD
 //    @Test
 //	@Transactional
 //	public void testEditPendingProductCancel(){
@@ -311,6 +358,30 @@ public class AdminOrderServiceTest {
 //		System.out.println("result : " + result);
 //		assertThat(result).isGreaterThan(0);
 //	}
+=======
+    @Test
+	@Transactional
+	public void testEditPendingProductCancel(){
+		//given
+    	List<ProductCancelRequest> productOrderNoList = new ArrayList<ProductCancelRequest>();
+    	ProductCancelRequest cancel1 = new ProductCancelRequest();
+    	cancel1.setProductOrderNo("O1701338658628-3");
+    	cancel1.setQuantity(2);
+    	ProductCancelRequest cancel2 = new ProductCancelRequest();
+    	cancel2.setProductOrderNo("O1701335073062-1");
+    	cancel2.setQuantity(3);
+    	
+    	productOrderNoList.add(cancel1);
+    	productOrderNoList.add(cancel2);
+		
+		//when
+		int result = adminOrderService.editPendingProductCancel(productOrderNoList);
+		
+		//then
+		System.out.println("result : " + result);
+		assertThat(result).isGreaterThan(0);
+	}
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
     
     @Test
 	@Transactional
@@ -377,10 +448,22 @@ public class AdminOrderServiceTest {
     	ProductCancelRequest cancel3 = new ProductCancelRequest();
     	ProductCancelRequest cancel4 = new ProductCancelRequest();
     	
+<<<<<<< HEAD
     	cancel1.setOrderNo("O1701466461394");
     	cancel2.setOrderNo("O1701335516842");
     	cancel3.setOrderNo("O1701331238383");
     	cancel4.setOrderNo("O1700812765494");
+=======
+//    	cancel1.setOrderNo("O1701747480059");
+//    	cancel2.setOrderNo("O1701747179730");
+//    	cancel3.setOrderNo("O1701746759210");
+//    	cancel4.setOrderNo("O1701746500489");
+    	
+    	cancel1.setProductOrderNo("O1701747480059-1");
+    	cancel2.setProductOrderNo("O1701747179730-1");
+    	cancel3.setProductOrderNo("O1701746759210-1");
+    	cancel4.setProductOrderNo("O1701746500489-1");
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
     	
     	productOrderNoList.add(cancel1);
     	productOrderNoList.add(cancel2);
@@ -491,7 +574,94 @@ public class AdminOrderServiceTest {
     	int result = adminOrderDao.savePendingOrderCancel(cancelInfoList);
 		
 		//then
+<<<<<<< HEAD
 		System.out.println(result);
+=======
+    	System.out.println("result : " + result);
+	}
+    
+    @Test
+	@Transactional
+	public void testSaveOrderCancelRefund(){
+		//given
+    	List<String> orderNoList = Arrays.asList("O1701747480059");
+    	List<PendingCancelInfoResponse> cancelInfoList = adminOrderDao.findCancelInfo(orderNoList);
+    	
+    	List<RefundNoInfo> refundInfoList = adminOrderDao.findOrderRefundInfo(orderNoList);
+		
+    	int result = -1;
+    	
+    	//when
+//    	if(adminOrderDao.saveOrderCancel(cancelInfoList) > 0) {
+//    		cancelInfoList.forEach(item ->System.out.println("CancelId : " + item.getCancelId()));
+//    	};
+    	
+    	
+    	if(adminOrderDao.saveOrderCancel(cancelInfoList) > 0) {
+//    		cancelInfoList.forEach(e-> System.out.println("cancelInfoList : cancelID : " +e.getCancelId() + ", Pno : "
+//    				+ e.getProductOrderNo()));
+//    		refundInfoList.forEach(e-> System.out.println("cancelInfoList : cancelID : " +e.getCancelId() + ", Pno : "
+//    				+ e.getProductOrderNo()));
+    		
+    		refundInfoList.forEach(info -> {
+				cancelInfoList.stream()
+	                .filter(cancelInfo -> info.getProductOrderNo().equals(cancelInfo.getProductOrderNo()))
+	                .findFirst()
+	                .ifPresent(cancelInfo -> info.setCancelId(cancelInfo.getCancelId()));
+	        });	
+    		refundInfoList.forEach(e-> System.out.println("refundInfoList : " +e.getCancelId()));
+			
+			/* 환불 테이블 insert */
+			result = adminOrderDao.saveOrderCancelRefund(refundInfoList);
+		}
+		
+		//then
+    	System.out.println("result : " + result);
+	}
+
+    
+    @Test
+	@Transactional
+	public void testSaveProductCancelRefund(){
+		//given
+    	List<ProductCancelRequest> productOrderNoList = new ArrayList<ProductCancelRequest>();
+    	ProductCancelRequest cancel1 = ProductCancelRequest.of("O1701747480059-1");
+    	ProductCancelRequest cancel2 = ProductCancelRequest.of("O1701747480059-2");
+    	ProductCancelRequest cancel3 = ProductCancelRequest.of("O1701662611938-1");
+    	
+    	productOrderNoList.add(cancel1);
+    	productOrderNoList.add(cancel2);
+    	productOrderNoList.add(cancel3);
+    	
+    	int result = -1;
+    	
+    	/* 환불용 정보 select */
+		List<RefundProductInfo> refundInfoList = adminOrderDao.findProductRefundInfo(productOrderNoList);
+		
+		List<String> productNoList = productOrderNoList.stream()
+				.map(ProductCancelRequest::getProductOrderNo)	
+				.collect(Collectors.toList());
+		
+		
+		//when
+		
+		List<PendingCancelInfoResponse> cancelInfoList = adminOrderDao.findProductCancelInfo(productNoList);
+		/* 취소 테이블 insert */
+	    if(adminOrderDao.saveProductCancel(cancelInfoList) > 0) {
+	    	refundInfoList.forEach(info -> {
+				cancelInfoList.stream()
+	                .filter(request -> info.getProductOrderNo().equals(request.getProductOrderNo()))
+	                .findFirst()
+	                .ifPresent(request -> info.setCancelId(request.getCancelId()));
+	        });		    	
+	    	refundInfoList.forEach(e-> System.out.println("refundInfoList : " +e.getCancelId()));
+	    	/* 환불 테이블 insert */
+			result = adminOrderDao.saveProductCancelRefund(refundInfoList);
+		}
+	    
+		//then
+	    System.out.println("result : " + result);
+>>>>>>> f2d8df4f6b57eee7c774879d529db917f721e2a7
 	}
     
 }

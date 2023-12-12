@@ -4,40 +4,40 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.ksh.mappers.OrderMapper">
-	<insert id="insertNewPayment">
-		<choose>
-			<when test="nonOrderNo != null">
-				INSERT INTO payments (payment_number, non_order_no,
-				payment_method, total_amount, shipping_fee, used_points,
-				used_reward,
-				actual_payment_amount, payment_time, card_name,
-				card_number,
-				payment_status)
-				VALUES(#{paymentNumber}, #{nonOrderNo},
-				#{paymentMethod},
-				#{totalAmount}, #{shippingFee},
-				#{usedPoints},
-				#{usedReward},
-				#{actualPaymentAmount},
-				#{paymentTime},#{cardName},#{cardNumber}, #{paymentStatus})
-			</when>
-			<otherwise>
-				INSERT INTO payments (payment_number, order_no,
-				payment_method, total_amount, shipping_fee, used_points,
-				used_reward,
-				actual_payment_amount, payment_time, card_name,
-				card_number,
-				payment_status)
-				VALUES(#{paymentNumber}, #{orderNo},
-				#{paymentMethod},
-				#{totalAmount}, #{shippingFee},
-				#{usedPoints},
-				#{usedReward},
-				#{actualPaymentAmount},
-				#{paymentTime},#{cardName},#{cardNumber}, #{paymentStatus})
-			</otherwise>
-		</choose>
-	</insert>
+   <insert id="insertNewPayment">
+      <choose>
+         <when test="nonOrderNo != null">
+            INSERT INTO payments (payment_number, non_order_no,
+            payment_method, total_amount, shipping_fee, used_points,
+            used_reward,
+            actual_payment_amount, payment_time, card_name,
+            card_number,
+            payment_status)
+            VALUES(#{paymentNumber}, #{nonOrderNo},
+            #{paymentMethod},
+            #{totalAmount}, #{shippingFee},
+            #{usedPoints},
+            #{usedReward},
+            #{actualPaymentAmount},
+            #{paymentTime},#{cardName},#{cardNumber}, #{paymentStatus})
+         </when>
+         <otherwise>
+            INSERT INTO payments (payment_number, order_no,
+            payment_method, total_amount, shipping_fee, used_points,
+            used_reward,
+            actual_payment_amount, payment_time, card_name,
+            card_number,
+            payment_status)
+            VALUES(#{paymentNumber}, #{orderNo},
+            #{paymentMethod},
+            #{totalAmount}, #{shippingFee},
+            #{usedPoints},
+            #{usedReward},
+            #{actualPaymentAmount},
+            #{paymentTime},#{cardName},#{cardNumber}, #{paymentStatus})
+         </otherwise>
+      </choose>
+   </insert>
 
 	<insert id="insertDetailOrderItem" parameterType="java.util.Map">
 		<choose>
@@ -67,7 +67,7 @@
 			</otherwise>
 		</choose>
 
-	</insert>
+   </insert>
 
 	<insert id="insertNewNonOrderHistory">
 		INSERT INTO non_order_history (non_order_no,
@@ -86,23 +86,23 @@
 		#{nonDeliveryStatus})
 	</insert>
 
-	<insert id="insertNewOrderHistory">
-		INSERT INTO order_history (order_no,
-		member_id,
-		recipient_name, recipient_phone_number,
-		zip_code,
-		shipping_address,
-		detailed_shipping_address,
-		delivery_message,
-		delivery_status)
-		VALUES(#{orderNo},
-		#{memberId}, #{recipientName},
-		#{recipientPhoneNumber},
-		#{zipCode}, #{shippingAddress},
-		#{detailedShippingAddress},
-		#{deliveryMessage},
-		#{deliveryStatus})
-	</insert>
+   <insert id="insertNewOrderHistory">
+      INSERT INTO order_history (order_no,
+      member_id,
+      recipient_name, recipient_phone_number,
+      zip_code,
+      shipping_address,
+      detailed_shipping_address,
+      delivery_message,
+      delivery_status)
+      VALUES(#{orderNo},
+      #{memberId}, #{recipientName},
+      #{recipientPhoneNumber},
+      #{zipCode}, #{shippingAddress},
+      #{detailedShippingAddress},
+      #{deliveryMessage},
+      #{deliveryStatus})
+   </insert>
 
 	<select id="getPaymentDetail"
 		resultType="com.project.vodto.ksh.CompleteOrder">
@@ -141,28 +141,28 @@
 
 
 
-	<resultMap id="result" type="com.project.vodto.ksh.OrderInfo">
+   <resultMap id="result" type="com.project.vodto.ksh.OrderInfo">
 
-		<result property="productId" column="product_id" />
-		<result property="productName" column="product_name" />
-		<result property="productImage" column="product_image" />
-		<result property="categoryKey" column="category_key" />
-		<result property="currentQuantity" column="current_quantity" />
-		<result property="sellingPrice" column="selling_price" />
+      <result property="productId" column="product_id" />
+      <result property="productName" column="product_name" />
+      <result property="productImage" column="product_image" />
+      <result property="categoryKey" column="category_key" />
+      <result property="currentQuantity" column="current_quantity" />
+      <result property="sellingPrice" column="selling_price" />
 
-	</resultMap>
+   </resultMap>
 
-	<select id="getProductInfo"
-		parameterType="com.project.vodto.ksh.OrderInfo" resultMap="result">
-		select
-		p.product_id, p.product_name, i.product_image, p.category_key,
-		p.current_quantity,
-		p.selling_price from products p inner join
-		product_images i on
-		p.product_id = i.product_id where p.product_id =
-		#{productId} limit
-		1;
-	</select>
+   <select id="getProductInfo"
+      parameterType="com.project.vodto.ksh.OrderInfo" resultMap="result">
+      select
+      p.product_id, p.product_name, i.product_image, p.category_key,
+      p.current_quantity,
+      p.selling_price from products p inner join
+      product_images i on
+      p.product_id = i.product_id where p.product_id =
+      #{productId} limit
+      1;
+   </select>
 
 	<insert id="saveBankTransfer">
 		<choose>
@@ -188,11 +188,11 @@
 		</choose>
 	</insert>
 
-	<select id="getShippingAddr"
-		resultType="com.project.vodto.ShippingAddress">
-		select * from shipping_address where member_id =
-		#{memberId}
-	</select>
+   <select id="getShippingAddr"
+      resultType="com.project.vodto.ShippingAddress">
+      select * from shipping_address where member_id =
+      #{memberId}
+   </select>
 
 	<select id="getCouponInfos"
 		resultType="com.project.vodto.CouponInfos">
@@ -208,24 +208,24 @@
 		c.coupon_number ORDER BY l.obtained_date;
 	</select>
 
-	<select id="getCategoryKey" resultType="String">
-		select category_key from
-		coupon_categories where coupon_number =
-		#{couponNumber};
-	</select>
+   <select id="getCategoryKey" resultType="String">
+      select category_key from
+      coupon_categories where coupon_number =
+      #{couponNumber};
+   </select>
 
 	<select id="getProductIds" resultType="String">
 		select product_id from
 		detailed_order_items where order_no = #{orderNo}
 	</select>
 
-	<resultMap id="completeOrderItem"
-		type="com.project.vodto.ksh.CompleteOrderItem">
-		<result property="productPrice" column="product_price" />
-		<result property="productQuantity" column="product_quantity" />
-		<result property="productName" column="product_name" />
-		<result property="productImage" column="product_image" />
-	</resultMap>
+   <resultMap id="completeOrderItem"
+      type="com.project.vodto.ksh.CompleteOrderItem">
+      <result property="productPrice" column="product_price" />
+      <result property="productQuantity" column="product_quantity" />
+      <result property="productName" column="product_name" />
+      <result property="productImage" column="product_image" />
+   </resultMap>
 
 	<select id="getDetailOrderItem"
 		resultType="com.project.vodto.ksh.CompleteOrderItem"
@@ -257,7 +257,7 @@
 			</otherwise>
 		</choose>
 
-	</select>
+   </select>
 
 	<update id="updateCouponLogs">
 		UPDATE coupon_logs
@@ -304,13 +304,13 @@
 		#{reward},
 		#{total_rewards})
 
-	</insert>
+   </insert>
 
-	<update id="updateMemberCoupon">
-		update member set coupon_count = coupon_count -
-		#{usedCouponCount} where member_id =
-		#{memberId}
-	</update>
+   <update id="updateMemberCoupon">
+      update member set coupon_count = coupon_count -
+      #{usedCouponCount} where member_id =
+      #{memberId}
+   </update>
 
 	<update id="updateMemberPoints">
 		update member set total_points = total_points -
@@ -326,26 +326,26 @@
 		#{memberId}
 	</update>
 
-	<!-- <update id="updateDetailOrderItem" parameterType="java.util.Map"> <foreach 
-		item="item" collection="list" separator=";"> update products set current_quantity 
-		= current_quantity - #{item.productQuantity} where product_id = #{item.productId} 
-		</foreach> </update> -->
+   <!-- <update id="updateDetailOrderItem" parameterType="java.util.Map"> <foreach 
+      item="item" collection="list" separator=";"> update products set current_quantity 
+      = current_quantity - #{item.productQuantity} where product_id = #{item.productId} 
+      </foreach> </update> -->
 
-	<update id="updateDetailOrderItem" parameterType="java.util.Map">
-		UPDATE products
-		SET current_quantity = current_quantity - CASE
-		<foreach item="item" collection="list">
-			WHEN product_id =
-			#{item.productId}
-			THEN #{item.productQuantity}
-		</foreach>
-		END
-		WHERE product_id IN
-		<foreach collection="list" item="item" open="(" close=")"
-			separator=",">
-			#{item.productId}
-		</foreach>
-	</update>
+   <update id="updateDetailOrderItem" parameterType="java.util.Map">
+      UPDATE products
+      SET current_quantity = current_quantity - CASE
+      <foreach item="item" collection="list">
+         WHEN product_id =
+         #{item.productId}
+         THEN #{item.productQuantity}
+      </foreach>
+      END
+      WHERE product_id IN
+      <foreach collection="list" item="item" open="(" close=")"
+         separator=",">
+         #{item.productId}
+      </foreach>
+   </update>
 
 	<select id="getMemberInfo"
 		resultType="com.project.vodto.kjy.Memberkjy">
