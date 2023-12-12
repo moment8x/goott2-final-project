@@ -12,7 +12,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class SearchVO {
-	private String category_name;
-	private String category_key;
-	private int category_count;
+	private String categoryName;
+	private String categoryKey;
+	private int categoryCount;
 }

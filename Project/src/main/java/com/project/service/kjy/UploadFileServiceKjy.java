@@ -22,16 +22,15 @@ import com.project.etc.kjs.ImgMimeType;
 import com.project.vodto.UploadFiles;
 
 @Service
-public class UploadFileServiceNotuf {
-	public UploadFiles uploadFile(String originalFileName, long size, byte[] data, String contentType, String realPath) throws Exception {
-		UploadFiles uploadFile = uploadFile(originalFileName, size, data, contentType, realPath);
+public class UploadFileServiceKjy {
+	public UploadFiles uploadFileKjy(String originalFileName, long size, byte[] data, String contentType, String realPath) throws Exception {
+		UploadFiles uploadFile = new UploadFiles(0, contentType, realPath, originalFileName, originalFileName, size);
 		String completePath = makeCalculatePath(realPath);
 		System.out.println("completePath : " + completePath);
 		
 		if(size > 0) {
 			String newFileName = getNewFileName(originalFileName, realPath, completePath);
 			uploadFile.setNewFileName(newFileName);
-			
 			FileCopyUtils.copy(data, new File(realPath + newFileName));
 			if(ImgMimeType.contentTypeIsImage(contentType)) {
 				String thumbFileName = makeThumbNailImage(newFileName, realPath, completePath);
@@ -58,13 +57,12 @@ public class UploadFileServiceNotuf {
 		BufferedImage originImg = ImageIO.read(new File(realPath + newFileName)); // 원본 파일
 		BufferedImage thumbNailImg = Scalr.resize(originImg, Mode.FIT_TO_HEIGHT, 50); // 리사이징
 		
-		String thumbImgName = "thumb_" + newFileName;
+		String thumbImgName = "thumb_" + newFileName.substring(newFileName.lastIndexOf("\\") + 1);
 		String ext = newFileName.substring(newFileName.lastIndexOf(".") + 1);
 		
 		File saveTarget = new File(completePath + File.separator + thumbImgName);
-		 
+		 System.out.println(thumbNailImg +", "+ ext+", "+ saveTarget);
 		if(ImageIO.write(thumbNailImg, ext, saveTarget)) { // 썸네일 이미지를 저장 -> 성공이면 uf에 담기
-			
 			return completePath.substring(realPath.length()) + File.separator + thumbImgName;
 		}
 		

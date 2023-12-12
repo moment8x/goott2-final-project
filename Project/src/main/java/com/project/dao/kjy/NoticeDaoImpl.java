@@ -53,4 +53,39 @@ public class NoticeDaoImpl implements NoticeDao {
 		return -1;
 	}
 
+	@Override
+	public Board selectBoardByPostNo(int postNo) throws Exception {
+		
+		return ses.selectOne(ns+".selectBoardByPostNo", postNo);
+	}
+
+	@Override
+	public int updateNotice(Board board) throws Exception {
+		
+		return ses.update(ns+".updateBoardByPostNo", board);
+	}
+
+	@Override
+	public int deleteNotice(Board board) throws Exception {
+		
+		return ses.delete(ns+".deleteBoard", board);
+	}
+
+	@Override
+	public int selectBoardCount() throws Exception {
+		
+		return ses.selectOne(ns+".selectBoardCount");
+	}
+
+	@Override
+	public int selectPostNo(Board board) {
+		return ses.selectOne(ns+".selectPostNo", board);
+	}
+
+	@Override
+	public int updateBoardRef(int postNo) throws Exception {
+		// TODO Auto-generated method stub
+		return ses.update(ns+".updateRef", postNo);
+	}
+
 }

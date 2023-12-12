@@ -105,6 +105,48 @@
 	function hideModal() {
 		$("#rejectModal").hide();
 	}
+	function modalInfo(no){
+		$(".deleteNotice").attr("id",no);
+	}
+	function deleteNotice(tag) {
+		$.ajax({
+			url : '/etc/deleteNotice',
+			type : 'POST',
+			data : {"postNo" : tag.id},
+			async : false,
+			success : function(data) {
+				process(data);
+			},
+			error : function(error) {
+				console.log(error);
+			}
+		});
+	}
+	function process(data) {
+		$("#deleteModal").hide();
+		if(data == "success"){
+			window.location.href="/etc/notice";
+		}
+
+	}
+	function beforePaging() {
+		if(page > 10){
+		page = (Math.floor(page / 10)-1)* 10 + 1;
+		getProduct(checkedList ,checkedLang, sort, page);
+		 $(".page-"+page).addClass("clicked");
+		} else {
+			return false;
+		}
+	}
+	function afterPaging() {
+		if(Math.ceil(page / 10) < (totalPagingBlockCnt/10)){
+		page = Math.floor((page - 1) / 10) * 10 + 11;
+		getProduct(checkedList ,checkedLang, sort, page);
+		 $(".page-"+page).addClass("clicked");
+		} else {
+			return false;
+		}
+	}
 </script> 
 <style>
 #writeBtn{
@@ -158,11 +200,13 @@
                               <th>이벤트/공지사항</th>
                               <th>제목</th>
                               <th>작성일</th>
-                              <th>수정 및 삭제</th>
+                              <c:if test="${isAdmin == 'admin' }">
+                              	<th>수정 및 삭제</th>
+                              </c:if>
                             </tr>
                           </thead>
                           
-                          <c:forEach items="${list }" var="board" >
+                          <c:forEach items="${boardMap.boardList }" var="board" >
                           <tbody>
                             <tr>
                             <c:choose>
@@ -177,26 +221,69 @@
                               <td><a href="/etc/readNotice?no=${board.postNo }">${board.title }</a></td>
                               <td>${board.createdDate }</td>
                            
+                           	<c:if test="${isAdmin == 'admin' }">
                               <td>
                                 <ul>
                                   <li>
-                                    <a href="javascript:void(0)">
+                                    <a href="/etc/writeNotice?postNo=${board.postNo }">
                                       <i class="ri-pencil-line"></i>
                                     </a>
                                   </li>
 
                                   <li>
-                                    <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#exampleModalToggle" >
+                                    <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="modalInfo(${board.postNo});">
                                       <i class="ri-delete-bin-line"></i>
                                     </a>
                                   </li>
                                 </ul>
                               </td>
+                              </c:if>
                             </tr>
                           </tbody>
                           </c:forEach>
                         </table>
-                  		<button onclick="validAdmin();" id="writeBtn" type="button" class="btn btn-primary">글 작성</button>
+                        <div>
+                        <c:if test="${isAdmin == 'admin' }">
+                  			<button onclick="validAdmin();" id="writeBtn" type="button" class="btn btn-primary">글 작성</button>
+                  		</c:if>
+                  		<nav class="custome-pagination">
+						<ul class="pagination justify-content-center">
+							<li class="page-item">
+							<c:if test="${boardMap.pagingInfo.pageNo > 10 }">
+								<a class="page-link" href="/list/categoryList/${key }?page=${boardMap.pagingInfo.startNumOfCurrentPagingBlock - 10}" >
+									<i class="fa-solid fa-angles-left"></i>
+								</a>
+							</c:if>
+							</li>
+							<c:choose>
+								<c:when
+									test="${boardMap.pagingInfo.totalPagingBlockCnt > boardMap.pagingInfo.endNumOfCurrentPagingBlock }">
+									<c:forEach var="i"
+										begin="${boardMap.pagingInfo.startNumOfCurrentPagingBlock}"
+										end="${boardMap.pagingInfo.endNumOfCurrentPagingBlock }" step="1">
+										<li class="page-item active"><a class="page-link link${i}"
+											href="/list/categoryList/${key }?page=${i}">${i}</a></li>
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+									<c:forEach var="i"
+										begin="${boardMap.pagingInfo.startNumOfCurrentPagingBlock}"
+										end="${boardMap.pagingInfo.totalPagingBlockCnt }" step="1">
+										<li class="page-item active"><a class="page-link"
+											href="/list/categoryList/${key }?page=${i}">${i}</a></li>
+									</c:forEach>
+								</c:otherwise>
+							</c:choose>
+							<li class="page-item">
+								<c:if test="${boardMap.pagingInfo.totalPageCnt > boardMap.pagingInfo.endNumOfCurrentPagingBlock}">
+								<a class="page-link" href="/list/categoryList/${key }?page=${boardMap.pagingInfo.startNumOfCurrentPagingBlock + 10}">
+								<i class="fa-solid fa-angles-right"></i>
+								</a>
+							</c:if>
+							</li>
+						</ul>
+					</nav>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -210,49 +297,11 @@
         </div>
       </div>
       <!-- Page Body End -->
-      
-      <!-- Modal Start -->
-      <div
-        class="modal fade"
-        id="staticBackdrop"
-        data-bs-backdrop="static"
-        data-bs-keyboard="false"
-        tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-body">
-              <h5 class="modal-title" id="staticBackdropLabel">Logging Out</h5>
-              <p>Are you sure you want to log out?</p>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-              <div class="button-box">
-                <button
-                  type="button"
-                  class="btn btn--no"
-                  data-bs-dismiss="modal"
-                >
-                  No
-                </button>
-                <button type="button" class="btn btn--yes btn-primary">
-                  Yes
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Modal End -->
-    </div>
-    <!-- page-wrapper End-->
 
     <!-- Delete Modal Box Start -->
     <div
       class="modal fade theme-modal remove-coupon"
-      id="exampleModalToggle"
+      id="deleteModal"
       aria-hidden="true"
       tabindex="-1"
     >
@@ -260,7 +309,7 @@
         <div class="modal-content">
           <div class="modal-header d-block text-center">
             <h5 class="modal-title w-100" id="exampleModalLabel22">
-              Are You Sure ?
+              삭제하시겠습니까?
             </h5>
             <button
               type="button"
@@ -274,8 +323,7 @@
           <div class="modal-body">
             <div class="remove-box">
               <p>
-                The permission for the use/group, preview is inherited from the
-                object, object will create a new permission for this object
+                삭제하실 경우 영구히 제거됩니다.
               </p>
             </div>
           </div>
@@ -285,75 +333,14 @@
               class="btn btn-animation btn-md fw-bold"
               data-bs-dismiss="modal"
             >
-              No
+              취소
             </button>
             <button
               type="button"
-              class="btn btn-animation btn-md fw-bold"
-              data-bs-target="#exampleModalToggle2"
-              data-bs-toggle="modal"
-              data-bs-dismiss="modal"
+              class="btn btn-animation btn-md fw-bold deleteNotice" 
+              onclick="deleteNotice(this);"
             >
-              Yes
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="modal fade theme-modal remove-coupon"
-      id="exampleModalToggle2"
-      aria-hidden="true"
-      tabindex="-1"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title text-center" id="exampleModalLabel12">
-              Done!
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            >
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="remove-box text-center">
-              <div class="wrapper">
-                <svg
-                  class="checkmark"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 52 52"
-                >
-                  <circle
-                    class="checkmark__circle"
-                    cx="26"
-                    cy="26"
-                    r="25"
-                    fill="none"
-                  />
-                  <path
-                    class="checkmark__check"
-                    fill="none"
-                    d="M14.1 27.2l7.1 7.2 16.7-16.8"
-                  />
-                </svg>
-              </div>
-              <h4 class="text-content">It's Removed.</h4>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              class="btn btn-primary"
-              data-bs-toggle="modal"
-              data-bs-dismiss="modal"
-            >
-              Close
+              삭제
             </button>
           </div>
         </div>

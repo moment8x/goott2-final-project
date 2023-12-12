@@ -6,22 +6,37 @@
   
   <mapper namespace="com.project.mappers.NoticeMapper">
 	<insert id="insertBoardNotice" parameterType="com.project.vodto.Board">
-	    <selectKey keyProperty="ref" order="AFTER" resultType="java.lang.Integer">
-	        SELECT LAST_INSERT_ID() AS ref;
-	    </selectKey>
 	    INSERT INTO gott123.board(author, category_id, title, content, likes, ref)
-	    VALUES (#{author}, #{categoryId}, #{title}, <![CDATA[#{content}]]>, 0, #{ref});
+	    VALUES (#{author}, #{categoryId}, #{title}, <![CDATA[#{content}]]>, 0, 0);
 	</insert>
+	<select id="selectPostNo" resultType="int">
+		select post_no from gott123.board where title = #{title}
+	</select>
+	<update id="updateRef">
+		 UPDATE gott123.board SET ref = #{postNo} where post_no = #{postNo}
+	</update>
   	<select id="selectBoardNotice" resultType="com.project.vodto.Board">
-  		select * from board where category_id = 3 or category_id = 4 order by created_date;
+  		select * from gott123.board where category_id = 3 or category_id = 4 order by created_date desc;
   	</select>
   	<select id="selectBoardNoticeByNo" resultType="com.project.vodto.Board">
-  		select * from board where post_no = #{no}
+  		select * from gott123.board where post_no = #{no}
   	</select>
   	<select id="selectNoticePostNoPrev" resultType="int">
-  		<![CDATA[select post_no from board where (category_id = 3 or category_id = 4) and post_no < #{no} order by post_no desc limit 1]]>
+  		<![CDATA[select post_no from gott123.board where (category_id = 3 or category_id = 4) and post_no < #{no} order by post_no desc limit 1]]>
   	</select>
   	<select id="selectNoticePostNoNext" resultType="int">
-  		<![CDATA[select post_no from board where (category_id = 3 or category_id = 4) and post_no > #{no} order by post_no limit 1]]>
+  		<![CDATA[select post_no from gott123.board where (category_id = 3 or category_id = 4) and post_no > #{no} order by post_no limit 1]]>
+  	</select>
+  	<select id="selectBoardByPostNo" resultType="com.project.vodto.Board">
+  		select * from gott123.board where (category_id = 3 or category_id = 4) and post_no = #{postNo} 
+  	</select>
+  	<update id="updateBoardByPostNo">
+  		update gott123.board set author = #{author}, category_id = #{categoryId}, content =  <![CDATA[#{content}]]> where post_no = #{postNo};
+  	</update>
+  	<delete id="deleteBoard">
+  		delete from board where post_no = #{postNo} and author = #{author}
+  	</delete>
+  	<select id="selectBoardCount" resultType="int">
+  		select count(*) from board where category_id = 3 or category_id = 4
   	</select>
   </mapper>

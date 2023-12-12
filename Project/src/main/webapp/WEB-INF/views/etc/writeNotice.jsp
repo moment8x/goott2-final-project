@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 
@@ -56,7 +57,7 @@ $(function() {
 });
 function checkState() {
 	let state = "${state}";
-	let error = "${error}"
+	let error = "${error}";
 	if(state == "fail"){
 		$("#failModal").show();
 		$("#errorDiv").html(error);
@@ -134,7 +135,9 @@ function uploadImage(file) {
                                             <div class="card-header-2">
                                                 <h5>공지사항/이벤트 글 작성</h5>
                                             </div>
-
+                                            
+                                            <c:choose>
+                                            <c:when test="${board == 'noBoard' }">
                                             <form class="theme-form theme-form-2 mega-form" method="post" action="/etc/saveNotice">
                                                 <div class="mb-4 row align-items-center">
                                                     <label class="form-label-title col-sm-3 mb-0">제목</label>
@@ -154,12 +157,50 @@ function uploadImage(file) {
                                                         </select>
                                                     </div>
                                                 </div>
-                                                	<div class="mb-4 row align-items-center">
+                                                <div class="mb-4 row align-items-center">
                                                     <label class="col-sm-3 col-form-label form-label-title">내용</label>
                                                     	<textarea id="summernote" name="editordata"></textarea>		
                                                    </div>
                                                    <button id="subBtn" type="submit">저장</button>
                                             </form>
+                                            </c:when>
+                                            <c:when test="${board != 'noBoard'}">
+                                              <form class="theme-form theme-form-2 mega-form" method="post" action="/etc/modifyNotice">
+                                              	<input type="hidden" value="${board.postNo }" name="postNo"/>
+                                                <div class="mb-4 row align-items-center">
+                                                    <label class="form-label-title col-sm-3 mb-0">제목</label>
+                                                    <div class="col-sm-9">
+                                                        <input class="form-control" type="text"
+                                                            placeholder="Product Name" name="subj" value="${board.title }">
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-4 row align-items-center">
+                                                    <label class="col-sm-3 col-form-label form-label-title">게시 글 타입</label>
+                                                    <div class="col-sm-9">
+                                                        <select class="js-example-basic-single w-100" name="state">
+                                                            <option disabled>Static Menu</option>
+                                                            <c:choose>
+                                                            <c:when test="${board.categoryId == 3}">
+	                                                            <option selected="selected">공지사항</option>
+    	                                                        <option>이벤트</option>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                               <option>공지사항</option>
+    	                                                       <option selected="selected">이벤트</option>
+                                                            </c:otherwise>
+                                                            </c:choose>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-4 row align-items-center">
+                                                    <label class="col-sm-3 col-form-label form-label-title">내용</label>
+                                                    	<textarea id="summernote" name="editordata">${board.content }</textarea>		
+                                                   </div>
+                                                   <button id="subBtn" type="submit">저장</button>
+                                            </form>
+                                            </c:when>
+                                            </c:choose>
                                         </div>
                                     </div>
                                 </div>

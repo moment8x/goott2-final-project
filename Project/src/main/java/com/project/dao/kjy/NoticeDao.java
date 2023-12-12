@@ -14,4 +14,16 @@ public interface NoticeDao {
 	public int selectNoticePostNoPrev(String no) throws Exception;
 	
 	public int selectNoticePostNoNext(String no) throws Exception;
+	
+	public Board selectBoardByPostNo(int postNo) throws Exception;
+	
+	public int updateNotice(Board board)throws Exception;
+	
+	public int deleteNotice(Board board) throws Exception;
+
+	public int selectBoardCount() throws Exception;
+
+	public int selectPostNo(Board board);
+	
+	public int updateBoardRef(int postNo) throws Exception;
 }

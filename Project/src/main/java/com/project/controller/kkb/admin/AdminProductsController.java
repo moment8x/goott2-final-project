@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.project.service.AdminProductsService;
-import com.project.service.kjy.UploadFileServiceNotuf;
+import com.project.service.kjy.UploadFileServiceKjy;
 import com.project.vodto.UploadFiles;
 import com.project.vodto.kjs.AdminProductsSearchVO;
 import com.project.vodto.kjs.AdminUpdateStockVO;
@@ -58,7 +58,7 @@ public class AdminProductsController {
 	// ----------------------------------------------------------------
 	// ----------------------------- 김재용 -----------------------------
 	
-	private final UploadFileServiceNotuf fileServiceNotuf;
+	private final UploadFileServiceKjy fileServiceNotuf;
 	
 	@ResponseBody
 	@RequestMapping("/getAllProducts")
@@ -128,7 +128,7 @@ public class AdminProductsController {
 			String contentType = image.getContentType();
 				try {
 					byte[] imageByte = image.getBytes();
-					uploadFiles.add(fileServiceNotuf.uploadFile(orginalFileName, size, imageByte, contentType, realPath));
+					uploadFiles.add(fileServiceNotuf.uploadFileKjy(orginalFileName, size, imageByte, contentType, realPath));
 					if(adminProductsService.inputProductsForAdmin(products, uploadFiles)) {
 						result = "저장에 성공하셨습니다.";
 					} else {
@@ -207,7 +207,7 @@ public class AdminProductsController {
 				try {
 					byte[] imageByte = image.getBytes();
 					
-					uploadFiles.add(fileServiceNotuf.uploadFile(orginalFileName, 0, imageByte, contentType, realPath));
+					uploadFiles.add(fileServiceNotuf.uploadFileKjy(orginalFileName, 0, imageByte, contentType, realPath));
 					
 				} catch (Exception e) {
 					e.printStackTrace();
