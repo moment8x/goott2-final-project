@@ -14,15 +14,15 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Refund {
-	private int refundNo;
-	private String productId;
-	private Timestamp refundApplicationDate;
-	private Timestamp refundProcessingCompletionDate;
-	private int refundNumber;
-	private int totalRefundAmount;
-	private int actualRefundAmount;
-	private int refundRewardUsed;
-	private int refundPointUsed;
-	private char refundProcessingDetail;
-	private String refundInformation;
+	private int refund_no;
+	private String product_id;
+	private Timestamp refund_application_date;
+	private Timestamp refund_processing_completion_date;
+	private int refund_number;
+	private int total_refund_amount;
+	private int actual_refund_amount;
+	private int refund_reward_used;
+	private int refund_point_used;
+	private char refund_processing_detail;
+	private String refund_information;
 }

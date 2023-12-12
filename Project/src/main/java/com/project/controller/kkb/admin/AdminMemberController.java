@@ -208,4 +208,8 @@ public class AdminMemberController {
 	        return new ResponseEntity<>("Failed to add member memo", HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	}
+	
+	/* CRM 회원 메모 수정 */
+	
+	/* CRM 회원 메모 삭제 */
 }
