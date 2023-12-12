@@ -1,6 +1,7 @@
 package com.project.vodto.jmj;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +21,9 @@ public class ReturnOrder {
 	private String addr;
 	private String detailAddr;
 	private String returnReason;
-	private int detailedOrderId;
+	private List<Integer> detailedOrderId;
 	private String orderNo;
 	private String returnMsg;
+	private List<Integer> selectQty;
+	private List<String> couponName;
 }
