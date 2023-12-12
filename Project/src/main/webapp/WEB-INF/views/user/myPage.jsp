@@ -1589,6 +1589,15 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 									<i data-feather="shopping-bag"></i>주문내역
 								</button>
 							</li>
+							
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-cancel-return-exchange-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-cancel-return-exchange"
+									type="button" role="tab" aria-controls="pills-cancel-return-exchange"
+									aria-selected="false">
+									<i data-feather="shopping-bag"></i>취소 / 반품 / 교환 내역
+								</button>
+							</li>
 
 							<li class="nav-item" role="presentation">
 								<button class="nav-link" id="pills-profile-tab"
@@ -1955,6 +1964,153 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 												</div>
 											</div>
 										</div>
+
+									</div>
+									<div class="order-contain orderHistory">
+										<div class="order-box dashboard-bg-box">
+											<c:forEach var="order" items="${orderList }">
+												<div class="product-order-detail" id="productOrderDetail">
+													<c:choose>
+														<c:when test="${order.productImage != '' }">
+															<a href="/detail/${order.productId }" class="order-image">
+																<img src="${order.productImage }"
+																class="blur-up lazyload" alt="${order.productName }"
+																id="productImg" />
+															</a>
+														</c:when>
+														<c:otherwise>
+															<a href="/detail/${order.productId }" class="order-image">
+																<img src="/resources/assets/images/noimage.jpg"
+																class="blur-up lazyload" alt="noImg" id="productImg" />
+															</a>
+														</c:otherwise>
+													</c:choose>
+
+													<div class="order-wrap">
+														<div id="orderWrap">
+															<span class="orderDetailClick">주문번호 :
+																${order.orderNo }</span> <a
+																href="orderDetail?no=${order.orderNo }"
+																id="clickDetailOrder">상세보기</a>
+														</div>
+														<p class="text-content" id="orderTime">
+															<fmt:formatDate value="${order.orderTime }" type="date" />
+
+														</p>
+
+														<a href="/detail/${order.productId }">
+															<h3>${order.productName }</h3>
+														</a>
+														<ul class="product-size">
+															<li>
+																<div class="size-box">
+																	<h6 class="text-content">총 수량 :</h6>
+																	<h5>${order.totalOrderCnt }권</h5>
+																</div>
+															</li>
+
+															<li>
+																<div class="size-box">
+																	<h6 class="text-content">결제금액 :</h6>
+																	<c:forEach var="bankTransfers"
+																		items="${bankTransfers }">
+																		<c:choose>
+																			<c:when
+																				test="${order.orderNo == bankTransfers.orderNo && order.paymentMethod == 'bkt'}">
+																				<h5>
+																					<fmt:formatNumber
+																						value="${bankTransfers.amountToPay}" type="NUMBER" />
+																					원
+																				</h5>
+																			</c:when>
+																		</c:choose>
+																	</c:forEach>
+																	<c:if test="${order.paymentMethod != 'bkt'}">
+																		<h5>
+																			<fmt:formatNumber
+																				value="${order.actualPaymentAmount}" type="NUMBER" />
+																			원
+																		</h5>
+																	</c:if>
+																</div>
+															</li>
+
+															<li>
+																<div class="size-box">
+																	<h6 class="text-content">주문상태 :</h6>
+																	<h5>${order.deliveryStatus }</h5>
+																</div>
+															</li>
+
+															<li>
+																<div class="size-box">
+																	<div id="orderStatus">
+
+																		<c:if test="${order.deliveryStatus eq '배송중' }">
+																			<button class="btn theme-bg-color text-white m-0"
+																				type="button" id="button-addon1">
+																				<span>배송조회</span>
+																			</button>
+																			<div>${order.invoiceNumber }</div>
+																		</c:if>
+
+																		<c:if test="${order.deliveryStatus eq '배송완료' }">
+																			<div>배송완료</div>
+																		</c:if>
+
+																	</div>
+																</div>
+															</li>
+														</ul>
+													</div>
+												</div>
+											</c:forEach>
+
+										</div>
+									</div>
+								</div>
+
+								<nav class="custome-pagination">
+									<ul class="pagination justify-content-center">
+
+										<!--  	<c:if test="${page.pageNo > 1 }">
+											<li class="page-item"><a class="page-link" href="#"
+												
+												onclick="orderHistoryPaging(${page.pageNo -1}); return false;">
+													<i class="fa-solid fa-angles-left"></i>
+											</a></li>
+										</c:if>-->
+
+										<c:forEach var="i"
+											begin="${page.startNumOfCurrentPagingBlock }"
+											end="${page.endNumOfCurrentPagingBlock }">
+											<li class="page-item"><a class="page-link"
+												onclick="orderHistoryPaging(${i}); return false;" href="#">${i }</a></li>
+										</c:forEach>
+
+										<c:if test="${page.pageNo < page.totalPageCnt }">
+											<li class="page-item"><a class="page-link"
+												onclick="orderHistoryPaging(${page.pageNo +1}); return false;"
+												href="#"> <i class="fa-solid fa-angles-right"></i>
+											</a></li>
+										</c:if>
+
+									</ul>
+								</nav>
+							</div>
+							
+							<div class="tab-pane fade show" id="pills-cancel-return-exchange" role="tabpanel"
+								aria-labelledby="pills-cancel-return-exchange">
+								<div class="dashboard-order">
+									<div class="title">
+										<h2>취소 / 반품 /교환 내역</h2>
+										<span class="title-leaf title-leaf-gray"> <svg
+												class="icon-width bg-gray">
+                          <use
+													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
+                        </svg>
+										</span>
+
 
 									</div>
 									<div class="order-contain orderHistory">

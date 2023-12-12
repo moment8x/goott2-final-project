@@ -565,7 +565,7 @@ public class MemberServiceImpl implements MemberService {
 		boolean allCancel = true;
 		int selectQty = 0;
 		int detailedOrderId = 0;
-		int amount = 0;
+		int amount = 0; //상품가격 * 취소하려고 선택한 수량
 		System.out.println(tmpCancel.toString());
 		// 해당주문에서 취소하려고 선택한 상품
 
