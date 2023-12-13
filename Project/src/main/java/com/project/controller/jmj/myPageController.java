@@ -60,6 +60,7 @@ import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageCouponLog;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
+import com.project.vodto.jmj.PagingInfoPointLog;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
@@ -161,6 +162,9 @@ public class myPageController {
 				//교환 리스트
 				List<CancelListVO> exchangeList = (List<CancelListVO>)map.get("exchangeList");
 				model.addAttribute("exchangeList", exchangeList);
+				
+				//포인트로그 페이징
+				PagingInfoPointLog pointLogPaging = (PagingInfoPointLog)map.get("pointLogPaging");
 				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

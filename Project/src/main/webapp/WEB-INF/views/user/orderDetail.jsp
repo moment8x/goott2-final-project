@@ -385,14 +385,22 @@ function orderCancel(){
 	 		  				$('.refundCoupon').text(usedCouponName)			
 	 		  			}
 	 		  			//환불금액
-	 		  			for(let i = 0; i < productStatus.length; i++){
-		 		  			if(productStatus[i] != "입금전" && paymentMethod == "bkt"){
-		 			  			$(`#\${amountId}`).text(bktActualAmount.toLocaleString()+ "원")		  				
-		 		  			}else if(productStatus[i] != "입금전" && paymentMethod != "bkt"){
-		 		  				$(`#\${amountId}`).text(actualAmount.toLocaleString()+ "원")		
-		 		  			}else if(productStatus[i] == "입금전"){
-		 		  				$(`#\${amountId}`).text("0 원")
-		 		  			}	  				
+	 		  			if(productStatus.length == 0){
+	 		  				if(paymentMethod == "bkt"){
+	 		  					$(`#\${amountId}`).text(bktActualAmount.toLocaleString()+ "원")	
+	 		  				}else{
+	 		  					$(`#\${amountId}`).text(actualAmount.toLocaleString()+ "원")
+	 		  				}
+	 		  			}else{
+		 		  			for(let i = 0; i < productStatus.length; i++){
+			 		  			if(productStatus[i] != "입금전" && paymentMethod == "bkt"){
+			 			  			$(`#\${amountId}`).text(bktActualAmount.toLocaleString()+ "원")		  				
+			 		  			}else if(productStatus[i] != "입금전" && paymentMethod != "bkt"){
+			 		  				$(`#\${amountId}`).text(actualAmount.toLocaleString()+ "원")		
+			 		  			}else if(productStatus[i] == "입금전"){
+			 		  				$(`#\${amountId}`).text("0 원")
+			 		  			}	  				
+		 		  			}	 		  				
 	 		  			}
 	 		  			//적립금
 	 		  			$(`#\${rewardId}`).text(usedReward.toLocaleString()+ "원")
@@ -405,14 +413,19 @@ function orderCancel(){
 	 		  			let refundReward = data.calcRefund.refundReward
 	 		  			let refundPoint = data.calcRefund.refundPoint
 	 		  			
-	 		  			for(let i = 0; i < productStatus.length; i++){
-		 		  			if(productStatus[i] != "입금전"){
-			 		  			//환불금액
-			 			  		$(`#\${amountId}`).text(refundAmount.toLocaleString()+ "원")		  					
-		 		  			}else{
-		 		  				$(`#\${amountId}`).text("0 원")	 		  				
-	 		  				}
+	 		  			if(productStatus.length == 0){
+	 		  				$(`#\${amountId}`).text(refundAmount.toLocaleString()+ "원")
+	 		  			}else{
+		 		  			for(let i = 0; i < productStatus.length; i++){
+			 		  			if(productStatus[i] != "입금전"){
+				 		  			//환불금액
+				 			  		$(`#\${amountId}`).text(refundAmount.toLocaleString()+ "원")		  					
+			 		  			}else{
+			 		  				$(`#\${amountId}`).text("0 원")	 		  						 		  				
+			 		  			}
+		 		  			}	 		  				
 	 		  			}
+	 		  			
 	 		  			//적립금
 	 		  			$(`#\${rewardId}`).text(refundReward.toLocaleString()+ "원")
 	 		  			//포인트
@@ -1070,7 +1083,14 @@ function editRturnAccount() {
 													<ul class="summery-contain pb-0 border-bottom-0">
 														<li class="pb-0">
 															<h4 class="infoTitle">결제수단 :</h4>
+															<c:choose>
+															<c:when test="${detailOrder.paymentMethod eq 'ptr' }">
+																<h4 class="infoContent">포인트 / 적립금 사용</h4>
+															</c:when>
+															<c:otherwise>
 															<h4 class="infoContent">${detailOrder.paymentMethod}</h4>
+															</c:otherwise> 
+															</c:choose>
 														</li>
 
 														<li class="pb-0">
@@ -1381,6 +1401,7 @@ function editRturnAccount() {
 						<input type="text" class="form-control" id="cancelReason"
 							name="reason" placeholder="취소 사유" /><label for="cancelReason">취소
 							사유</label>
+						<p>* 필수 항목 입니다.</p>
 					</div>
 
 					<c:choose>

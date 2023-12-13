@@ -65,8 +65,8 @@
 	</update>
 	
 	<insert id="addShippingAddress">
-		insert into shipping_address(member_id, recipient, recipient_contact, zip_code, address, detail_address)
- 		values(#{memberId}, #{recipient}, #{recipientContact}, #{zipCode}, #{address}, #{detailAddress})
+		insert into shipping_address(member_id, recipient, recipient_contact, zip_code, address, detail_address, basic_addr)
+ 		values(#{memberId}, #{recipient}, #{recipientContact}, #{zipCode}, #{address}, #{detailAddress}, #{basicAddr})
 	</insert>
 	
 	<select id="getShippingAddress" resultType="com.project.vodto.ShippingAddress">
@@ -172,7 +172,7 @@
 		         and d.product_status = '배송중'      
 	        </when>
 	        <when test="deliveryCompleted != null and deliveryCompleted.equals('배송완료')">
-		         and o.delivery_status = '배송완료'   
+		         and d.product_status = '배송완료'   
 	        </when>
 	         <when test="returnApply != null and returnApply.equals('반품신청')">
 		         and d.product_status = '반품신청'   
@@ -425,7 +425,7 @@
 		from (SELECT * FROM product_images GROUP BY product_id) p, wishlist w, products prod
 		where w.member_id = #{memberId}
 		and p.product_id = w.product_id
-		and prod.product_id = w.product_id
+		and prod.product_id = w.product_id order by registration_date desc
 	</select>
 	
 	<insert id="addShoppingCart">
@@ -508,8 +508,16 @@
 	</select>
 	
 	<update id="updateProductQuantity">
-		update detailed_order_items set product_quantity = product_quantity - #{selectQty}
-		where order_no = #{orderNo} and product_id = #{productId}
+		<choose>
+			<when test="remainingQuantity != 0">
+				update detailed_order_items set product_quantity = product_quantity - #{selectQty}
+				where order_no = #{orderNo} and product_id = #{productId}
+			</when>
+			<otherwise>
+				update detailed_order_items set product_quantity = 0
+				where order_no = #{orderNo} and product_id = #{productId}
+			</otherwise>
+		</choose>
 	</update>
 	
 	<update id="updateActualAmount">
@@ -563,6 +571,14 @@
         and r.product_id = p.product_id 
         and rsa.returns_id = r.returns_id
         order by r.request_time desc;
+	</select>
+	
+	<select id="viewWishlist" resultType="com.project.vodto.jmj.SelectWishlist">
+		select prod.product_id, prod.product_name, prod.selling_price, prod.consumer_price, p.product_image
+		from (SELECT * FROM product_images GROUP BY product_id) p, wishlist w, products prod
+		where w.member_id = #{memberId}
+		and p.product_id = w.product_id
+		and prod.product_id = w.product_id order by registration_date desc limit 3
 	</select>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">

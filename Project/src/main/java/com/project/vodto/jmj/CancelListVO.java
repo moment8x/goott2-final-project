@@ -21,6 +21,7 @@ public class CancelListVO {
 	 private String processingStatus;
 	 private int detailedOrderId;
 	 private String productId;
+	 private int returnsId;
 	 private String returnShippingAddressZipNo;
 	 private String returnShippingAddressAddr;
 	 private String returnShippingAddressDetailAddr; 

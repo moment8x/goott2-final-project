@@ -173,14 +173,14 @@ public class MemberDAOImpl implements MemberDAO {
 
 	@Override
 	public int addShippingAddress(String memberId, ShippingAddress tmpAddr) throws SQLException, NamingException {
-		Map<String, String> params = new HashMap<String, String>();
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("memberId", memberId);
 		params.put("recipient", tmpAddr.getRecipient());
 		params.put("recipientContact", tmpAddr.getRecipientContact());
 		params.put("zipCode", tmpAddr.getZipCode());
 		params.put("address", tmpAddr.getAddress());
 		params.put("detailAddress", tmpAddr.getDetailAddress());
-		
+		params.put("basicAddr", tmpAddr.getBasicAddr());
 		
 		return ses.insert(ns + ".addShippingAddress", params);
 	}
@@ -750,12 +750,13 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	
 	@Override
-	public int updateProductQuantity(int selectQty, String orderNo, String productId)
+	public int updateProductQuantity(int selectQty, String orderNo, String productId, int remainingQuantity)
 			throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("selectQty", selectQty);
 		params.put("orderNo", orderNo);
 		params.put("productId", productId);
+		params.put("remainingQuantity", remainingQuantity);
 		
 		return ses.update(ns + ".updateProductQuantity", params);
 	}
@@ -798,6 +799,12 @@ public class MemberDAOImpl implements MemberDAO {
 	public List<CancelListVO> getExchangeList(String memberId) throws SQLException, NamingException {
 
 		return ses.selectList(ns + ".getExchangeList", memberId);
+	}
+	
+	@Override
+	public List<SelectWishlist> viewWishlist(String memberId) throws SQLException, NamingException {
+		
+		return ses.selectList(ns + ".viewWishlist", memberId);
 	}
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
@@ -845,6 +852,8 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectList(ns + ".getTerms");
 	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
+
 
 
 

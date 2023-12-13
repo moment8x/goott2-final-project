@@ -265,7 +265,7 @@ public interface MemberDAO {
 	int selectProductQuantity(String orderNo, String productId) throws SQLException, NamingException;
 	
 	//선택한 상품 수량이랑 상품 주문수량이랑 일치하지 않으면 상품 주문수량 업데이트
-	int updateProductQuantity(int selectQty, String orderNo, String productId) throws SQLException, NamingException;
+	int updateProductQuantity(int selectQty, String orderNo, String productId, int remainingQuantity) throws SQLException, NamingException;
 	
 	//취소, 반품시 실 결제금액 업데이트
 	int updateActualAmount(String orderNo, int actualRefundAmount, String paymentMethod) throws SQLException, NamingException;
@@ -284,6 +284,9 @@ public interface MemberDAO {
 	
 	//해당 유저의 교환 리스트 가져오기
 	List<CancelListVO> getExchangeList(String memberId) throws SQLException, NamingException;
+	
+	//찜목록 최근 3개 가져오기
+	List<SelectWishlist> viewWishlist(String memberId) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -299,6 +302,7 @@ public interface MemberDAO {
 	// 약관 가져오기
 	List<TermsOfSignUpVO> getTerms() throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+	
 	
 
 	

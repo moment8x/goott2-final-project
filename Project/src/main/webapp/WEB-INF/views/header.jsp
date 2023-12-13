@@ -342,10 +342,10 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                             </div>
                                         </a>
                                     </li>
-                                    <li class="right-side" data-bs-toggle="modal" data-bs-target="#deal-box">
+                                <!--   <li class="right-side" data-bs-toggle="modal" data-bs-target="#deal-box">
                                             <i data-feather="heart"></i>
 
-                                    </li>
+                                    </li>-->
                                     <li class="right-side">
                                         <div class="onhover-dropdown header-badge">
                                             <button type="button" class="btn p-0 position-relative header-wishlist"
@@ -414,10 +414,11 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                 <li class="product-box-contain">
                                                     <a href="forgot.html">Forgot Password</a>
                                                 </li>
-                                                
+                                              <c:if test="${sessionScope.loginMember != null }">
                                               <li class="product-box-contain">
                                                     <a href="/user/myPage">My Page</a>
                                                 </li>
+                                               </c:if>
                                               
                                             </ul>
                                         </div>
@@ -721,8 +722,8 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
             <div class="modal-content">
                 <div class="modal-header">
                     <div>
-                        <h5 class="modal-title w-100" id="deal_today">Deal Today</h5>
-                        <p class="mt-1 text-content">Recommended deals for you.</p>
+                        <h5 class="modal-title w-100" id="deal_today"></h5>
+                        <p class="mt-1 text-content"></p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                         <i class="fa-solid fa-xmark"></i>
