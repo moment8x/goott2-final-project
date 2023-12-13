@@ -28,7 +28,7 @@ const COLUMNS = [
     Header: '상품명',
     accessor: 'productName',
     Cell: (row) => {
-      return <span>{row?.cell?.value}</span>;
+      return <span className=''>{row?.cell?.value}</span>;
     },
   },
   {
@@ -73,7 +73,7 @@ const DashboardProductRank = ({ title = '오늘 상품 판매량 순위 TOP 10',
 
   return (
     <div>
-      <div className='grid grid-cols-12 gap-5'>
+      <div className=''>
         <div className='2xl:col-span-8 lg:col-span-7 col-span-12'>
           <Card>
             <div className='md:flex items-center mb-6'></div>
@@ -92,7 +92,7 @@ const DashboardProductRank = ({ title = '오늘 상품 판매량 순위 TOP 10',
                             <th
                               {...column.getHeaderProps(column.getSortByToggleProps())}
                               scope='col'
-                              className='table-th'
+                              className='table-th '
                             >
                               {column.render('Header')}
                               <span>{column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}</span>
@@ -114,11 +114,9 @@ const DashboardProductRank = ({ title = '오늘 상품 판매량 순위 TOP 10',
                                 <td
                                   {...cell.getCellProps()}
                                   className={`${
-                                    index < 3
-                                      ? 'table-td cursor-pointer text-center'
-                                      : index == 3
-                                      ? 'table-td cursor-pointer text-left pr-0'
-                                      : 'table-td cursor-pointer text-right pr-10'
+                                    index !== 1
+                                      ? 'table-td cursor-pointer text-center w-[80px]'
+                                      : 'table-td cursor-pointer text-left pr-0'
                                   }`}
                                 >
                                   {cell.render('Cell')}

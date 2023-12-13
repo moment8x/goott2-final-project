@@ -7,7 +7,7 @@ const DashboardInfo = () => {
   return (
     <div>
       <HomeBredCurbs title='Today 리포트' />
-      <div className='grid grid-cols-12 gap-5 mb-5'>
+      <div className='grid grid-cols-12 gap-5 mb-5 flex-col'>
         <div className='2xl:col-span-3 lg:col-span-4 col-span-12'>
           <ImageBlock2 />
         </div>

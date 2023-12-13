@@ -15,7 +15,7 @@ import com.project.vodto.kjs.AdminUpdateStockVO;
 public interface AdminProductsService {
 	// ----------------------------- 김상희 -----------------------------
 	Map<String, Object> getAllProductsCount();
-	Map<String, Object> getAllProducts(String sellingProducts);
+	Map<String, Object> getAllProducts(AdminProductsSearchVO search);
 	// ----------------------------------------------------------------
 	// ----------------------------- 김재용 -----------------------------
 	// 전체 상품 정보와 이미지들 가져오기

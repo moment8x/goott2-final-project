@@ -58,6 +58,7 @@
 		<typeAlias type="com.project.vodto.kkb.ProductRankingResponse" alias="ProductRankingResponse" />
 		<typeAlias type="com.project.vodto.kkb.CategoryRankingResponse" alias="CategoryRankingResponse" />
 		<typeAlias type="com.project.vodto.kkb.UserStorageResponse" alias="UserStorageResponse" />
+		<typeAlias type="com.project.vodto.kkb.BestSellerResponse" alias="BestSellerResponse" />
 		<typeAlias type="com.project.vodto.Product" alias="product" />
 		<typeAlias type="com.project.vodto.Board" alias="Board" />
 	</typeAliases>

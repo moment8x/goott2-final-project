@@ -1,11 +1,8 @@
 import SelectMonth from '@/components/partials/SelectMonth';
-import ImageBlock2 from '@/components/partials/widget/block/image-block-2';
-import GroupChart2 from '@/components/partials/widget/chart/group-chart-2';
 import Card from '@/components/ui/Card';
 import { useMemo } from 'react';
 import { usePagination, useRowSelect, useSortBy, useTable } from 'react-table';
 import Products from '../../../components/partials/widget/products';
-import HomeBredCurbs from '../../dashboard/HomeBredCurbs';
 
 const COLUMNS = [
   {
@@ -16,28 +13,28 @@ const COLUMNS = [
     },
   },
   {
-    Header: '상품명',
-    accessor: 'productName',
+    Header: '분류',
+    accessor: 'detailCategory',
     Cell: (row) => {
       return <span>{row?.cell?.value}</span>;
     },
   },
   {
-    Header: '반품율',
-    accessor: 'returnRate',
+    Header: '개수',
+    accessor: 'salesQuantity',
     Cell: (row) => {
       return <span>{(row?.cell?.value).toLocaleString('ko-KR')}</span>;
     },
   },
 ];
 
-const DashboardReturnRateRank = ({ title = '주간 취소/반품 순위 TOP 5 (반품율)', returnRateData }) => {
+const DashboardCategoryRankMonth = ({ title = '전월 분류별 판매순위 TOP 5', categoryMonthlyData }) => {
   const columns = useMemo(() => COLUMNS, []);
 
   const tableInstance = useTable(
     {
       columns,
-      data: returnRateData,
+      data: categoryMonthlyData,
     },
 
     useSortBy,
@@ -105,11 +102,9 @@ const DashboardReturnRateRank = ({ title = '주간 취소/반품 순위 TOP 5 (�
                                 <td
                                   {...cell.getCellProps()}
                                   className={`${
-                                    index == 1
-                                      ? 'table-td cursor-pointer text-left pr-0'
-                                      : index == 2
-                                      ? 'table-td cursor-pointer text-center w-[90px]'
-                                      : 'table-td cursor-pointer text-center w-[80px]'
+                                    index !== 1
+                                      ? 'table-td cursor-pointer text-center w-[80px]'
+                                      : 'table-td cursor-pointer text-left pr-0'
                                   }`}
                                 >
                                   {cell.render('Cell')}
@@ -131,4 +126,4 @@ const DashboardReturnRateRank = ({ title = '주간 취소/반품 순위 TOP 5 (�
   );
 };
 
-export default DashboardReturnRateRank;
+export default DashboardCategoryRankMonth;

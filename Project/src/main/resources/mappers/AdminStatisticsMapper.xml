@@ -5,6 +5,17 @@
 
 <mapper namespace="com.project.mappers.adminStatisticsMapper">
 	
+	<select id="selectBestSeller" resultType="BestSellerResponse">
+		SELECT 		i.product_image, p.product_id, p.product_name, p.selling_price, p.category_key
+		FROM		products p 
+		INNER JOIN 	product_images i
+		ON 			p.product_id = i.product_id
+		WHERE 		p.best_seller_status = 1 
+		GROUP BY 	p.product_id
+		ORDER BY 	p.product_id DESC 
+					limit 6
+	</select>	
+	
 <!-- 매출 분석 -->
 	
 	<!-- 매출분석(일별 매출) -->
@@ -549,16 +560,16 @@
 									ON			pa.payment_number = b.payment_number 
 		                            WHERE 		pa.payment_time BETWEEN DATE_ADD(NOW(), INTERVAL -1 WEEK) AND NOW()
 								) s
-				INNER JOIN 		products p 
-				ON 				s.product_id = p.product_id
 		        INNER JOIN		product_images i 
 		        ON				s.product_id = i.product_id
-		        INNER JOIN		(
+		        RIGHT JOIN		(
 									SELECT		product_id, SUM(quantity) quantity
 		                            FROM		shopping_cart
 		                            GROUP BY	product_id
 								) sh
 		        ON				s.product_id = sh.product_id
+		        INNER JOIN 		products p 
+				ON 				sh.product_id = p.product_id
 		        <where>
 					<choose> 
 			         	<when test='(dateStart != null and !dateStart.equals("")) and 

@@ -22,7 +22,7 @@ import com.project.vodto.ksh.AdminProductsList;
 public interface AdminProductsDAO {
 	// ----------------------------- 김상희 -----------------------------
 	int getProductsOnSaleCount();
-	List<AdminProductsList> getAllProducts(String sellingProducts);
+	List<AdminProductsList> getAllProducts(AdminProductsSearchVO search);
 	// ----------------------------------------------------------------
 	// ----------------------------- 김재용 -----------------------------
 	// product 리스트, 이미지들 가져오기

@@ -60,7 +60,7 @@ const Navmenu = ({ menus }) => {
         });
       }
     });
-    document.title = `Deer Books  | ${locationName}`;
+    document.title = `Dear Books  | ${locationName}`;
 
     setActiveSubmenu(submenuIndex);
     setMultiMenu(multiMenuIndex);
@@ -82,16 +82,16 @@ const Navmenu = ({ menus }) => {
           >
             {/* single menu with no childred*/}
             {!item.child && !item.isHeadr && (
-              <NavLink className="menu-link" to={item.link}>
-                <span className="menu-icon flex-grow-0">
+              <NavLink className='menu-link' to={item.link}>
+                <span className='menu-icon flex-grow-0'>
                   <Icon icon={item.icon} />
                 </span>
-                <div className="text-box flex-grow">{item.title}</div>
-                {item.badge && <span className="menu-badge">{item.badge}</span>}
+                <div className='text-box flex-grow'>{item.title}</div>
+                {item.badge && <span className='menu-badge'>{item.badge}</span>}
               </NavLink>
             )}
             {/* only for menulabel */}
-            {item.isHeadr && !item.child && <div className="menulabel">{item.title}</div>}
+            {item.isHeadr && !item.child && <div className='menulabel'>{item.title}</div>}
             {/*    !!sub menu parent   */}
             {item.child && (
               <NavLink
@@ -100,20 +100,20 @@ const Navmenu = ({ menus }) => {
                 className={`menu-link ${activeSubmenu === i ? 'parent_active not-collapsed' : 'collapsed'}`}
                 onClick={() => toggleSubmenu(i)}
               >
-                <div className="flex-1 flex items-start">
-                  <span className="menu-icon">
+                <div className='flex-1 flex items-start'>
+                  <span className='menu-icon'>
                     <Icon icon={item.icon} />
                   </span>
-                  <div className="text-box">{item.title}</div>
+                  <div className='text-box'>{item.title}</div>
                 </div>
 
-                <div className="flex-0">
+                <div className='flex-0'>
                   <div
                     className={`menu-arrow transform transition-all duration-300 ${
                       activeSubmenu === i ? ' rotate-90' : ''
                     }`}
                   >
-                    <Icon icon="heroicons-outline:chevron-right" />
+                    <Icon icon='heroicons-outline:chevron-right' />
                   </div>
                 </div>
               </NavLink>

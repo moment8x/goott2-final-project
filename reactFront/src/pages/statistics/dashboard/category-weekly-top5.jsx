@@ -28,13 +28,13 @@ const COLUMNS = [
   },
 ];
 
-const DashboardCategoryRank = ({ title = '전월 분류별 판매순위 TOP 5', categoryData }) => {
+const DashboardCategoryRankWeek = ({ title = '주간 분류별 판매순위 TOP 5', categoryWeeklyData }) => {
   const columns = useMemo(() => COLUMNS, []);
 
   const tableInstance = useTable(
     {
       columns,
-      data: categoryData,
+      data: categoryWeeklyData,
     },
 
     useSortBy,
@@ -61,7 +61,7 @@ const DashboardCategoryRank = ({ title = '전월 분류별 판매순위 TOP 5', 
 
   return (
     <div>
-      <div className='grid grid-cols-12 gap-5'>
+      <div className=''>
         <div className='2xl:col-span-8 lg:col-span-7 col-span-12'>
           <Card>
             <div className='md:flex items-center mb-6'></div>
@@ -102,11 +102,9 @@ const DashboardCategoryRank = ({ title = '전월 분류별 판매순위 TOP 5', 
                                 <td
                                   {...cell.getCellProps()}
                                   className={`${
-                                    index < 3
-                                      ? 'table-td cursor-pointer text-center'
-                                      : index == 3
-                                      ? 'table-td cursor-pointer text-left pr-0'
-                                      : 'table-td cursor-pointer text-right pr-10'
+                                    index !== 1
+                                      ? 'table-td cursor-pointer text-center w-[80px]'
+                                      : 'table-td cursor-pointer text-left pr-0'
                                   }`}
                                 >
                                   {cell.render('Cell')}
@@ -128,4 +126,4 @@ const DashboardCategoryRank = ({ title = '전월 분류별 판매순위 TOP 5', 
   );
 };
 
-export default DashboardCategoryRank;
+export default DashboardCategoryRankWeek;

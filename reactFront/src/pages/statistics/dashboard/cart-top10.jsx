@@ -31,7 +31,7 @@ const COLUMNS = [
   },
 ];
 
-const DashboardCartRank = ({ title = '장바구니 담긴 순위 TOP10', cartData }) => {
+const DashboardCartRank = ({ title = '장바구니 담긴 순위 TOP 10', cartData }) => {
   const columns = useMemo(() => COLUMNS, []);
 
   const tableInstance = useTable(
@@ -64,7 +64,7 @@ const DashboardCartRank = ({ title = '장바구니 담긴 순위 TOP10', cartDat
 
   return (
     <div>
-      <div className='grid grid-cols-12 gap-5'>
+      <div className=''>
         <div className='2xl:col-span-8 lg:col-span-7 col-span-12'>
           <Card>
             <div className='md:flex items-center mb-6'></div>
@@ -105,11 +105,9 @@ const DashboardCartRank = ({ title = '장바구니 담긴 순위 TOP10', cartDat
                                 <td
                                   {...cell.getCellProps()}
                                   className={`${
-                                    index < 3
-                                      ? 'table-td cursor-pointer text-center'
-                                      : index == 3
-                                      ? 'table-td cursor-pointer text-left pr-0'
-                                      : 'table-td cursor-pointer text-right pr-10'
+                                    index !== 1
+                                      ? 'table-td cursor-pointer text-center w-[80px]'
+                                      : 'table-td cursor-pointer text-left pr-0'
                                   }`}
                                 >
                                   {cell.render('Cell')}

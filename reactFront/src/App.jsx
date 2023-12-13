@@ -61,8 +61,9 @@ function App() {
           <Route path="/lock-screen3" element={<LockScreen3 />} />
         </Route> */}
         <Route path='/' element={<Layout />}>
-          <Route index element={<Navigate to='admin/home' />} />
-          <Route path='admin' element={<Navigate to='home' />} />
+          <Route path='admin' element={<Navigate to='home' />}>
+            <Route index element={<Navigate to='admin/home' />} />
+          </Route>
           <Route path='admin/home' element={<Ecommerce />} />
           <Route path='admin/members' element={<Navigate to='dashboard' />} />
           <Route path='admin/members/dashboard' element={<CrmDashboard />} />
@@ -84,7 +85,7 @@ function App() {
           <Route path='admin/statistics/cart' element={<CartAnalysis />} />
           <Route path='admin/statistics/wishlist' element={<WishlistAnalysis />} />
         </Route>
-        <Route path='/*' element={<Error />} />
+        <Route path='/admin/*' element={<Error />} />
       </Routes>
     </main>
   );

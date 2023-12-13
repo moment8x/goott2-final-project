@@ -3,6 +3,7 @@ package com.project.dao.kkb.admin;
 import java.util.List;
 
 import com.project.vodto.kkb.AggregateResponse;
+import com.project.vodto.kkb.BestSellerResponse;
 import com.project.vodto.kkb.CategoryRankingResponse;
 import com.project.vodto.kkb.ProductRankingResponse;
 import com.project.vodto.kkb.RevenueResponse;
@@ -10,6 +11,9 @@ import com.project.vodto.kkb.StatisticsCond;
 import com.project.vodto.kkb.UserStorageResponse;
 
 public interface AdminStatisticsDAO {
+	
+	/* 베스트셀러 정보 */
+	List<BestSellerResponse> findBestSellerInfo();
 	
 /* ----------------------- 매출 분석 -----------------------*/	
 	

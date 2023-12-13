@@ -65,6 +65,14 @@ public class StatisticsCond {
 					cond.getDateEnd(),
 					limit);
 	}
+	
+	public static StatisticsCond create(int limit , String dateStart, String dateEnd ) {		
+		
+		return new StatisticsCond(
+				null,
+				null,
+				limit);
+}
 
 	public static StatisticsCond create(String dateStart, String dateEnd, int limit, boolean isReturnRateRanking) {
 	

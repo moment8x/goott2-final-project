@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.project.dao.kkb.admin.AdminStatisticsDAO;
 import com.project.vodto.kkb.AggregateResponse;
+import com.project.vodto.kkb.BestSellerResponse;
 import com.project.vodto.kkb.CategoryRankingResponse;
 import com.project.vodto.kkb.ProductRankingResponse;
 import com.project.vodto.kkb.RevenueResponse;
@@ -36,9 +37,10 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 		String lastMonthStart = todayDate.minusMonths(1).with(TemporalAdjusters.firstDayOfMonth()).toString();
 		String lastMonthEnd = todayDate.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).toString();
 		
-		StatisticsCond todayTop10 = StatisticsCond.create(today, today, 10);
+		StatisticsCond todayTop10 = StatisticsCond.create(10, null, null);
 		StatisticsCond weekTop5Quantity = StatisticsCond.create(weekStart, today, 5, false);
 		StatisticsCond weekTop5Rate = StatisticsCond.create(weekStart, today, 5, true);
+		StatisticsCond weekTop5 = StatisticsCond.create(weekStart, today, 5);
 		StatisticsCond lastMonthTop5 = StatisticsCond.create(lastMonthStart, lastMonthEnd, 5);
 		
 		List<ProductRankingResponse> productRankingTop10 = adminStatisticsDAO.findProductRanking(todayTop10);
@@ -46,13 +48,17 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 		List<ProductRankingResponse> returnRankingTop5Quantity = adminStatisticsDAO.findReturnRanking(weekTop5Quantity);
 		List<ProductRankingResponse> returnRankingTop5Rate = adminStatisticsDAO.findReturnRanking(weekTop5Rate);
 		List<CategoryRankingResponse> categoryRankingLastMonthTop5 = adminStatisticsDAO.findCategoryRanking(lastMonthTop5);
+		List<CategoryRankingResponse> categoryRankingWeeklyTop5 = adminStatisticsDAO.findCategoryRanking(weekTop5);
+		List<BestSellerResponse> bestSellerList = adminStatisticsDAO.findBestSellerInfo();
 		
 		Map<String, Object> result = new HashMap<>();
+		result.put("bestSellerList", bestSellerList);
 		result.put("productRankingTop10", productRankingTop10);
 		result.put("cartRankingTop10", cartRankingTop10);
 		result.put("returnRankingTop5Quantity", returnRankingTop5Quantity);
 		result.put("returnRankingTop5Rate", returnRankingTop5Rate);
 		result.put("categoryRankingLastMonthTop5", categoryRankingLastMonthTop5);
+		result.put("categoryRankingWeeklyTop5", categoryRankingWeeklyTop5);
 		
 		return result;
 	}

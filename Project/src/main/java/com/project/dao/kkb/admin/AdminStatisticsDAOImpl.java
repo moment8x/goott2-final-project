@@ -7,6 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.kkb.AggregateResponse;
+import com.project.vodto.kkb.BestSellerResponse;
 import com.project.vodto.kkb.CategoryRankingResponse;
 import com.project.vodto.kkb.ProductRankingResponse;
 import com.project.vodto.kkb.RevenueResponse;
@@ -22,7 +23,11 @@ public class AdminStatisticsDAOImpl implements AdminStatisticsDAO {
 	private static String ns = "com.project.mappers.adminStatisticsMapper";
 	private final SqlSession ses;
 	
-
+	@Override
+	public List<BestSellerResponse> findBestSellerInfo() {
+		return ses.selectList(ns + ".selectBestSeller");
+	}
+	
 	@Override
 	public List<RevenueResponse> findDaliyReport(StatisticsCond statisticsCond) {
 		return ses.selectList(ns + ".selectDaliyReport", statisticsCond);
