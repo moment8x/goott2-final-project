@@ -53,13 +53,12 @@ public class AdminProductsController {
 			@RequestParam String searchKey,
 			@RequestParam String searchValue,
 			@RequestParam String categoryKey,
-			@RequestParam(defaultValue = "0") byte childCategory,
 			@RequestParam String startDate,
 			@RequestParam String endDate,
 			@RequestParam(defaultValue = "2") byte bestSellerStatus)
 			/*@RequestParam String sellingProducts)*/ {
 		
-		AdminProductsSearchVO search = AdminProductsSearchVO.create(searchKey, searchValue, categoryKey, childCategory, startDate, endDate, bestSellerStatus);
+		AdminProductsSearchVO search = AdminProductsSearchVO.create(searchKey, searchValue, categoryKey, startDate, endDate, bestSellerStatus);
 		System.out.println("search : " + search.toString());
 		return adminProductsService.getAllProducts(search);
 	}
@@ -309,7 +308,6 @@ public class AdminProductsController {
 			@RequestParam String searchKey,
 			@RequestParam String searchValue,
 			@RequestParam String categoryKey,
-			@RequestParam(defaultValue = "0") byte childCategory,
 			@RequestParam String startDate,
 			@RequestParam String endDate,
 			@RequestParam(defaultValue = "2") byte bestSellerStatus
@@ -325,7 +323,7 @@ public class AdminProductsController {
 		middle category,	중분류
 		minor category		소분류
 		*/
-		AdminProductsSearchVO search = AdminProductsSearchVO.create(searchKey, searchValue, categoryKey, childCategory, startDate, endDate, bestSellerStatus);
+		AdminProductsSearchVO search = AdminProductsSearchVO.create(searchKey, searchValue, categoryKey, startDate, endDate, bestSellerStatus);
 		return adminProductsService.getSearchStockList(search);
 	}
 	

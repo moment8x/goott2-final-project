@@ -11,6 +11,7 @@ public class AdminStockListVO {
 	private String productId;
 	private String productName;
 	private int currentQuantity;
+	private int quantity;
 	private String categoryKey;
 	private String categoryName;
 	private String productImage;

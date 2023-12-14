@@ -101,11 +101,11 @@ export const menuItems = [
         multi_menu: [
           {
             multiTitle: '상품 정보 변경',
-            multiLink: 'product6',
+            multiLink: 'Level-12', //
           },
           {
             multiTitle: '상품 재고 관리',
-            multiLink: 'product6',
+            multiLink: 'admin/products/inventory',
           },
         ],
       },
@@ -130,11 +130,11 @@ export const menuItems = [
         multi_menu: [
           {
             multiTitle: '회원 탈퇴 관리',
-            multiLink: 'user9',
+            multiLink: 'user62', //
           },
           {
             multiTitle: '휴면 회원 관리',
-            multiLink: 'user10',
+            multiLink: 'user61', //
           },
         ],
       },

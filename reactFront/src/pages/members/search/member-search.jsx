@@ -85,7 +85,7 @@ const gender = [
   },
 ];
 
-const MemberSearch = ({ setSearchedInfo }) => {
+const MemberSearch = ({ setSearchedInfo, setSearchedMember }) => {
   const [selectGender, setSelectGender] = useState('');
   const [picker, setPicker] = useState();
   const [picker2, setPicker2] = useState();
@@ -250,13 +250,11 @@ const MemberSearch = ({ setSearchedInfo }) => {
       },
       body: JSON.stringify(searchMember),
     })
-      .then((res) => {
-        console.log('res:', res);
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((res) => {
         console.log('res2:', res);
         setSearchedInfo(res.memberList);
+        setSearchedMember(res.memberList.length);
       });
   };
 

@@ -9,6 +9,7 @@ import MemberInfoModal from './member-modal';
 import Layout from './member-modal-detail/Layout';
 import Sidebar from '@/components/partials/sidebar';
 import { Symbols } from 'recharts';
+import { Link } from 'react-router-dom';
 
 const COLUMNS = [
   {
@@ -120,17 +121,21 @@ const COLUMNS = [
 //   );
 // });
 
-const SearchedMember = ({ title = '회원 목록', data }) => {
+const SearchedMember = ({ title = '회원 목록', data, searchedMember }) => {
   const columns = useMemo(() => COLUMNS, []);
   // // const data = useMemo(() => searchedInfo, []);
   const [totalMember, setTotalMember] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [selectedMemberId, setSelectedMemberId] = useState('');
 
-  const openModal = (row) => {
-    setShowModal(!showModal);
-    setSelectedMemberId(row.cells[3].value);
-    console.log('id: ', row.cells[3].value);
+  // const openModal = (row) => {
+  //   setShowModal(!showModal);
+  //   setSelectedMemberId(row.cells[2].value);
+  //   console.log('id: ', row.cells[2].value);
+  // };
+
+  const handleRowClick = (row) => {
+    setSelectedMemberId(row.cells[2].value);
   };
 
   const tableInstance = useTable(
@@ -243,6 +248,13 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
               <span>명</span>
             </div>
           </Button>
+          <Button className='btn-outline-dark ml-5 p-[7px] pointer-events-none'>
+            <div className='space-x-1 rtl:space-x-reverse'>
+              <span>검색결과</span>
+              <Badge label={searchedMember} className='bg-white text-slate-900 ' />
+              <span>명</span>
+            </div>
+          </Button>
         </div>
         <div className='overflow-x-auto -mx-6'>
           <div className='inline-block min-w-full align-middle'>
@@ -274,16 +286,15 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
                   {page.map((row) => {
                     prepareRow(row);
                     return (
-                      <tr {...row.getRowProps()}>
+                      <tr {...row.getRowProps()} onClick={() => handleRowClick(row)}>
                         {row.cells.map((cell, index) => {
                           return (
-                            <td
-                              {...cell.getCellProps()}
-                              className='table-td cursor-pointer pr-0 pl-12'
-                              onClick={index !== 0 ? () => openModal(row) : null}
-                            >
-                              {/* row 클릭 시 모달 오픈 */}
-                              {cell.render('Cell')}
+                            <td {...cell.getCellProps()} className='table-td cursor-pointer pr-0 pl-12'>
+                              {index !== 0 ? (
+                                <Link to={`/admin/members/${selectedMemberId}`}>{cell.render('Cell')}</Link>
+                              ) : (
+                                cell.render('Cell')
+                              )}
                               {/* <Link to='' onClick={openModal}>
                                 {cell.render('Cell')}
                               </Link> */}
