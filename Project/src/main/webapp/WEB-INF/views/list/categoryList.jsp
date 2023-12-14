@@ -164,7 +164,7 @@
 		let likeDislikeId = $(`#\${productId}`);
 		let member = '${sessionScope.loginMember.memberId}'
 		if (member == "") {
-			alert("로그인 해주세요");
+			alert("로그인이 필요한 서비스 입니다.");
 			location.href = '/login/';
 		} else if (likeDislikeId.hasClass("fa-regular")) {
 			likeDislikeId.removeClass("fa-regular").addClass("fa-solid");
@@ -183,11 +183,7 @@
 
 				},
 				error : function(error) {
-					if (error.status === 409) {
-						alert("상품이 이미 리스트에 있습니다.")
-						likeDislikeId.removeClass("fa-solid").addClass(
-								"fa-regular");
-					}
+
 				}
 			});
 
@@ -204,7 +200,7 @@
 				dataType : 'json',
 				async : false,
 				success : function(data) {
-					console.log(productId + "번 상품 좋아요")
+					console.log(productId + " 좋아요")
 
 				},
 				error : function() {
