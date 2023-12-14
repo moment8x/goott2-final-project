@@ -806,6 +806,13 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectList(ns + ".viewWishlist", memberId);
 	}
+	
+	@Override
+	public int updateProductStatus(int detailedOrderId) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".updateProductStatus", detailedOrderId);
+	}
+
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
 	@Override
@@ -854,8 +861,4 @@ public class MemberDAOImpl implements MemberDAO {
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
 
 
-
-
-
-	
 }

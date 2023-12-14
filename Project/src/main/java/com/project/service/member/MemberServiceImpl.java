@@ -677,19 +677,27 @@ public class MemberServiceImpl implements MemberService {
 					mDao.updateProductQuantity(selectQty, tmpCancel.getOrderNo(), cancelOrder.getProductId(),
 							remainingQuantity);
 				}
-				// 디테일 프로덕트상태 주문취소로 업데이트
-				if (mDao.updateDetailProductStatus(detailedOrderId) > 0) {
-					System.out.println("디테일 상태 업데이트 완");
-					for (DetailOrder cancelDetail : detailOrder) {
-//						// 모든 디테일 상품 상태가 취소라면 주문내역 배송상태 취소로 변경
-						if (!"주문취소".equals(cancelDetail.getProductStatus())) {
-							allCancel = false;
-							break;
-						} else {
-							mDao.updatedeliveryStatus(memberId, tmpCancel.getOrderNo());
-							System.out.println("주문내역 배송상태 변경 완");
-						}
+				// 디테일 프로덕트상태 업데이트
+				if(productQuantity != selectQty) { 
+					// 취소하는 상품 수량이랑 선택한 상품 수량이랑 일치하지 않는다면 부분취소로 업데이트
+					if(mDao.updateProductStatus(detailedOrderId) > 0) {
+						System.out.println("디테일 상태 부분취소로 업데이트 완");						
 					}
+				}else {
+					if (mDao.updateDetailProductStatus(detailedOrderId) > 0) {
+						
+						System.out.println("디테일 상태 주문취소로 업데이트 완");
+						for (DetailOrder cancelDetail : detailOrder) {
+//						// 모든 디테일 상품 상태가 취소라면 주문내역 배송상태 취소로 변경
+							if (!"주문취소".equals(cancelDetail.getProductStatus())) {
+								allCancel = false;
+								break;
+							} else {
+								mDao.updatedeliveryStatus(memberId, tmpCancel.getOrderNo());
+								System.out.println("주문내역 배송상태 변경 완");
+							}
+						}
+					}					
 				}
 
 				System.out.println(tmpCancel.toString());

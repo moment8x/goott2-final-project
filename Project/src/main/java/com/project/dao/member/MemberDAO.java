@@ -287,6 +287,9 @@ public interface MemberDAO {
 	
 	//찜목록 최근 3개 가져오기
 	List<SelectWishlist> viewWishlist(String memberId) throws SQLException, NamingException;
+	
+	//디테일 상품상태 부분취소로 업데이트
+	int updateProductStatus(int detailedOrderId) throws SQLException, NamingException;
 	// ----------------------------------- 장민정 끝 ------------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -302,6 +305,7 @@ public interface MemberDAO {
 	// 약관 가져오기
 	List<TermsOfSignUpVO> getTerms() throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
+
 	
 	
 

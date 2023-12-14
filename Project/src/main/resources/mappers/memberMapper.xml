@@ -580,6 +580,10 @@
 		and p.product_id = w.product_id
 		and prod.product_id = w.product_id order by registration_date desc limit 3
 	</select>
+	
+	<update id="updateProductStatus">
+		update detailed_order_items set product_status = '부분취소' where detailed_order_id = #{detailedOrderId}
+	</update>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">
 		SELECT member_id FROM member WHERE member_id = #{memberId}  
