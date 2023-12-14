@@ -414,7 +414,8 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 					console.log(data);
 					if (data){
 						$('#newEmail').val('');
-						printMsg("newEmail", "newEmail", "중복된 이메일 입니다.", true)
+					//	printMsg("newEmail", "newEmail", "중복된 이메일 입니다.", true)
+						$('#errMsg').text("중복된 이메일 입니다.").hide(10000)
 						$('.trueMsg').hide();
 					}else if(!regExp.test(tmpEmail)){
 						$('#newEmail').val('');
