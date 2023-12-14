@@ -589,20 +589,8 @@
 		SELECT member_id FROM member WHERE member_id = #{memberId}  
 	</select>
 	<insert id="insertMember">
-		<choose>
-			<when test='#{phoneNumber} != null and #{cellPhoneNumber} != null'>
-				INSERT INTO member(member_id, password, name, phone_number, cell_phone_number, date_of_birth, email, gender, zip_code, address, detailed_address, refund_bank, refund_account) 
-				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress}, #{refund_bank}, #{refund_account})
-			</when>
-			<when test="#{phoneNumber} != null and #{cellPhoheNumber} == null">
-				INSERT INTO member(member_id, password, name, phone_number, date_of_birth, email, gender, zip_code, address, detailed_address, refund_bank, refund_account) 
-				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress}, #{refund_bank}, #{refund_account})
-			</when>
-			<otherwise>
-				INSERT INTO member(member_id, password, name, cell_phone_number, date_of_birth, email, gender, zip_code, address, detailed_address, refund_bank, refund_account) 
-				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress}, #{refund_bank}, #{refund_account})
-			</otherwise>
-		</choose>
+		INSERT INTO member(member_id, password, name, phone_number, cell_phone_number, date_of_birth, email, gender, zip_code, address, detailed_address, refund_bank, refund_account) 
+		VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress}, #{refundBank}, #{refundAccount})
 	</insert>
 	<select id="login" resultType="com.project.vodto.Member">
 		SELECT * FROM member WHERE member_id = #{memberId} AND password = sha1(md5(#{password}))

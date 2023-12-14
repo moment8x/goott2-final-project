@@ -63,6 +63,7 @@
       
       $('.review-imgs').click(function (e) {
     	  let output = "";
+    	  let output2 = '';
     	  let index = $(this).prev().val();
     	  let src = `<c:out value='${reviewList}'/>`;
     	  src = src.split("ReviewBoardDTO");
@@ -71,22 +72,25 @@
     	  src = src.replaceAll(")", "");
       	  src = src.replaceAll("thumb_", "");
       	  src = src.split(', ');
-      	  
+      	  if (src.length > 1) {
+	      	  src.pop();
+      	  }
       	  for (let i = 0; i < src.length; i++) {
       		  if (src[i] !== "") {
-      			  output += "<div><img src='../resources/uploads" + src[i] + "'></div>";
+      			  if (i == 0) {
+      			  	output += '<div class="carousel-item active">';
+      			  	output2 += '<button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>';
+      			  } else {
+      				output += '<div class="carousel-item">';
+      				output2 += '<button type="button" data-bs-target="#demo" data-bs-slide-to="' + i + '"></button>';
+      			  }
+      			  output += "<img src='../resources/uploads" + src[i] + "'>";
+      			  output += '</div>';
       		  }
       	  }
       	  
-      	  $('.fade-img').html(output);
-      	  
-      	  $('.one-time').slick({
-      		  dots: true,
-      		  infinite: true,
-      		  speed: 300,
-      		  slidesToShow: 1,
-      		  adaptiveHeight: true
-      	  });
+      	  $('.carousel-inner').html(output);
+      	  $('.carousel-indicators').html(output2);
 	  });
    
       changeStar();
@@ -96,7 +100,6 @@
       
       // 리뷰 작성하려 할 시 검증!
       $("form").click(function(e) {
-    	  console.log("chk");
          if (${sessionScope.loginMember == null}) {
             if (window.confirm("회원만 리뷰 등록이 가능합니다. 로그인 페이지로 이동하시겠습니까?")) {
                location.href="/login/";
@@ -120,7 +123,6 @@
                 	  $("#floatingTextarea2").attr("readonly", true);
                   }
                }, error : function(data) {
-                  console.log("error", data);
                   $("#floatingTextarea2").attr("readonly", true);
                }
             });
@@ -131,9 +133,6 @@
       getBestSeller();
       
 		$('#submit-btn').click(function(e) {
-			//let productId = ${product.productId}
-			//let rating = $('input[name=rating]:checked').val();
-			//let content = $('#floatingTextarea2').val();
 			let key = "insert";
 			if (isValid()) {
 				let sendData = {
@@ -157,7 +156,6 @@
 							showUploadedFile(key);
 							showRatingBox(ratingCount);
 					}, error : function(data) {
-						console.log("업로드 실패", data);
 					}
 				});
 			} else {
@@ -170,11 +168,9 @@
 	function showRatingBox(ratingCount) {
 		let output = "<ul>";
 		let index = 0;
-		console.log("ratingCount", ratingCount);
 		for (let i = 0; i < 5; i++) {
 			if (ratingCount[index].rating == i + 1) {
 				let percent = ratingCount[index].count / ${product.participationCount} * 100;
-				console.log("percent",percent);
 				output += '<li><div class="rating-list"><h5>' + (i + 1) +' Star</h5><div class="progress">';
 				output += '<div class="progress-bar" role="progressbar" style="width: ' + percent + '%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">'
 										+ percent + '%</div>';
@@ -203,13 +199,12 @@
 			async: false,
 			success: function(data) {
 				if (data.status === "success") {
-					alert("장바구니 등록 완료");
 					newCart(data.cartItems);
 				} else if (data.status === "exist") {
 					alert("기존에 장바구니에 존재하는 상품입니다.");
+					hideModal("cartModal");
 				}
 			}, error: function(data) {
-				console.log(data);
 			}
 		});
 	}
@@ -224,7 +219,6 @@
 			success : function(data) {
 				printBestSeller(data);
 			}, error : function(data) {
-				console.log("BS error", data);
 			}
 		});
 	}
@@ -296,7 +290,6 @@
            changeStar();
            lastPage = data.pagingInfo.totalPageCnt;
         }, error: function(data) {
-           console.log("err", data);
         }
      });
 	}
@@ -371,7 +364,6 @@
 							showUploadedFile(key);
 						}
 					}, error : function(data) {
-						console.log("업로드 실패", data);
 					}
 				});
 			}
@@ -404,7 +396,6 @@
          dataType: "JSON",
          async: false,
          success: function(data) {
-            console.log("success", data);
             if (data.status === "success") {
                // 리뷰 수정 시작
                fileList = data.fileList;
@@ -417,7 +408,6 @@
                return false;
             }
          }, error: function(data) {
-            console.log("err", data);
          }
       });
    }
@@ -478,12 +468,10 @@
 			dataType : "JSON",
 			async : false,
 			success : function(data) {
-				console.log("update", data);
 				showReview(data);
 				paging(data.pagingInfo);
 				showRatingBox(data.ratingCount);
 			}, error : function(data) {
-				console.log("err", data);
 			}
 		});
    	}
@@ -512,6 +500,21 @@
       
       $('#review-' + index + ' div.reply').html(output);
       $('#review-' + index + ' div.product-rating').html(output2);
+      
+      let sendData = {
+				fileList
+	  }
+	  $.ajax({
+			url : "/review/refreshFile",
+			type : "POST",
+			contentType : "application/json",
+			data : JSON.stringify(fileList),
+			dataType : "JSON",
+			async : true,
+			success : function(data) {
+			}, error : function(data) {
+			}
+	  });
       fileList = [];
       deleteList = [];
    }
@@ -535,7 +538,6 @@
             paging(data.pagingInfo);
             showRatingBox(data.ratingCount);
          }, error: function(data) {
-            console.log("err", data);
          }
       });
    }
@@ -552,7 +554,7 @@
             output += '<input type="hidden" value=' + (i + 1) + '>';
             output += '<img src="../resources/uploads' + reviewList[i].imagesAddr[0] + '"';
             output += 'class="img-fluid blur-up lazyload review-imgs"';
-            output += 'data-bs-toggle="modal" data-bs-target="#myModal" />';
+            output += 'data-bs-toggle="modal" data-bs-target="#imgModal" />';
          }
          // 이미지 영역 종료
          output += '</div></div>';
@@ -633,13 +635,12 @@
          async: false,
          success: function(data) {
             if (data.status === "success") {
-               alert("장바구니 등록 완료");
                newCart(data.cartItems);
             } else if (data.status === "exist") {
                alert("기존에 장바구니에 존재하는 상품입니다.");
+               hideModal("cartModal");
             }
          }, error: function(data) {
-            console.log(data);
          }
       });
    }
@@ -675,7 +676,15 @@
 		}
 		uploadFileDelete();
 	}
-   
+	
+	// 모달 종료
+	function hideModal(id) {
+		console.log("id", id);
+		document.body.style.overflow = "unset";
+		$(".modal-backdrop").remove();
+		$("#" + id).hide();
+	}
+	
 	// 페이지 나갈 시
 	window.onbeforeunload = function (e) {
 		let sendData = {
@@ -689,9 +698,7 @@
 			dataType : "JSON",
 			async : true,
 			success : function(data) {
-				console.log("OK");
 			}, error : function(data) {
-				console.log("err");
 			}
 		});
 		//window.navigator.sendBeacon('/review/refreshFile');
@@ -737,8 +744,8 @@
 	textarea {
 	   resize: none;
 	}
-	.modal-body {
-		margin : auto;
+	.carousel-item > img {
+		width: 100%;
 	}
 </style>
 
@@ -851,7 +858,6 @@
                      
                      <div class="col-xl-6 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="right-box-contain">
-                           <h6 class="offer-top">30% Off</h6>
                            <h2 class="name">${product.productName}</h2>
                            <div class="price-rating">
                             <h3 class="theme-color price"><fmt:formatNumber value="${product.sellingPrice}" pattern="#,###" />원
@@ -900,12 +906,12 @@
                                       </div>
                                    </div>
                                    <button onclick="addCart();"
-                                      class="btn btn-md bg-dark cart-button text-white w-80">장바구니</button>
+                                      class="btn btn-md bg-dark cart-button text-white w-80" data-bs-toggle="modal" data-bs-target="#cartModal">장바구니</button>
                                    <button onclick="buy();"
                                       class="btn btn-md bg-dark cart-button text-white w-80">바로구매</button>
                                 </div>
                                  
-                                <div class="buy-box">
+                                <!-- <div class="buy-box">
                                    <a href="wishlist.html">
                                       <i data-feather="heart"></i>
                                       <span>Add To Wishlist</span>
@@ -914,7 +920,7 @@
                                       <i data-feather="shuffle"></i>
                                       <span>Add To Compare</span>
                                    </a>
-                                </div>
+                                </div> -->
 
                               </div>
                         </div>
@@ -1106,7 +1112,7 @@
                                                       						<h5>${status.count} Star</h5>
                                                       						<div class="progress">
                                                       							<div class="progress-bar" role="progressbar"
-																				style="width: ${ratingCount[i].count / product.participationCount * 100}%" aria-valuenow="100"
+																				style="width: ${product.participationCount > 0 ? (ratingCount[i].count / product.participationCount * 100) : 0}%" aria-valuenow="100"
 																				aria-valuemin="0" aria-valuemax="100">${ratingCount[i].count / product.participationCount * 100}%</div>
 																			</div>
 																		</div>
@@ -1127,56 +1133,6 @@
                                                       			</c:otherwise>
                                                       		</c:choose>
                                                       	</c:forEach>
-                                                         <!-- <li>
-                                                            <div class="rating-list">
-                                                               <h5>5 Star</h5>
-                                                               <div class="progress">
-                                                                    <div class="progress-bar" role="progressbar"
-                                                                     style="width: 68%" aria-valuenow="100"
-                                                                     aria-valuemin="0" aria-valuemax="100">68%</div>
-                                                               </div>
-                                                            </div>
-                                                         </li>
-                                                         <li>
-                                                            <div class="rating-list">
-                                                               <h5>4 Star</h5>
-                                                               <div class="progress">
-                                                                  <div class="progress-bar" role="progressbar"
-                                                                  style="width: 67%" aria-valuenow="100"
-                                                                  aria-valuemin="0" aria-valuemax="100">67%</div>
-                                                               </div>
-                                                            </div>
-                                                         </li>
-                                                         <li>
-                                                            <div class="rating-list">
-                                                               <h5>3 Star</h5>
-                                                               <div class="progress">
-                                                                  <div class="progress-bar" role="progressbar"
-                                                                  style="width: 42%" aria-valuenow="100"
-                                                                  aria-valuemin="0" aria-valuemax="100">42%</div>
-                                                               </div>
-                                                            </div>
-                                                         </li>
-                                                         <li>
-                                                            <div class="rating-list">
-                                                               <h5>2 Star</h5>
-                                                               <div class="progress">
-                                                                  <div class="progress-bar" role="progressbar"
-                                                                  style="width: 30%" aria-valuenow="100"
-                                                                  aria-valuemin="0" aria-valuemax="100">30%</div>
-                                                               </div>
-                                                            </div>
-                                                         </li>
-                                                         <li>
-                                                            <div class="rating-list">
-                                                            <h5>1 Star</h5>
-                                                               <div class="progress">
-                                                                  <div class="progress-bar" role="progressbar"
-                                                                    style="width: 24%" aria-valuenow="100"
-                                                                  aria-valuemin="0" aria-valuemax="100">24%</div>
-                                                               </div>
-                                                            </div>
-                                                         </li> -->
                                                       </ul>
                                                    </div>
                                                 </div>
@@ -1186,7 +1142,6 @@
                                                       <h4 class="fw-500">Add a review</h4>
                                                    </div>
                                                    
-                                                   <!-- <form action="/review/saveReview" method="POST" enctype="multipart/form-data" onsubmit="return isValid();"> -->
                                                    <form id="review-form">
                                                       <input type="hidden" name="productId" value="${product.productId }">
                                                      <div class="row g-4">
@@ -1254,7 +1209,7 @@
                                                                               <input type="hidden" value="${status.count}">
                                                                               <img src="../resources/uploads${review.imagesAddr[0]}"
                                                                               class="img-fluid blur-up lazyload review-imgs"
-                                                                              data-bs-toggle="modal" data-bs-target="#myModal" />
+                                                                              data-bs-toggle="modal" data-bs-target="#imgModal" />
                                                                            </c:if>
                                                                         </div>
                                                                      </div>
@@ -1376,8 +1331,8 @@
                               <div class="address-contact">
                                  <i data-feather="map-pin"></i>
                                  <h5>
-                                    Address: 
-                                    <span class="text-content">1288 Franklin Avenue</span>
+                                    주소: 
+                                    <span class="text-content">구로디지털단지 구트아카데미 306</span>
                                  </h5>
                               </div>
                            </li>
@@ -1385,7 +1340,7 @@
                               <div class="address-contact">
                                  <i data-feather="headphones"></i>
                                  <h5>
-                                    Contact Seller: 
+                                    연락처: 
                                     <span class="text-content">(+1)-123-456-789</span>
                                  </h5>
                               </div>
@@ -1413,10 +1368,9 @@
       <section class="product-list-section section-b-space">
          <div class="container-fluid-lg">
             <div class="title">
-               <h2>Related Products</h2>
+               <h2>관련 도서</h2>
                <span class="title-leaf"> <svg class="icon-width">
-                        <use
-                        xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
+                        <use xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
                     </svg>
                </span>
             </div>
@@ -1484,10 +1438,10 @@
 	                                    <del><fmt:formatNumber value="${item.consumerPrice}" pattern="#,###" />원</del>
 	                                 </h5>
 	                                 <div class="add-to-cart-box bg-white">
-	                                    <button class="btn btn-add-cart addcart-button" onclick="addCartRelated('${item.productId}');">
-	                                       Add <span class="add-icon bg-light-gray"> <i
-	                                          class="fa-solid fa-plus"></i>
-	                                       </span>
+ 	                                    <button class="btn btn-add-cart addcart-button" data-bs-toggle="modal" data-bs-target="#cartModal"
+ 	                                    	onclick="addCartRelated('${item.productId}');">
+ 	                                    	Add
+ 	                                    	<span class="add-icon bg-light-gray"> <i class="fa-solid fa-plus"></i></span>
 	                                    </button>
 	                                    <div class="cart_qty qty-box">
 	                                       <div class="input-group bg-white">
@@ -1520,30 +1474,61 @@
    </div>
 
    <jsp:include page="./footer.jsp"></jsp:include>
-
+   
 	<!-- The Modal -->
-	<div class="modal fade" id="myModal">
-	  <div class="modal-dialog modal-lg">
-	    <div class="modal-content">
+	<div class="modal" id="imgModal">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">이미지 상세보기</h4>
+					<button type="button" style="border:none" onclick="hideModal('imgModal')">X</button>
+				</div>
+				<div class="modal-body">
+					<!-- Carousel -->
+					<div id="demo" class="carousel" data-bs-ride="carousel">
+						<!-- Indicators/dots -->
+						<div class="carousel-indicators">
+							<!-- <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
+							<button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
+							<button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button> -->
+						</div>
+
+						<!-- The slideshow/carousel -->
+						<div class="carousel-inner">
+							<!-- <div class="carousel-item"></div> -->
+						</div>
+					</div>
+					<div class="container-fluid mt-3"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default"
+								onclick="hideModal('imgModal');"data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	
-	      <!-- Modal Header -->
-	      <div class="modal-header">
-	        <h4 class="modal-title">이미지</h4>
-	        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-	      </div>
-	
-	      <!-- Modal body -->
-	      <div class="modal-body">
-	      	<div class="fade-img"></div>
-	      </div>
-	
-	      <!-- Modal footer -->
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-	      </div>
-	
-	    </div>
-	  </div>
+	<!-- The Modal -->
+	<div class="modal" id="cartModal">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">장바구니 저장 완료</h4>
+					<button type="button" style="border:none" onclick="hideModal('cartModal')">X</button>
+				</div>
+				<div class="modal-body">
+					장바구니 페이지로 이동하시겠습니까?
+				</div>	
+					
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" onclick="location.href='/shoppingCart/shoppingCart'">예</button>
+					<button type="button" class="btn btn-default"
+							onclick="hideModal('cartModal');"data-dismiss="modal">아니요</button>
+				</div>
+			</div>
+		</div>
 	</div>
 	  
 	<!-- jquery ui-->

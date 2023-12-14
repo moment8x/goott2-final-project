@@ -67,6 +67,34 @@
 					updateQTY(prod, $(this).val());
 				}
 			});
+			
+			// checked 속성이 false일 시 금액에 포함X
+			$('input[type="checkbox"]').click(function (e) {
+				let subtotal = $('#subtotal').text().replace('원','').replace(/(,)/g, '');
+				let shipping = 0;
+				let total = $('#total_amount').text().replace('원',"").replace(/(,)/g, '');
+				let productId = $(this).val();
+				let id = "total" + productId;	// 선택된 상품의 가격을 찾기 위한 id
+				let isChecked = $('#' + productId).prop('disabled');
+				
+				if (!$(this).is(":checked")) {
+					subtotal = subtotal - $('#' + id).html().replace('원','').replace(/(,)/g, '');
+				} else {
+					subtotal = parseInt(subtotal) + parseInt($('#' + id).html().replace('원','').replace(/(,)/g, ''));
+				}
+				if (subtotal < 10000) {
+					shipping = 3000;
+				}
+				
+				total = subtotal + shipping;
+				
+				$('#subtotal').html(addComma(subtotal) + '원');
+				$('#shipping').html(addComma(shipping) + '원');
+				$('#total_amount').html(addComma(total) + '원');
+				$('#' + productId).prop("disabled", isChecked ? false : true);
+				$('#' + productId).next().next().prop("disabled", isChecked ? false : true);
+				$('#' + productId).prev().prev().prop("disabled", isChecked ? false : true);
+			});
 		});
 		
 		// 선택된 항목 삭제.
@@ -129,8 +157,8 @@
 					}
 					let qty = data.list.list[i].quantity;
 					output += `<tr class="product-box-contain">`;
-					// 완성 전 주석처리!
-					output += `<td class="product-checkbox" style="min-width:15px;"><input class="checkbox_animated check-it" type="checkbox" name="check_item" value="\${item.productId}" checked/></td>`;
+					// 체크박스
+					output += `<td class="product-checkbox" style="min-width:15px;"><input id="check\${item.productId}" class="checkbox_animated check-it" type="checkbox" name="check_item" value="\${item.productId}" checked/></td>`;
 					// 이미지, 책 제목
 					output += `<td class="product-detail">`;
 					output += `<div class="product border-0">`;
@@ -240,10 +268,8 @@
 			return Number(dataValue).toLocaleString('en');
 		}
 		
-		// 원화표시 삭제 및 콤마 삭제
+		// 콤마 삭제
 		function digitize(prod) {
-			$('#total' + prod).html($('#total' + prod).html().substr(1));	// 원화표시 삭제
-			$('#subtotal').html($('#subtotal').html().substr(1));
 			// 콤마가 있다면
 			if($('#total' + prod).html().indexOf(",") != -1){
 				$('#total' + prod).html($('#total' + prod).html().replace(/(,)/g, "")); // 콤마를 ""로 replace함
@@ -251,7 +277,7 @@
 			}
 		}
 		function digitizeNormal(price) {
-			price = price.substr(0, price.lastIndexOf("원") - 1);
+			price = price.substr(0, price.lastIndexOf("원"));
 			
 			if(price.indexOf(",") != -1){
 				price = price.replace(/(,)/g, "");
@@ -307,7 +333,7 @@
 				async: false,
 				success: function(data) {
 					if (data.status === "success") {
-						subtotal();
+						subtotal(productId);
 						totalAmount();
 						buy();
 					} else if (data.status === "problem") {
@@ -321,12 +347,18 @@
 		}
 		
 		// 구매액(subtotal)
-		function subtotal() {
+		function subtotal(productId) {
 			let sum = 0;
 			for (let i = 0; i < $('h5.subtotal').length; i++) {
-				let temp = document.getElementsByClassName('calc_total')[i].innerHTML;
-				temp = digitizeNormal(temp);
-				sum += Number(temp);
+				let elt = document.getElementsByClassName('calc_total')[i];
+				let id = elt.id.replace("total", "");
+				if (!$('#' + id).is(":disabled")) {
+					console.log("id", id);
+					console.log($('#' + id).is(":disabled"));
+					let temp = elt.innerHTML;
+					temp = digitizeNormal(temp);
+					sum += Number(temp);
+				}
 			}
 			$('#subtotal').html(addComma(sum) + "원");
 		}

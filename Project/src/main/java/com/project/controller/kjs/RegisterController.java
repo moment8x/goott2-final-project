@@ -40,8 +40,6 @@ public class RegisterController {
 	@Inject
 	private UploadFileService ufService;
 	
-//	private List<UploadFiles> fileList = null;
-	
 	@RequestMapping("register")
 	public String moveRegister(Model model) {
 		try {
@@ -80,16 +78,15 @@ public class RegisterController {
 	
 	@RequestMapping(value="signUp", method=RequestMethod.POST)
 	public @ResponseBody String signUp(@RequestBody SignUpDTO member, Model model) {
-		System.out.println("회원가입 : " + member);
 		try {
 			if (member.getFileList() != null) {
 				mService.insertMember(member);
 			} else {
 			}
-		} catch (SQLException | NamingException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return "redirect:/";
+		return "success";
 	}
 	
 	@RequestMapping(value="uploadFile", method=RequestMethod.POST)
@@ -137,7 +134,7 @@ public class RegisterController {
 		
 		String code = UUID.randomUUID().toString();
 		request.getSession().setAttribute("authCode", code);
-		
+		System.out.println("code : " + code);
 		try {
 			mService.sendEmail(email, code);
 			result = new ResponseEntity<String>("success", HttpStatus.OK);
@@ -187,4 +184,7 @@ public class RegisterController {
 		
 		return "redirect:/register/register?snsSignUp=1";
 	}
+	
+	@RequestMapping("jusoPopup")
+	public void findAddr() {}
 }

@@ -133,7 +133,7 @@ public interface MemberService {
 	// 회원 아이디 중복 조회
 	boolean checkedDuplication(String memberId) throws SQLException, NamingException;
 	// 회원 가입
-	boolean insertMember(SignUpDTO member) throws SQLException, NamingException;
+	boolean insertMember(SignUpDTO member) throws Exception;
 	// 이메일 인증
 	void sendEmail(String email, String code) throws MessagingException;
 	// 코드 검증

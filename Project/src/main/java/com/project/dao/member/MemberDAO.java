@@ -295,7 +295,7 @@ public interface MemberDAO {
 	// 회원 아이디 중복 조회
 	boolean selectId(String memberId) throws SQLException, NamingException;
 	// 회원 가입
-	int insertMember(SignUpDTO member) throws SQLException, NamingException;
+	int insertMember(SignUpDTO member) throws Exception;
 	// 로그인(비밀번호 체크)
 	Member selectMember(String memberId, String password) throws SQLException, NamingException;
 	// 프로필사진 업데이트
