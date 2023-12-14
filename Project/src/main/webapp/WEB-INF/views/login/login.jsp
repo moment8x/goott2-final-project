@@ -182,8 +182,8 @@
                     <div class="log-in-box">
                         <div class="log-in-title">
                             <div>
-                            <img src="/resources/assets/images/deer.png" style="width: 50%" />
-                            <img src="/resources/assets/images/Deer_logo.png" />
+                            <!-- <img src="/resources/assets/images/deer.png" style="width: 50%" />
+                            <img src="/resources/assets/images/Deer_logo.png" /> -->
                             </div>
                         </div>
 

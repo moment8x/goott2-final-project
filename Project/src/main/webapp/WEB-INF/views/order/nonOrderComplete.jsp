@@ -204,9 +204,7 @@ $(function() {
 														<ul>
 															<li class="name"><div class="product_id">${item.productName }</div></li>
 
-															<li class="text-content">Sold By: Fresho</li>
-
-															<li class="text-content">Quantity - 500 g</li>
+															
 														</ul>
 													</div>
 												</div>

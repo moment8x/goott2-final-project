@@ -201,8 +201,8 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                 <div>
                                     <div class="timer-notification">
                                        <h6>
-                       					 사슴을 살려주세요!
-                       					 <a href="shop-left-sidebar.html" class="text-white">Save Life!</a >
+                       					 Deer Books에 오신것을 환영합니다!
+                       					 <!-- <a href="shop-left-sidebar.html" class="text-white">Save Life!</a > -->
                     				  </h6>
                                     </div>
                                 </div>
@@ -265,7 +265,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                     <li class="right-side" data-bs-toggle="modal" data-bs-target="#deal-box">
                                             <i data-feather="heart"></i>
 
-                                    </li>-->
+                                    </li>
                                     <li class="right-side">
                                         <div class="onhover-dropdown header-badge">
                                             <button type="button" class="btn p-0 position-relative header-wishlist"

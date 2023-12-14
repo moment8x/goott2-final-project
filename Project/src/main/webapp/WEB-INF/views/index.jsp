@@ -88,7 +88,7 @@ function changeRatingProductInfo(data) {
             <div class="row g-4">
                 <div class="col-xl-9 col-lg-8">
                     <div class="home-contain h-100">
-                        <img src="/resources/assets/images/banner1.png" class="bg-img blur-up lazyload" alt="">
+                        <img src="/resources/assets/images/banner2.jpg" class="bg-img blur-up lazyload" alt="">
                         </div>
                         <div class="home-detail p-center-left w-75 position-relative mend-auto">
                         </div>
@@ -98,7 +98,7 @@ function changeRatingProductInfo(data) {
                         <img src="/resources/assets/images/subBanner1.png" class="bg-img blur-up lazyload" alt="">
                         <div class="home-detail p-top-left home-p-sm w-75">
                             <div>
-                                <h2 class="mt-0 text-danger">45% <span class="discount text-title text-warnning" style="font-size: 42px;">할인</span></h2>
+                                <h2 class="mt-0 text-danger">15% <span class="discount text-title text-warnning" style="font-size: 42px;">할인</span></h2>
                             </div>
                         </div>
                     </div>
@@ -149,7 +149,7 @@ function changeRatingProductInfo(data) {
                         </div>
 
                         <div>
-                            <a href="shop-left-sidebar.html" class="category-box wow fadeInUp" data-wow-delay="0.1s">
+                            <a href="/cs/serviceCenter" class="category-box wow fadeInUp" data-wow-delay="0.1s">
                                 <div>
                                     <img src="/resources/assets/images/customer-care.png" class="blur-up lazyload" alt="">
                                     <h5>고객센터</h5>

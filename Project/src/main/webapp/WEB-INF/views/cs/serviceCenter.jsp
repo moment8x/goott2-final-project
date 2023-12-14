@@ -128,9 +128,11 @@
 								</div>
 
 								<div class="faq-box-contain">
-									<h3>FAQ</h3>
-									<p>Bring to the table win-win survival strategies to ensure
-										proactive domination.</p>
+									
+									 <h3>
+										<a href="/cs/serviceCenter">FAQ</a>
+									</h3>
+									
 								</div>
 							</div>
 						</div>
@@ -142,9 +144,10 @@
 								</div>
 
 								<div class="faq-box-contain">
-									<h3>공지사항</h3>
-									<p>Curabitizzle fizzle break yo neck, yall quis fo shizzle
-										mah nizzle fo rizzle.</p>
+									<h3>
+										<a href="/etc/notice">공지사항</a>
+									</h3>
+									
 								</div>
 							</div>
 						</div>
@@ -159,7 +162,7 @@
 									<h3>
 										<a href="/cs/makeInquiry">1:1 문의접수</a>
 									</h3>
-									<p>Lorizzle ipsizzle boom shackalack sit get down get down.</p>
+									
 								</div>
 							</div>
 						</div>
@@ -175,8 +178,7 @@
 									<h3>
 										<a href="/cs/viewInquiry">1:1 문의내역</a>
 									</h3>
-									<p>Gizzle fo shizzle bow wow wow bizzle leo bibendizzle
-										check out this.</p>
+									
 								</div>
 							</div>
 						</div>

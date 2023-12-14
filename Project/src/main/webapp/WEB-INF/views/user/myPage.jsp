@@ -1536,8 +1536,8 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 						</div>
 						<div class="profile-box">
 							<div class="cover-image">
-								<img src="/resources/assets/images/deer.png"
-									class="img-fluid blur-up lazyload" alt="" />
+								<!-- <img src="/resources/assets/images/deer.png"
+									class="img-fluid blur-up lazyload" alt="" /> -->
 							</div>
 
 							<div class="profile-contain">

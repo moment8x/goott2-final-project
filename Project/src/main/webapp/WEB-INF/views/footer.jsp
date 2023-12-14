@@ -41,8 +41,8 @@
                             <div style="width: 60%;">
                                 <a href="index.html">
                                 	<div style="display: flex; flex-direction: column;">
-                                    	<img src="/resources/assets/images/deer.png">
-                                    	<img src="/resources/assets/images/Deer_logo.png" >
+                                    	<!-- <img src="/resources/assets/images/deer.png">
+                                    	<img src="/resources/assets/images/Deer_logo.png" > -->
                                     </div>
                                 </a>
                             </div>
