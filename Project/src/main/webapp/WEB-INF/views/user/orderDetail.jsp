@@ -807,7 +807,8 @@ function editRturnAccount() {
 											</td>
 											<c:choose>
 												<c:when
-													test="${order.productStatus eq '출고전' || order.productStatus eq '입금전' || order.productStatus eq '결제완료'}">
+													test="${order.productStatus eq '출고전' || order.productStatus eq '입금전' || order.productStatus eq '결제완료' ||
+													order.productStatus eq '부분취소'}">
 													<td class="name">
 														<h4 class="table-title text-content">상품상태</h4>
 														<h5>${order.productStatus }</h5>
@@ -1317,7 +1318,7 @@ function editRturnAccount() {
 					<c:forEach var="order" items="${detailOrderInfo }">
 						<table class="table mb-0 productInfo">
 							<c:if
-								test="${order.productStatus == '출고전' || order.productStatus == '입금전' || order.productStatus == '결제완료'}">
+								test="${order.productStatus == '출고전' || order.productStatus == '입금전' || order.productStatus == '결제완료' || order.productStatus == '부분취소'}">
 								<tbody>
 									<tr>
 										<td class="product-detail">
