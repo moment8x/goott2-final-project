@@ -1,5 +1,6 @@
 package com.project.dao.kjy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,9 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.project.vodto.Board;
+import com.project.vodto.PagingInfo;
+import com.project.vodto.UploadFiles;
+import com.project.vodto.kjy.Reply;
 
 @Repository
 public class NoticeDaoImpl implements NoticeDao {
@@ -84,8 +88,64 @@ public class NoticeDaoImpl implements NoticeDao {
 
 	@Override
 	public int updateBoardRef(int postNo) throws Exception {
-		// TODO Auto-generated method stub
+		
 		return ses.update(ns+".updateRef", postNo);
 	}
+
+	@Override
+	public boolean insertNoticeReply(Board board) {
+		boolean result = false;
+
+		if(ses.insert(ns+".insertNoticeReply", board) == 1) {
+			result = true;
+		}
+		
+		return result;
+	}
+
+	@Override
+	public boolean updateNoticeReplyRef(Board board)throws Exception {
+		boolean result = false;
+		if(ses.update(ns+".updateNoticeReplyRef", board) == 1) {
+			result = true;
+		}
+		return result;
+	}
+
+	@Override
+	public void insertNoticeReplyImage(List<UploadFiles> uploadList) throws Exception {
+	    for(UploadFiles uploadFile : uploadList) {
+	    	ses.insert(ns + ".insertNoticeReplyImages", uploadFile);	
+	    }
+	}
+
+	@Override
+	public boolean insertBoardUf(Board board, List<UploadFiles> uploadList)throws Exception {
+		boolean result = false;
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("postNo", board.getPostNo());
+		for(UploadFiles uploadFile:uploadList) {			
+			params.put("uploadNo", uploadFile.getUploadFilesSeq());
+			ses.insert(ns+".insertBoarUf", params);
+		}
+		result = true;
+		return result;
+	}
+
+	@Override
+	public List<Reply> selectReplies(PagingInfo pagingInfo, int parentNo) throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("parentNo", parentNo);
+		params.put("pagingInfo", pagingInfo);
+		
+		return ses.selectList(ns+".selectNoticeReply", params);
+	}
+
+	@Override
+	public int selectRepliesCount(int parentNo) {
+		
+		return ses.selectOne(ns+".selectCountNoticeReply", parentNo);
+	}
+	
 
 }

@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.service.kjs.upload.UploadFileService;
 import com.project.service.kjy.ListService;
 import com.project.service.kjy.LoginService;
@@ -107,7 +109,6 @@ public class HomeController {
 		} else {
 			result = new ResponseEntity<String>("NoLogin", HttpStatus.OK);
 		}
-		System.out.println(result);
 		return result;
 	}
 	
@@ -131,7 +132,6 @@ public class HomeController {
 		ResponseEntity<UploadFiles> result = null;
 		List<UploadFiles> fileList = new ArrayList<UploadFiles>();
 		String realPath = request.getSession().getServletContext().getRealPath("/resources/productImages");
-		System.out.println("리얼패쓰"+realPath);
 		try {
 			fileList.add(fileService.uploadFileKjy(image.getOriginalFilename(), image.getSize(), image.getBytes(), image.getContentType(), realPath));
 			for(UploadFiles file :fileList) {
@@ -184,10 +184,12 @@ public class HomeController {
 		return model;
 	}
 	@RequestMapping("/etc/readNotice")
-	public void readBoard(@RequestParam("no")int no, Model model) {
+	public void readBoard(@RequestParam("no")int no, Model model, @RequestParam(value="pageNo", defaultValue = "1") int pageNo) {
 		try {
 			Board board = noticeService.getNoticeByNo(no);
+			Map<String, Object> map = noticeService.getNoticeReply(pageNo, no);
 			model.addAttribute("board", board);
+			model.addAttribute("replyMap", map);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -277,7 +279,44 @@ public class HomeController {
 		return uf;
 	}
 	@RequestMapping(value="/etc/inputNoticeReply", method = RequestMethod.POST)
-	public void inputNoticeReply(@RequestParam("replyText") String replyText, @RequestPart("replyUpload") String replyUpload  ) {
-		System.out.println("아아앙아아");
+	public ResponseEntity<String> inputNoticeReply(@RequestBody Map<String, Object> requestData, HttpServletRequest request) {
+		ResponseEntity<String> result = null;
+
+		try {
+			if(request.getSession().getAttribute("loginMember") != null) {
+				Memberkjy member = (Memberkjy) request.getSession().getAttribute("loginMember");
+				
+				ObjectMapper objectMapper = new ObjectMapper();
+				List<UploadFiles> fileList = objectMapper.convertValue(requestData.get("replyUpload"), new TypeReference<List<UploadFiles>>() {});
+
+				int parentPost = Integer.parseInt((String)requestData.get("parentNo"));
+				String content = (String) requestData.get("replyText");
+
+				Board board = new Board();
+				board.setAuthor(member.getMemberId());
+				board.setParentPost(parentPost);
+				board.setContent(content);
+				if(noticeService.inputNoticeReply(board, fileList)) {
+
+				result =  new ResponseEntity<String>("success", HttpStatus.OK);
+
+				}
+			} else {
+				result =  new ResponseEntity<String>("noLogin", HttpStatus.CONFLICT);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			result =  new ResponseEntity<String>("error", HttpStatus.CONFLICT);
+		}
+		return result;
+	}
+	@RequestMapping(value="/etc/isLogin", method = RequestMethod.POST)
+	public ResponseEntity<String> isLogin(HttpServletRequest request) {
+		ResponseEntity<String> result = new ResponseEntity<String>("noLogin", HttpStatus.OK);
+		if(request.getSession().getAttribute("loginMember") != null) {
+			result = new ResponseEntity<String>("login", HttpStatus.OK);
+		}
+		return result;
 	}
 }

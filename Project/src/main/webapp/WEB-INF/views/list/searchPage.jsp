@@ -23,12 +23,11 @@ $(function() {
 	$('.key-category input[type="checkbox"]').on("change", function() {
 		if($(this).prop("checked")){
 			checkedList.push($(this).val());
-			console.log(checkedList);
+
 			getProduct(checkedList,checkedLang, sort, page);
 		} else {
 			if(checkedList.includes($(this).val())){
 				checkedList.splice(checkedList.indexOf($(this).val()), 1);
-				console.log(checkedList);
 				getProduct(checkedList,checkedLang, sort, page);
 			}
 		}
@@ -44,12 +43,12 @@ $(function() {
 	$('.lang-category input[type="checkbox"]').on("change", function() {
 		if($(this).prop("checked")){
 			checkedLang.push($(this).val());
-			console.log(checkedLang);
+
 			getProduct(checkedList,checkedLang, sort, page);
 		} else {
 			if(checkedLang.includes($(this).val())){
 				checkedLang.splice(checkedLang.indexOf($(this).val()), 1);
-				console.log(checkedLang);
+
 				getProduct(checkedList,checkedLang, sort, page);
 			}
 		}
@@ -77,7 +76,6 @@ function getProduct(listCategory, listLang, sortValue, pageValue) {
 			"checkedList[]" : listCategory,
 			"checkedLang[]" : listLang,
 			"sort" : sortValue,
-			"page" : pageValue,
 		},
 		dataType : 'json',
 		async : false,
@@ -142,16 +140,16 @@ function afterPaging() {
 	}
 }
 function makePageButton(paging) {
-	console.log(paging);
+
 	let output = "";
-	if (paging.totalPagingBlockCnt > paging.endNumOfCurrentPagingBlock){
+	if (paging.totalPageCnt > paging.endNumOfCurrentPagingBlock){
 		for(let i = paging.startNumOfCurrentPagingBlock; i <paging.endNumOfCurrentPagingBlock+1; i++){	
 			output += `<li class="page-item active">`;
 			output += `<button class="page-link page-\${i}">\${i}</button>`;
 			output += `</li>`;
 		}
 	} else {
-		for(let i = paging.startNumOfCurrentPagingBlock; i <paging.totalPagingBlockCnt+1; i++){	
+		for(let i = paging.startNumOfCurrentPagingBlock; i <paging.totalPageCnt+1; i++){	
 			output += `<li class="page-item active">`;
 			output += `<button class="page-link page-\${i}">\${i}</button>`;
 			output += `</li>`;
@@ -271,7 +269,7 @@ function makePageButton(paging) {
                                                         <input class="checkbox_animated" type="checkbox" id="categories${loop.index }" value="${category.categoryKey }">
                                                         <label class="form-check-label" for="categories${loop.index }">
                                                             <span class="name">${category.categoryName }</span>
-                                                            <span class="number">${category.categoryCount }</span>
+                                                            <span class="number" style="margin-right: 10px;">${category.categoryCount }</span>
                                                         </label>
                                                     </div>
                                                 </li>
@@ -678,7 +676,7 @@ function makePageButton(paging) {
                      </c:choose>
                         </div>
                     </div>
-
+					
                     <nav class="custome-pagination">
                         <ul class="pagination justify-content-center">
                             <li class="page-item paging-left-arrow">
@@ -689,7 +687,7 @@ function makePageButton(paging) {
                             <div class="pagingBtnDiv">
                             <c:set var="val" value="${param.val }" />
                             <c:choose>
-                            <c:when test="${paging.totalPagingBlockCnt > paging.endNumOfCurrentPagingBlock }">
+                            <c:when test="${paging.totalPageCnt > paging.endNumOfCurrentPagingBlock }">
                             	<c:forEach var="i" begin="${paging.startNumOfCurrentPagingBlock}" end="${paging.endNumOfCurrentPagingBlock }" step="1">
                             		<li class="page-item active">
                               	  		<button class="page-link page-${i}">${i}</button>
@@ -697,7 +695,7 @@ function makePageButton(paging) {
                             </c:forEach>
                             </c:when>
                             <c:otherwise>
-                            	<c:forEach var="i" begin="${paging.startNumOfCurrentPagingBlock}" end="${paging.totalPagingBlockCnt }" step="1">
+                            	<c:forEach var="i" begin="${paging.startNumOfCurrentPagingBlock}" end="${paging.totalPageCnt }" step="1">
 		                            <li class="page-item active">
 		                                <button class="page-link plink${i}" >${i}</button>
 		                            </li>
@@ -759,6 +757,10 @@ function makePageButton(paging) {
 	<!-- Quick View Modal Box End -->
     
     <jsp:include page="../footer.jsp"></jsp:include>
+    
+      <script src="/resources/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/resources/assets/js/bootstrap/bootstrap-notify.min.js"></script>
+    <script src="/resources/assets/js/bootstrap/popper.min.js"></script>
 </body>
 
 </html>

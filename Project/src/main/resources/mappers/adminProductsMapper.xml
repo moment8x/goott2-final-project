@@ -73,7 +73,7 @@
 	  </insert>
 	  <insert id="insertProductImagesForAdmin">
 	  		insert into gott123.product_images(product_id, product_image) values	 		
-	  		<foreach collection="uploadFiles" item="file" separator=",">
+	  		<foreach collection="list" item="file" separator=",">
 	  			(#{productId}, #{file.newFileName})
 	  		</foreach>
 	  </insert>
@@ -90,7 +90,7 @@
 	  </delete>
 	  <delete id="deleteProductImagesForAdmin">
 	  	delete from gott123.product_images where product_image in
-	  	<foreach collection="images" index="image" open="(" close=")" separator=",">
+	  	<foreach collection="list" index="image" open="(" close=")" separator=",">
 	  		#{image}
 	  	</foreach> 
 	  </delete>

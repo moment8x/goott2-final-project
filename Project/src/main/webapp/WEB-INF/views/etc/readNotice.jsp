@@ -4,7 +4,7 @@
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
-  <head>
+<head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -88,159 +88,192 @@
 	    <!-- latest js -->
     <script src="/resources/boardAssets/js/jquery-3.6.0.min.js"></script>
 <script>
-	let fileList = [];
-	$(function() {
-		$("#fileUpload").on("change", function() {
-			console.log(this.files.length);
-			if(this.files.length <= 3){
-				if((fileList.length + this.files.length) <= 3 ){
-				for(let i = 0; i < this.files.length; i++){		        	
-				let image = new FormData();
-				image.append('replyImages', this.files[i]);
-				console.log("FormData contents:", this.files[i]);
-					$.ajax({
-						url: '/etc/replyUploadImage',
-						type: 'POST',
-						data: image,
-						contentType: false,
-						processData: false,
-						success: function (data) {
-							console.log('파일 업로드가 성공적으로 완료되었습니다.');
-			                fileList.push(data);
-			                console.log(fileList);
-			                showFileList();
-			            },
-			            error: function (error) {
-			            	console.log('파일 업로드 중 오류가 발생했습니다.');
-			            }
-			        });
-				}
-				} else {
-					window.alert("파일은 최대 3개까지만 올리실 수 있습니다.");
-				}
-		    } else {
-		    	window.alert("파일은 3개까지만 올리실 수 있습니다.");
-		  	}
-		});
-		
-		$("#myModal").on("dragover", function(e) {
-		    e.preventDefault();
-		    e.stopPropagation();
-		});
-
-		$("#myModal").on("dragenter", function(e) {
-		    e.preventDefault();
-		    e.stopPropagation();
-		});
-		
-		$("#inputImages, #myModal").on("drop", function(e) {
-			e.preventDefault(); 
-			e.stopPropagation();
-			
-			let files = e.originalEvent.dataTransfer.files;
-			if(files.length <= 3){
-				if((fileList.length + files.length) <= 3 ){
-				for(let i = 0; i < files.length; i++){		        	
-				let image = new FormData();
-				image.append('replyImages', files[i]);
-					$.ajax({
-						url: '/etc/replyUploadImage',
-						type: 'POST',
-						data: image,
-						contentType: false,
-						processData: false,
-						success: function (data) {
-							console.log('파일 업로드가 성공적으로 완료되었습니다.');
-			                fileList.push(data);
-			                console.log(fileList);
-			                showFileList();
-			            },
-			            error: function (error) {
-			            	console.log('파일 업로드 중 오류가 발생했습니다.');
-			            }
-			        });
-				}
-				} else {
-					window.alert("파일은 최대 3개까지만 올리실 수 있습니다.");
-				}
-		    } else {
-		    	window.alert("파일은 3개까지만 올리실 수 있습니다.");
-		  	}
-		});
-	})
-
-	function showFileList() {
-		$("#fileListDiv").empty();
-		 for (let file of fileList) {
-		        let imageSrc = "/resources/productImages" + file.thumbnailFileName;
-
-		        let imageElement = $("<img>").attr("src", imageSrc);
-
-		        $("#fileListDiv").append(imageElement);
-		    }
-	}
-
-	function movementNotice(state) {
-		 $.ajax({
-	         url: '/etc/moveNotice', 
-	         method: 'POST',
-	         data: {"state" : state,
-	        	 	"no" : "${board.postNo}"},
-	         async:false,
-	         success: function(data) {
-	        	 console.log(data);
-	        	 procrssMovement(data);
-	         },
-	         error: function(error) {
-	             console.error('Image upload failed:', error);
-	         }
-	     });
-	}
-	function procrssMovement(no) {
-		if(no != 0 && no != -1){			
-		window.location.href="/etc/readNotice?no="+ no;
-		} else {
-			checkState(no);
-		}
-	}
+let fileList = [];
+$(function() {
+	$("#fileUpload").on("change", function() {
+		console.log(this.files.length);
+		if(this.files.length <= 3){
+			if((fileList.length + this.files.length) <= 3 ){
+			for(let i = 0; i < this.files.length; i++){		        	
+			let image = new FormData();
+			image.append('replyImages', this.files[i]);
+			console.log("FormData contents:", this.files[i]);
+				$.ajax({
+					url: '/etc/replyUploadImage',
+					type: 'POST',
+					data: image,
+					contentType: false,
+					processData: false,
+					success: function (data) {
+						console.log('파일 업로드가 성공적으로 완료되었습니다.');
+		                fileList.push(data);
+		                console.log(fileList);
+		                showFileList();
+		            },
+		            error: function (error) {
+		            	console.log('파일 업로드 중 오류가 발생했습니다.');
+		            }
+		        });
+			}
+			} else {
+				window.alert("파일은 최대 3개까지만 올리실 수 있습니다.");
+			}
+	    } else {
+	    	window.alert("파일은 3개까지만 올리실 수 있습니다.");
+	  	}
+	});
 	
-	function checkState(no) {
-		let error = "${error}"
-		$("#failModal").show();
-		$("#errorDiv").html(error);
-		if(no == 0){			
-			$("#errorMsg").html("이전 페이지가 존재하지 않습니다.")
-		} else if(no == -1) {
-			$("#errorMsg").html("다음 페이지가 존재하지 않습니다.")
-		}
-	}
-	function modalClose() {
-		$("#failModal").hide();
-	}
-	function uploadFiles(tag) {
-		console.log(tag.files);
-	} 
-	function submitForm() {
-		 let replyText = document.getElementById('replyText').value;
+	$("#myModal").on("dragover", function(e) {
+	    e.preventDefault();
+	    e.stopPropagation();
+	});
+
+	$("#myModal").on("dragenter", function(e) {
+	    e.preventDefault();
+	    e.stopPropagation();
+	});
+	
+	$("#inputImages, #myModal").on("drop", function(e) {
+		e.preventDefault(); 
+		e.stopPropagation();
 		
-		 let formData = new FormData();
-		 formData.append('replyText', replyText);
-		 formData.append('replyUpload', fileList);
-		 
-		  $.ajax({
-			    url: '/etc/inputNoticeReply',
-			    type: 'POST',
-			    data: formData,
-			    contentType: false,  
-			    processData: false, 
-			    success: function (data) {
-			      console.log('댓글 및 파일 업로드가 성공적으로 완료되었습니다.');
-			    },
-			    error: function (error) {
-			      console.log('댓글 및 파일 업로드 중 오류가 발생했습니다.');
-			    }
-			  });
+		let files = e.originalEvent.dataTransfer.files;
+		if(files.length <= 3){
+			if((fileList.length + files.length) <= 3 ){
+			for(let i = 0; i < files.length; i++){		        	
+			let image = new FormData();
+			image.append('replyImages', files[i]);
+				$.ajax({
+					url: '/etc/replyUploadImage',
+					type: 'POST',
+					data: image,
+					contentType: false,
+					processData: false,
+					success: function (data) {
+						console.log('파일 업로드가 성공적으로 완료되었습니다.');
+		                fileList.push(data);
+		                console.log(fileList);
+		                showFileList();
+		            },
+		            error: function (error) {
+		            	console.log('파일 업로드 중 오류가 발생했습니다.');
+		            }
+		        });
+			}
+			} else {
+				window.alert("파일은 최대 3개까지만 올리실 수 있습니다.");
+			}
+	    } else {
+	    	window.alert("파일은 3개까지만 올리실 수 있습니다.");
+	  	}
+	});
+	
+	$("#replyBtn").on("click", function() {
+		 $.ajax({
+			 url: '/etc/isLogin',
+			 type: 'POST',
+			 dataType:'text',
+			 success: function (data) {
+				 if(data == "noLogin"){
+					 $("#noLoginModal").show();
+				 } else if(data =="login") {
+					 $("#myModal").show();
+				 }
+			 },
+			 error: function (error) {
+			 }
+		});
+	});
+});
+
+function showFileList() {
+	$("#fileListDiv").empty();
+	 for (let file of fileList) {
+	        let imageSrc = "/resources/productImages" + file.thumbnailFileName;
+
+	        let imageElement = $("<img>").attr("src", imageSrc);
+
+	        $("#fileListDiv").append(imageElement);
+	    }
+}
+
+function movementNotice(state) {
+	 $.ajax({
+         url: '/etc/moveNotice', 
+         method: 'POST',
+         data: {"state" : state,
+        	 	"no" : "${board.postNo}"},
+         async:false,
+         success: function(data) {
+        	 console.log(data);
+        	 procrssMovement(data);
+         },
+         error: function(error) {
+             console.error('Image upload failed:', error);
+         }
+     });
+}
+function procrssMovement(no) {
+	if(no != 0 && no != -1){			
+	window.location.href="/etc/readNotice?no="+ no;
+	} else {
+		checkState(no);
 	}
+}
+
+function checkState(no) {
+	let error = "${error}";
+	$("#failModal").show();
+	$("#errorDiv").html(error);
+	if(no == 0){			
+		$("#errorMsg").html("이전 페이지가 존재하지 않습니다.")
+	} else if(no == -1) {
+		$("#errorMsg").html("다음 페이지가 존재하지 않습니다.")
+	}
+}
+function modalClose() {
+	$("#failModal").hide();
+}
+function uploadFiles(tag) {
+	console.log(tag.files);
+} 
+function submitForm() {
+	 let replyText = document.getElementById('replyText').value;
+	 let queryString = window.location.search;
+	 let params = new URLSearchParams(queryString);
+	 let parentNo = 0;
+	 params.forEach(function(value, key) {
+		 if(key == "no"){			 
+		 	parentNo = value;
+		 }
+	});
+	
+	 $.ajax({
+		 url: '/etc/inputNoticeReply',
+		 type: 'POST',
+		 data: JSON.stringify({
+		     parentNo: parentNo,
+		     replyText: replyText,
+		     replyUpload: fileList
+		 }),
+		 contentType: 'application/json',
+		 success: function (data) {
+		 location.reload(true);
+		 },
+		 error: function (error) {
+		 }
+	});
+}
+
+function modalHide() {
+	$("#myModal").hide();
+	$("#replyText").val("");
+	$("#fileUpload").empty();
+	$("#fileListDiv").empty();
+}
+function loginModalClose() {
+	 $("#noLoginModal").hide();
+}
 </script> 
 <style>
 #title{
@@ -314,9 +347,25 @@ textarea {
 	max-width: 100%; 
 	resize: vertical; 
 }
+#replies{
+	margin: 10px 0;
+}
+#replyHeader{
+	display: flex;
+	justify-content: space-between;
+	margin-top: 5px;
+}
+#replyImages {
+	margin: 10px 0;
+}
+#reply{
+	height : 100%;
+	border-bottom: 1px solid rgba(0,0,0,0.3);
+	margin: 10px 0;
+}
 </style>
-  </head>
-  <body>
+</head>
+<body>
   <jsp:include page="../header.jsp"></jsp:include>
   
   	<div class="container mt-3" id="title">
@@ -336,11 +385,27 @@ textarea {
 		<div id="content">
 	       ${board.content }
 		</div>
-		<div id="reply">
+		<div id="replies">
 			<div id="replySubj">
-				<h2>댓글</h2>
-				<button id="replyBtn" data-bs-toggle="modal" data-bs-target="#myModal">댓글 작성</button>
+				<h2>댓글 (${replyMap.pagingInfo.totalProducts })</h2>
+				<button id="replyBtn" >댓글 작성</button>
 			</div>
+			<c:forEach items="${replyMap.replyList}" var="reply">
+				<div id="reply">
+				<div id="replyHeader">
+					<div><h4>${reply.author }</h4></div>
+					<div>${reply.createdDate }</div>
+				</div>
+				<div>
+				<div id="replyImages">
+					<c:forEach items="${reply.thumbnailFileName }" var="thumbnailFileName">
+						<img alt="thumbnailFileName" src="/resources/productImages${thumbnailFileName}">		
+					</c:forEach>
+				</div>
+					<div>${reply.content }</div>
+				</div>
+				</div>
+			</c:forEach>
 		</div>
 		<div id="btns">
 			<div id="listUp">
@@ -379,30 +444,30 @@ textarea {
 	
 	<!-- The Modal -->
 	<div class="modal" id="myModal">
-	  <div class="modal-dialog modal-lg"">
+	  <div class="modal-dialog modal-lg">
 	    <div class="modal-content">
 	
 	      <!-- Modal Header -->
 	      <div class="modal-header">
 	        <h4 class="modal-title">댓글을 남겨보세요!</h4>
-	        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+	        <button type="button" class="btn-close" onclick="modalHide();"></button>
 	      </div>
 	
 	      <!-- Modal body -->
 	      <div class="modal-body">
-	        <div ><h3>댓글작성</h3></div>
-	        	<textarea rows="10" cols="90" name="replyText"></textarea>
+	        <div><h3>댓글작성</h3></div>
+	        	<textarea rows="10" cols="90" name="replyText" id="replyText"></textarea>
 	        	<div><h3>파일 업로드</h3></div>
 	        	<div id="upload">
 	        		<input type="file" id="fileUpload" multiple="multiple" name="replyImages"/>
-	        		<label for="fileUpload" id="inputImages"><img src="/resources/assets/images/add.png" /></label>
+	        		<label for="fileUpload" id="inputImages"><img src="/resources/assets/images/add.png" />파일을 선택하시거나 드래그 해 주세요</label>
 	        		<div id="fileListDiv"></div>
 	        	</div>
 	      </div>
 	
 	      <!-- Modal footer -->
 	      <div class="modal-footer">
-	        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소</button>
+	        <button type="button" class="btn btn-danger" onclick="modalHide();">취소</button>
 	        <button type="button" class="btn btn-danger" onclick="submitForm();">등록</button>
 	      </div>
 	
@@ -410,7 +475,20 @@ textarea {
 	  </div>
 	</div>
 	
- 
+ 	<div class="modal" id="noLoginModal" >
+        <div class="modal-dialog  modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                   
+                	<div style="margin: 30px 0;"><h3>로그인 후 작성하실 수 있습니다.</h3></div>
+
+                    <div class="button-box">
+                        <button type="button" class="btn btn--no" data-bs-dismiss="modal" onclick="loginModalClose();">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <!-- Bootstrap js -->
