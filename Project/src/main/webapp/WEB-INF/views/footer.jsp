@@ -32,115 +32,26 @@
 </head>
   <body>
      <!-- Footer Section Start -->
-    <footer class="section-t-space">
+    <footer class="section-t-space" style="padding: 5px;">
         <div class="container-fluid-lg">
-            <div class="service-section">
-                <div class="row g-3">
-                    <div class="col-12">
-                        <div class="service-contain">
-                            <div class="service-box">
-                                <div class="service-image">
-                                    <img src="/resources/assets/svg/product.svg" class="blur-up lazyload" alt="">
-                                </div>
-
-                                <div class="service-detail">
-                                    <h5>Every Fresh Products</h5>
-                                </div>
-                            </div>
-
-                            <div class="service-box">
-                                <div class="service-image">
-                                    <img src="/resources/assets/svg/delivery.svg" class="blur-up lazyload" alt="">
-                                </div>
-
-                                <div class="service-detail">
-                                    <h5>Free Delivery For Order Over $50</h5>
-                                </div>
-                            </div>
-
-                            <div class="service-box">
-                                <div class="service-image">
-                                    <img src="/resources/assets/svg/discount.svg" class="blur-up lazyload" alt="">
-                                </div>
-
-                                <div class="service-detail">
-                                    <h5>Daily Mega Discounts</h5>
-                                </div>
-                            </div>
-
-                            <div class="service-box">
-                                <div class="service-image">
-                                    <img src="/resources/assets/svg/market.svg" class="blur-up lazyload" alt="">
-                                </div>
-
-                                <div class="service-detail">
-                                    <h5>Best Price On The Market</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="main-footer section-b-space section-t-space">
                 <div class="row g-md-4 g-3">
-                    <div class="col-xl-3 col-lg-4 col-sm-6">
+                    <div class="col-xl-3 col-lg-6 ">
                         <div class="footer-logo">
-                            <div class="theme-logo">
+                            <div style="width: 60%;">
                                 <a href="index.html">
-                                    <img src="/resources/assets/images/logo/1.png" class="blur-up lazyload" alt="logo">
+                                	<div style="display: flex; flex-direction: column;">
+                                    	<img src="/resources/assets/images/deer.png">
+                                    	<img src="/resources/assets/images/Deer_logo.png" >
+                                    </div>
                                 </a>
                             </div>
-
-                            <div class="footer-logo-contain">
-                                <p>간단한 소개. 참고로 위에는 로고 박는 곳</p>
-
-                                <ul class="address">
-                                    <li>
-                                        <i data-feather="home"></i>
-                                        <a href="javascript:void(0)">회사 주소</a>
-                                    </li>
-                                    <li>
-                                        <i data-feather="mail"></i>
-                                        <a href="javascript:void(0)">문의 이메일</a>
-                                    </li>
-                                </ul>
-                            </div>
                         </div>
                     </div>
 
-                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                    <div class="col-xl-2 col-sm-3">
                         <div class="footer-title">
-                            <h4>Categories</h4>
-                        </div>
-
-                        <div class="footer-contain">
-                            <ul>
-                                <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">a</a>
-                                </li>
-                                <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">b</a>
-                                </li>
-                                <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">c</a>
-                                </li>
-                                <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">d</a>
-                                </li>
-                                <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">e</a>
-                                </li>
-                                <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">f</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="col-xl col-lg-2 col-sm-3">
-                        <div class="footer-title">
-                            <h4>바로가기 링크...인데...</h4>
+                            <h4>바로가기</h4>
                         </div>
 
                         <div class="footer-contain">
@@ -220,23 +131,6 @@
                                     </div>
                                 </li>
 
-                                <li class="social-app">
-                                    <h5 class="mb-2 text-content">앱 다운로드라는데 이건 빼죠.</h5>
-                                    <ul>
-                                        <li class="mb-0">
-                                            <a href="https://play.google.com/store/apps" target="_blank">
-                                                <img src="/resources/assets/images/playstore.svg" class="blur-up lazyload"
-                                                    alt="">
-                                            </a>
-                                        </li>
-                                        <li class="mb-0">
-                                            <a href="https://www.apple.com/in/app-store/" target="_blank">
-                                                <img src="/resources/assets/images/appstore.svg" class="blur-up lazyload"
-                                                    alt="">
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
                             </ul>
                         </div>
                     </div>

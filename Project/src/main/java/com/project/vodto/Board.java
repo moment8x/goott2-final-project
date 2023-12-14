@@ -22,6 +22,7 @@ public class Board {
    private int categoryId;
    private int ref;
    private int step;
-   private int ref_order;
+   private int refOrder;
    private int likes;
+   private int parentPost;
 }

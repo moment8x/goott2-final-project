@@ -76,7 +76,7 @@ function redirectToPage(going) {
 
 function getSubmit() {
 	$("#idForgotForm").submit();
-	$("#pdForgotForm").submit();
+	//$("#pdForgotForm").submit();
 }
 
 </script>
@@ -526,7 +526,6 @@ function getSubmit() {
   </div>
 </div>
 
-    
     <jsp:include page="../footer.jsp"></jsp:include>
 </body>
 
