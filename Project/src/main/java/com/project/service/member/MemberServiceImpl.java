@@ -839,14 +839,10 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public boolean insertMember(SignUpDTO member) throws SQLException, NamingException {
+	public boolean insertMember(SignUpDTO member) throws Exception {
 		boolean result = false;
 		String newFileName = "";
-		if (member.getCellPhoneNumber() == null || member.getCellPhoneNumber().length() < 1 ) {
-			member.setPhoneNumber(member.getPhoneNumber1() + "-" + member.getPhoneNumber2() + "-" + member.getPhoneNumber1());
-			member.setCellPhoneNumber(
-					member.getCellPhoneNumber1() + "-" + member.getCellPhoneNumber2() + "-" + member.getCellPhoneNumber3());
-		}
+		
 		// 회원 가입 - 프로필 사진 저장
 		if (member.getFileList().size() > 0) {
 			UploadFiles file = new UploadFiles();
@@ -870,7 +866,7 @@ public class MemberServiceImpl implements MemberService {
 			shipping.setZipCode(member.getZipCode());
 			shipping.setAddress(member.getAddress());
 			shipping.setDetailAddress(member.getDetailedAddress());
-			if (member.getBasicAddr() == null || member.getBasicAddr().equals("")) {
+			if (member.getBasicAddr() == null) {
 				member.setBasicAddr("N");
 			}
 			shipping.setBasicAddr(member.getBasicAddr());

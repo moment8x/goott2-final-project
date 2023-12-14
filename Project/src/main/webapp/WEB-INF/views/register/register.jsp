@@ -36,6 +36,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
     <script>
     	let fileName = "";
+    	let fileList = [];
     	let checkDuplication = false;
     	let isValidServiceTerms = false;
     	let isValidPrivacyTerms = false;
@@ -48,11 +49,8 @@
     	let isValidName = false;
     	let isValidEmail = false;
     	let isValidEmailCode = false;
-    	let isValidPhone1 = false;
-    	let isValidPhone2 = false;
-    	let isValidPhone3 = false;
-    	let isValidCellPhone2 = false;
-    	let isValidCellPhone3 = false;
+    	let isValidPhone = false;
+    	let isValidCellPhone = false;
     	let isValidBirth = false;
     	let isValidZipCode = false;
     	let isValidAddress = false;
@@ -70,30 +68,27 @@
 	    			}
     			}
         		if (isValid()) {
+        			let sendData;
         			if (snsSign != 1) {
-	    	    		let sendData = {
+	    	    		sendData = {
 	    	    			"memberId" : $('#memberId').val(),
 	    	    			"password" : $('#password').val(),
 	    	    			"name" : $('#name').val(),
 	    	    			"email" : $('#email').val(),
-	    	    			"phoneNumber1" : $('#phone-number1').val(),
-	    	    			"phoneNumber2" : $('#phone-number2').val(),
-	    	    			"phoneNumber3" : $('#phone-number3').val(),
-	    	    			"cellPhoneNumber1" : $('#cell-phone-number1').val(),
-	    	    			"cellPhoneNumber2" : $('#cell-phone-number2').val(),
-	    	    			"cellPhoneNumber3" : $('#cell-phone-number3').val(),
+	    	    			"phoneNumber" : $('#phone-number').val(),
+	    	    			"cellPhoneNumber" : $('#cell-phone-number').val(),
 	    	    			"dateOfBirth" : $('#dateOfBirth').val(),
 	    	    			"gender" : $('input[name=gender]:checked').val(),
 	    	    			"zipCode" : $('#zipCode').val(),
 	    	    			"address" : $('#address').val(),
 	    	    			"detailedAddress" : $('#detailedAddress').val(),
-	    	    			"baseAddr" : $('input[name=baseAddr]:checked').val(),
+	    	    			"basicAddr" : $('input[name=basicAddr]:checked').val(),
 	    	    			"refundBank" : $('#refundBank').val(),
 	    	    			"refundAccount" : $('#refundAccount').val(),
 	    	    			fileList
 	    	    		}
         			} else {
-        				let sendData = {
+        				sendData = {
     	    	    		"memberId" : "${id}",
     	    	    		"password" : $('#password').val(),
     	    	    		"name" : $('#name').val(),
@@ -104,7 +99,7 @@
     	    	    		"zipCode" : $('#zipCode').val(),
     	    	    		"address" : $('#address').val(),
     	    	    		"detailedAddress" : $('#detailedAddress').val(),
-    	    	    		"baseAddr" : $('input[name=baseAddr]:checked').val(),
+    	    	    		"basicAddr" : $('input[name=basicAddr]:checked').val(),
     	    	    		"refundBank" : $('#refundBank').val(),
     	    	    		"refundAccount" : $('#refundAccount').val(),
     	    	    		fileList
@@ -118,6 +113,7 @@
     	    			dataType : "TEXT",
     	    			async : false,
     	    			success : function(data) {
+    	    				location.href="/";
     	    			}, error : function(data) {
     	    				console.log("err", data);
     	    			}
@@ -179,7 +175,7 @@
     				validCss("password");
     				checkedPasswordFormat = true;
     			} else {
-    				$('#password').parent().next().html("사용 불가능");
+    				$('#password').parent().next().html("비밀번호는 영문자, 숫자, 특수문자가 포함된 8글자 이상 15글자 이하의 번호만 가능합니다.");
     				notValidCss("password");
     				checkedPasswordFormat = false;
     			}
@@ -225,72 +221,45 @@
     				isValidEmail = false;
     			}
     		});
-    		// 전화번호1 유효성 검사
-    		$('#phone-number1').on('blur', function() {
-    			let regNumber = /^[0-9]{2,4}$/;
+    		
+    		$('#phone-number').on('blur', function() {
+    			let regNumber = /^([0-9]{2,3})-?([0-9]{3,4})-?([0-9]{4})$/;
     			if (regNumber.test($(this).val())) {
-    				$('#phone-number1').parent().next().html('');
-    				isValidPhone1 = true;
+    				$(this).parent().next().html('');
+    				let addHyphen = $(this).val().replace(/[^0-9]/g, '').replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
+    				$(this).val(addHyphen);
+    				isValidPhone = true;
     			} else {
-    				$('#phone-number1').parent().next().html('숫자만 입력이 가능합니다.');
-    				notValidCss("phone-number1");
-    				isValidPhone1 = false;
-    			}
-    		});
-    		// 전화번호2 유효성 검사
-    		$('#phone-number2').on('blur', function() {
-    			let regNumber = /^[0-9]{3,4}$/;
-    			if (regNumber.test($(this).val())) {
-    				$('#phone-number2').parent().next().html('');
-    				isValidPhone2 = true;
-    			} else {
-    				$('#phone-number2').parent().next().html('숫자만 입력이 가능합니다.');
-    				notValidCss("phone-number2");
-    				isValidPhone2 = false;
-    			}
-    		});
-    		// 전화번호3 유효성 검사
-    		$('#phone-number3').on('blur', function() {
-    			let regNumber = /^[0-9]{4}$/;
-    			if (regNumber.test($(this).val())) {
-    				$('#phone-number3').parent().next().html('');
-    				isValidPhone3 = true;
-    			} else {
-    				$('#phone-number3').parent().next().html('숫자만 입력이 가능합니다.');
-    				notValidCss("phone-number3");
-    				isValidPhone3 = false;
+    				$('#phone-number').parent().next().html('숫자만 입력이 가능합니다.');
+    				$(this).val("");
+    				notValidCss("phone-number");
+    				isValidPhone = false;
     			}
     		});
     		
-    		// 휴대폰 번호1 유효성 검사
-    		$('#cell-phone-number1').on('blur', function() {
-    			let regNumber = /^[0-9]{3,4}$/;
-    			if (regNumber.test($(this).val())) {
-    				$('#cell-phone-number1').parent().next().html('');
-    				isValidCellPhone2 = true;
-    			} else {
-    				$('#cell-phone-number1').parent().next().html('숫자만 입력이 가능합니다.');
-    				notValidCss("cell-phone-number1");
-    				isValidCellPhone2 = false;
-    			}
-    		});
-    		// 휴대폰 번호2 유효성 검사
-    		$('#cell-phone-number2').on('blur', function() {
-    			let regNumber = /^[0-9]{4}$/;
-    			if (regNumber.test($(this).val())) {
-    				$('#cell-phone-number2').parent().next().html('');
-    				isValidCellPhone3 = true;
-    			} else {
-    				$('#cell-phone-number2').parent().next().html('숫자만 입력이 가능합니다.');
-    				notValidCss("cell-phone-number2");
-    				isValidCellPhone3 = false;
-    			}
-    		});
+    		// 휴대폰 번호 유효성 검사
+			$('#cell-phone-number').on('blur', function () {
+				let regNumber = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
+				if (regNumber.test($('#cell-phone-number').val())) {
+					let addHyphen = $('#cell-phone-number').val().replace(/[^0-9]/g, '').replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
+					$('#cell-phone-number').val(addHyphen);
+					isValidCellPhone = true;   
+				} else {
+					alert("올바른 전화번호가 아닙니다.");
+					$('#cell-phone-number').val("");
+					$(this).parent().next().html('숫자만 입력이 가능합니다.');
+    				notValidCss("cell-phone-number");
+					isValidCellPhone = false;
+    	         }
+    	            
+    	      });
     		
     		// 생년월일 유효성 검사
     		$('#dateOfBirth').on('blur', function () {
     			let regBirth = /^[0-9]{8}$/;
     			if (regBirth.test($('#dateOfBirth').val())) {
+    				let addHyphen = $('#dateOfBirth').val().replace(/[^0-9]/g, '').replace(/^(\d{4})(\d{2})(\d{2})$/, `$1-$2-$3`);
+    				$('#dateOfBirth').val(addHyphen);
     				isValidBirth = true;
     				$('#dateOfBirth').parent().next().html('');
     			} else {
@@ -339,6 +308,12 @@
     					contentType : false,   // application/x-www-form-urlencoded 처리 안함.(인코딩 하지 않음)  default = true
     					success : function(data) {
     						if (data != null) {
+    							if (fileList.length > 0) {
+    								fileList.pop();
+    								flieList.push(data);
+    							} else {
+    								flieList.push(data);
+    							}
     							fileName = data.newFileName;
     							showUploadedFile(data);
     						}
@@ -472,7 +447,7 @@
     	//도로명주소API 
     	function goPopup() {
     		// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
-    		var pop = window.open("/user/jusoPopup", "pop",
+    		var pop = window.open("/register/jusoPopup", "pop",
     				"width=570,height=420, scrollbars=yes, resizable=yes");
 
     		// 모바일 웹인 경우, 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(https://business.juso.go.kr/addrlink/addrMobileLinkUrl.do)를 호출하게 됩니다.
@@ -502,7 +477,7 @@
     		if (isValidServiceTerms && isValidPrivacyTerms) {
 	    		if (isValidId && isValidPassword && isValidName && isValidBirth && isValidZipCode && isValidAddress) {
 	    			if (isValidEmailCode) {
-		    			if ((isValidPhone1 && isValidPhone2 && isValidPhone3) || (isValidCellPhone2 && isValidCellPhone3)) {
+		    			if (isValidPhone || isValidCellPhone) {
 		    				alert("유효성 검사 통과, 회원가입 가능");
 		    				result = true;
 		    			} else {
@@ -517,8 +492,7 @@
 	    			isValidId = true;
 	    			isValidName = true;
 	    			isValidBirth = true;
-	    			isValidCellphone2 = true;
-	    			isValidCellphone3 = true;
+	    			isValidCellphone = true;
 	    			isValidEmailCode = true;
 	    		} else {
 	    			alert("필수 항목은 모두 입력해주세요");
@@ -598,6 +572,16 @@
     		resize : none;
     		width: 100%;
     		min-height: 250px;
+    	}
+    	.profile {
+    		color : #4a5568;
+    		font-size: 16px;
+    	}
+    	.upFileArea {
+    		width: 100%;
+    		min-height : 200px;
+    		border: 1px solid gray;
+    		background-color: white;
     	}
     </style>
 </head>
@@ -744,7 +728,7 @@
                                 <!-- 이름 -->
                                 <div class="col-12">
 	                                <c:choose>
-	                                	<c:when test="${name != ''}">
+	                                	<c:when test="${name.length > 0}">
 			                                    <div class="form-floating theme-form-floating">
 			                                        <input type="text" class="form-control" id="name" name="name" placeholder="Full Name" value="${name}" readonly>
 			                                        <label for="name">*이름</label>
@@ -764,7 +748,7 @@
                                 <!-- 이메일 -->
                                 <div class="col-12">
                                 	<c:choose>
-                                		<c:when test="${email != ''}">
+                                		<c:when test="${email.length > 0}">
                                 			<div class="form-floating theme-form-floating">
 		                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email Address" value="${email}" readonly>
 		                                        <label for="email">*이메일</label>
@@ -787,7 +771,7 @@
                                 </div>
                                 
                                 <!-- 전화번호 -->
-								<div class="col-12">
+								<!-- <div class="col-12">
                                     <div class="form-floating theme-form-floating phone-number" id="phone-number">
                                         <input type="text" class="form-control" id="phone-number1" name="phoneNumber1" style="width:30%; display:inline;">&nbsp;-&nbsp;
                                         <input type="text" class="form-control" id="phone-number2" name="phoneNumber2" style="width:30%; display:inline;">&nbsp;-&nbsp;
@@ -795,35 +779,27 @@
                                         <label for="phoneNumber">전화 번호</label>
                                     </div>
                                     <div class="validation"></div>
+                                </div> -->
+                                <div class="col-12">
+                                    <div class="form-floating theme-form-floating phone-number"">
+                                        <input type="text" class="form-control" id="phone-number" name="phoneNumber">
+                                        <label for="phoneNumber">전화 번호</label>
+                                    </div>
+                                    <div class="validation"></div>
                                 </div>
                                 
                                 <!-- 핸드폰 번호 -->
 								<div class="col-12">
-									<c:choose>
-										<c:when test="${mobile != ''}">
-											<div class="form-floating theme-form-floating phone-number" id="cell-phone-number">
-		                                        <input type="text" class="form-control" id="cell-phone-number" name="cellPhoneNumber" style="width:30%; display:inline;" value="010" readonly>&nbsp;-&nbsp;
-		                                        <input type="text" class="form-control" id="cell-phone-number1" name="cellPhoneNumber1" style="width:30%; display:inline;" value="${mobile.split('-')[1]}" readonly>&nbsp;-&nbsp;
-		                                        <input type="text" class="form-control" id="cell-phone-number2" name="cellPhoneNumber2" style="width:30%; display:inline;" value="${mobile.split('-')[2]}" readonly>
-		                                        <label for="cellPhoneNumber">핸드폰 번호</label>
-		                                    </div>
-										</c:when>
-										<c:otherwise>
-											<div class="form-floating theme-form-floating phone-number" id="cell-phone-number">
-		                                        <input type="text" class="form-control" id="cell-phone-number" name="cellPhoneNumber" style="width:30%; display:inline;" value="010" readonly>&nbsp;-&nbsp;
-		                                        <input type="text" class="form-control" id="cell-phone-number1" name="cellPhoneNumber1" style="width:30%; display:inline;">&nbsp;-&nbsp;
-		                                        <input type="text" class="form-control" id="cell-phone-number2" name="cellPhoneNumber2" style="width:30%; display:inline;">
-		                                        <label for="cellPhoneNumber">핸드폰 번호</label>
-		                                    </div>
-                                    		<div class="validation"></div>
-										</c:otherwise>
-									</c:choose>
+									<div class="form-floating theme-form-floating phone-number">
+										<input type="text" class="form-control" id="cell-phone-number" name="cellPhoneNumber">
+										<label for="cellPhoneNumber">핸드폰 번호</label>
+									</div>
                                 </div>
                                 
                                 <!-- 생년월일 -->
 								<div class="col-12">
 	                                <c:choose>
-	                                	<c:when test="${birthday != ''}">
+	                                	<c:when test="${birthday.length > 0}">
 	                                		<div class="form-floating theme-form-floating">
 		                                        <input type="text" class="form-control" id="dateOfBirth" name="dateOfBirth" placeholder="생년월일 8글자" value="${birthday}" readonly>
 		                                        <label for="dateOfBirth">*생년월일</label>
@@ -873,17 +849,19 @@
                                     </div>
                                     <div class="validation"></div>
                                     <div>
-                                    	<input id="baseAddr" type="checkbox" name="basicAddr" value="Y" checked/>
-                                    	<label for="baseAddr">기본 배송지로 설정</label>
+                                    	<input id="basicAddr" type="checkbox" name="basicAddr" value="Y" checked/>
+                                    	<label for="basicAddr">기본 배송지로 설정</label>
                                     </div>
                                 </div>
                                 <!-- 프로필사진 -->
                                 <div class="col-12">
                                     <div class="form-floating theme-form-floating">
-                                        <label for="profileImage">프로필 이미지</label>
-                                        <div class="upFileArea">
-							    			업로드할 파일을 드래그 앤 드랍 하세요.
-								    		<div class="uploadFiles"></div>
+                                        <!-- <label for="profileImage">프로필 이미지</label> -->
+                                        <div class="profile">프로필 이미지
+	                                        <div class="upFileArea">
+									    		<div class="uploadFiles"></div>
+								    			업로드할 파일을 드래그 앤 드랍 하세요.
+								    		</div>
 							    		</div>
                                     </div>
                                     <div class="validation"></div>
@@ -925,18 +903,6 @@
                                     </div>
                                     <div class="validation"></div>
                                 </div>
-								
-								<!-- 동의 여부 
-                                <div class="col-12">
-                                    <div class="forgot-box">
-                                        <div class="form-check ps-0 m-0 remember-box">
-                                            <input class="checkbox_animated check-box" type="checkbox"
-                                                id="flexCheckDefault">
-                                            <label class="form-check-label" for="flexCheckDefault">I agree with
-                                                <span>Terms</span> and <span>Privacy</span></label>
-                                        </div>
-                                    </div>
-                                </div> -->
 
                                 <div class="col-12">
                                     <button type="button" id="submit-btn" class="btn btn-animation w-100">Sign Up</button>

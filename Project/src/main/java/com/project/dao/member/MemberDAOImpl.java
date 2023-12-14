@@ -791,7 +791,7 @@ public class MemberDAOImpl implements MemberDAO {
 		return result;
 	}
 
-	public int insertMember(SignUpDTO member) throws SQLException, NamingException {
+	public int insertMember(SignUpDTO member) throws Exception {
 		return ses.insert(ns + ".insertMember", member);
 	}
 	

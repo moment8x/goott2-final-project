@@ -45,9 +45,6 @@ public class ReviewController {
 	@Inject
 	private ProductDetailService pdService;
 	
-//	List<UploadFiles> fileList = new ArrayList<UploadFiles>();
-//	List<String> deleteFileList = new ArrayList<String>();
-	
 	@RequestMapping("uploadFile")
 	public @ResponseBody UploadFiles uploadFile(HttpServletRequest request, MultipartFile uploadFile) {
 		// 1. 파일이 저장될 경로 확인
@@ -63,24 +60,7 @@ public class ReviewController {
 		
 		return file;
 	}
-	/*
-	@RequestMapping(value="deleteUploadFile", method=RequestMethod.POST)
-	public @ResponseBody Map<String, Object> deleteUploadedFile(HttpServletRequest request, @RequestParam("thumbFileName") String thumbFileName,
-			@RequestBody List<UploadFiles> fileList, @RequestBody List<String> deleteFileList) {
-		Map<String, Object> result = new HashMap<String, Object>();
-		List<UploadFiles> list = null;
-		thumbFileName = thumbFileName.replace("/", "\\");
-		// 1. deleteFileList에 삭제할 파일 등록
-		String newFileName = thumbFileName.replace("thumb_", "");
-		deleteFileList.add(newFileName);
-		// 2. fileList - deleteFileList 해서 남은 값만 return
-		list = calcFileList(fileList, deleteFileList);
-		result.put("fileList", fileList);
-		result.put("deleteFileList", deleteFileList);
-		
-		return result;
-	}
-	*/
+	
 	// fileList - deleteFileList 해서 남은 값만 return
 	private List<UploadFiles> calcFileList(List<UploadFiles> fileList, List<String> deleteFileList) {
 		List<UploadFiles> result = fileList;

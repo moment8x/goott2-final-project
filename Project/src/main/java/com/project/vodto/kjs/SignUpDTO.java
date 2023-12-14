@@ -21,13 +21,7 @@ public class SignUpDTO {
 	private String name;
 	private String email;
 	private String phoneNumber;
-	private String phoneNumber1; //전화번호
-	private String phoneNumber2;
-	private String phoneNumber3;
 	private String cellPhoneNumber;
-	private String cellPhoneNumber1; // 핸드폰번호
-	private String cellPhoneNumber2; // 핸드폰번호
-	private String cellPhoneNumber3; // 핸드폰번호
 	private String dateOfBirth;
 	private String gender;
 	private String zipCode;
