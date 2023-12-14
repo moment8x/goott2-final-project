@@ -679,7 +679,6 @@
 	
 	// 모달 종료
 	function hideModal(id) {
-		console.log("id", id);
 		document.body.style.overflow = "unset";
 		$(".modal-backdrop").remove();
 		$("#" + id).hide();
@@ -1139,7 +1138,7 @@
                                                 
                                                 <div class="col-xl-6">
                                                    <div class="review-title">
-                                                      <h4 class="fw-500">Add a review</h4>
+                                                      <h4 class="fw-500">리뷰 쓰기</h4>
                                                    </div>
                                                    
                                                    <form id="review-form">
@@ -1169,7 +1168,7 @@
                                                               <textarea class="form-control"
                                                                  placeholder="Leave a comment here"
                                                                  id="floatingTextarea2" style="height: 150px; resize: none;" name="content"></textarea>
-                                                              <label for="floatingTextarea2">Write Your Comment</label>
+                                                              <label for="floatingTextarea2">내용을 작성해주세요.</label>
                                                            </div>
                                                         </div>
                                                          

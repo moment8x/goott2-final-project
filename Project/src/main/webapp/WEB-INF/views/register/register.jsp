@@ -216,8 +216,8 @@
     				isValidEmail = true;
     				$('#email').parent().next().html('');
     			} else {
-    				$('#email').parent().next().html("올바른 이메일이 아닙니다.");
-    				notValidCss("email");
+    				$('#email').parent().next().next().next().html("올바른 이메일이 아닙니다.");
+    				notValidCss("email-code");
     				isValidEmail = false;
     			}
     		});
@@ -342,49 +342,6 @@
     		});
     	});
     	
-    	// 회원가입하기
-    	/*function signUp() {
-    		console.log("1");
-    		if (isValid()) {
-    			console.log("2");
-	    		let sendData = {
-	    				"memberId" : $('#memberId').val(),
-	    				"password" : $('#password').val(),
-	    				"name" : $('#name').val(),
-	    				"email" : $('#email').val(),
-	    				"phoneNumber1" : $('#phone-number1').val(),
-	    				"phoneNumber2" : $('#phone-number2').val(),
-	    				"phoneNumber3" : $('#phone-number3').val(),
-	    				"cellPhoneNumber1" : $('#cell-phone-number1').val(),
-	    				"cellPhoneNumber2" : $('#cell-phone-number2').val(),
-	    				"cellPhoneNumber3" : $('#cell-phone-number3').val(),
-	    				"dateOfBirth" : $('#dateOfBirth').val(),
-	    				"gender" : $('input[name=gender]:checked').val(),
-	    				"zipCode" : $('#zipCode').val(),
-	    				"address" : $('#address').val(),
-	    				"detailedAddress" : $('#detailedAddress').val(),
-	    				"baseAddr" : $('input[name=baseAddr]:checked').val(),
-	    				"refundBank" : $('#refundBank').val(),
-	    				"refundAccount" : $('#refundAccount').val(),
-	    				fileList
-	    		}
-	    		console.log("3");
-	    		$.ajax({
-	    			url : "/reginster/signUp",
-	    			type : "POST",
-	    			contentType : "application/json",
-	    			data : JSON.stringify(sendData),
-	    			dataType : "JSON",
-	    			async : false,
-	    			success : function(data) {
-	    				console.log("gg");
-	    			}, error : function(data) {
-	    				console.log("err", data);
-	    			}
-	    		});
-    		}
-    	}*/
-    	
     	// 이메일 인증하기
     	function sendMail() {
     		if ($('#email').val() != '') {
@@ -422,7 +379,13 @@
     			async : false,
     			success : function(data) {
     				if (data === "pass") {
+    					$('#email-code').parent().next().html("인증 되었습니다.");
+    					validCss("email");
     					isValidEmailCode = true;
+    				} else {
+    					$('#email-code').parent().next().html("올바른 코드가 아닙니다.");
+    					notValidCss("email");
+        				isValidEmail = false;
     				}
     			}, error : function(data) {
     				console.log("error", data);
@@ -568,6 +531,13 @@
     		background-color: #f8f8f8;
     		border-radius: 10px;
     	}
+    	.edit-btn {
+    		border: 1px solid #ccc;
+    		background-color: #ccc;
+    		height: 30px;
+    		margin: 5px 0;
+    		border-radius: 5px;
+    	}
     	textarea {
     		resize : none;
     		width: 100%;
@@ -637,7 +607,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="breadscrumb-contain">
-                        <h2>Sign In</h2>
+                        <h2>회원가입</h2>
                         <nav>
                             <ol class="breadcrumb mb-0">
                                 <li class="breadcrumb-item">
@@ -645,7 +615,7 @@
                                         <i class="fa-solid fa-house"></i>
                                     </a>
                                 </li>
-                                <li class="breadcrumb-item active">Sign In</li>
+                                <li class="breadcrumb-item active">회원가입</li>
                             </ol>
                         </nav>
                     </div>
@@ -680,9 +650,6 @@
 	                		<label for="service-terms">위 내용에 동의합니다.</label>
 	                	</div>
                 	</div>
-                    <!-- <div class="image-contain">
-                        <img src="/resources/assets/images/inner-page/sign-up.png" class="img-fluid" alt="">
-                    </div> -->
                 </div>
 
                 <div class="col-xxl-4 col-xl-5 col-lg-6 col-sm-8 mx-auto">
@@ -694,7 +661,6 @@
 						
 						<!-- Login Form -->
                         <div class="input-box">
-                            <!-- <form class="row g-4" action="/register/signUp" method="POST" onsubmit="return isValid();" enctype="multipart/form-data"> -->
                             <form class="row g-4" id="form">
                             	<!-- 아이디 -->
                             	<c:if test="${name != ''}">
@@ -759,29 +725,20 @@
 		                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email Address">
 		                                        <label for="email">*이메일</label>
 		                                    </div>
-		                                    <button type="button" id="sendMail">인증하기</button>
+		                                    <button type="button" id="sendMail" class="edit-btn">인증하기</button>
 		                                    <div class="form-floating theme-form-floating">
 		                                    	<input type="text" class="form-control" id="email-code" placeholder="인증 코드 입력">
 		                                    	<label for="email-code">인증코드 입력</label>
-		                                    	<button type="button" onclick="confirmCode();">확인</button>
+		                                    	<button type="button" class="edit-btn" onclick="confirmCode();">확인</button>
 		                                    </div>
 		                                    <div class="validation"></div>
                                 		</c:otherwise>
                                 	</c:choose>
                                 </div>
                                 
-                                <!-- 전화번호 -->
-								<!-- <div class="col-12">
-                                    <div class="form-floating theme-form-floating phone-number" id="phone-number">
-                                        <input type="text" class="form-control" id="phone-number1" name="phoneNumber1" style="width:30%; display:inline;">&nbsp;-&nbsp;
-                                        <input type="text" class="form-control" id="phone-number2" name="phoneNumber2" style="width:30%; display:inline;">&nbsp;-&nbsp;
-                                        <input type="text" class="form-control" id="phone-number3" name="phoneNumber3" style="width:30%; display:inline;">
-                                        <label for="phoneNumber">전화 번호</label>
-                                    </div>
-                                    <div class="validation"></div>
-                                </div> -->
+                                <!-- 전화 번호 -->
                                 <div class="col-12">
-                                    <div class="form-floating theme-form-floating phone-number"">
+                                    <div class="form-floating theme-form-floating phone-number">
                                         <input type="text" class="form-control" id="phone-number" name="phoneNumber">
                                         <label for="phoneNumber">전화 번호</label>
                                     </div>
@@ -905,13 +862,13 @@
                                 </div>
 
                                 <div class="col-12">
-                                    <button type="button" id="submit-btn" class="btn btn-animation w-100">Sign Up</button>
+                                    <button type="button" id="submit-btn" class="btn btn-animation w-100">가입하기</button>
                                 </div>
                             </form>
                         </div>
 
                         <div class="other-log-in">
-                            <h6>or</h6>
+                            <h6>또는</h6>
                         </div>
 
                         <div class="log-in-button">
@@ -938,8 +895,8 @@
                         </div>
 						
                         <div class="sign-up-box">
-                            <h4>Already have an account?</h4>
-                            <a href="login.html">Log In</a>
+                            <h4>이미 가입한 계정이 있습니까?</h4>
+                            <a href="/login/">로그인</a>
                         </div>
                     </div>
                 </div>

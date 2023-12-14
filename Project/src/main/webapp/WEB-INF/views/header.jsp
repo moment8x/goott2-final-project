@@ -109,7 +109,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     		output += `<c:if test='${cartItems == "none"}'>`;
     		output += `등록된 상품이 없습니다.</c:if>`;
     		
-    		output2 += `<h5>Total :</h5>`;
+    		output2 += `<h5>총계 :</h5>`;
     		output2 += `<c:if test='${cartItems != "none"}'>`;
     		output2 += `<c:set var="total" value="0" />`;
             output2 += `<c:forEach var="item" items="${cartItems}" varStatus="status">`;
@@ -129,7 +129,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 		
 		function newCart(items) {
 			let output = "";
-			let output2 = '<h5>Total :</h5>';
+			let output2 = '<h5>총 계 :</h5>';
 			let output3 = '';
 			
 			if (items !== "none") {
@@ -287,7 +287,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                             </a>
 
                             <div class="middle-box">
-                                <div class="location-box">
+                                <!-- <div class="location-box">
                                     <button class="btn location-button" data-bs-toggle="modal"
                                         data-bs-target="#locationModal">
                                         <span class="location-arrow">
@@ -296,7 +296,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                         <span class="locat-name">Your Location</span>
                                         <i class="fa-solid fa-angle-down"></i>
                                     </button>
-                                </div>
+                                </div> -->
 
                                 <div class="search-box">
                                     <div class="input-group">
@@ -337,7 +337,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                 <i data-feather="phone-call"></i>
                                             </div>
                                             <div class="delivery-detail">
-                                                <h6>24/7 Delivery</h6>
+                                                <h6>문의 전화</h6>
                                                 <h5>+91 888 104 2340</h5>
                                             </div>
                                         </a>
@@ -364,9 +364,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                 </div>
 
                                                 <div class="button-group">
-                                                    <a href="/shoppingCart/shoppingCart" class="btn btn-sm cart-button">View Cart</a>
-                                                    <a href="checkout.html" class="btn btn-sm cart-button theme-bg-color
-                                                    text-white">Checkout</a>
+                                                    <a href="/shoppingCart/shoppingCart" class="btn btn-sm cart-button" style="margin:auto;">장바구니</a>
+                                                    <!-- <a href="checkout.html" class="btn btn-sm cart-button theme-bg-color
+                                                    text-white">결제</a> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -399,16 +399,16 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                     -->
                                                     <c:choose>
 														<c:when test="${sessionScope.loginMember == null }">
-		                                                    <a href="/login/">Log In</a>
+		                                                    <a href="/login/">로그인</a>
 														</c:when>
 														<c:otherwise>
-		                                                    <a href="/login/logout">Log out</a>
+		                                                    <a href="/login/logout">로그 아웃</a>
 														</c:otherwise>
 													</c:choose>
                                                 </li>
 
                                                 <li class="product-box-contain">
-                                                    <a href="/register/register">Register</a>
+                                                    <a href="/register/register">회원가입</a>
                                                 </li>
 
                                                 <li class="product-box-contain">
@@ -438,7 +438,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                         <div class="header-nav-left">
                             <button class="dropdown-category">
                                 <i data-feather="align-left"></i>
-                                <span>All Categories</span>
+                                <span>전체 분류</span>
                             </button>
 
                             <div class="category-dropdown">

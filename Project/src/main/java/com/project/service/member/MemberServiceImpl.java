@@ -889,8 +889,6 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public void sendEmail(String email, String code) throws MessagingException {
-		System.out.println("sendMail 서비스");
-
 		String emailTo = email;
 		String emailFrom = "lesilion@naver.com";
 		String subject = "DeerBooks 이메일 인증";
@@ -909,8 +907,7 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public boolean confirmCode(String sessionCode, String userCode) {
 		boolean result = false;
-		System.out.println("코드 검증");
-
+		
 		if (sessionCode.equals(userCode)) {
 			result = true;
 		}
