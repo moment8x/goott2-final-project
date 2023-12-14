@@ -22,6 +22,7 @@ import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.kjs.SignUpDTO;
 import com.project.vodto.kjs.TermsOfSignUpVO;
 import com.project.vodto.jmj.ReturnOrder;
+import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
 
 public interface MemberService {
@@ -124,6 +125,9 @@ public interface MemberService {
 	
 	//리뷰 한개 가져오기
 	Map<String, Object> selectMyReview(String memberId, int postNo) throws SQLException, NamingException;
+	
+	//찜목록 최근 3개 가져오기
+	List<SelectWishlist> viewWishlist(String memberId) throws SQLException, NamingException;
 	// ------------------------------------ 장민정 끝 -----------------------------------
 	// ----------------------------------- 김진솔 시작 -----------------------------------
 	// 회원 아이디 중복 조회
@@ -139,5 +143,6 @@ public interface MemberService {
 	// 회원가입 시 약관 가져오기
 	List<TermsOfSignUpVO> getTerms() throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
+	
 
 }

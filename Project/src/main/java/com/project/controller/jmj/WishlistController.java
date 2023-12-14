@@ -1,6 +1,10 @@
 package com.project.controller.jmj;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import javax.inject.Inject;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -13,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.project.service.kjy.ListService;
+import com.project.service.member.MemberService;
+import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.kjy.Memberkjy;
 
 @Controller
@@ -20,6 +26,8 @@ import com.project.vodto.kjy.Memberkjy;
 public class WishlistController {
 	@Inject 
 	private ListService lService;
+	@Inject 
+	private MemberService mService;
 	
 	@RequestMapping(value = "likeProduct", method = RequestMethod.POST)
 	public ResponseEntity<String> likeProduct(@RequestParam("productId") String productId, HttpServletRequest request, Model model) {
@@ -59,4 +67,5 @@ public class WishlistController {
 			e.printStackTrace();
 		}
 	}
+	
 }

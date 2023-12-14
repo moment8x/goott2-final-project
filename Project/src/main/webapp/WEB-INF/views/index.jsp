@@ -131,10 +131,10 @@ function changeRatingProductInfo(data) {
                             </a>
                         </div>
                         <div>
-                            <a href="shop-left-sidebar.html" class="category-box wow fadeInUp">
+                            <a href="/user/myPage" class="category-box wow fadeInUp">
                                 <div>
                                     <img src="/resources/assets/images/invoice.png" class="blur-up lazyload" alt="">
-                                    <h5>주문내역 조회</h5>
+                                    <h5>마이페이지</h5>
                                 </div>
                             </a>
                         </div>

@@ -529,11 +529,13 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 		let detailAddress = $('#addAddrDetail').val()
 		let recipient = $('#recipient').val()
 		let recipientContact = $('#recipientContact').val()
-	//	let basicAddr = null;
-	//	if($('#choiceBasicAddr').is(':checked')){
-	//		basicAddr = 'Y'
-	//	}
-		console.log("추가 확인1");
+		let basicAddr = "";
+		if($('#choiceBasicAddr').is(':checked')){
+			basicAddr = $('#choiceBasicAddr').val()
+		}else{
+			basicAddr = 'N'
+		}
+		console.log("basicAddr"  + basicAddr);
 		$.ajax({
 			url : '/user/addShippingAddress', // 데이터를 수신받을 서버 주소
 			type : 'post', // 통신방식(GET, POST, PUT, DELETE)
@@ -542,7 +544,8 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 				address,
 				detailAddress,
 				recipient,
-				recipientContact
+				recipientContact,
+				basicAddr
 			},
 			dataType : 'json',
 			async : false,
@@ -1054,10 +1057,10 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 				output += `</table>`
 				output += `<div class="form-floating mb-4 theme-form-floating">`
 				output += `<textarea rows="7" cols="62" id="reviewContent">\${data.review.content}</textarea>`
-				output += `<div>`
-				output += `<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>`
-				output += `몇글자까지 가능?`
-				output += `</div>`
+			//	output += `<div>`
+			//	output += `<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>`
+			//	output += `몇글자까지 가능?`
+			//	output += `</div>`
 				output += `</div>`
 				output += `<div class="mb-3">`
 				output += `<label for="upFile" class="form-label">첨부파일</label>`
@@ -1299,8 +1302,7 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 	margin-left: 800px;
 }
 
-.reviewStar, #modifyAddress, .col-12.codeCheck,
-	#sendCodeBtn {
+.reviewStar, #modifyAddress, .col-12.codeCheck, #sendCodeBtn {
 	display: none;
 }
 
@@ -1386,7 +1388,7 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 	margin-top: 0px;
 }
 
-#deliveryStatus {
+#deliveryStatus, #reviewBtn {
 	gap: 15px;
 }
 
@@ -1454,7 +1456,8 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 .btn.theme-bg-color.btn-md.text-white.modifyReview {
 	text-align: right;
 }
-#successEmail{
+
+#successEmail {
 	margin-top: 10px;
 }
 </style>
@@ -1587,6 +1590,33 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 									type="button" role="tab" aria-controls="pills-order"
 									aria-selected="false">
 									<i data-feather="shopping-bag"></i>주문내역
+								</button>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-cancel-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-cancel"
+									type="button" role="tab" aria-controls="pills-cancel"
+									aria-selected="false">
+									<i data-feather="shopping-bag"></i>취소 내역
+								</button>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-return-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-return"
+									type="button" role="tab" aria-controls="pills-return"
+									aria-selected="false">
+									<i data-feather="shopping-bag"></i>반품 내역
+								</button>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="pills-exchange-tab"
+									data-bs-toggle="pill" data-bs-target="#pills-exchange"
+									type="button" role="tab" aria-controls="pills-exchange"
+									aria-selected="false">
+									<i data-feather="shopping-bag"></i>교환 내역
 								</button>
 							</li>
 
@@ -2088,6 +2118,269 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 
 									</ul>
 								</nav>
+							</div>
+
+							<div class="tab-pane fade show" id="pills-cancel" role="tabpanel"
+								aria-labelledby="pills-cancel">
+								<div class="dashboard-order">
+									<div class="title">
+										<h2>취소 내역</h2>
+										<span class="title-leaf title-leaf-gray"> <svg
+												class="icon-width bg-gray">
+                          <use
+													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
+                        </svg>
+										</span>
+
+
+									</div>
+									<div class="order-contain orderHistory">
+										<div class="order-box dashboard-bg-box">
+											<c:forEach var="cancel" items="${cancelList }">
+												<div class="product-order-detail" id="productOrderDetail">
+													<c:choose>
+														<c:when test="${cancel.productImage != '' }">
+															<a href="/detail/${cancel.productId }"
+																class="order-image"> <img
+																src="${cancel.productImage }" class="blur-up lazyload"
+																alt="${cancel.productName }" id="productImg" />
+															</a>
+														</c:when>
+														<c:otherwise>
+															<a href="/detail/${cancel.productId }"
+																class="order-image"> <img
+																src="/resources/assets/images/noimage.jpg"
+																class="blur-up lazyload" alt="noImg" id="productImg" />
+															</a>
+														</c:otherwise>
+													</c:choose>
+
+													<div class="order-wrap">
+													<p class="text-content">취소번호 :
+																${cancel.cancelId }</p>
+														<p class="text-content" id="orderTime">
+															<fmt:formatDate value="${cancel.requestTime }"
+																type="date" />
+
+														</p>
+
+														<a href="/detail/${cancel.productId }">
+															<h3>${cancel.productName }</h3>
+														</a>
+														<ul class="product-size">
+															<li>
+																<div class="size-box">
+																	<h6 class="text-content">취소금액 :</h6>
+																	<h5>
+																		<fmt:formatNumber value="${cancel.amount}"
+																			type="NUMBER" />
+																		원
+																	</h5>
+																</div>
+															</li>
+
+															<li>
+																<div class="size-box">
+																	<h5>${cancel.processingStatus }</h5>
+																</div>
+															</li>
+														</ul>
+													</div>
+												</div>
+											</c:forEach>
+
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="tab-pane fade show" id="pills-return" role="tabpanel"
+								aria-labelledby="pills-return">
+								<div class="dashboard-order">
+									<div class="title">
+										<h2>반품 내역</h2>
+										<span class="title-leaf title-leaf-gray"> <svg
+												class="icon-width bg-gray">
+                          <use
+													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
+                        </svg>
+										</span>
+
+
+									</div>
+									<div class="order-contain orderHistory">
+										<div class="order-box dashboard-bg-box">
+											<c:forEach var="returnList" items="${returnList }">
+												<div class="product-order-detail" id="productOrderDetail">
+													<c:choose>
+														<c:when test="${returnList.productImage !=''}">
+															<a href="/detail/${returnList.productId }"
+																class="order-image"> <img
+																src="${returnList.productImage }"
+																class="blur-up lazyload"
+																alt="${returnList.productName }" id="productImg" />
+															</a>
+														</c:when>
+														<c:otherwise>
+															<a href="/detail/${returnList.productId }"
+																class="order-image"> <img
+																src="/resources/assets/images/noimage.jpg"
+																class="blur-up lazyload" alt="noImg" id="productImg" />
+															</a>
+														</c:otherwise>
+													</c:choose>
+
+													<div class="order-wrap">
+													<p class="text-content" id="orderTime">반품 번호 : ${returnList.returnsId }</p>
+														<p class="text-content" id="orderTime">
+															<fmt:formatDate value="${returnList.requestTime }"
+																type="date" />
+
+														</p>
+
+														<a href="/detail/${returnList.productId }">
+															<h3>${returnList.productName }</h3>
+														</a>
+														<ul class="product-size">
+															<li>
+																<div class="size-box">
+																	<h5>${returnList.processingStatus }</h5>
+																</div>
+															</li>
+															<li>
+																<div class="size-box">
+																	<h6 class="text-content">회수 우편번호 :</h6>
+																	<h5>${returnList.returnShippingAddressZipNo }</h5>
+																</div>
+															</li>
+															<li>
+																<div class="size-box">
+																	<h6 class="text-content">회수 주소 :</h6>
+																	<h5>${returnList.returnShippingAddressAddr }</h5>
+																</div>
+															</li>
+															<li>
+																<div class="size-box">
+																	<h6 class="text-content">회수 상세주소 :</h6>
+																	<h5>${returnList.returnShippingAddressDetailAddr }</h5>
+																</div>
+															</li>
+															<c:if
+																test="${returnList.returnShippingAddressReturnMsg.equal('')}">
+																<li>
+																	<div class="size-box">
+																		<h6 class="text-content">메세지 :</h6>
+																		<h5>${returnList.returnShippingAddressReturnMsg }</h5>
+																	</div>
+																</li>
+															</c:if>
+														</ul>
+													</div>
+												</div>
+											</c:forEach>
+
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="tab-pane fade show" id="pills-exchange"
+								role="tabpanel" aria-labelledby="pills-exchange">
+								<div class="dashboard-order">
+									<div class="title">
+										<h2>교환 내역</h2>
+										<span class="title-leaf title-leaf-gray"> <svg
+												class="icon-width bg-gray">
+                          <use
+													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
+                        </svg>
+										</span>
+
+
+									</div>
+									<div class="order-contain orderHistory">
+										<div class="order-box dashboard-bg-box">
+											<c:forEach var="exchange" items="${exchangeList }">
+												<div class="product-order-detail" id="productOrderDetail">
+													<c:choose>
+														<c:when test="${exchange.productImage != '' }">
+															<a href="/detail/${exchange.productId }"
+																class="order-image"> <img
+																src="${exchange.productImage }" class="blur-up lazyload"
+																alt="${exchange.productName }" id="productImg" />
+															</a>
+														</c:when>
+														<c:otherwise>
+															<a href="/detail/${exchange.productId }"
+																class="order-image"> <img
+																src="/resources/assets/images/noimage.jpg"
+																class="blur-up lazyload" alt="noImg" id="productImg" />
+															</a>
+														</c:otherwise>
+													</c:choose>
+
+													<div class="order-wrap">
+													<p class="text-content" id="orderTime">교환 번호 : ${exchange.returnsId }</p>
+														<p class="text-content" id="orderTime">
+															<fmt:formatDate value="${exchange.requestTime }"
+																type="date" />
+
+														</p>
+
+														<a href="/detail/${exchange.productId }">
+															<h3>${exchange.productName }</h3>
+														</a>
+														<ul class="product-size">
+
+															<li>
+																<div class="size-box">
+																	<h5>${exchange.processingStatus }</h5>
+																</div>
+															</li>
+															<li>
+																<div class="size-box">
+																	<h6 class="text-content">회수 주소 :</h6>
+																	<h5>${exchange.returnShippingAddressZipNo }</h5>
+																	<h5>${exchange.returnShippingAddressAddr }</h5>
+																	<h5>${exchange.returnShippingAddressDetailAddr }</h5>
+																</div>
+															</li>
+															<c:if
+																test="${exchange.returnShippingAddressReturnMsg != ''}">
+																<li>
+																	<div class="size-box">
+																		<h6 class="text-content">메세지 :</h6>
+																		<h5>${exchange.returnShippingAddressReturnMsg }</h5>
+																	</div>
+																</li>
+															</c:if>
+
+															<li>
+																<div class="size-box">
+																	<h6 class="text-content">교환 주소 :</h6>
+																	<h5>${exchange.exchangeShippingAddressZipNo }</h5>
+																	<h5>${exchange.exchangeShippingAddressAddr }</h5>
+																	<h5>${exchange.exchangeShippingAddressDetailAddr }</h5>
+																</div>
+															</li>
+															<c:if
+																test="${exchange.exchangeShippingAddressExchangeMsg != ''}">
+																<li>
+																	<div class="size-box">
+																		<h6 class="text-content">메세지 :</h6>
+																		<h5>${exchange.exchangeShippingAddressExchangeMsg }</h5>
+																	</div>
+																</li>
+															</c:if>
+
+														</ul>
+													</div>
+												</div>
+											</c:forEach>
+
+										</div>
+									</div>
+								</div>
 							</div>
 
 							<div class="tab-pane fade show" id="pills-profile"
@@ -2685,67 +2978,83 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 									</div>
 								</div>
 							</div>
+							
+							<div class="tab-pane fade show" id="pills-review"
+								role="tabpanel" aria-labelledby="pills-review">
+								<div class="dashboard-order">
+									<div class="title">
+										<h2>작성한 리뷰</h2>
+										<span class="title-leaf title-leaf-gray"> <svg
+												class="icon-width bg-gray">
+                          <use
+													xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
+                        </svg>
+										</span>
 
-							<div class="tab-pane fade show" id="pills-review" role="tabpanel"
-								aria-labelledby="pills-review"-tab">
-								<div class="dashboard-card">
-									<div class="title title-flex">
-										<div>
-											<h2>나의 리뷰</h2>
-											<span class="title-leaf"> <svg
-													class="icon-width bg-gray">
-                            <use
-														xlink:href="/resources/assets/svg/leaf.svg#leaf"></use>
-                          </svg>
-											</span>
-										</div>
+
 									</div>
-									<div class="row g-4">
-										<div class="container mt-3">
+									<div class="order-contain orderHistory">
+										<div class="order-box dashboard-bg-box">
 											<c:forEach var="review" items="${reviewList }">
-												<table class="table table-borderless reviewTable"
-													id="${review.productId}">
-													<tbody>
-														<tr>
-															<td><a href="/detail/${review.productId }"> <c:choose>
-																		<c:when test="${review.productImage == '' }">
-																			<img src="/resources/assets/images/noimage.jpg"
-																				class="img-fluid blur-up lazyload"
-																				alt="${review.productName }" />
-																		</c:when>
-																		<c:otherwise>
-																			<img src="${review.productImage }"
-																				class="img-fluid blur-up lazyload reviewImg"
-																				alt="${review.productName }" width="80px" />
-																		</c:otherwise>
-																	</c:choose>
-															</a> <a href="/detail/${review.productId }">
-																	${review.productName } </a></td>
-															<td class="reviewBtn"><button type="button"
+												<div class="product-order-detail" id="productOrderDetail">
+													<c:choose>
+														<c:when test="${review.productImage != '' }">
+															<a href="/detail/${review.productId }"
+																class="order-image"> <img
+																src="${review.productImage }" class="blur-up lazyload"
+																alt="${review.productName }" id="productImg" />
+															</a>
+														</c:when>
+														<c:otherwise>
+															<a href="/detail/${review.productId }"
+																class="order-image"> <img
+																src="/resources/assets/images/noimage.jpg"
+																class="blur-up lazyload" alt="noImg" id="productImg" />
+															</a>
+														</c:otherwise>
+													</c:choose>
+
+													<div class="order-wrap">
+														<p class="text-content" id="orderTime">
+															<fmt:formatDate value="${review.createdDate }"
+																type="date" />
+
+														</p>
+
+														<a href="/detail/${review.productId }">
+															<h3>${review.productName }</h3>
+														</a>
+														<ul class="product-size">
+
+															<li>
+																<div class="size-box">
+																	<h5><c:forEach begin="1" end="${review.rating }">
+																	<i class="fa-solid fa-star" style="color: #0DA487;"></i>
+																</c:forEach></h5>
+																</div>
+															</li>
+															<li>
+																<div class="size-box">
+																	<h5>${review.content }</h5>
+																</div>
+															</li>
+															<li>
+																<div class="size-box" id="reviewBtn">
+																	<button type="button"
 																	class="btn theme-bg-color btn-md text-white modifyReview"
 																	data-bs-toggle="modal"
 																	data-bs-target="#modifyReviewModal"
-																	onclick="selectReview(${review.postNo})">수정</button></td>
-															<td><button type="button"
+																	onclick="selectReview(${review.postNo})">수정</button>
+																	<button type="button"
 																	class="btn theme-bg-color btn-md text-white delReview"
-																	onclick="delReview(${review.postNo }, '${review.productId }');">삭제</button></td>
-														</tr>
-
-														<tr>
-															<td><c:forEach begin="1" end="${review.rating }">
-																	<i class="fa-solid fa-star" style="color: #0DA487;"></i>
-																</c:forEach></td>
-															<td></td>
-															<td></td>
-														</tr>
-														<tr>
-															<td>${review.content }</td>
-															<td></td>
-															<td></td>
-														</tr>
-													</tbody>
-												</table>
+																	onclick="delReview(${review.postNo }, '${review.productId }');">삭제</button>
+																</div>
+															</li>
+														</ul>
+													</div>
+												</div>
 											</c:forEach>
+
 										</div>
 									</div>
 								</div>
@@ -2830,10 +3139,10 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 							placeholder="참고 항목" /><label for="addExtraAddress">참고항목</label>
 					</div>
 
-					<!-- <input class="checkbox_animated check-box" type="checkbox"
-						id="choiceBasicAddr" name="basicAddr"/> <label
+					 <input class="checkbox_animated check-box" type="checkbox"
+						id="choiceBasicAddr" name="basicAddr" value="Y"/> <label
 						class="form-check-label" for="choiceBasicAddr"><span
-						id="choiceBasicAddr">기본배송지로 설정</span></label>  -->
+						id="choiceBasicAddr">기본배송지로 설정</span></label> 
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary btn-md"
