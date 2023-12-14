@@ -1,4 +1,5 @@
 import Card from '@/components/ui/Card';
+import Radio from '@/components/ui/Radio';
 import Textinput from '@/components/ui/Textinput';
 import { Korean } from 'flatpickr/dist/l10n/ko.js';
 import { useState } from 'react';
@@ -13,6 +14,24 @@ const searchOption = [
   { value: 'publisher', label: '출판사' },
   { value: 'categoryKey', label: '카테고리' },
   ,
+];
+
+const productDivision = [
+  {
+    value: '',
+    label: '전체',
+    activeClass: 'ring-primary-500 border-primary-500',
+  },
+  {
+    value: 'KOR',
+    label: '일반',
+    activeClass: 'ring-primary-500 border-primary-500',
+  },
+  {
+    value: 'ENG',
+    label: '베스트셀러',
+    activeClass: 'ring-primary-500 border-primary-500',
+  },
 ];
 
 // select
@@ -103,6 +122,15 @@ const ProductSearch = ({ setSearchedInfo }) => {
     console.log('handleProductsValueChange:', e.target.value);
   };
 
+  // 상품구분
+  const handleRadio = (e) => {
+    setSelectDivision(e.target.value);
+    setSearchProduct({
+      ...searchProduct,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   // 상품등록일
   const handlePicker = (e, value, name) => {
     setSearchProduct({
@@ -128,7 +156,7 @@ const ProductSearch = ({ setSearchedInfo }) => {
   // 대분류
   const handleMainCategoryChange = (option) => {
     setSelectedMainCategory(option);
-    setSearchInfo((prev) => ({
+    setSearchProduct((prev) => ({
       ...prev,
       main: option,
     }));
@@ -139,13 +167,13 @@ const ProductSearch = ({ setSearchedInfo }) => {
     setSub1CategoryList([]);
     setSub2CategoryList([]);
     setDetailCategoryList([]);
-    console.log('category : ', category);
+    // console.log('category : ', category);
   };
 
   // 중분류
   const handleSub1CategoryChange = (option) => {
     setSelectedSub1Category(option);
-    setSearchInfo((prev) => ({
+    setSearchProduct((prev) => ({
       ...prev,
       sub1: option,
     }));
@@ -159,7 +187,7 @@ const ProductSearch = ({ setSearchedInfo }) => {
   // 소분류
   const handleSub2CategoryChange = (option) => {
     setSelectedSub2Category(option);
-    setSearchInfo((prev) => ({
+    setSearchProduct((prev) => ({
       ...prev,
       sub2: option,
     }));
@@ -171,7 +199,7 @@ const ProductSearch = ({ setSearchedInfo }) => {
   // 상세분류
   const handleDetailCategoryChange = (option) => {
     setSelectedDetailCategory(option);
-    setSearchInfo((prev) => ({
+    setSearchProduct((prev) => ({
       ...prev,
       detail: option,
     }));
@@ -182,7 +210,8 @@ const ProductSearch = ({ setSearchedInfo }) => {
     console.log('searchProduct:', searchProduct);
     e.preventDefault();
     fetch(
-      'http://localhost:8081/admin/products/productManage?searchKey=&searchValue=&categoryKey=&childCategory=&startDate&endDate&bestSellerStatus=&sellingProducts',
+      'http://localhost:8081/admin/products/productManage?searchKey=&searchValue=&categoryKey=&childCategory=&startDate=&endDate=&bestSellerStatus=',
+      // `http://localhost:8081/admin/products/productManage?searchKey=${}&searchValue=${}&categoryKey=${}&childCategory=${}&startDate=${}&endDate=${}&bestSellerStatus=${}`,
       { method: 'GET' }
     )
       .then((res) => res.json())
@@ -305,7 +334,23 @@ const ProductSearch = ({ setSearchedInfo }) => {
                           </div>
                         </td>
                       </tr>
-
+                      <tr>
+                        <td className='table-td w-[150px]'>상품구분</td>
+                        <td className='flex gap-5 mt-[16px]'>
+                          {productDivision.map((Division, i) => (
+                            <Radio
+                              key={i}
+                              name='product'
+                              label={Division.label}
+                              value={Division.value}
+                              checked={selectDivision === Division.value}
+                              onChange={handleRadio}
+                              activeClass={Division.activeClass}
+                            />
+                          ))}
+                        </td>
+                      </tr>
+                      <tr></tr>
                       <tr>
                         <td className='table-td'>상품등록일</td>
                         <td>
