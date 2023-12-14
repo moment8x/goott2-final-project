@@ -262,13 +262,13 @@ public class MemberServiceImpl implements MemberService {
 		return result;
 	}
 
-	public Map<String, Object> emailSend(String email) throws MessagingException {
-		Map<String, Object> result = new HashMap<String, Object>();
+	public boolean emailSend(String email) throws MessagingException {
+//		Map<String, Object> result = new HashMap<String, Object>();
 		String code = UUID.randomUUID().toString();
 		System.out.println("code!!!!!!!!!!!!!!!!!!!!!!!!!! : " + code);
 //		this.emailCode = code;
 
-//		boolean result = false;
+		boolean result = false;
 
 		String emailTo = email;
 		String emailFrom = "game046@naver.com";
@@ -284,8 +284,7 @@ public class MemberServiceImpl implements MemberService {
 		mimeHelper.setText(message);
 
 		mailSender.send(mimeMsg);
-
-		result.put("code", code);
+		result = true;
 
 		return result;
 	}

@@ -61,7 +61,7 @@ public interface MemberService {
 	boolean duplicateUserEmail(String email) throws SQLException, NamingException, MessagingException;
 	
 	//이메일 전송
-	public Map<String, Object> emailSend(String email) throws MessagingException;
+	boolean emailSend(String email) throws MessagingException;
 	
 	// 전화번호 중복검사
 	Member duplicatePhoneNumber(String phoneNumber) throws SQLException, NamingException;

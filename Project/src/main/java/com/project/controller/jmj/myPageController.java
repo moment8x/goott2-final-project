@@ -340,8 +340,9 @@ public class myPageController {
 	public @ResponseBody boolean sendCode(@RequestParam("email") String email, HttpServletRequest request){
 		boolean result = false;
 		try {
-			String code = (String)mService.emailSend(email).get("code");
-			request.getSession().setAttribute("code", code);
+			if(mService.emailSend(email)) {
+				System.out.println(email+" 로 전송 완료");
+			}
 			result = true;
 		} catch (MessagingException e) {
 			e.printStackTrace();
