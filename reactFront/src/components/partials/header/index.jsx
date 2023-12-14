@@ -82,7 +82,7 @@ const Header = ({ className = 'custom-class' }) => {
               {/* <SearchModal /> */}
               <a
                 className='cursor-pointer text-slate-900 dark:text-white text-2xl'
-                href='http://localhost:8081/'
+                href='http://gott123.cafe24.com'
                 target='_blank'
                 rel='noopener noreferrer'
               >

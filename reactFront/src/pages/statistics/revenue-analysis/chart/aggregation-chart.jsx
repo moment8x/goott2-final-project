@@ -65,7 +65,7 @@ const AggregationChart = ({ data }) => {
       },
     },
     xaxis: {
-      categories: ['', '', ''],
+      categories: [''],
     },
     yaxis: {
       labels: {
@@ -74,7 +74,7 @@ const AggregationChart = ({ data }) => {
           fontFamily: 'Inter',
         },
         formatter: (value) => {
-          return value.toFixed(0) + ' 원';
+          return value + '원';
         },
       },
     },
@@ -82,7 +82,7 @@ const AggregationChart = ({ data }) => {
       y: {
         formatter: function (y) {
           if (typeof y !== 'undefined') {
-            return y.toFixed(0) + ' 원';
+            return y.toFixed(0) + '원';
           }
           return y;
         },

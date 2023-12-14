@@ -5,24 +5,75 @@
 
 <mapper namespace="com.project.mappers.adminProductsMapper">
 	<!-- ============================================ 상희 ============================================  -->
-	<select id="getProductsOnSaleCount">
-		select count(*) from products where current_quantity > 0;
+	<select id="getProductsOnSaleCount" resultType="Integer">
+		select count(product_id) from products where current_quantity > 0;
 	</select>
+	
 	<select id="getAllProducts" resultType="com.project.vodto.ksh.AdminProductsList">
-		SELECT @rownum:=@rownum+1 AS no, p.product_id, p.product_name, category.id
-		as category_key, category.name as category_name,
-		(SELECT product_image FROM product_images pi WHERE pi.product_id =
-		p.product_id LIMIT 1) as product_image,
-		p.consumer_price, p.selling_price,
-		CONCAT('/detail/', p.product_id) as url
+		SELECT  @rownum:=@rownum+1 AS no, 
+				p.product_id, 
+				p.product_name, 
+				category.id
+				as category_key, 
+				category.name as category_name,
+				(SELECT product_image FROM product_images pi WHERE pi.product_id = p.product_id LIMIT 1) as product_image,
+				p.consumer_price, 
+				p.selling_price,
+				CONCAT('http://gott123.cafe24.com/detail/', p.product_id) as url
 		FROM products p
 		INNER JOIN categories category
 		ON category.id = p.category_key
 		INNER JOIN (SELECT @rownum:=0) AS r
-		<if test='sellingProducts != null and !sellingProducts.equals("")'>
-		where current_quantity > 0
-		</if>
-		ORDER BY no DESC;
+		<where>
+			<choose>
+				<when test='searchKey != null and searchKey.equals("productId")'>
+					p.product_id = #{searchValue}
+				</when>
+				<when test='searchKey != null and searchKey.equals("categoryName")'>
+					category.name LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey != null and searchKey.equals("categoryKey")'>
+					category.id = #{searchValue}
+				</when>
+				<when test='searchKey != null and searchKey.equals("ISBN")'>
+					p.isbn = #{searchValue}
+				</when>
+				<when test='searchKey != null and searchKey.equals("authorTranslator")'>
+					p.author_translator LIKE CONCAT('%', #{searchValue}, '%') OR p.original_author LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey != null and searchKey.equals("illustrator")'>
+					p.illustrator LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey != null and searchKey.equals("publisher")'>
+					p.publisher LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey != null and searchKey.equals("publicationDate")'>
+					p.publication_date = #{publicationDate}
+				</when>
+				<otherwise>
+					REPLACE(p.product_name, ' ', '') LIKE CONCAT('%', #{searchValue}, '%')
+				</otherwise>
+			</choose>
+			<if test='bestSellerStatus == 0'>
+				AND p.best_seller_status = 0
+			</if>
+			<if test='bestSellerStatus == 1'>
+				AND p.best_seller_status = 1
+			</if>
+			<if test='categoryKey != null and !categoryKey.equals("") and childCategory == 1'>
+				AND p.category_key LIKE CONCAT('%', #{categoryKey}, '%')
+			</if>
+			<if test='(categoryKey != null and !categoryKey.equals("")) and (childCategory == 0 or childCategory.equals(""))'>
+				AND p.category_key = #{categoryKey}
+			</if>
+			<if test='startDate != null and !startDate.equals("") and endDate != null and !endDate.equals("")'>
+				AND DATE_FORMAT(p.publication_date, '%Y-%m-%d') BETWEEN STR_TO_DATE(#{startDate}, '%Y-%m-%d') AND STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+			</if>
+			<if test='sellingProducts != null and !sellingProducts.equals("")'>
+				AND p.current_quantity > 0
+			</if>
+        </where>    
+		ORDER BY no DESC
 	</select>
 	<!-- ==============================================================================================  -->
 	<!-- ============================================ 재용 ============================================  -->
@@ -103,12 +154,18 @@
 	<select id="totalProductsCount" resultType="int">
 		SELECT count(product_id) FROM products
 	</select>
-	<select id="getCategoryChild" resultType="com.project.vodto.ProductCategory">
+	
+	<resultMap id="categoryChild" type="com.project.vodto.ProductCategory">
+	    <result column="id" property="value"/>
+	    <result column="name" property="label"/>
+	</resultMap>	
+	
+	<select id="getCategoryChild" resultMap="categoryChild">
 		SELECT c.*
 		FROM categories c
 		INNER JOIN category_paths p
 		ON c.id = p.descendant
-		WHERE p.﻿ancestor = #{categoryKey} AND p.depth = 1
+		WHERE p.ancestor = #{categoryKey} AND p.depth = 1
 	</select>
 	<select id="getSearchProductsList" resultType="com.project.vodto.kjs.AdminStockListVO">
 		SELECT @rownum:=@rownum+1 AS no, p.product_id, p.product_name, p.current_quantity,

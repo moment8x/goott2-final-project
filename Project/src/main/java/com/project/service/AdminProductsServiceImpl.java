@@ -41,10 +41,10 @@ public class AdminProductsServiceImpl implements AdminProductsService {
 	}
 	
 	@Override
-	public Map<String, Object> getAllProducts(String sellingProducts) {
+	public Map<String, Object> getAllProducts(AdminProductsSearchVO search) {
 		Map<String, Object> result = new HashMap<>();
-		List<AdminProductsList> allProducts = adminProductsDao.getAllProducts(sellingProducts);
-		result.put("allProducts", allProducts);
+		List<AdminProductsList> allProducts = adminProductsDao.getAllProducts(search);
+		result.put("productList", allProducts);
 		return result;
 	}
 	

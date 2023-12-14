@@ -5,7 +5,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 //import Dashboard from "./pages/dashboard";
 const Ecommerce = lazy(() => import('./pages/dashboard/ecommerce'));
 const CrmDashboard = lazy(() => import('./pages/members/dashboard'));
-const StatisticsDashboard = lazy(() => import('./pages/statistics/dashboard'));
+const StatisticsDashboard = lazy(() => import('./pages/statistics/dashboard/index'));
 const MemberInfo = lazy(() => import('./pages/members/search/index'));
 const MemberInfoModal = lazy(() => import('./pages/members/search/member-modal'));
 const SearchedMember = lazy(() => import('./pages/members/search/member-result'));
@@ -61,7 +61,9 @@ function App() {
           <Route path="/lock-screen3" element={<LockScreen3 />} />
         </Route> */}
         <Route path='/' element={<Layout />}>
-          <Route index element={<Navigate to='admin/home' />} />
+          <Route path='admin' element={<Navigate to='home' />}>
+            <Route index element={<Navigate to='admin/home' />} />
+          </Route>
           <Route path='admin/home' element={<Ecommerce />} />
           <Route path='admin/members' element={<Navigate to='dashboard' />} />
           <Route path='admin/members/dashboard' element={<CrmDashboard />} />
@@ -71,6 +73,7 @@ function App() {
           <Route path='admin/products/dashboard' element={<ProductDashboard />} />
           <Route path='admin/products/search' element={<ProductInfo />} />
           <Route path='admin/products/register' element={<ProductRegister />} />
+          <Route path='admin/products' element={<Navigate to='dashboard' />} />
           <Route path='admin/statistics/dashboard' element={<StatisticsDashboard />} />
           <Route path='admin/statistics/daily' element={<DailyReport />} />
           <Route path='admin/statistics/weekly' element={<WeeklyReport />} />
@@ -82,7 +85,7 @@ function App() {
           <Route path='admin/statistics/cart' element={<CartAnalysis />} />
           <Route path='admin/statistics/wishlist' element={<WishlistAnalysis />} />
         </Route>
-        <Route path='/*' element={<Error />} />
+        <Route path='/admin/*' element={<Error />} />
       </Routes>
     </main>
   );

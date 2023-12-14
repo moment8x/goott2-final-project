@@ -35,8 +35,9 @@ public class AdminProductsDAOImpl implements AdminProductsDAO {
 		return ses.selectOne(ns+".getProductsOnSaleCount");
 	}
 	
-	public List<AdminProductsList> getAllProducts(String sellingProducts) {
-		return ses.selectList(ns+".getAllProducts");
+	@Override
+	public List<AdminProductsList> getAllProducts(AdminProductsSearchVO search) {
+		return ses.selectList(ns+".getAllProducts", search);
 	}
 	// ----------------------------------------------------------------
 	// ----------------------------- 김재용 -----------------------------
