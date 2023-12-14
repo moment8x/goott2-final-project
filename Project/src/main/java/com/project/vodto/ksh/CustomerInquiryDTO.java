@@ -34,5 +34,6 @@ public class CustomerInquiryDTO {
 	private int uploadFilesSeq;
 	private List<UploadFiles> objList;
 	private List<UploadFiles> deleteList;
+	private String inquirySms;
 	
 }

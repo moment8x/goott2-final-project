@@ -305,7 +305,6 @@ public interface MemberDAO {
 	// 약관 가져오기
 	List<TermsOfSignUpVO> getTerms() throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
-
 	
 	
 

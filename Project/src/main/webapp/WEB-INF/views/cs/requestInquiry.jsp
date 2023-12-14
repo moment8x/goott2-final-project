@@ -153,7 +153,7 @@ display:flex;
 									<div class="card">
 										<div class="card-body">
 											<div class="card-header-2">
-												<h5>1:1 문의 상세</h5>
+												<h5 id="inquiryStatus">1:1 문의 상세</h5>
 											</div>
 											<div class="theme-form theme-form-2 mega-form">
 												<div class="mb-4 row align-items-center">
@@ -321,12 +321,22 @@ display:flex;
 
 														<!-- Indicators/dots -->
 														<div class="carousel-indicators">
+														<c:forEach items="${requestScope.uploadFiles }" varStatus="status" >
+															<c:choose>
+															<c:when test="${status.index == 0 }">
 															<button type="button" data-bs-target="#demo"
-																data-bs-slide-to="0" class="active"></button>
+																data-bs-slide-to="${status.index }" class="active"></button>
+															</c:when>
+															<c:otherwise>
 															<button type="button" data-bs-target="#demo"
-																data-bs-slide-to="1"></button>
+																data-bs-slide-to="${status.index }" ></button>
+															</c:otherwise>
+															</c:choose>
+															  <!--<button type="button" data-bs-target="#demo"
+																data-bs-slide-to="${status.index }"></button>
 															<button type="button" data-bs-target="#demo"
-																data-bs-slide-to="2"></button>
+																data-bs-slide-to="2"></button>-->
+														</c:forEach>
 														</div>
 
 														<!-- The slideshow/carousel -->
@@ -345,13 +355,13 @@ display:flex;
 																	<img
 																		src="../resources/inquiryUploads${file.newFileName }"
 																		id="newFile${status.index }" class="d-block"
-																		style="width: 512px; height: 512px;">
+																		style="max-width: 450px;">
 																</div>
 															</c:forEach>
 
 														</div>
 
-														<!-- Left and right controls/icons -->
+														<!-- Left and right controls/icons 
 														<button class="carousel-control-prev" type="button"
 															data-bs-target="#demo" data-bs-slide="prev">
 															<span class="carousel-control-prev-icon"></span>
@@ -359,12 +369,14 @@ display:flex;
 														<button class="carousel-control-next" type="button"
 															data-bs-target="#demo" data-bs-slide="next">
 															<span class="carousel-control-next-icon"></span>
-														</button>
+														</button>-->
 													</div>
 
 													<div class="container-fluid mt-3">
+													
 													</div>
 													<div class="modal-footer">
+													
 														<button type="button" class="btn btn-default"
 															onclick="closeBigImgModal()"data-dismiss="modal">Close</button>
 													</div>
@@ -389,7 +401,7 @@ display:flex;
 													</div>
 												</div>
 												<div>
-													<input type="checkbox" name="inquirySms" disabled /> 답변 알림 문자 요청
+													<input type="checkbox" name="inquirySms" id="inquirySms" onclick="checkSms()" disabled /> 답변 알림 문자 요청
 												</div>
 
 												<!--  <div class="mb-4 row">

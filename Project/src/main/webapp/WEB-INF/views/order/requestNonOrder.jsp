@@ -32,6 +32,7 @@ let orderId = ('${requestScope.orderId}');
 let products = [];
 let createName = "";
 let finalTotal = 0;
+let deliveryMessage = "";
 	$(function() {
 		itemLen = $(".summery-contain").find("li").length; // 상품 종류
 		for(i=0; i<itemLen; i++) {
@@ -99,22 +100,58 @@ let finalTotal = 0;
 		
 		//$("#subTotal").val();
 
-	function getOrderId() {
-		console.log($("#nonOrderNo").val());
-		
-		let itemLen = $(".summery-contain").find("li").length; // 2
-		for(i=0; i<itemLen; i++) {
-			let product = new Object();
-		}
+	function packData() {
+	      for(i=0; i<itemLen; i++) {
+	         products[i] = new Object;
+	         products[i].nonOrderNo = orderId;
+	         products[i].productId = $(".summery-contain").find("li").eq(i).attr("id");
+	         products[i].productQuantity = $('#productQty'+i).text();
+	         products[i].productPrice = $('#productPrice'+i).text().replaceAll(",","");
+	       
+	         products[i].productOrderNo = orderId + "-"+(i+1);
+	      }
+	      if($("select[name=nonDeliveryMessage] option:selected").text() == "직접입력") {
+	    	  console.log('여기오냐');
+	    	  deliveryMessage = $('#directInput').val();
+	      } else {
+	    	  deliveryMessage = $("select[name=nonDeliveryMessage] option:selected").text();
+	      }
+	         /* $('#addRecipient').val($('#recipient').text());
+	         $('#addAddress').val($('#address').text());
+	         $('#addDetailAddress').val($('#detailAddress').text());
+	         $('#addZipCode').val($('#zipCode').text());
+	         $('#addRecipientContact').val($('#recipientContact').text());
+	         console.log($('#addRecipientContact').val());
+	         console.log($('#addAddress').val());
+	         console.log($('#addDetailAddress').val());
+	         console.log($('#addZipCode').val());
+	         console.log($('#addRecipientContact').val()); */
 
-		//console.log(itemLen);
-		for(i=0; i<itemLen; i++) { 
-			product.nonOrderNo = orderId;
-			product.productId = $(".summery-contain").find("li").eq(i).attr("id");
-			products2[i] = product; 
-		}	
-	}
+	      if(itemLen > 1) {
+	         createName = $('#productName0').text()+" 외 "+(itemLen - 1)+"개";
+	      } else {
+	         createName = $('#productName0').text();
+	      }
+	      console.log(createName);
+	      console.log(products);
+	      console.log(deliveryMessage);
+	   
+	   }
 	
+	function abcTest() {
+		packData();
+		 nonOrderHistory = {
+      	   "nonRecipientName" : $('#nonRecipientName').val(),
+       		  "nonRecipientPhoneNumber" : $('#nonRecipientPhoneNumber').val(),
+       		  "nonZipCode" : $('#addZipNo').val(),
+       		  "nonShippingAddress" : $('#addAddr').val(),
+       		  "nonDetailedShippingAddress" : $('#addAddrDetail').val().replaceAll("\n",""),
+       		  "nonDeliveryMessage" : deliveryMessage,
+       		  "nonPassword" : $('#nonPassword').val(),
+       		  "nonEmail" : $('#nonEmail').val(),
+         }
+	console.log(nonOrderHistory);
+	}
 
 	function identify() {
 		// IMP.certification(param, callback) 호출
@@ -155,6 +192,7 @@ let finalTotal = 0;
           if (rsp.success) { // 결제 내역 받기
             // 결제 검증 ajax        
               // 결제 내역 저장 ajax
+              packData();
               obj = {
                 "paymentNumber" : rsp.imp_uid, // 결제번호
                 "nonOrderNo" : rsp.merchant_uid, // 주문번호
@@ -169,15 +207,19 @@ let finalTotal = 0;
                 //"cardName" : data.response.cardName,
                 //"cardNumber" : data.response.cardNumber,   주석 처리 한 것은 백에서 작업.            
                 "impUid" : rsp.imp_uid,
+                "depositedAccount" : $("#bktBank").val(),
+                "bktSms" : $('#bktSms').val(),
                 products,
                 nonOrderHistory : {
-	            	   "nonRecipientName" : $('#recipient').text(),
-	             		  "nonRecipientPhoneNumber" : $('#recipientContact').text(),
-	             		  "nonZipCode" : $('#zipCode').text(),
-	             		  "nonShippingAddress" : $('#address').text(),
-	             		  "nonDetailedShippingAddress" : $('#detailAddress').text().replaceAll("\n",""),
-	             		  "nonDeliveryMessage" : deliveryMessage,
-	               }
+                   	   "nonRecipientName" : $('#nonRecipientName').val(),
+                    		  "nonRecipientPhoneNumber" : $('#nonRecipientPhoneNumber').val(),
+                    		  "nonZipCode" : $('#addZipNo').val(),
+                    		  "nonShippingAddress" : $('#addAddr').val(),
+                    		  "nonDetailedShippingAddress" : $('#addAddrDetail').val().replaceAll("\n",""),
+                    		  "nonDeliveryMessage" : deliveryMessage,
+                    		  "nonPassword" : $('#nonPassword').val(),
+                    		  "nonEmail" : $('#nonEmail').val(),
+                      }
               }
               $.ajax({
                 url : "/pay/output/",
@@ -237,46 +279,12 @@ let finalTotal = 0;
 		} else {
 			console.log("제대로 입력해");
 			console.log(addrValid);
+			alert("모든 항목을 입력해주세요.");
 			return false;
 		}
 		
 	}
-	function packData() {
-	      for(i=0; i<itemLen; i++) {
-	         products[i] = new Object;
-	         products[i].nonOrderNo = orderId;
-	         products[i].productId = $(".summery-contain").find("li").eq(i).attr("id");
-	         products[i].productQuantity = $('#productQty'+i).text();
-	         products[i].productPrice = $('#productPrice'+i).text().replaceAll(",","");
-	       
-	         products[i].productOrderNo = orderId + "-"+(i+1);
-	      }
-	      if($("select[name=nonDeliveryMessage] option:selected").text() == "직접입력") {
-	    	  console.log('여기오냐');
-	    	  deliveryMessage = $('#directInput').val();
-	      } else {
-	    	  deliveryMessage = $("select[name=deliveryMessage] option:selected").text();
-	      }
-	         /* $('#addRecipient').val($('#recipient').text());
-	         $('#addAddress').val($('#address').text());
-	         $('#addDetailAddress').val($('#detailAddress').text());
-	         $('#addZipCode').val($('#zipCode').text());
-	         $('#addRecipientContact').val($('#recipientContact').text());
-	         console.log($('#addRecipientContact').val());
-	         console.log($('#addAddress').val());
-	         console.log($('#addDetailAddress').val());
-	         console.log($('#addZipCode').val());
-	         console.log($('#addRecipientContact').val()); */
-
-	      if(itemLen > 1) {
-	         createName = $('#productName0').text()+" 외 "+(itemLen - 1)+"개";
-	      } else {
-	         createName = $('#productName0').text();
-	      }
-	      console.log(createName);
-	      console.log(products);
-	   
-	   }
+	
 	
 	function checkBank() {
 		   if($("select[name=bktBank] option:selected").text() == "입금할 은행을 선택해주세요.") {
@@ -322,15 +330,15 @@ let finalTotal = 0;
 		               "actualPaymentAmount" : 0, // 실 결제 금액(무통장입금은 default 0)              
 		               products,
 		               nonOrderHistory : {
-		            	   "nonRecipientName" : $('#recipient').text(),
-		             		  "nonRecipientPhoneNumber" : $('#recipientContact').text(),
-		             		  "nonZipCode" : $('#zipCode').text(),
-		             		  "nonShippingAddress" : $('#address').text(),
-		             		  "nonDetailedShippingAddress" : $('#detailAddress').text().replaceAll("\n",""),
-		             		  "nonDeliveryMessage" : deliveryMessage,
-		             		  "nonPassword" : $('#nonPassword').val(),
-		             		  "nonEmail" : $('#nonEmail').val(),
-		               }
+	                   	   "nonRecipientName" : $('#nonRecipientName').val(),
+	                    		  "nonRecipientPhoneNumber" : $('#nonRecipientPhoneNumber').val(),
+	                    		  "nonZipCode" : $('#addZipNo').val(),
+	                    		  "nonShippingAddress" : $('#addAddr').val(),
+	                    		  "nonDetailedShippingAddress" : $('#addAddrDetail').val().replaceAll("\n",""),
+	                    		  "nonDeliveryMessage" : deliveryMessage,
+	                    		  "nonPassword" : $('#nonPassword').val(),
+	                    		  "nonEmail" : $('#nonEmail').val(),
+	                      }
 		            };
 		            console.log(obj);
 		            $.ajax({
@@ -520,7 +528,7 @@ let finalTotal = 0;
 																	<li>
 																		<h6 class="text-content mb-0">
 																			<span class="text-title">휴대폰: </span> <input
-																				class="form-control" name="nonRecipientPhoneNumber"
+																				class="form-control" placeholder="-빼고 입력해주세요." name="nonRecipientPhoneNumber"
 																				id="nonRecipientPhoneNumber">
 
 																		</h6>
@@ -696,54 +704,7 @@ let finalTotal = 0;
 
 
 
-														<!--<div class="col-xxl-6">
-													<div class="delivery-option">
-														<div class="delivery-category">
-															<div class="shipment-detail">
-																<div
-																	class="form-check mb-0 custom-form-check show-box-checked">
-																	<input class="form-check-input" type="radio"
-																		name="standard" id="future"> <label
-																		class="form-check-label" for="future">포인트/적립금</label>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-
-
-													  <div class="col-12 future-box">
-														<div class="future-option">
-															<div class="row g-md-0 gy-4">
-																<div class="col-md-6">
-																	<div class="delivery-items">
-																		<div>
-																			<h5 class="items text-content">
-																				<span>3 Items</span>@ $693.48
-																			</h5>
-																			<h5 class="charge text-content">
-																				Delivery Charge $34.67
-																				<button type="button" class="btn p-0"
-																					data-bs-toggle="tooltip" data-bs-placement="top"
-																					title="Extra Charge">
-																					<i class="fa-solid fa-circle-exclamation"></i>
-																				</button>
-																			</h5>
-																		</div>
-																	</div>
-																</div>
-
-																<div class="col-md-6">
-																	<form
-																		class="form-floating theme-form-floating date-box">
-																		<input type="date" class="form-control"> <label>Select
-																			Date</label>
-																	
-																</div>
-															</div>
-														</div>
-													</div>
-													-->
+														
 
 													</div>
 												</div>
@@ -893,45 +854,7 @@ let finalTotal = 0;
 											</h4></li>
 									</c:forEach>
 
-									<!-- <li><img
-										src="/resources/assets/images/vegetable/product/2.png"
-										class="img-fluid blur-up lazyloaded checkout-image" alt="">
-										<h4>
-											Eggplant <span>X 3</span>
-										</h4>
-										<h4 class="price">$12.23</h4></li>
-
-									<li><img
-										src="/resources/assets/images/vegetable/product/3.png"
-										class="img-fluid blur-up lazyloaded checkout-image" alt="">
-										<h4>
-											Onion <span>X 2</span>
-										</h4>
-										<h4 class="price">$18.27</h4></li>
-
-									<li><img
-										src="/resources/assets/images/vegetable/product/4.png"
-										class="img-fluid blur-up lazyloaded checkout-image" alt="">
-										<h4>
-											Potato <span>X 1</span>
-										</h4>
-										<h4 class="price">$26.90</h4></li>
-
-									<li><img
-										src="/resources/assets/images/vegetable/product/5.png"
-										class="img-fluid blur-up lazyloaded checkout-image" alt="">
-										<h4>
-											Baby Chili <span>X 1</span>
-										</h4>
-										<h4 class="price">$19.28</h4></li>
-
-									<li><img
-										src="/resources/assets/images/vegetable/product/6.png"
-										class="img-fluid blur-up lazyloaded checkout-image" alt="">
-										<h4>
-											Broccoli <span>X 2</span>
-										</h4>
-										<h4 class="price">$29.69</h4></li> -->
+									
 								</ul>
 
 								<ul class="summery-total">
@@ -991,9 +914,9 @@ let finalTotal = 0;
 								<iframe id="iframeSon" src="../resources/terms.txt"></iframe>
 								<!-- 약관 -->
 							</div>
-							<!--  <button
+							  <button
 								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
-								type="button" onclick="cancelPayment()">취소하기</button>
+								type="button" onclick="abcTest()">테스트</button><!--
 							<button type="button"
 								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
 								onclick="identify()">본인 인증</button>-->

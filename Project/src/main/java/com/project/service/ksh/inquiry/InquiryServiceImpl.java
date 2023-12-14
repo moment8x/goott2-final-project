@@ -31,6 +31,11 @@ public class InquiryServiceImpl implements InquiryService {
 	public int saveInquiry(CustomerInquiryDTO inquiry, List<UploadFiles> fileList) throws Exception {
 		// 문의 저장
 		int result = 0;
+		if(inquiry.getInquirySms().equals("sms")) {
+			inquiry.setInquirySms("Y");
+		} else {
+			inquiry.setInquirySms("N");			
+		}
 		inquiry.setContent(inquiry.getContent().replace("\r\n", "<br />"));
 		if (fileList.size() > 0) {
 			// 파일이 한 개라도 있을 때
@@ -135,6 +140,11 @@ public class InquiryServiceImpl implements InquiryService {
 		inquiry.setContent(inquiry.getContent().replace("\r\n", "<br />"));
 		List<UploadFiles> existingFiles;
 
+		if(inquiry.getInquirySms().equals("sms")) {
+			inquiry.setInquirySms("Y");
+		} else {
+			inquiry.setInquirySms("N");			
+		}
 		existingFiles = inquiryDao.getInquiryFiles(inquiry.getAuthor(), inquiry.getPostNo());
 		System.out.println("수정하려는데 기존 파일 알아오기! " + existingFiles.toString());
 		System.out.println("fileList 일치하나 보자! " + fileList.toString());

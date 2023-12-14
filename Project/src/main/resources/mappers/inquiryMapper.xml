@@ -8,10 +8,10 @@
 	<insert id="saveInquiry"
 		parameterType="com.project.vodto.ksh.CustomerInquiryDTO">
 		insert into customer_inquiries_board (author, title, content,
-		answer_status, ref, inquiry_type) values (#{author}, #{title},
+		answer_status, ref, inquiry_type, phone_number, inquiry_sms) values (#{author}, #{title},
 		#{content}, 'n', (select auto_increment from information_schema.tables
 		where table_schema = 'gott123' and table_name =
-		'customer_inquiries_board'), #{inquiryType})
+		'customer_inquiries_board'), #{inquiryType}, #{phoneNumber}, #{inquirySms})
 		<selectKey resultType="int" keyProperty="postNo"
 			order="AFTER">
 			select post_no from customer_inquiries_board where author =
@@ -107,7 +107,7 @@
 	</delete>
 	<update id="updateInquiry">
 		UPDATE customer_inquiries_board
-		SET title = #{title}, content = #{content}, inquiry_type = #{inquiryType}, phone_number = #{phoneNumber}
+		SET title = #{title}, content = #{content}, inquiry_type = #{inquiryType}, phone_number = #{phoneNumber}, inquiry_sms = #{inquirySms}
 		WHERE post_no = #{postNo} and author = #{author};
 	</update>
 	<delete id="deleteInquiry">
