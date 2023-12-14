@@ -143,9 +143,9 @@ public class ListServiceImpl implements ListService {
 	
 	private PagingInfo getSearchPagingInfo(String val, int page, List<String> checkedList, List<String> checkedLang ) throws Exception {	
 		// 전체 글의 개수
-		int ProductCounts = lDao.selectSearchProductCount(val, checkedList, checkedLang);
+		int productCounts = lDao.selectSearchProductCount(val, checkedList, checkedLang);
 		
-		PagingInfo pagingInfo = new PagingInfo(ProductCounts, 10, page, 10);
+		PagingInfo pagingInfo = new PagingInfo(productCounts, 10, page, 10);
 		System.out.println(pagingInfo.getStartRowIndex() + "start");
 		return pagingInfo;
 	}

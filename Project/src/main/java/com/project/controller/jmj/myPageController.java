@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -310,24 +311,41 @@ public class myPageController {
 
 	@RequestMapping(value = "duplicateUserEmail", method = RequestMethod.POST)
 	public @ResponseBody boolean duplicateUserEmail(@RequestParam("tmpEmail") String email) {
-
 		boolean result = false;
 
 		try {
-			Member newEmail = mService.duplicateUserEmail(email);
-			System.out.println("이메일 중복 검사" + newEmail);
-
-			if (newEmail != null) {// 이메일이 중복
+			if( mService.duplicateUserEmail(email)) {
 				result = true;
 			}
-
-		} catch (SQLException | NamingException e) {
-
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return result;
-
+	}
+	
+	@RequestMapping(value = "sendCode", method = RequestMethod.POST)
+	public @ResponseBody boolean sendCode(@RequestParam("email") String email, HttpServletRequest request){
+		boolean result = false;
+		try {
+			String code = (String)mService.emailSend(email).get("code");
+			request.getSession().setAttribute("code", code);
+			result = true;
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@RequestMapping(value = "checkCode", method = RequestMethod.POST)
+	public @ResponseBody boolean checkCode(@RequestParam("userCode") String userCode, HttpServletRequest request) {
+		boolean result = false;
+		String code = (String)request.getSession().getAttribute("code");
+		if(code.equals(userCode)) {
+			result = true;
+			System.out.println(userCode);
+		}
+		return result;
 	}
 
 	@RequestMapping(value = "duplicatePhoneNumber", method = RequestMethod.POST)
@@ -552,21 +570,24 @@ public class myPageController {
 	}
 	
 	@RequestMapping(value = "calcRefundAmount", method = RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> orderDetailFromJson(@RequestParam("orderNo") String orderNo, @RequestParam("detailedOrderId") int detailedOrderId,
-			@RequestParam int selectQty, HttpServletRequest request, Model model) {
+	public ResponseEntity<Map<String, Object>> orderDetailFromJson(@RequestBody CancelDTO tmpCancel , HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
-		System.out.println("selectQty"  + selectQty);
+		
+		System.out.println("tmpCancel"  + tmpCancel.toString());
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json; charset=UTF-8");
 		
 		ResponseEntity<Map<String, Object>> result = null;
-		
+		Map<String, Object> map = null;
 		try {
 			// 주문상품 상세정보, 쿠폰사용내역
-			Map<String, Object> map = mService.selectCancelOrder(memberId, orderNo, detailedOrderId, selectQty);
-
+			
+			for(int i = 0; i < tmpCancel.getDetailedOrderId().size(); i++) {
+				map = mService.selectCancelOrder(memberId, tmpCancel.getOrderNo(), tmpCancel.getDetailedOrderId().get(i), tmpCancel.getSelectQty().get(i));				
+				System.out.println(i);
+			}
 
 			result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);
 		} catch (SQLException | NamingException e) {
@@ -656,29 +677,31 @@ public class myPageController {
 	}
 	
 	@RequestMapping(value = "cancelOrder", method = RequestMethod.POST)
-	public ResponseEntity<String> cancelOrder(@ModelAttribute CancelDTO tmpCancel, HttpServletRequest request) {
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@취소 " + tmpCancel.toString());
-		
+	public ResponseEntity<Map<String, Object>> cancelOrder(@RequestBody CancelDTO tmpCancel,HttpServletRequest request) {
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@취소 ");
+		System.out.println(tmpCancel.toString());
+
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
 		
-		ResponseEntity<String> result = null;
+		ResponseEntity<Map<String, Object>> result = null;
+		HttpHeaders header = new HttpHeaders();
+		header.add("Content-Type", "application/json; charset=UTF-8");
 		
 		try {
-			 if(mService.cancelOrder(tmpCancel, memberId)) {
-				 result = new ResponseEntity<String>("success", HttpStatus.OK);				 
-			 }
+			Map<String, Object> map = mService.cancelOrder(tmpCancel, memberId);
+			result = new ResponseEntity<Map<String, Object>>(map, header, HttpStatus.OK);				 
 
-		} catch (SQLException | NamingException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			result = new ResponseEntity<String>("fail", HttpStatus.CONFLICT);
+			result = new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
 		return result;
 	}
 	
 	@RequestMapping(value = "returnOrder", method = RequestMethod.POST)
-	public ResponseEntity<String> returnOrder(@ModelAttribute ReturnOrder ro, HttpServletRequest request) {
+	public ResponseEntity<String> returnOrder(@RequestBody ReturnOrder ro, HttpServletRequest request) {
 		System.out.println("반품버튼 눌렀다." + ro.toString());
 		
 		HttpSession session = request.getSession();
@@ -700,7 +723,7 @@ public class myPageController {
 	}
 	
 	@RequestMapping(value = "applyExchange", method = RequestMethod.POST)
-	public ResponseEntity<String> applyExchange(@ModelAttribute exchangeDTO ed, HttpServletRequest request){
+	public ResponseEntity<String> applyExchange(@RequestBody exchangeDTO ed, HttpServletRequest request){
 			System.out.println("교환합니당" + ed.toString());
 			
 			HttpSession session = request.getSession();

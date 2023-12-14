@@ -266,13 +266,13 @@
 	</select>
 	
 	<insert id="insertCancelOrder">
-		insert into cancellations(product_id, reason, amount, processing_status, refund_status, detailed_order_id) 
+		insert into cancellations(product_id, reason, amount, processing_status, refund_status, completion_time, detailed_order_id) 
 		<choose>
 			<when test="paymentMethod != null and paymentMethod.equals('bkt')">			
-				values (#{productId},#{reason}, #{amount},'취소완료','Y',#{detailedOrderId})
+				values (#{productId},#{reason}, #{amount},'취소완료','Y',now(), #{detailedOrderId})
 			</when>
 			<otherwise>
-				values (#{productId},#{reason}, #{amount},'취소완료','N',#{detailedOrderId})
+				values (#{productId},#{reason}, #{amount},'취소완료','N', now(),#{detailedOrderId})
 			</otherwise>
 		</choose>
 	</insert>
@@ -328,7 +328,10 @@
 	</update>
 	
 	<update id="updateCouponLog">
-		update coupon_logs set used_date = null, related_order = null where coupon_logs_seq = #{couponLogsSeq}
+		update coupon_logs cl join coupons cp 
+		on cl.coupon_number = cp.coupon_number
+		set used_date = null, related_order = null
+		where cl.related_order = #{orderNo} and cl.member_id = #{memberId} and cp.coupon_name = #{couponName}
 	</update>
 	
 	<select id="selectCouponCnt" resultType="int">
@@ -495,6 +498,38 @@
 	<select id="selectDetailOrderId" resultType="int">
 		select detailed_order_id from detailed_order_items where product_id = #{productId} and order_no = #{orderNo}
 	</select>
+	
+	<select id="selectProductPrice" resultType="int">
+		select selling_price from products where product_id = #{productId}
+	</select>
+	
+	<select id="selectproductQuantity" resultType="int">
+		select product_quantity from detailed_order_items where order_no = #{orderNo} and product_id = #{productId}
+	</select>
+	
+	<update id="updateProductQuantity">
+		update detailed_order_items set product_quantity = product_quantity - #{selectQty}
+		where order_no = #{orderNo} and product_id = #{productId}
+	</update>
+	
+	<update id="updateActualAmount">
+		<choose>
+			<when test="paymentMethod != null and paymentMethod.equals('bkt')">
+				update bank_transfers set amount_to_pay = amount_to_pay - #{actualRefundAmount} where order_no = #{orderNo}
+			</when>
+			<otherwise>
+				update payments set actual_payment_amount = actual_payment_amount - #{actualRefundAmount} where order_no = #{orderNo}			
+			</otherwise>
+		</choose>
+	</update>
+	
+	<update id="updateUsedReward">
+		update payments set used_reward = 0 where order_no = #{orderNo}
+	</update>
+	
+	<update id="updateUsedPoint">
+		update payments set used_points = 0 where order_no = #{orderNo}
+	</update>
 	<!-- =========================== 김진솔 =========================== -->
 	<select id="getId" resultType="com.project.vodto.Member">
 		SELECT member_id FROM member WHERE member_id = #{memberId}  
@@ -502,16 +537,16 @@
 	<insert id="insertMember">
 		<choose>
 			<when test='#{phoneNumber} != null and #{cellPhoneNumber} != null'>
-				INSERT INTO member(member_id, password, name, phone_number, cell_phone_number, date_of_birth, email, gender, zip_code, address, detailed_address) 
-				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress})
+				INSERT INTO member(member_id, password, name, phone_number, cell_phone_number, date_of_birth, email, gender, zip_code, address, detailed_address, refund_bank, refund_account) 
+				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress}, #{refund_bank}, #{refund_account})
 			</when>
 			<when test="#{phoneNumber} != null and #{cellPhoheNumber} == null">
-				INSERT INTO member(member_id, password, name, phone_number, date_of_birth, email, gender, zip_code, address, detailed_address) 
-				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress})
+				INSERT INTO member(member_id, password, name, phone_number, date_of_birth, email, gender, zip_code, address, detailed_address, refund_bank, refund_account) 
+				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{phoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress}, #{refund_bank}, #{refund_account})
 			</when>
 			<otherwise>
-				INSERT INTO member(member_id, password, name, cell_phone_number, date_of_birth, email, gender, zip_code, address, detailed_address) 
-				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress})
+				INSERT INTO member(member_id, password, name, cell_phone_number, date_of_birth, email, gender, zip_code, address, detailed_address, refund_bank, refund_account) 
+				VALUES(#{memberId}, sha1(md5(#{password})), #{name}, #{cellPhoneNumber}, #{dateOfBirth}, #{email}, #{gender}, #{zipCode}, #{address}, #{detailedAddress}, #{refund_bank}, #{refund_account})
 			</otherwise>
 		</choose>
 	</insert>
@@ -528,5 +563,8 @@
 		INSERT INTO shipping_address(member_id, recipient, recipient_contact, zip_code, address, detail_address, basic_addr)
 		VALUES(#{memberId}, #{recipient}, #{recipientContact}, #{zipCode}, #{address}, #{detailAddress}, #{basicAddr});
 	</insert>
+	<select id="getTerms" resultType="com.project.vodto.kjs.TermsOfSignUpVO">
+		SELECT terms_type, terms_content FROM terms_and_conditions WHERE terms_type='회원가입' OR terms_type='개인정보'
+	</select>
 	<!-- =========================== 김진솔 끝 =========================== -->
 </mapper>

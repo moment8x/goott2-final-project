@@ -73,16 +73,15 @@ public class OrderServiceImpl implements OrderService {
 							pd.setDepositedAccount(pd.getDepositedAccount()+" 123-456-789012");
 							if (od.saveBankTransfer(pd) > 0) {
 								System.out.println("무통장 입금 테이블 저장");
-								System.out.println(od.deleteShoppingCart(pd, itemList));
 							}
 						}
-
 					}
 				}
 			}
 			if (updateDiscountMethod(pd, itemList)) {
-				result = true;
 				System.out.println("여기까지 오나?");
+				System.out.println(od.deleteShoppingCart(pd, itemList));
+				result = true;
 			}
 		} else { // 카드 및 간편결제
 			pd.setPaymentStatus("결제완료");

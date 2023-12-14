@@ -16,18 +16,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import com.project.service.kjs.upload.UploadFileService;
 import com.project.service.member.MemberService;
 import com.project.vodto.UploadFiles;
 import com.project.vodto.kjy.SnsRegisterInfo;
 import com.project.vodto.kjs.SignUpDTO;
+import com.project.vodto.kjs.TermsOfSignUpVO;
 
 
 @Controller
@@ -39,13 +40,18 @@ public class RegisterController {
 	@Inject
 	private UploadFileService ufService;
 	
-	private List<UploadFiles> fileList = null;
+//	private List<UploadFiles> fileList = null;
 	
 	@RequestMapping("register")
-	public ModelAndView moveRegister() {
-		ModelAndView mav = new ModelAndView("register/register");
+	public String moveRegister(Model model) {
+		try {
+			List<TermsOfSignUpVO> data = mService.getTerms();
+			model.addAttribute("terms", data);
+		} catch (SQLException | NamingException e) {
+			e.printStackTrace();
+		}
 		
-		return mav;
+		return "/register/register";
 	}
 	
 	@RequestMapping("checkedId")
@@ -73,14 +79,12 @@ public class RegisterController {
 	}
 	
 	@RequestMapping(value="signUp", method=RequestMethod.POST)
-	public String signUp(SignUpDTO member, Model model) {
-		
+	public @ResponseBody String signUp(@RequestBody SignUpDTO member, Model model) {
+		System.out.println("회원가입 : " + member);
 		try {
-			if (fileList != null) {
-				mService.insertMember(member, fileList.get(0));
-				fileList.clear();
+			if (member.getFileList() != null) {
+				mService.insertMember(member);
 			} else {
-				mService.insertMember(member, null);
 			}
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
@@ -89,17 +93,15 @@ public class RegisterController {
 	}
 	
 	@RequestMapping(value="uploadFile", method=RequestMethod.POST)
-	public @ResponseBody UploadFiles uploadFile(HttpServletRequest request, MultipartFile uploadFile) {
+	public ResponseEntity<UploadFiles> uploadFile(HttpServletRequest request, MultipartFile uploadFile, String fileName) {
 		// 1. 파일이 저장될 경로 확인
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
 		UploadFiles file = null;
 		try {
 			// 2. 파일 업로드
-			if (fileList.get(0) != null) {
-				// 기존 파일 삭제. 단, DB에 저장된 파일일 경우 삭제X
-				if (!ufService.isExist(fileList.get(0).getNewFileName())) {
-					ufService.deleteFile(fileList.get(0).getNewFileName(), realPath);
-				}
+			// 기존 파일 삭제. 단, DB에 저장된 파일일 경우 삭제X
+			if (!ufService.isExist(fileName)) {
+				ufService.deleteFile(fileName, realPath);
 			}
 			// 새 파일 업로드.
 			file = ufService.uploadFile(uploadFile.getOriginalFilename(), uploadFile.getSize(), 
@@ -108,23 +110,29 @@ public class RegisterController {
 			e.printStackTrace();
 		}
 		
-		return file;
+		return new ResponseEntity<UploadFiles>(file, HttpStatus.OK);
 	}
 	
 	@RequestMapping("refreshFile")
-	public void refreshFile(HttpServletRequest request) {
-		
+	public ResponseEntity<String> refreshFile(HttpServletRequest request, @RequestBody String fileName) {
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
-		
-		if (fileList.size() > 0) {
-			ufService.deleteFile(fileList.get(0).getNewFileName(), realPath);
-			fileList.clear();
+		try {
+			// 업로드 되어있는 파일이 존재
+			if (!fileName.equals("")) {
+				// DB에 존재하는 파일이 아니라면
+				if (!ufService.isExist(fileName)) {
+					// 파일 삭제
+					ufService.deleteFile(fileName, realPath);
+				}
+			}
+		} catch (SQLException | NamingException e) {
+			e.printStackTrace();
 		}
+		return new ResponseEntity<String>("OK", HttpStatus.OK);
 	}
 	
 	@RequestMapping("sendMail")
 	public ResponseEntity<String> sendMail(HttpServletRequest request, @RequestParam("email") String email) {
-		System.out.println("메일 보내기");
 		ResponseEntity<String> result = null;
 		
 		String code = UUID.randomUUID().toString();
@@ -137,13 +145,11 @@ public class RegisterController {
 			e.printStackTrace();
 			result = new ResponseEntity<String>("error", HttpStatus.BAD_REQUEST);
 		}
-		
 		return result;
 	}
 	
 	@RequestMapping("confirmCode")
 	public ResponseEntity<String> confirmCode(HttpServletRequest request, @RequestParam("emailCode") String emailCode) {
-		System.out.println("코드 검증");
 		ResponseEntity<String> result = null;
 		String code = (String)request.getSession().getAttribute("authCode");
 		
@@ -158,22 +164,27 @@ public class RegisterController {
 	
 	@RequestMapping("snsRegister")
 	public String snsRegister(Model model) {
-		System.out.println("================스타트=================");
 		SnsRegisterInfo snsInfo = (SnsRegisterInfo) model.asMap().get("snsInfo");
-		System.out.println("정보받음 " + snsInfo);
-		
 		if (snsInfo.getEmail() != null) {
 			// 네이버
+			String id = mService.randomId(snsInfo.getId());
+			model.addAttribute("id", id);
 			model.addAttribute("email", snsInfo.getEmail());
 			model.addAttribute("mobile", snsInfo.getMobile());
 			model.addAttribute("name", snsInfo.getName());
 			model.addAttribute("birthday", snsInfo.getBirthyear() + "-" + snsInfo.getBirthday());
 			model.addAttribute("mobile_e164", snsInfo.getMobile_e164());
+			
+			try {
+				List<TermsOfSignUpVO> data = mService.getTerms();
+				model.addAttribute("terms", data);
+			} catch (SQLException | NamingException e) {
+				e.printStackTrace();
+			}
 		} else {
 			// 카카오
 		}
 		
-		System.out.println("================끝났음=================");
 		return "redirect:/register/register?snsSignUp=1";
 	}
 }

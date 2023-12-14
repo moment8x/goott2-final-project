@@ -80,6 +80,7 @@ public class ListController {
 	public String goList(Model model, @PathVariable(name="key") String key, @RequestParam(value="page", defaultValue = "1") int page,@RequestParam(value="active", defaultValue = "grid-btn d-xxl-inline-block d-none") String active, HttpServletRequest request) {	
 		this.page = page;
 		
+	//----------------------민정------------------------------------------
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		if(member != null) {
@@ -93,7 +94,7 @@ public class ListController {
 				e.printStackTrace();
 			}
 		}
-		
+	//----------------------------------------------------------------------	
 		String lang = key.substring(0, 3);
 		System.out.println("랭" + lang);
 		
@@ -290,46 +291,5 @@ public class ListController {
 		
 		return mapJson;
 	}
-	
-//----------------------------------------------민정-----------------------------------------------------------------------
-	
-	@RequestMapping(value = "likeProduct", method = RequestMethod.POST)
-	public ResponseEntity<String> likeProduct(@RequestParam("productId") String productId, HttpServletRequest request, Model model) {
-		System.out.println(productId + "번 상품 찜@@");
-		
-		HttpSession session = request.getSession();
-		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
-		
-		ResponseEntity<String> result = null;
 
-		try {
-			if(lService.insertlikeProduct(memberId, productId)) {
-				result = new ResponseEntity<String>("success", HttpStatus.OK);	
-			}
-			
-		} catch (Exception e) {
-			result = new ResponseEntity<String>("fail", HttpStatus.CONFLICT);	
-			e.printStackTrace();
-		}
-		return result;
-	}
-	
-	@RequestMapping(value = "disLikeProduct", method = RequestMethod.POST)
-	public void disLikeProduct(@RequestParam("productId") String productId, HttpServletRequest request) {
-		
-		HttpSession session = request.getSession();
-		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
-		String memberId = member.getMemberId();
-		
-		try {
-			if(lService.deleteWishList(memberId, productId)) {
-				System.out.println(productId + "번 상품 찜 삭제 완룡");
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-//----------------------------------------------민정 끝------------------------------------------------------------------
 }

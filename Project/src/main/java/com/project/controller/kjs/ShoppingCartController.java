@@ -27,6 +27,7 @@ import org.springframework.web.util.WebUtils;
 
 import com.project.controller.HomeController;
 import com.project.service.kjs.shoppingcart.ShoppingCartService;
+import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ShowCartDTO;
 import com.project.vodto.kjy.Memberkjy;
 
@@ -75,11 +76,12 @@ public class ShoppingCartController {
 		return result;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private ResponseEntity<Map<String,Object>> output(Map<String, Object> list) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		
-		if (list != null) {
-			if (list.get("items") != null) {
+		if (list.size() > 0) {
+			if (((List<DisPlayedProductDTO>)list.get("items")).size() > 0) {
 				map.put("list", list);
 				map.put("status", "success");
 			} else {

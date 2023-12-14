@@ -1,5 +1,7 @@
 package com.project.vodto.jmj;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,12 +20,13 @@ public class CancelDTO {
 	private int refundRewardUsed; // 환불 적립금
 	private int totalRefundAmount; //취소하는 상품의 할인 전 금액
 	private int actualRefundAmount; // 돌려줄 환불액
-	private int detailedOrderId;
+	private List<Integer> detailedOrderId;
 	private String orderNo;
 	private String refundBank;
 	private String refundAccount;
 	private String accountHolder;
 	private int totalQty; //취소할 총 수량
 	private int orderQty; //해당 주문건의 총 수량
-	private int selectQty; //입력한 수량
+	private List<Integer> selectQty;
+	private List<String> couponName;
 }

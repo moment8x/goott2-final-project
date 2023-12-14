@@ -1,5 +1,7 @@
 package com.project.vodto.jmj;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +22,8 @@ public class exchangeDTO {
 	private String exchangeAddr;
 	private String exchangeDetailAddr;
 	private String exchangeMsg;
-	private int detailedOrderId;
+	private List<Integer> detailedOrderId;
 	private String orderNo;
 	private String exchangeReason;
+	private List<Integer> selectQty;
 }

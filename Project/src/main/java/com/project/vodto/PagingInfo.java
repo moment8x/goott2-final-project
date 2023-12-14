@@ -39,9 +39,9 @@ public class PagingInfo {
 		
 		this.pageCntPerBlock = pageCntPerBlock;
 		 if(totalProducts % pageCntPerBlock == 0) {
-			 this.totalPagingBlockCnt = totalProducts / pageCntPerBlock;
+			 this.totalPagingBlockCnt = totalPageCnt / pageCntPerBlock;
 		} else {
-			this.totalPagingBlockCnt = totalProducts / pageCntPerBlock + 1;
+			this.totalPagingBlockCnt = totalPageCnt / pageCntPerBlock + 1;
 		}
 		this.pageBlockOfCurrentPage = (int)(Math.ceil(pageNo / (double)pageCntPerBlock));
 		this.startNumOfCurrentPagingBlock = (this.pageBlockOfCurrentPage-1) * pageCntPerBlock + 1;

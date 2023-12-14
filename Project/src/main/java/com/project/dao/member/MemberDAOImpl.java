@@ -11,8 +11,6 @@ import javax.naming.NamingException;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
-import com.project.vodto.BankTransfer;
-import com.project.vodto.CouponLog;
 import com.project.vodto.Member;
 import com.project.vodto.PointLog;
 import com.project.vodto.RewardLog;
@@ -30,6 +28,7 @@ import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.PagingInfo;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
+import com.project.vodto.kjs.TermsOfSignUpVO;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
@@ -406,26 +405,26 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public int insertRefund(String productId, int totalRefundAmount, int actualRefundAmount, int refundRewardUsed, int refundPointUsed, int refundCouponDiscount)
+	public int insertRefund(String productId, int totalRefundAmount, int actualRefundAmount, int refundRewardUsed, int refundPointUsed, int refundCouponDiscount, String paymentMethod)
 			throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
-//		params.put("productId", productId);
-//		params.put("amount", amountAfterDiscount);
-//		params.put("refundRewardUsed", tmpCancel.getRefundRewardUsed());
-//		params.put("refundPointUsed", tmpCancel.getRefundPointUsed());
-//		params.put("totalRefundAmount", amountBeforeDiscount);
-//		params.put("paymentMethod", paymentMethod);
+		params.put("productId", productId);
+		params.put("totalRefundAmount", totalRefundAmount);
+		params.put("actualRefundAmount", actualRefundAmount);
+		params.put("refundRewardUsed", refundRewardUsed);
+		params.put("refundPointUsed", refundPointUsed);
+		params.put("refundCouponDiscount", refundCouponDiscount);
+		params.put("paymentMethod", paymentMethod);
 		
 		return ses.insert(ns + ".insertRefund", params);
 	}
 	
 	@Override
-	public int insertRewardLog(String memberId, CancelDTO tmpCancel, int totalReward)
-			throws SQLException, NamingException {
+	public int insertRewardLog(String memberId, String orderNo, int refundRewardUsed, int totalReward) throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("memberId", memberId);
-		params.put("refundRewardUsed", tmpCancel.getRefundRewardUsed());
-		params.put("orderNo", tmpCancel.getOrderNo());
+		params.put("refundRewardUsed", refundRewardUsed);
+		params.put("orderNo", orderNo);
 		params.put("balance", totalReward);
 		
 		return ses.insert(ns + ".insertRewardLog", params);
@@ -474,9 +473,13 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public int updateCouponLog(int couponLogsSeq) throws SQLException, NamingException {
+	public int updateCouponLog(String memberId, String orderNo, String couponName) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("memberId", memberId);
+		params.put("orderNo", orderNo);
+		params.put("couponName", couponName);
 		
-		return ses.update(ns + ".updateCouponLog", couponLogsSeq);
+		return ses.update(ns + ".updateCouponLog", params);
 	}
 
 	@Override
@@ -513,11 +516,11 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public int insertReturn(String productId, ReturnOrder ro) throws SQLException, NamingException {
+	public int insertReturn(String productId, String returnReason, int detailedOrderId) throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("productId", productId);
-		params.put("reason", ro.getReturnReason());
-		params.put("detailedOrderId", ro.getDetailedOrderId());
+		params.put("reason", returnReason);
+		params.put("detailedOrderId", detailedOrderId);
 		
 		return ses.insert(ns + ".insertReturn", params);
 	}
@@ -560,11 +563,11 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 	
 	@Override
-	public int insertReturnWithExchange(String productId, exchangeDTO ed) throws SQLException, NamingException {
+	public int insertReturnWithExchange(String productId, String exchangeReason, int detailedOrderId) throws SQLException, NamingException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("productId", productId);
-		params.put("reason", ed.getExchangeReason());
-		params.put("detailedOrderId", ed.getDetailedOrderId());
+		params.put("reason", exchangeReason);
+		params.put("detailedOrderId", detailedOrderId);
 		
 		return ses.insert(ns + ".insertExchange", params);
 	}
@@ -727,8 +730,54 @@ public class MemberDAOImpl implements MemberDAO {
 		
 		return ses.selectOne(ns + ".selectDetailOrderId", params);
 	}
+	
+	@Override
+	public int selectProductPrice(String productId) throws SQLException, NamingException {
+		
+		return ses.selectOne(ns + ".selectProductPrice", productId);
+	}
+	
+	@Override
+	public int selectProductQuantity(String orderNo, String productId) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("productId", productId);
+		params.put("orderNo", orderNo);
+		
+		return ses.selectOne(ns + ".selectproductQuantity", params);
+	}
+	
+	@Override
+	public int updateProductQuantity(int selectQty, String orderNo, String productId)
+			throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("selectQty", selectQty);
+		params.put("orderNo", orderNo);
+		params.put("productId", productId);
+		
+		return ses.update(ns + ".updateProductQuantity", params);
+	}
+	
+	@Override
+	public int updateActualAmount(String orderNo, int actualRefundAmount, String paymentMethod) throws SQLException, NamingException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("actualRefundAmount", actualRefundAmount);
+		params.put("orderNo", orderNo);
+		params.put("paymentMethod", paymentMethod);
+		
+		return ses.update(ns + ".updateActualAmount", params);
+	}
+	
+	@Override
+	public int updateUsedReward(String orderNo) throws SQLException, NamingException {
+		
+		return ses.update(ns + ".updateUsedReward", orderNo);
+	}
 
-
+	@Override
+	public int updateUsedPoint(String orderNo) throws SQLException, NamingException {
+	
+		return ses.update(ns +".updateUsedPoint", orderNo);
+	}
 	// ---------------------------------------- 장민정 끝 -----------------------------------------
 	// ---------------------------------------- 김진솔 시작 ----------------------------------------
 	@Override
@@ -769,10 +818,10 @@ public class MemberDAOImpl implements MemberDAO {
 	public int insertShipping(ShippingAddrDTO shipping) throws SQLException, NamingException {
 		return ses.insert(ns + ".insertShipping", shipping);
 	}
+	
+	@Override
+	public List<TermsOfSignUpVO> getTerms() throws SQLException, NamingException {
+		return ses.selectList(ns + ".getTerms");
+	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
-
-
-
-
-
 }

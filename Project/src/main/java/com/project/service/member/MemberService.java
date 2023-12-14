@@ -19,9 +19,8 @@ import com.project.vodto.jmj.DetailOrder;
 import com.project.vodto.jmj.DetailOrderInfo;
 import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
-import com.project.vodto.jmj.MyPageReview;
 import com.project.vodto.kjs.SignUpDTO;
-import com.project.vodto.kjy.SnsRegisterInfo;
+import com.project.vodto.kjs.TermsOfSignUpVO;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.exchangeDTO;
 
@@ -58,7 +57,10 @@ public interface MemberService {
 	int getOrderProductCount(String orderNo) throws SQLException, NamingException;
 	
 	// 이메일 중복검사
-	Member duplicateUserEmail(String email) throws SQLException, NamingException;
+	boolean duplicateUserEmail(String email) throws SQLException, NamingException, MessagingException;
+	
+	//이메일 전송
+	public Map<String, Object> emailSend(String email) throws MessagingException;
 	
 	// 전화번호 중복검사
 	Member duplicatePhoneNumber(String phoneNumber) throws SQLException, NamingException;
@@ -106,7 +108,7 @@ public interface MemberService {
 	Map<String, Object> selectCancelOrder(String memberId, String orderNo, int detailedOrderId, int selectQty) throws SQLException, NamingException;
 	
 	//출고전, 입금전 주문취소하기
-	boolean cancelOrder(CancelDTO tmpCancel, String memberId) throws SQLException, NamingException;
+	 Map<String, Object>  cancelOrder(CancelDTO tmpCancel, String memberId) throws SQLException, NamingException;
 	
 	//배송완료시 반품하기
 	boolean returnOrder(ReturnOrder ro, String memberId) throws SQLException, NamingException;
@@ -127,13 +129,15 @@ public interface MemberService {
 	// 회원 아이디 중복 조회
 	boolean checkedDuplication(String memberId) throws SQLException, NamingException;
 	// 회원 가입
-	boolean insertMember(SignUpDTO member, UploadFiles file) throws SQLException, NamingException;
+	boolean insertMember(SignUpDTO member) throws SQLException, NamingException;
 	// 이메일 인증
 	void sendEmail(String email, String code) throws MessagingException;
 	// 코드 검증
 	boolean confirmCode(String sessionCode, String userCode);
-	// sns 회원가입
-	boolean snsSignUp(SnsRegisterInfo snsInfo) throws SQLException, NamingException;
+	// 랜덤한 변수 8자리 생성
+	String randomId(String memberId);
+	// 회원가입 시 약관 가져오기
+	List<TermsOfSignUpVO> getTerms() throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
 
 }

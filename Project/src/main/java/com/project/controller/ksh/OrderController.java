@@ -200,7 +200,7 @@ public class OrderController {
 	@RequestMapping("jusoPopup")
 	public String findAddr() {
 		System.out.println("주소 검색");
-		return "/user/jusoPopup";
+		return "/order/jusoPopup";
 	}
 
 	@RequestMapping(value = "orderComplete", method = RequestMethod.POST)

@@ -15,20 +15,10 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script type="text/javascript">
 	$(function() {
-		$(document).ready(function() {
-			$(".grid-option ul li").on("click", function() {
-				let clickedClass = $(this).attr("class").split("active")[0];
-
-				useState(clickedClass);
-
-			});
+		$(".grid-option ul li").on("click", function() {
+			let clickedClass = $(this).attr("class").split("active")[0];
+			useState(clickedClass);
 		});
-
-		// 시큐리티 적용시 결제모달 링크 적용
-		//$('#payModalBtn').on("click", function() {
-		//	let pId = $(this).attr("value");
-		//	getHrefModal(pId);
-		//})
 
 		$('#payModalBtn').on("click", function() {
 			let pId = $(this).attr("value");
@@ -72,7 +62,7 @@
 
 	function payLink(data, pId) {
 		if (data.isLogin == "loginOK") {
-			$('#MemberLoginPay').attr("href",
+			$('#memberLoginPay').attr("href",
 					"/order/requestOrder?productId=" + pId + "&isLogin=Y");
 		} else {
 			$('#loginPay').attr("href", "/login/");
@@ -181,7 +171,7 @@
 			console.log(productId + "좋아요")
 
 			$.ajax({
-				url : '/list/likeProduct',
+				url : '/wish/likeProduct',
 				type : 'POST',
 				data : {
 					"productId" : productId,
@@ -206,7 +196,7 @@
 			console.log(productId + "싫어요")
 
 			$.ajax({
-				url : '/list/disLikeProduct',
+				url : '/wish/disLikeProduct',
 				type : 'POST',
 				data : {
 					"productId" : productId,
@@ -460,13 +450,16 @@
 					</div>
 					<nav class="custome-pagination">
 						<ul class="pagination justify-content-center">
-							<li class="page-item disabled"><a class="page-link"
-								href="javascript:void(0)" tabindex="-1" aria-disabled="true">
+							<li class="page-item">
+							<c:if test="${pagingInfo.pageNo > 10 }">
+								<a class="page-link" href="/list/categoryList/${key }?page=${pagingInfo.startNumOfCurrentPagingBlock - 10}" >
 									<i class="fa-solid fa-angles-left"></i>
-							</a></li>
+								</a>
+							</c:if>
+							</li>
 							<c:choose>
 								<c:when
-									test="${pagingInfo.totalPagingBlockCnt > pagingInfo.endNumOfCurrentPagingBlock }">
+									test="${pagingInfo.totalPageCnt > pagingInfo.endNumOfCurrentPagingBlock }">
 									<c:forEach var="i"
 										begin="${pagingInfo.startNumOfCurrentPagingBlock}"
 										end="${pagingInfo.endNumOfCurrentPagingBlock }" step="1">
@@ -477,16 +470,19 @@
 								<c:otherwise>
 									<c:forEach var="i"
 										begin="${pagingInfo.startNumOfCurrentPagingBlock}"
-										end="${pagingInfo.totalPagingBlockCnt }" step="1">
+										end="${pagingInfo.totalPageCnt }" step="1">
 										<li class="page-item active"><a class="page-link"
 											href="/list/categoryList/${key }?page=${i}">${i}</a></li>
 									</c:forEach>
 								</c:otherwise>
 							</c:choose>
-							<li class="page-item"><a class="page-link"
-								href="javascript:void(0)"> <i
-									class="fa-solid fa-angles-right"></i>
-							</a></li>
+							<li class="page-item">
+							<c:if test="${pagingInfo.totalPageCnt > pagingInfo.endNumOfCurrentPagingBlock}">
+								<a class="page-link" href="/list/categoryList/${key }?page=${pagingInfo.startNumOfCurrentPagingBlock + 10}">
+								<i class="fa-solid fa-angles-right"></i>
+								</a>
+							</c:if>
+							</li>
 						</ul>
 					</nav>
 				</div>
@@ -519,7 +515,7 @@
 							<div>
 							 <c:choose>
 							 	<c:when test="${sessionScope.loginMember != null }">
-							 		<a href="" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+							 		<a href="" id="memberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
 							 	</c:when>
 							 	<c:otherwise>
 							 		<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>

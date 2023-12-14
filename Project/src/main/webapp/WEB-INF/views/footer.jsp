@@ -88,22 +88,21 @@
                         <div class="footer-logo">
                             <div class="theme-logo">
                                 <a href="index.html">
-                                    <img src="/resources/assets/images/logo/1.png" class="blur-up lazyload" alt="">
+                                    <img src="/resources/assets/images/logo/1.png" class="blur-up lazyload" alt="logo">
                                 </a>
                             </div>
 
                             <div class="footer-logo-contain">
-                                <p>We are a friendly bar serving a variety of cocktails, wines and beers. Our bar is a
-                                    perfect place for a couple.</p>
+                                <p>간단한 소개. 참고로 위에는 로고 박는 곳</p>
 
                                 <ul class="address">
                                     <li>
                                         <i data-feather="home"></i>
-                                        <a href="javascript:void(0)">1418 Riverwood Drive, CA 96052, US</a>
+                                        <a href="javascript:void(0)">회사 주소</a>
                                     </li>
                                     <li>
                                         <i data-feather="mail"></i>
-                                        <a href="javascript:void(0)">support@fastkart.com</a>
+                                        <a href="javascript:void(0)">문의 이메일</a>
                                     </li>
                                 </ul>
                             </div>
@@ -118,22 +117,22 @@
                         <div class="footer-contain">
                             <ul>
                                 <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">Vegetables & Fruit</a>
+                                    <a href="shop-left-sidebar.html" class="text-content">a</a>
                                 </li>
                                 <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">Beverages</a>
+                                    <a href="shop-left-sidebar.html" class="text-content">b</a>
                                 </li>
                                 <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">Meats & Seafood</a>
+                                    <a href="shop-left-sidebar.html" class="text-content">c</a>
                                 </li>
                                 <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">Frozen Foods</a>
+                                    <a href="shop-left-sidebar.html" class="text-content">d</a>
                                 </li>
                                 <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">Biscuits & Snacks</a>
+                                    <a href="shop-left-sidebar.html" class="text-content">e</a>
                                 </li>
                                 <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">Grocery & Staples</a>
+                                    <a href="shop-left-sidebar.html" class="text-content">f</a>
                                 </li>
                             </ul>
                         </div>
@@ -141,7 +140,7 @@
 
                     <div class="col-xl col-lg-2 col-sm-3">
                         <div class="footer-title">
-                            <h4>Useful Links</h4>
+                            <h4>바로가기 링크...인데...</h4>
                         </div>
 
                         <div class="footer-contain">
@@ -167,7 +166,7 @@
 
                     <div class="col-xl-2 col-sm-3">
                         <div class="footer-title">
-                            <h4><a href="/cs/serviceCenter">Help Center</a></h4>
+                            <h4><a href="/cs/serviceCenter">고객 센터</a></h4>
                         </div>
 
                         <div class="footer-contain">
@@ -196,7 +195,7 @@
 
                     <div class="col-xl-3 col-lg-4 col-sm-6">
                         <div class="footer-title">
-                            <h4>Contact Us</h4>
+                            <h4>문의 방법</h4>
                         </div>
 
                         <div class="footer-contact">
@@ -205,7 +204,7 @@
                                     <div class="footer-number">
                                         <i data-feather="phone"></i>
                                         <div class="contact-number">
-                                            <h6 class="text-content">Hotline 24/7 :</h6>
+                                            <h6 class="text-content">전화번호</h6>
                                             <h5>+91 888 104 2340</h5>
                                         </div>
                                     </div>
@@ -215,14 +214,14 @@
                                     <div class="footer-number">
                                         <i data-feather="mail"></i>
                                         <div class="contact-number">
-                                            <h6 class="text-content">Email Address :</h6>
+                                            <h6 class="text-content">email : </h6>
                                             <h5>fastkart@hotmail.com</h5>
                                         </div>
                                     </div>
                                 </li>
 
                                 <li class="social-app">
-                                    <h5 class="mb-2 text-content">Download App :</h5>
+                                    <h5 class="mb-2 text-content">앱 다운로드라는데 이건 빼죠.</h5>
                                     <ul>
                                         <li class="mb-0">
                                             <a href="https://play.google.com/store/apps" target="_blank">

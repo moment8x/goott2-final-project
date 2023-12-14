@@ -214,7 +214,6 @@ public class ReviewServiceImpl implements ReviewService {
 					ufService.deleteFile(deleteFile, realPath);
 				}
 			}
-			
 			// 리뷰 업데이트 성공 시 ratings 테이블도 업데이트
 			Ratings ratings = rDao.getCalcRatingData(productId);
 			if (ratings.getHighestRating() < rating) {
@@ -225,7 +224,6 @@ public class ReviewServiceImpl implements ReviewService {
 			ratings.setProductId(productId);
 			// 연산 시작
 			float totalRating = Math.round(ratings.getRating() * 10) / 10f;
-			ratings.setParticipationCount(ratings.getParticipationCount() + 1);
 			totalRating /= ratings.getParticipationCount();
 			ratings.setRating(totalRating);
 			// 연산 결과 DB에 저장

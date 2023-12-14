@@ -137,8 +137,14 @@
 				} else {
 					
 					alert("이미지 파일은 최대 3개까지만 첨부 가능합니다.");
+					maximumFile = 0;
 				}
 		});
+		console.log("${requestScope.inquiry.inquirySms }");
+		if("${requestScope.inquiry.inquirySms }" == "Y") {
+			console.log("하이");
+			$("input:checkbox[name='inquirySms']").prop("checked", true);
+		}
 		
 		// 휴대폰 번호 유효성 검사
 		
@@ -164,14 +170,14 @@
 			   console.log("!");
 			   $("input:checkbox[name='inquirySms']").prop("checked", false);   
 				 
-			   $('#inquirySms').removeAttr('value');
+			   $("input:checkbox[name='inquirySms']").removeAttr('value');
 			   
 		   } else {
 			   if($("input:checkbox[name='inquirySms']").prop("checked")){
 				   
-			   	$('#inquirySms').val('sms');
+				   $("input:checkbox[name='inquirySms']").val('sms');
 				   } else {
-				   $('#inquirySms').removeAttr('value');
+					   $("input:checkbox[name='inquirySms']").removeAttr('value');
 					   
 				   }
 			  
@@ -180,7 +186,7 @@
 			   // 체크된 체크박스의 value만 제출 데이터에 포함되고 체크 해제된 체크박스의 value는 아예 누락됩니다. 
 			   // 또한 value를 지정하지 않은 경우의 기본 값은 문자열 on입니다.
 		   }
-		   console.log($('#inquirySms').val());	// 체크하면 sms, 아니면 on
+		   console.log($("input:checkbox[name='inquirySms']").val());	// 체크하면 sms, 아니면 on
 	   }
 	
 	function addObject(data) {
@@ -260,10 +266,12 @@
 				updateInquiry("saveInquiry");
 			//$('#saveInquiry').submit();
 			} else if (purpose == 'change') { // 수정하려 할 때
+				$('input[name=inquirySms]').removeAttr("disabled");
 				 $('input').prop('readonly', false);
 				 $('textarea').prop('readonly', false);
 				 $('.uploadFiles').find('button').css("display", "");
 				 $('#cancelButton').text('취소');
+				 $('#inquiryStatus').text('1:1문의 수정');
 				 update = true;
 			} else { // 수정 완료 할 때
 				// 변경 사항이 없을 때 업데이트 안함
@@ -292,8 +300,9 @@
 				"postNo" : Number(postNo),
 				"title" : $('#inquiryTitle').val(),
 				"content" : $('#inquiryContent').val(),
-				"phoneNumber" : "",
+				"phoneNumber" : $('#phoneNumber').val(),
 				"inquiryType" : $('#selectState').val(),
+				"inquirySms" : $("input:checkbox[name='inquirySms']").val(),
 				objList,
 				deleteList,
 		}
@@ -310,6 +319,7 @@
 				console.log("업로드성공", data);
 				if (data != null) {
 					console.log(data);
+					location.href="viewInquiry";
 				}
 			},
 			error : function(data) {
@@ -367,13 +377,21 @@
 		console.log(id);
 		let fileName = id.slice(0, -1);
 		console.log(fileName);
+		console.log(objList);
+		
+		if(objList.length > 0) {
+			
 		for(let j in objList) {
-	    	if(objList[j].newFileName.indexOf(fileName.substring(12))) {
+			console.log(objList[j].thumbnailFileName.indexOf(fileName.substring(12)));
+	    	if(objList[j].thumbnailFileName.indexOf(fileName.substring(12)) != -1) {
 	    		objList.splice(j,1);
 	    		console.log("여기로 안와?");
 	    		update = false;
 	    	}
-	    } 
+	    }
+		}
+		
+		
 		$.ajax({
 			url : "/cs/removeSpecificImg",
 			type : "GET",
@@ -392,6 +410,11 @@
 				console.log(div);
 				  
 				div.remove();
+				if($('#inquiryStatus').text().indexOf("수정") != -1) {
+					console.log('?');
+					update = true;
+				}
+				console.log(update);
 				maximumFile--;
 				
 			},
@@ -477,6 +500,8 @@ display:flex;
 .uploadFiles, .insertFiles {
 	display: flex;
 }
+
+
 </style>
 </head>
 <body>

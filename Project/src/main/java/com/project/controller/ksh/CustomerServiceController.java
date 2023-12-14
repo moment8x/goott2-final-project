@@ -92,20 +92,23 @@ public class CustomerServiceController {
 	}
 
 	@RequestMapping(value = "saveInquiry", method = RequestMethod.POST)
-	public String saveInquiry(@RequestBody CustomerInquiryDTO inquiry, HttpServletRequest request) {
+	public @ResponseBody String saveInquiry(@RequestBody CustomerInquiryDTO inquiry, HttpServletRequest request) {
 		System.out.println(inquiry.toString());
+		int result = 0;
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		
 		try {
 			inquiry.setAuthor(member.getMemberId());
-			inquiryService.saveInquiry(inquiry, inquiry.getObjList());
+			if(inquiryService.saveInquiry(inquiry, inquiry.getObjList())>0) {
+				result = 1;
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		return "redirect:/cs/viewInquiry";
+		System.out.println("ㅎㅎ");
+		return result+"";
 	}
 
 	public String isLogin(String path, HttpServletRequest request) {
@@ -171,18 +174,7 @@ public class CustomerServiceController {
 			}
 		} else {
 			if (ufService.deleteFile(file, realPath) > 0) {
-				System.out.println("진짜지운다?");
-//				for (UploadFiles uf : fileList) {
-//					System.out.println("uf : " + uf.getNewFileName());
-//					System.out.println("fileName : " + fileName.substring(12));
-//					if (uf.getNewFileName().contains(fileName.substring(12))) {
-//
-//						break;
-//					}
-////					i++;
-//				}
-//				fileList.remove(i);
-				
+				System.out.println("진짜지운다?");			
 			}
 		
 		}
@@ -208,7 +200,6 @@ public class CustomerServiceController {
 				if (request.getParameter("postNo") != null || request.getParameter("postNo") != "") {
 					System.out.println("여기안옴?");
 					inquiry = inquiryService.viewDetailInquiry(memberId, postNo);
-
 					if (inquiry.getUploadFilesSeq() > 0) {
 						System.out.println("파일이 있다고요");
 						List<UploadFiles> uploadFiles = inquiryService.getInquiryFiles(inquiry.getAuthor(), postNo);
@@ -247,11 +238,11 @@ public class CustomerServiceController {
 			if (session.getAttribute("loginMember") != null) {
 				String memberId = ((Memberkjy) session.getAttribute("loginMember")).getMemberId();
 				System.out.println(memberId.toString());
-				int yaho = inquiryService.checkValidation(inquiry.getPostNo(), memberId);
-				System.out.println("야호!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + yaho);
-				if (yaho > 0) { // inquiry 가져옴
+				int checkAuthor = inquiryService.checkValidation(inquiry.getPostNo(), memberId);
+				System.out.println(checkAuthor);
+				if (checkAuthor > 0) { // inquiry 가져옴
 					// 작성자 일치, 수정 가능
-					inquiry.setAuthor(memberId);
+					inquiry.setAuthor(memberId);	
 					if (inquiry.getDeleteList().size() > 0) {
 						for (UploadFiles delFile : inquiry.getDeleteList()) {
 							removeSpecificImg(delFile.getThumbnailFileName(), "delete", request);
