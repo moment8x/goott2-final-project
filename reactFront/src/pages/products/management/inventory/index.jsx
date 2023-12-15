@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import ProductSearch from './product-search';
-import SearchedProduct from './product-result';
+import { useState } from 'react';
+import SearchedProduct from './inventory-result';
+import ProductSearch from './inventory-search';
 
-const ProductInfo = () => {
+const InventoryInfo = () => {
   const [searchedProduct, setSearchedProduct] = useState(0);
   const [searchedInfo, setSearchedInfo] = useState([
     {
@@ -24,4 +24,4 @@ const ProductInfo = () => {
   );
 };
 
-export default ProductInfo;
+export default InventoryInfo;

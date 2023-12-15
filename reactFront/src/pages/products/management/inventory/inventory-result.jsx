@@ -1,32 +1,17 @@
-import React, { memo, useEffect, useMemo, useState } from 'react';
-import Card from '@/components/ui/Card';
-import Icon from '@/components/ui/Icon';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import Tooltip from '@/components/ui/Tooltip';
-import { useTable, useRowSelect, useSortBy, usePagination } from 'react-table';
-import ProductInfoModal from './product-modal';
-import Layout from './product-modal-detail/Layout';
-import ProductRegistrationModal from './product-modal-detail/product-modal-register';
+import Card from '@/components/ui/Card';
+import Icon from '@/components/ui/Icon';
+import Modal from '@/components/ui/Modal';
+import Textinput from '@/components/ui/Textinput';
+import MemberInfoModal from '@/pages/members/search/member-modal';
+import React, { memo, useEffect, useMemo, useState } from 'react';
+import { usePagination, useRowSelect, useSortBy, useTable } from 'react-table';
 
 const COLUMNS = [
   {
     Header: 'No',
     accessor: 'no',
-    Cell: (row) => {
-      return <span>{row?.cell?.value}</span>;
-    },
-  },
-  {
-    Header: '카테고리',
-    accessor: 'categoryName',
-    Cell: (row) => {
-      return <span>{row?.cell?.value}</span>;
-    },
-  },
-  {
-    Header: '상품ID',
-    accessor: 'productId',
     Cell: (row) => {
       return <span>{row?.cell?.value}</span>;
     },
@@ -46,37 +31,63 @@ const COLUMNS = [
     },
   },
   {
-    Header: '소비자가',
+    Header: '상품ID',
+    accessor: 'productId',
+    Cell: (row) => {
+      return <span>{row?.cell?.value}</span>;
+    },
+  },
+  {
+    Header: '총 재고량',
+    accessor: 'currentQuantity',
+    Cell: (row) => {
+      return <span>{row?.cell?.value?.toLocaleString('ko-KR')}</span>;
+    },
+  },
+  {
+    Header: '카테고리 코드',
+    accessor: 'categoryKey',
+    Cell: (row) => {
+      return <span>{row?.cell?.value}</span>;
+    },
+  },
+  {
+    Header: '카테고리 이름',
+    accessor: 'categoryName',
+    Cell: (row) => {
+      return <span>{row?.cell?.value}</span>;
+    },
+  },
+  {
+    Header: '재고수량',
+    accessor: 'quantity',
+    Cell: (row) => {
+      return (
+        <span className='flex justify-center'>
+          {
+            <Textinput
+              id='smallsize'
+              type='text'
+              className='w-[80px] h-[32px] text-sm text-right '
+              defaultValue={row?.cell?.value?.toLocaleString('ko-KR')}
+            />
+          }
+        </span>
+      );
+    },
+  },
+  {
+    Header: '판매가',
     accessor: 'consumerPrice',
     Cell: (row) => {
       return <span>{row?.cell?.value?.toLocaleString('ko-KR')}</span>;
     },
   },
   {
-    Header: '판매가',
-    accessor: 'sellingPrice',
+    Header: '총 누적 판매량',
+    accessor: 'salesVolume',
     Cell: (row) => {
       return <span>{row?.cell?.value?.toLocaleString('ko-KR')}</span>;
-    },
-  },
-  {
-    Header: 'URL',
-    accessor: 'url',
-    Cell: (row) => {
-      return (
-        row?.cell?.value && (
-          <span>
-            <a
-              href={row?.cell?.value}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='text-blue-600 underline hover:text-blue-400'
-            >
-              Link
-            </a>
-          </span>
-        )
-      );
     },
   },
 ];
@@ -91,17 +102,27 @@ const IndeterminateCheckbox = React.forwardRef(({ indeterminate, ...rest }, ref)
 
   return (
     <>
-      <input type='checkbox' ref={resolvedRef} {...rest} className='table-checkbox' />
+      <input
+        type='checkbox'
+        ref={resolvedRef}
+        {...rest}
+        className='table-checkbox'
+        onClick={(e) => console.log('target: ', e)}
+      />
     </>
   );
 });
 
-const SearchedProduct = ({ title = '상품 목록', data, searchedProduct }) => {
+const SearchedProductStock = ({ title = '상품 목록', data, searchedProduct }) => {
   const columns = useMemo(() => COLUMNS, []);
-  // // const data = useMemo(() => searchedInfo, []);
   const [totalProduct, setTotalProduct] = useState(0);
+  const [updateStockList, setUpdateStockList] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [selectedProductId, setSelectedProductId] = useState('');
+  const [modalContent, setModalContent] = useState('');
+
+  const openModal = () => {
+    setShowModal(!showModal);
+  };
 
   // 총 상품 수 조회
   useEffect(() => {
@@ -113,16 +134,53 @@ const SearchedProduct = ({ title = '상품 목록', data, searchedProduct }) => 
       });
   }, []);
 
-  const openModal = (row) => {
-    setShowModal(!showModal);
-    setSelectedMemberId(row.cells[3].value);
-    console.log('id: ', row.cells[3].value);
+  const handleSaveStock = () => {
+    fetch(`http://localhost:8081/admin/products/updateStock`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify(updateStockList),
+    })
+      .then((res) => res.text())
+      .then((res) => {
+        console.log('handleSaveStock res2:', res);
+        setModalContent('재고 업데이트 성공');
+        openModal();
+      })
+      .catch((error) => {
+        console.error('Error :', error);
+        setModalContent('재고 업데이트 실패');
+        openModal();
+      });
+  };
+
+  const handleQuantityChange = (row, newQuantity) => {
+    const productId = row.original.productId;
+    setUpdateStockList((prev) => {
+      const existingIndex = prev.findIndex((item) => item.productId === productId);
+      if (existingIndex !== -1) {
+        const updatedItem = { ...prev[existingIndex], newQuantity: newQuantity };
+        return [...prev.slice(0, existingIndex), updatedItem, ...prev.slice(existingIndex + 1)];
+      } else {
+        return [...prev, { productId, newQuantity: newQuantity }];
+      }
+    });
+    console.log('updateStockList : ', updateStockList);
   };
 
   const tableInstance = useTable(
     {
       columns,
       data,
+      initialState: { quantityMap: {} },
+      getRowId: (row) => row.productId,
+      // 추가된 부분: row에 대한 수량 정보를 업데이트하는 로직
+      updateMyData: (rowIndex, columnId, value) => {
+        const updatedQuantityMap = { ...quantityMap };
+        updatedQuantityMap[rowIndex] = value;
+        setQuantityMap(updatedQuantityMap);
+      },
     },
 
     useSortBy,
@@ -164,7 +222,10 @@ const SearchedProduct = ({ title = '상품 목록', data, searchedProduct }) => 
     pageCount,
     setPageSize,
     prepareRow,
+    state: { selectedRowIds },
   } = tableInstance;
+
+  // const selectedRows = Object.keys(selectedRowIds).map((rowId) => tableInstance.rows.find((row) => row.id === rowId));
 
   const { pageIndex, pageSize } = state;
   const length = data.length;
@@ -182,51 +243,60 @@ const SearchedProduct = ({ title = '상품 목록', data, searchedProduct }) => 
 
   return (
     <>
-      {/* <Routes location={location}>
-        <Route path=':modal' element={<Modal2 />} />
-      </Routes> */}
-      {/* state 값 true일 시 모달 오픈 */}
       {showModal && (
-        <ProductInfoModal
-          title='product register modal'
-          label='product register modal'
+        <MemberInfoModal
+          title=''
+          label=''
           labelClass='btn-outline-dark'
           uncontrol
-          // scrollContent
-          noFade
-          className='max-w max-h'
+          disableBackdrop
+          className='max-w-xs'
           showModal={showModal}
           setShowModal={setShowModal}
-          selectedProductId={selectedProductId}
         >
-          {/* <h4 className="font-medium text-lg mb-3 text-slate-900">
-            Lorem ipsum dolor sit.
-          </h4> */}
-          <ProductRegistrationModal />
+          {/* <h4 className='font-medium text-lg mb-3 text-slate-900'>Lorem ipsum dolor sit.</h4> */}
 
-          <div className='text-base text-slate-600 dark:text-slate-300'>
-            {/* <Layout /> */}
-            {/* <Sidebar /> */}
-          </div>
-        </ProductInfoModal>
+          <div className='text-base text-slate-600 dark:text-slate-300 text-center'>{modalContent}</div>
+        </MemberInfoModal>
       )}
       <Card>
         <div className='md:flex items-center mb-6'>
-          <h4 className='card-title font-black'>{title}</h4>
-          <Button className='btn-secondary ml-5 p-[7px] pointer-events-none'>
-            <div className='space-x-1 rtl:space-x-reverse'>
-              <span>총 상품 수</span>
-              <Badge label={totalProduct} className='bg-white text-slate-900 ' />
-              <span>개</span>
+          <h4 className='card-title font-black w-[6%]'>{title}</h4>
+          <div className='w-[100%] flex justify-between'>
+            <div>
+              <Button className='btn-secondary ml-5 p-[7px] pointer-events-none'>
+                <div className='space-x-1 rtl:space-x-reverse'>
+                  <span>총 상품 수</span>
+                  <Badge label={totalProduct} className='bg-white text-slate-900 ' />
+                  <span>개</span>
+                </div>
+              </Button>
+              <Button className='btn-outline-dark ml-5 p-[7px] pointer-events-none'>
+                <div className='space-x-1 rtl:space-x-reverse'>
+                  <span>검색결과</span>
+                  <Badge label={searchedProduct} className='bg-white text-slate-900 ' />
+                  <span>개</span>
+                </div>
+              </Button>
             </div>
-          </Button>
-          <Button className='btn-outline-dark ml-5 p-[7px] pointer-events-none'>
-            <div className='space-x-1 rtl:space-x-reverse'>
-              <span>검색결과</span>
-              <Badge label={searchedProduct} className='bg-white text-slate-900 ' />
-              <span>개</span>
+            <div className='box box-warning'>
+              {searchedProduct > 0 && (
+                <button
+                  className='btn btn-dark w-[70px] p-[8px]'
+                  onClick={
+                    updateStockList.length > 0
+                      ? handleSaveStock
+                      : () => {
+                          setModalContent('상품을 체크한 뒤 버튼을 눌러주세요.');
+                          openModal();
+                        }
+                  }
+                >
+                  저 장
+                </button>
+              )}
             </div>
-          </Button>
+          </div>
         </div>
         <div className='overflow-x-auto -mx-6'>
           <div className='inline-block min-w-full align-middle'>
@@ -255,7 +325,7 @@ const SearchedProduct = ({ title = '상품 목록', data, searchedProduct }) => 
                   className='bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700'
                   {...getTableBodyProps}
                 >
-                  {page.map((row) => {
+                  {page.map((row, rowIndex) => {
                     prepareRow(row);
                     return (
                       <tr {...row.getRowProps()}>
@@ -263,18 +333,25 @@ const SearchedProduct = ({ title = '상품 목록', data, searchedProduct }) => 
                           return (
                             <td
                               {...cell.getCellProps()}
-                              className={
-                                index < 5
-                                  ? 'table-td cursor-pointer text-center '
-                                  : index == 5
-                                  ? 'table-td cursor-pointer text-left '
-                                  : 'table-td cursor-pointer text-right pl-0 pr-12'
-                              }
+                              className={'table-td cursor-pointer text-center '}
                               onClick={index !== 0 && index !== 8 ? () => openModal(row) : null}
                             >
                               {/* row 클릭 시 모달 오픈 */}
 
-                              {cell.render('Cell')}
+                              {index === 8 ? ( // 재고수량 열에만 Textinput 컴포넌트 적용
+                                <span className='flex justify-center'>
+                                  <Textinput
+                                    id={`quantity-${rowIndex}`}
+                                    type='text'
+                                    className='w-[80px] h-[32px] text-sm text-right'
+                                    defaultValue={row?.original.quantity?.toLocaleString('ko-KR')}
+                                    onChange={(e) => handleQuantityChange(row, e.target.value)}
+                                  />
+                                </span>
+                              ) : (
+                                // 나머지 열에는 기존 내용 표시
+                                cell.render('Cell')
+                              )}
 
                               {/* <Link to='' onClick={openModal}>
                                 {cell.render('Cell')}
@@ -375,4 +452,4 @@ const SearchedProduct = ({ title = '상품 목록', data, searchedProduct }) => 
   );
 };
 
-export default memo(SearchedProduct);
+export default memo(SearchedProductStock);

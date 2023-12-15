@@ -1,17 +1,20 @@
-import React, { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { lazy } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 // home pages  & dashboard
 //import Dashboard from "./pages/dashboard";
 const Ecommerce = lazy(() => import('./pages/dashboard/ecommerce'));
 const CrmDashboard = lazy(() => import('./pages/members/dashboard'));
-const StatisticsDashboard = lazy(() => import('./pages/statistics/dashboard/index'));
 const MemberInfo = lazy(() => import('./pages/members/search/index'));
 const MemberInfoModal = lazy(() => import('./pages/members/search/member-modal'));
 const SearchedMember = lazy(() => import('./pages/members/search/member-result'));
+
 const ProductDashboard = lazy(() => import('./pages/dashboard/Product'));
 const ProductInfo = lazy(() => import('./pages/products/search/index'));
 const ProductRegister = lazy(() => import('./pages/products/register/index'));
+const ProductStock = lazy(() => import('./pages/products/management/inventory/index'));
+
+const StatisticsDashboard = lazy(() => import('./pages/statistics/dashboard/index'));
 const DailyReport = lazy(() => import('./pages/statistics/revenue-analysis/daily/index'));
 const WeeklyReport = lazy(() => import('./pages/statistics/revenue-analysis/weekly/index'));
 const MonthlyReport = lazy(() => import('./pages/statistics/revenue-analysis/monthly'));
@@ -34,8 +37,8 @@ const LockScreen2 = lazy(() => import('./pages/auth/lock-screen2'));
 const LockScreen3 = lazy(() => import('./pages/auth/lock-screen3'));
 
 import Layout from './layout/Layout';
-import AuthLayout from './layout/AuthLayout';
-import Error from './pages/404';
+import Error from './pages/error/404';
+import Crm from './pages/members/search/crm';
 // import MemberInfoModal from './pages/members/search/member-modal';
 
 function App() {
@@ -68,12 +71,14 @@ function App() {
           <Route path='admin/members' element={<Navigate to='dashboard' />} />
           <Route path='admin/members/dashboard' element={<CrmDashboard />} />
           <Route path='admin/members/search' element={<MemberInfo />} />
-          {/* <Route path='admin/members/search/detail' element={<MemberCrmPage />} /> */}
+          <Route path='admin/members/:memberId' element={<Crm />} />
+
           <Route path='admin/products' element={<Navigate to='dashboard' />} />
           <Route path='admin/products/dashboard' element={<ProductDashboard />} />
           <Route path='admin/products/search' element={<ProductInfo />} />
           <Route path='admin/products/register' element={<ProductRegister />} />
-          <Route path='admin/products' element={<Navigate to='dashboard' />} />
+          <Route path='admin/products/inventory' element={<ProductStock />} />
+
           <Route path='admin/statistics/dashboard' element={<StatisticsDashboard />} />
           <Route path='admin/statistics/daily' element={<DailyReport />} />
           <Route path='admin/statistics/weekly' element={<WeeklyReport />} />

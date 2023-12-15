@@ -2,13 +2,11 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Radio from '@/components/ui/Radio';
 import Textinput from '@/components/ui/Textinput';
-import { Korean } from 'flatpickr/dist/l10n/ko.js';
-import { useState } from 'react';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+import { useCallback, useState } from 'react';
 import Flatpickr from 'react-flatpickr';
 import Select from 'react-select';
-import dayjs from 'dayjs';
-import isLeapYear from 'dayjs/plugin/isLeapYear'; // 윤년 판단 플러그인
-import 'dayjs/locale/ko';
 
 dayjs.locale('ko'); // 언어 등록
 
@@ -81,7 +79,7 @@ const styles = {
   }),
 };
 
-const ProductSearch = ({ setSearchedInfo, setSearchedProduct }) => {
+const ProductStockSearch = ({ setSearchedInfo, setSearchedProduct }) => {
   const [categoryOption, setCategoryOption] = useState('productId');
   const [selectDivision, setSelectDivision] = useState('2');
   const [selectedMainCategory, setSelectedMainCategory] = useState(null);
@@ -299,7 +297,7 @@ const ProductSearch = ({ setSearchedInfo, setSearchedProduct }) => {
 
     fetch(
       // 'http://localhost:8081/admin/products/productManage?searchKey=&searchValue=&categoryKey=&childCategory=&startDate=&endDate=&bestSellerStatus=',
-      `http://localhost:8081/admin/products/productManage?searchKey=${searchKey}&searchValue=${searchValue}&categoryKey=${categoryKey}&startDate=${searchProduct.startDate}&endDate=${searchProduct.endDate}&bestSellerStatus=${searchProduct.bestSellerStatus}`,
+      `http://localhost:8081/admin/products/search?searchKey=${searchKey}&searchValue=${searchValue}&categoryKey=${categoryKey}&startDate=${searchProduct.startDate}&endDate=${searchProduct.endDate}&bestSellerStatus=${searchProduct.bestSellerStatus}`,
       { method: 'GET' }
     )
       .then((res) => res.json())
@@ -512,4 +510,4 @@ const ProductSearch = ({ setSearchedInfo, setSearchedProduct }) => {
   );
 };
 
-export default ProductSearch;
+export default ProductStockSearch;

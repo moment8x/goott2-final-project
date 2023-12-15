@@ -15,23 +15,31 @@ import javax.naming.NamingException;
 
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Mode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 
+import com.project.controller.HomeController;
 import com.project.dao.kjs.upload.UploadDAO;
 import com.project.etc.kjs.ImgMimeType;
 import com.project.vodto.UploadFiles;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class UploadFileServiceImpl implements UploadFileService {
-
+	
+	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	
 	@Inject
 	UploadDAO uDao;
 	
 	@Override
 	public UploadFiles uploadFile(String originalFileName, long size, String contentType, byte[] data,
 			String realPath) throws IOException {
-		
+		logger.info("originalFileName : " + originalFileName + ", size : " + size + ", contentType : " + contentType + ", realPath : " + realPath);
 		UploadFiles uf = null;
 		
 		// 새 파일 업로드.
@@ -73,7 +81,7 @@ public class UploadFileServiceImpl implements UploadFileService {
 		String thumbImgName = "thumb_" + uf.getNewFileName().substring(uf.getNewFileName().lastIndexOf("\\") + 1);
 		
 		File saveTarget = new File(completePath + File.separator + thumbImgName);
-
+		logger.info("thumbNailImg : " + thumbNailImg + ", ext : " + uf.getOriginalFileName().substring(uf.getOriginalFileName().lastIndexOf(".") + 1) + ", saveTarget");
 		// 저장될 섬네일 이름, 확장자, 파일
 		if (ImageIO.write(thumbNailImg, uf.getOriginalFileName().substring(uf.getOriginalFileName().lastIndexOf(".") + 1), saveTarget)) {
 			// 썸네일 이미지를 저장에 성공 시

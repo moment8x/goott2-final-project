@@ -87,8 +87,8 @@ const RevenueChart = ({ data }) => {
     },
     xaxis: {
       type: 'category',
+      max: 15,
       labels: {
-        hideOverlappingLabels: true,
         style: {
           colors: isDark ? '#CBD5E1' : '#475569',
           fontFamily: 'Inter',

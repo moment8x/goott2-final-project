@@ -13,7 +13,9 @@ const BestProduct = ({ bestData }) => {
           </span>
           <span className='text-slate-600 dark:text-slate-300 text-sm mb-4 block truncate'>{item.productName}</span>
           <a
-            href='#'
+            href={'http://gott123.cafe24.com/detail/' + item.productId}
+            target='_blank'
+            rel='noopener noreferrer'
             className='btn btn-secondary dark:bg-slate-800 dark:hover:bg-slate-600 block w-full text-center btn-sm'
           >
             View More

@@ -160,7 +160,7 @@ public class AdminProductsServiceImpl implements AdminProductsService {
 		List<AdminStockListVO> list = new ArrayList<AdminStockListVO>();
 		
 		list = adminProductsDao.getSearchStockList(search);
-		result.put("list", list);
+		result.put("productList", list);
 		
 		return result;
 	}

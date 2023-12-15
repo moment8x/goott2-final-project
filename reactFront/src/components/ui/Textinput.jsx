@@ -5,7 +5,7 @@ import 'cleave.js/dist/addons/cleave-phone.us';
 const Textinput = ({
   type,
   label,
-  placeholder = 'Add placeholder',
+  placeholder = '',
   classLabel = 'form-label',
   className = '',
   classGroup = '',
@@ -103,22 +103,22 @@ const Textinput = ({
           />
         )}
         {/* icon */}
-        <div className="flex text-xl absolute ltr:right-[14px] rtl:left-[14px] top-1/2 -translate-y-1/2  space-x-1 rtl:space-x-reverse">
+        <div className='flex text-xl absolute ltr:right-[14px] rtl:left-[14px] top-1/2 -translate-y-1/2  space-x-1 rtl:space-x-reverse'>
           {hasicon && (
-            <span className="cursor-pointer text-secondary-500" onClick={handleOpen}>
-              {open && type === 'password' && <Icon icon="heroicons-outline:eye" />}
-              {!open && type === 'password' && <Icon icon="heroicons-outline:eye-off" />}
+            <span className='cursor-pointer text-secondary-500' onClick={handleOpen}>
+              {open && type === 'password' && <Icon icon='heroicons-outline:eye' />}
+              {!open && type === 'password' && <Icon icon='heroicons-outline:eye-off' />}
             </span>
           )}
 
           {error && (
-            <span className="text-danger-500">
-              <Icon icon="heroicons-outline:information-circle" />
+            <span className='text-danger-500'>
+              <Icon icon='heroicons-outline:information-circle' />
             </span>
           )}
           {validate && (
-            <span className="text-success-500">
-              <Icon icon="bi:check-lg" />
+            <span className='text-success-500'>
+              <Icon icon='bi:check-lg' />
             </span>
           )}
         </div>
@@ -148,7 +148,7 @@ const Textinput = ({
         </div>
       )}
       {/* only description */}
-      {description && <span className="input-description">{description}</span>}
+      {description && <span className='input-description'>{description}</span>}
     </div>
   );
 };
