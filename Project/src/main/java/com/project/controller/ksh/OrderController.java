@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -15,16 +14,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.util.WebUtils;
 
 import com.project.service.ksh.payment.OrderService;
 import com.project.vodto.CouponInfos;
 import com.project.vodto.NonOrderHistory;
-import com.project.vodto.OrderHistory;
 import com.project.vodto.ShippingAddress;
 import com.project.vodto.kjy.Memberkjy;
 import com.project.vodto.ksh.OrderInfo;
-import com.project.vodto.ksh.CompleteOrder;
 import com.project.vodto.ksh.OrderIdAndQty;
 import com.project.vodto.ksh.PaymentDTO;
 

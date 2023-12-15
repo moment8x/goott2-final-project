@@ -34,7 +34,7 @@
 	<select id="getRelatedProduct" resultType="com.project.vodto.kjs.RelatedProductDTO">
 		SELECT p.product_id, p.product_name, i.product_image, r.rating, p.consumer_price, p.selling_price, c.name as category
 		FROM products p
-		INNER JOIN product_images i
+		LEFT OUTER JOIN product_images i
 		ON p.product_id = i.product_id
 		LEFT OUTER JOIN ratings r
 		ON p.product_id = r.product_id
@@ -42,7 +42,9 @@
 		ON p.category_key = c.id
 		WHERE p.category_key = #{categoryKey} AND p.product_id != #{productId}
 		GROUP BY p.product_id
-		ORDER BY (CASE WHEN p.publisher = #{publisher} THEN 1 ELSE 2 END), p.publication_date DESC
+		ORDER BY CASE WHEN p.product_name LIKE CONCAT(SUBSTR(#{productName}, 1, 5), '%') THEN 1
+					WHEN p.product_name LIKE CONCAT(SUBSTR(#{productName}, -5, 5), '%')THEN 2 ELSE 3 END,
+				CASE WHEN p.publisher = #{publisher} THEN 1 ELSE 2 END, p.publication_date DESC
 		LIMIT #{count}
 	</select>
 	<select id="getProductRatingCount" resultType="com.project.vodto.kjs.ProductRatingCountVO">

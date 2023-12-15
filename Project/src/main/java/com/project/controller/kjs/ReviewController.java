@@ -29,6 +29,7 @@ import com.project.service.kjs.upload.UploadFileService;
 import com.project.vodto.PagingInfo;
 import com.project.vodto.ReviewBoard;
 import com.project.vodto.UploadFiles;
+import com.project.vodto.kjs.DisPlayedProductDTO;
 import com.project.vodto.kjs.ProductRatingCountVO;
 import com.project.vodto.kjs.ReviewBoardAddPage;
 import com.project.vodto.kjs.ReviewBoardDTO;
@@ -77,8 +78,11 @@ public class ReviewController {
 	}
 	
 	@RequestMapping(value="saveReview", method=RequestMethod.POST)
-	public ResponseEntity<List<ProductRatingCountVO>> saveReview(HttpServletRequest request, @RequestBody ReviewBoard review) {
+	public ResponseEntity<Map<String, Object>> saveReview(HttpServletRequest request, @RequestBody ReviewBoard review) {
 		// 회원 아이디 가져오기, 작성자 등록
+		ResponseEntity<Map<String,Object>> result = null;
+		Map<String, Object> data = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		HttpSession session = request.getSession();
 		String memberId = ((Memberkjy)session.getAttribute("loginMember")).getMemberId();
 		review.setAuthor(memberId);
@@ -90,10 +94,21 @@ public class ReviewController {
 			rService.saveReview(review, calcFileList(review.getFileList(), review.getDeleteFileList()));
 			ufService.deleteUploadedFile(review.getDeleteFileList(), realPath);
 			ratingCount = pdService.getProductRatingCount(review.getProductId());
+			map = rService.getReviewList(review.getProductId(), 1);
+			@SuppressWarnings("unchecked")
+			List<ReviewBoardDTO> reviewList = (List<ReviewBoardDTO>)map.get("reviewList");
+			if (reviewList != null) {
+				ratingCount = pdService.getProductRatingCount(review.getProductId());
+			}
+			if (reviewList != null) {
+				data.put("reviewList", reviewList);
+				data.put("ratingCount", ratingCount);
+				result = new ResponseEntity<Map<String,Object>>(data, HttpStatus.OK);
+			}
 		} catch (SQLException | NamingException | IOException e) {
 			e.printStackTrace();
 		}
-		return new ResponseEntity<List<ProductRatingCountVO>>(ratingCount, HttpStatus.OK);
+		return result;
 	}
 	
 	@RequestMapping(value="refreshFile", method=RequestMethod.POST)
@@ -128,7 +143,7 @@ public class ReviewController {
 					isValid = true;
 					result = new ResponseEntity<Boolean>(isValid, HttpStatus.OK);
 				} else {
-					result = new ResponseEntity<Boolean>(isValid, HttpStatus.BAD_REQUEST); 
+					result = new ResponseEntity<Boolean>(isValid, HttpStatus.OK); 
 				}
 			} catch (SQLException | NamingException e) {
 				e.printStackTrace();
@@ -150,6 +165,9 @@ public class ReviewController {
 		PagingInfo pagingInfo = (PagingInfo)map.get("pagingInfo");
 		List<ProductRatingCountVO> ratingCount = pdService.getProductRatingCount(productId);
 		if (reviewList != null && pagingInfo != null) {
+			DisPlayedProductDTO product = pdService.getProductInfo(productId);
+			
+			data.put("product", product);
 			data.put("reviewList", reviewList);
 			data.put("pagingInfo", pagingInfo);
 			data.put("ratingCount", ratingCount);
@@ -175,13 +193,15 @@ public class ReviewController {
 			review = rService.getReview(postNo, memberId);
 			if (review.getAuthor() != null) {
 				// 등록된 파일이 있는가 확인하고 있으면 fileList에 put
-				for (UploadFiles uf : review.getImages()) {
-					fileList.add(uf);
+				if (review.getImages() != null) {
+					for (UploadFiles uf : review.getImages()) {
+						fileList.add(uf);
+					}
 				}
 				
 				map.put("review", review);
-				map.put("status", "success");
 				map.put("fileList", fileList);
+				map.put("status", "success");
 			} else {
 				// 다른 ID. 리뷰 수정X
 				map.put("status", "block");

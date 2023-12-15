@@ -4,10 +4,10 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.project.mappers.reviewMapper">
 	<insert id="insertReview">
-		<selectKey keyProperty="refer" resultType="int" order="BEFORE">
+		<selectKey keyProperty="ref" resultType="int" order="BEFORE">
 			SELECT post_no + 1 FROM review_board ORDER BY post_no DESC LIMIT 1
 		</selectKey>
-		INSERT INTO review_board(author, content, ref, rating, product_id) VALUES(#{author}, #{content}, #{refer}, #{rating}, #{productId})
+		INSERT INTO review_board(author, content, ref, rating, product_id) VALUES(#{author}, #{content}, #{ref}, #{rating}, #{productId})
 	</insert>
 	<select id="getReviewNo" resultType="Integer">
 		SELECT post_no FROM review_board WHERE author = #{author} ORDER BY post_no DESC limit 1

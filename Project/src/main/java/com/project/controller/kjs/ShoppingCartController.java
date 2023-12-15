@@ -111,7 +111,8 @@ public class ShoppingCartController {
 						map.put("cartItems", "none");
 					}
 					map.put("status", "success");
-					result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.OK);
+				} else {
+					map.put("status", "fail");
 				}
 			} else {
 				// 비회원이면
@@ -130,11 +131,11 @@ public class ShoppingCartController {
 					else {
 						map.put("status", "fail");
 					}
-					result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.OK);
 				}
 			}
+			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.OK);
 		} catch (SQLException | NamingException e) {
-			map.put("status", "fail");
+			map.put("status", "error");
 			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.BAD_REQUEST);
 			e.printStackTrace();
 		}
@@ -154,9 +155,9 @@ public class ShoppingCartController {
 			if (session.getAttribute("loginMember") != null) {
 				String memberId = ((Memberkjy)session.getAttribute("loginMember")).getMemberId();
 				// 로그인을 했으면
-				if (scService.dellteItems(memberId, true, itemNames)) {
-					if (scService.countList(memberId, false) > 0) {
-						items = scService.getCartList(memberId, false);
+				if (scService.deleteItems(memberId, true, itemNames)) {
+					if (scService.countList(memberId, true) > 0) {
+						items = scService.getCartList(memberId, true);
 						map.put("cartItems", items);
 					} else {
 						map.put("cartItems", "none");
@@ -169,7 +170,7 @@ public class ShoppingCartController {
 				// 비회원이면 
 				Cookie cookie = WebUtils.getCookie(request, "nom");
 				if (cookie != null) {
-					if(scService.dellteItems(cookie.getValue(), false, itemNames)) {
+					if(scService.deleteItems(cookie.getValue(), false, itemNames)) {
 						if (scService.countList(cookie.getValue(), false) > 0) {
 							items = scService.getCartList(cookie.getValue(), false);
 							map.put("cartItems", items);
@@ -184,7 +185,7 @@ public class ShoppingCartController {
 			}
 			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.OK);
 		} catch (SQLException | NamingException e) {
-			map.put("status", "fail");
+			map.put("status", "error");
 			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.BAD_REQUEST);
 			e.printStackTrace();
 		}
@@ -231,7 +232,7 @@ public class ShoppingCartController {
 			}
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
-			map.put("status", "fail");
+			map.put("status", "error");
 			result = new ResponseEntity<Map<String,Object>>(map, HttpStatus.BAD_REQUEST);
 		}
 		
@@ -266,7 +267,7 @@ public class ShoppingCartController {
 			result = new ResponseEntity<Map<String,String>>(map, HttpStatus.OK);
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
-			map.put("status", "fail");
+			map.put("status", "error");
 			result = new ResponseEntity<Map<String,String>>(map, HttpStatus.BAD_REQUEST);
 		}
 		return result;
