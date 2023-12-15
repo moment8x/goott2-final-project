@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.mappers.uploadFileMapper">
+	<insert id="insertImage">
+		INSERT INTO upload_files(thumbnail_file_name, extension, original_file_name, new_file_name, file_size) 
+		VALUES(#{thumbnailFileName}, #{extension}, #{originalFileName}, #{newFileName}, #{fileSize})
+	</insert>
+	<select id="isExist" resultType="Integer">
+		SELECT upload_files_seq FROM upload_files WHERE new_file_name = #{newFileName}
+	</select>
+	<delete id="deleteUploadFile">
+		DELETE FROM upload_files WHERE upload_files_seq = #{uploadFilesSeq}
+	</delete>
+</mapper>

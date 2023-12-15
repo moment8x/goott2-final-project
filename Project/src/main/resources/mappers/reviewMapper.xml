@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mappers.reviewMapper">
+	<insert id="insertReview">
+		<selectKey keyProperty="ref" resultType="int" order="BEFORE">
+			SELECT post_no + 1 FROM review_board ORDER BY post_no DESC LIMIT 1
+		</selectKey>
+		INSERT INTO review_board(author, content, ref, rating, product_id) VALUES(#{author}, #{content}, #{ref}, #{rating}, #{productId})
+	</insert>
+	<select id="getReviewNo" resultType="Integer">
+		SELECT post_no FROM review_board WHERE author = #{author} ORDER BY post_no DESC limit 1
+	</select>
+	<select id="getPurchaseRecord" resultType="String">
+		SELECT o.order_no
+		FROM order_history o
+		INNER JOIN detailed_order_items d
+		ON o.order_no = d.order_no
+		WHERE member_id = #{memberId}
+			AND delivery_status='배송완료'
+			AND product_id=#{productId}
+		GROUP BY o.order_no
+	</select>
+	<select id="firstCheck" resultType="int">
+		SELECT count(post_no) FROM review_board WHERE author=#{memberId} AND product_id=#{productID}
+	</select>
+	<select id="isExists" resultType="int">
+		SELECT count(post_no) FROM review_board WHERE author=#{memberId} AND product_id=#{productId} AND is_delete = 'N'
+	</select>
+	<select id="getPointRule" resultType="Integer">
+		SELECT point FROM point_rules WHERE reason=#{reason}
+	</select>
+	<insert id="insertPointLog">
+		<selectKey keyProperty="balance" resultType="int" order="BEFORE">
+			SELECT total_points + #{point} FROM member WHERE member_id = #{memberId}
+		</selectKey>
+		INSERT INTO point_logs(member_id, reason, point, balance) VALUES(#{memberId}, '리뷰작성', #{point}, #{balance})
+	</insert>
+	<update id="updatePoint">
+		UPDATE member SET total_points = total_points + #{point}, accumulated_point = accumulated_point + {point}
+		WHERE member_id = #{memberId}
+	</update>
+	<select id="selectProductCount" resultType="int">
+  		SELECT count(post_no) FROM review_board WHERE product_id = #{key} AND is_delete='N'
+  	</select>
+  	<select id="getReviewList" resultType="com.project.vodto.kjs.ReviewBoardDTO">
+  		SELECT * FROM review_board WHERE product_id=#{productId} AND is_delete='N' ORDER BY created_date desc LIMIT #{startRowIndex}, #{viewProductPerPage}
+  	</select>
+  	<select id="getCountImages" resultType="Integer">
+  		SELECT count(post_no) FROM review_uf WHERE post_no=#{postNo}
+  	</select>
+  	<select id="getImagesAddr" resultType="String">
+  		SELECT REPLACE(f.thumbnail_file_name, "\\", "/") AS thumnail_file_name
+		FROM review_board r
+		INNER JOIN review_uf u
+		ON r.post_no = u.post_no
+		INNER JOIN upload_files f
+		ON u.upload_files_seq = f.upload_files_seq
+		WHERE r.post_no = #{postNo}
+  	</select>
+  	<select id="getImages" resultType="com.project.vodto.UploadFiles">
+  		SELECT f.*
+		FROM review_board r
+		INNER JOIN review_uf u
+		ON r.post_no = u.post_no
+		INNER JOIN upload_files f
+		ON u.upload_files_seq = f.upload_files_seq
+		WHERE r.post_no = #{postNo}
+  	</select>
+  	<select id="getReview" resultType="com.project.vodto.kjs.ReviewBoardDTO">
+  		SELECT * FROM review_board WHERE post_no = #{postNo}
+  	</select>
+  	<select id="getMaxPostNo" resultType="int">
+  		SELECT post_no FROM review_board ORDER BY post_no DESC LIMIT 1
+  	</select>
+  	<select id="getCalcRatingData" resultType="com.project.vodto.Ratings">
+  		SELECT SUM(rating) as rating, COUNT(post_no) as participation_count,
+			(SELECT rating FROM review_board ORDER BY rating desc LIMIT 1) as highest_rating,
+    		(SELECT rating FROM review_board ORDER BY rating LIMIT 1) as lowest_rating
+		FROM review_board WHERE product_id = #{productId} AND is_delete = "N"
+  	</select>
+  	<insert id="insertRatings">
+  		INSERT INTO ratings VALUES(#{productId}, #{rating}, #{participationCount}, #{highestRating}, #{lowestRating})
+  	</insert>
+  	<update id="updateReview">
+  		UPDATE review_board
+		SET content = #{content}, rating = #{rating}
+		WHERE post_no = #{postNo}
+  	</update>
+  	<update id="updateRatings">
+  		UPDATE ratings
+  		SET rating=#{rating}, participation_count=#{participationCount}, highest_rating=#{highestRating}, lowest_rating=#{lowestRating}
+  		WHERE product_id=#{productId}
+  	</update>
+  	<select id="deleteCheck" resultType="int">
+  		SELECT count(post_no) FROM review_board WHERE post_no=#{postNo} AND author=#{memberId} AND product_id=#{productId} AND is_delete='N'
+  	</select>
+  	<update id="deleteReview">
+  		UPDATE review_board SET is_delete = 'Y' WHERE post_no=#{postNo}
+  	</update>
+</mapper>

@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.mappers.adminProductsMapper">
+	<!-- ============================================ 상희 ============================================  -->
+	<select id="getProductsOnSaleCount" resultType="Integer">
+		select count(product_id) from products where current_quantity > 0;
+	</select>
+	
+	<select id="getAllProducts" resultType="com.project.vodto.ksh.AdminProductsList">
+		SELECT  @rownum:=@rownum+1 AS no, 
+				p.product_id, 
+				p.product_name, 
+				category.id
+				as category_key, 
+				category.name as category_name,
+				(SELECT product_image FROM product_images pi WHERE pi.product_id = p.product_id LIMIT 1) as product_image,
+				p.consumer_price, 
+				p.selling_price,
+				CONCAT('http://gott123.cafe24.com/detail/', p.product_id) as url
+		FROM products p
+		INNER JOIN categories category
+		ON category.id = p.category_key
+		INNER JOIN (SELECT @rownum:=0) AS r
+		<where>
+			<choose>
+				<when test='searchKey != null and searchKey.equals("productId")'>
+					p.product_id = #{searchValue}
+				</when>
+				<when test='searchKey != null and searchKey.equals("categoryName")'>
+					category.name LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey != null and searchKey.equals("categoryKey")'>
+					category.id = #{searchValue}
+				</when>
+				<when test='searchKey != null and searchKey.equals("ISBN")'>
+					p.isbn = #{searchValue}
+				</when>
+				<when test='searchKey != null and searchKey.equals("authorTranslator")'>
+					p.author_translator LIKE CONCAT('%', #{searchValue}, '%') OR p.original_author LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey != null and searchKey.equals("illustrator")'>
+					p.illustrator LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey != null and searchKey.equals("publisher")'>
+					p.publisher LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey != null and searchKey.equals("publicationDate")'>
+					p.publication_date = #{publicationDate}
+				</when>
+				<otherwise>
+					REPLACE(p.product_name, ' ', '') LIKE CONCAT('%', #{searchValue}, '%')
+				</otherwise>
+			</choose>
+			<if test='bestSellerStatus == 0'>
+				AND p.best_seller_status = 0
+			</if>
+			<if test='bestSellerStatus == 1'>
+				AND p.best_seller_status = 1
+			</if>
+			<if test='categoryKey != null and !categoryKey.equals("")'>
+				AND p.category_key LIKE CONCAT('%', #{categoryKey}, '%')
+			</if>
+			<!-- <if test='categoryKey != null and !categoryKey.equals("")'>
+				AND p.category_key = #{categoryKey}
+			</if> -->
+			<if test='startDate != null and !startDate.equals("") and endDate != null and !endDate.equals("")'>
+				AND DATE_FORMAT(p.publication_date, '%Y-%m-%d') BETWEEN STR_TO_DATE(#{startDate}, '%Y-%m-%d') AND STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+			</if>
+			<if test='sellingProducts != null and !sellingProducts.equals("")'>
+				AND p.current_quantity > 0
+			</if>
+        </where>    
+		ORDER BY no DESC
+	</select>
+	<!-- ==============================================================================================  -->
+	<!-- ============================================ 재용 ============================================  -->
+	  <resultMap type="com.project.vodto.kjy.Products" id="allProductsSelectMap">
+	  	<result property="productId" column="product_id"/>
+	  	<result property="beforeProductId" column="product_id"/>
+  		<result property="productName" column="product_name"/>
+  		<result property="consumerPrice" column="consumer_price"/>
+  		<result property="supplyPrice" column="supply_price"/>
+  		<result property="sellingPrice" column="selling_price"/>
+  		<result property="isbn" column="isbn"/>
+  		<result property="productImage" column="product_image"/>
+  		<result property="productInfoImage" column="product_info_image"/>
+  		<result property="authorTranslator" column="author_translator"/>
+  		<result property="originalAuthor" column="original_author"/>
+  		<result property="illustrator" column="illustrator"/>
+  		<result property="publisher" column="publisher"/>
+  		<result property="publicationDate" column="publication_date"/>
+  		<result property="pageCount" column="page_count"/>
+  		<result property="size" column="size"/>
+  		<result property="totalVolume" column="total_volume"/>
+  		<result property="authorIntroduction" column="author_introduction"/>
+  		<result property="introductionIntro" column="introduction_intro"/>
+  		<result property="introductionDetail" column="introduction_detail"/>
+  		<result property="tableOfContents" column="table_of_contents"/>
+  		<result property="notificationSubscription" column="notification_subscription"/>
+  		<result property="bestSellerStatus" column="best_seller_status"/>
+  		<result property="categoryKey" column="category_key"/>
+  		<result property="currentQuantity" column="current_quantity"/>
+  		<collection property="productImages" ofType="String" column="product_images">
+  			<result property="productImages" column="product_images" />
+  		</collection>
+	  </resultMap>
+	  
+	  <select id="selectProductInfoForAdmin" resultMap="allProductsSelectMap">
+		select p.*, i.product_image as product_images from products p inner join product_images i on p.product_id = i.product_id; 
+	  </select>
+	  <select id="selectProductCategoriesForAdmin" resultType="com.project.vodto.kjy.Categories">
+	  	SELECT c.* FROM categories c INNER JOIN category_paths p ON c.id = p.descendant WHERE p.ancestor = #{key};
+	  </select>
+	
+	  <insert id="insertProductsForAdmin">
+		  	insert into gott123.products(
+		  		product_id, product_name, selling_price, consumer_price, supply_price, isbn, product_info_image, author_translator, original_author, illustrator, publisher, publication_date, page_count, size, total_volume, author_introduction, introduction_intro, introduction_detail, table_of_contents, category_key
+	  		)values(
+	  			#{productId}, #{productName}, #{sellingPrice}, #{consumerPrice}, #{supplyPrice}, #{isbn}, #{productInfoImage}, #{authorTranslator}, #{originalAuthor}, #{illustrator}, #{publisher}, #{publicationDate}, #{pageCount}, #{size}, #{totalVolume}, #{authorIntroduction}, #{introductionIntro}, #{introductionDetail}, #{tableOfContents}, #{categoryKey}
+	  		)  
+	  </insert>
+	  <insert id="insertProductImagesForAdmin">
+	  		insert into gott123.product_images(product_id, product_image) values	 		
+	  		<foreach collection="list" item="file" separator=",">
+	  			(#{productId}, #{file.newFileName})
+	  		</foreach>
+	  </insert>
+	  
+	  <update id="updateProductProductForAdmin">
+	  	update gott123.products set product_id = #{productId}, product_name = #{productName}, selling_price = #{sellingPrice}, consumer_price #{consumerPrice},supply_price = #{supplyPrice}, isbn = #{isbn}, product_info_image = #{productInfoImage},author_translator = #{authorTranslator},original_author = #{originalAuthor},illustrator = #{illustrator},publisher = #{publisher},publication_date = #{publicationDate},page_count = #{pageCount},size = #{size},total_volume = #{totalVolume},author_introduction = #{authorIntroduction},introduction_intro = #{introductionIntro},introduction_detail = #{introductionDetail},table_of_contents = #{tableOfContents},category_key = #{categoryKey} where product_id = #{beforeProductId}
+	  </update>
+	  
+	  <select id="selectProductImageForAdmin" resultType="com.project.vodto.kjs.ProductImage">
+	  	select product_image from gott123.product_images where product_id = #{productId};
+	  </select>
+	  <delete id="deleteProductImageForAdmin">
+	  	delete from gott123.product_images where product_image = #{newFileName}
+	  </delete>
+	  <delete id="deleteProductImagesForAdmin">
+	  	delete from gott123.product_images where product_image in
+	  	<foreach collection="list" index="image" open="(" close=")" separator=",">
+	  		#{image}
+	  	</foreach> 
+	  </delete>
+	  <delete id="deleteProductForAdmin">
+	  	delete from gott123.products where product_id = #{productId}
+	  </delete>
+	<!-- ==============================================================================================  -->
+	<!-- ============================================ 진솔 ============================================  -->
+	
+	<select id="totalProductsCount" resultType="int">
+		SELECT count(product_id) FROM products
+	</select>
+	
+	<resultMap id="categoryChild" type="com.project.vodto.ProductCategory">
+	    <result column="id" property="value"/>
+	    <result column="name" property="label"/>
+	</resultMap>	
+	
+	<select id="getCategoryChild" resultMap="categoryChild">
+		SELECT c.*
+		FROM categories c
+		INNER JOIN category_paths p
+		ON c.id = p.descendant
+		WHERE p.ancestor = #{categoryKey} AND p.depth = 1
+	</select>
+	<select id="getSearchProductsList" resultType="com.project.vodto.kjs.AdminStockListVO">
+		SELECT  	@rownum:=@rownum+1 AS no, 
+					p.product_id, p.product_name, 
+					p.current_quantity,
+					p.current_quantity AS quantity,
+					category.id as category_key, 
+					category.name as category_name,
+					(SELECT product_image FROM product_images pi WHERE pi.product_id = p.product_id LIMIT 1) as product_image,
+					p.consumer_price,
+					(SELECT SUM(product_quantity) FROM detailed_order_items doi WHERE doi.product_id = p.product_id) as sales_volume
+		FROM products p
+		INNER JOIN categories category
+		ON category.id = p.category_key
+		INNER JOIN (SELECT @rownum:=0) AS r
+		<where>
+			<choose>
+				<when test='searchKey != null and searchKey.equals("productId")'>
+					p.product_id = #{searchValue}
+				</when>
+				<when test='searchKey != null and searchKey.equals("categoryName")'>
+					category.name LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey != null and searchKey.equals("categoryKey")'>
+					category.id = #{searchValue}
+				</when>
+				<when test='searchKey != null and searchKey.equals("ISBN")'>
+					p.isbn = #{searchValue}
+				</when>
+				<when test='searchKey != null and searchKey.equals("authorTranslator")'>
+					p.author_translator LIKE CONCAT('%', #{searchValue}, '%') OR p.original_author LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey != null and searchKey.equals("illustrator")'>
+					p.illustrator LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey != null and searchKey.equals("publisher")'>
+					p.publisher LIKE CONCAT('%', #{searchValue}, '%')
+				</when>
+				<when test='searchKey != null and searchKey.equals("publicationDate")'>
+					p.publication_date = #{publicationDate}
+				</when>
+				<otherwise>
+					REPLACE(p.product_name, ' ', '') LIKE CONCAT('%', #{searchValue}, '%')
+				</otherwise>
+			</choose>
+			<if test='bestSellerStatus == 0'>
+				AND p.best_seller_status = 0
+			</if>
+			<if test='bestSellerStatus == 1'>
+				AND p.best_seller_status = 1
+			</if>
+			<if test='categoryKey != null and !categoryKey.equals("")'>
+				AND p.category_key LIKE CONCAT('%', #{categoryKey}, '%')
+			</if>
+			<!-- <if test='categoryKey != null and !categoryKey.equals("")'>
+				AND p.category_key = #{categoryKey}
+			</if> -->
+			<if test='startDate != null and !startDate.equals("") and endDate != null and !endDate.equals("")'>
+				AND DATE_FORMAT(p.publication_date, '%Y-%m-%d') BETWEEN STR_TO_DATE(#{startDate}, '%Y-%m-%d') AND STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+			</if>
+			<if test='sellingProducts != null and !sellingProducts.equals("")'>
+				AND p.current_quantity > 0
+			</if>
+        </where>    
+		ORDER BY no DESC
+	</select>
+	<update id="updateStock" parameterType="java.util.List">
+		UPDATE products SET current_quantity = 
+		CASE
+			<foreach collection="list" item="item">
+				WHEN product_id = #{item.productId}
+				THEN #{item.newQuantity}
+			</foreach>
+		END
+		WHERE product_id IN
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item.productId}
+		</foreach>
+	</update>
+	<select id="getSoldOutProducts" resultType="com.project.vodto.kjs.AdminStockListVO">
+		SELECT @rownum:=@rownum+1 AS no, p.product_id, p.product_name, p.current_quantity,
+				category.id as category_key, category.name as category_name,
+        		(SELECT product_image FROM product_images pi WHERE pi.product_id = p.product_id LIMIT 1) as product_image,
+        		p.consumer_price,
+				(SELECT SUM(product_quantity) FROM detailed_order_items doi WHERE doi.product_id = p.product_id) as sales_volume
+		FROM products p
+		INNER JOIN categories category
+		ON category.id = p.category_key
+		INNER JOIN (SELECT @rownum:=0) AS r
+		WHERE p.current_quantity = 0
+	</select>
+	<!-- ==============================================================================================  -->
+</mapper>

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.mappers.adminMemberMapper">
+	
+	<select id="selectAllMemberCount" resultType="Integer">
+		SELECT count(*) FROM member
+	</select>
+	
+	<update id="updateMemberDetailInfo">
+	   UPDATE member 
+		  SET password = #{password},
+			  name = #{name},
+			  phone_number = #{phoneNumber },
+			  cell_phone_number = #{cellPhoneNumber },
+			  gender = #{gender},
+			  date_of_birth = #{dateOfBirth},
+			  zip_code = #{zipCode},
+			  address = #{address},
+			  detailed_address = #{detailedAddress},
+			  email = #{email},
+			  membership_grade = #{membershipGrade},
+			  profile_image = #{profileImage},
+			  refund_bank = #{refundBank},
+			  refund_account = #{refundAccount},
+			  account_holder = #{accountHolder}
+		WHERE member_id  = #{memberId}
+	</update>
+	
+	<select id="selectMemberDetailInfo" resultType="MemberParam">
+		SELECT  member_id, name, phone_number, cell_phone_number, registration_date, 
+				gender, date_of_birth, zip_code, address, detailed_address, email, 
+				identity_verification_status, membership_grade, profile_image, 
+				last_login_date, refund_bank, refund_account, dormant_account,
+				permission, withdraw, account_holder
+		  FROM  member 
+		  WHERE member_id = #{memberId}
+	</select>
+	
+	<select id="selectRecentPost" resultType="MemberRecentPost">
+		SELECT 		c.category_name, c.subcategory, b.title, b.author, b.created_date 
+		FROM   		board b
+		INNER JOIN  board_categories c
+		ON 			b.category_id = c.category_id
+		WHERE 		b.author = #{memberId}
+		ORDER BY 	b.post_no DESC limit 5
+	</select>
+	
+	<select id="selectRecentInquiry" resultType="MemberRecentInquiry">
+		SELECT 	 title, author, created_date, answer_status
+		FROM   	 customer_inquiries_board 
+		WHERE  	 author = #{memberId}
+		ORDER BY post_no DESC limit 5 
+	</select>
+	
+	<select id="selectRecentOrder" resultType="MemberRecentOrder">
+		SELECT		 h.order_time,
+			   		h.order_no,
+		       		p.actual_payment_amount,
+		       		p.payment_method,
+		       		p.payment_status,
+		CASE   WHEN h.delivery_status = '배송중' THEN '배송중'
+			   WHEN h.delivery_status = '배송완료' THEN '배송완료'
+			   WHEN h.delivery_status = '취소' THEN '배송없음'
+			   ELSE '배송전'
+			   END  delivery_status,
+		CASE   WHEN cancels.count = total.count THEN '전체취소'
+			   WHEN cancels.count BETWEEN 1 AND (total.count - 1) THEN '부분취소'
+			   ELSE '취소 안 함'
+		       END  cancels,
+		CASE   WHEN exchanges.count = total.count THEN '전체교환'
+			   WHEN exchanges.count BETWEEN 1 AND (total.count - 1) THEN '부분교환'
+			   ELSE '교환 안 함'
+		       END  exchanges,
+		CASE   WHEN returns.count = total.count THEN '전체반품'
+			   WHEN returns.count BETWEEN 1 AND (total.count - 1) THEN '부분반품'
+			   ELSE '반품 안 함'
+		       END  returns
+		FROM 		payments p
+		INNER JOIN  order_history h 
+		ON 			p.order_no = h.order_no
+		LEFT JOIN   (
+					    SELECT order_no, count(*) count
+					    FROM detailed_order_items 
+					    WHERE product_status = '취소'
+					    GROUP BY order_no
+				    ) cancels
+		ON 			h.order_no = cancels.order_no
+		LEFT JOIN   (
+					    SELECT order_no, count(*) count
+					    FROM detailed_order_items 
+					    WHERE product_status = '교환'
+					    GROUP BY order_no
+				    ) exchanges
+		ON 			h.order_no = exchanges.order_no
+		LEFT JOIN   (
+					    SELECT order_no, count(*) count
+					    FROM detailed_order_items 
+					    WHERE product_status = '반품'
+					    GROUP BY order_no
+			    	) returns
+		ON 			h.order_no = returns.order_no
+		LEFT JOIN 	(
+					    SELECT order_no, count(*) count
+					    FROM detailed_order_items 
+					    GROUP BY order_no
+				    ) total 
+		ON 			h.order_no = total.order_no
+		WHERE 		h.member_id = #{memberId}
+		ORDER BY 	h.order_time DESC limit 5	
+	</select>
+	
+	<select id="selectBasicInfo" resultType="MemberBasicInfo">
+		SELECT member_id, name, phone_number, cell_phone_number, 
+			   gender, zip_code, address, detailed_address, email, identity_verification_status, 
+			   membership_grade, total_points, total_rewards, dormant_account, permission, withdraw
+	    FROM   member 
+	    WHERE  member_id = #{memberId}
+	</select>
+	
+	<select id="selectMemberInfo" resultType="MemberResponse">
+		SELECT registration_date, 
+			   name, 
+			   member_id, 
+			   membership_grade, 
+			   phone_number, 
+			   cell_phone_number, 
+			   gender, 
+			   date_of_birth, 
+			   address
+		FROM   member 
+		<where>
+			 <if test='memberId != null and !memberId.equals("")'>
+	            AND member_id = #{memberId} 
+	         </if> <!-- 아이디 -->
+	         
+	         <if test='name != null and !name.equals("")'>
+	            AND name LIKE CONCAT('%',#{name},'%') 
+	         </if> <!-- 이름 -->
+	         
+	         <if test='email != null and !email.equals("")'>
+	            AND email = #{email} 
+	         </if> <!-- 이메일 -->
+	         
+	         <if test='phoneNumber != null and !phoneNumber.equals("")'>
+	            AND replace(phone_number,'-','') = #{phoneNumber} 
+	         </if> <!-- 전화번호 -->
+	         
+	         <if test='cellPhoneNumber != null and !cellPhoneNumber.equals("")'>
+	            AND replace(cell_phone_number,'-','') = #{cellPhoneNumber} 
+	         </if> <!-- 휴대전화번호 -->
+	         
+	         <if test='address != null and !address.equals("")'>
+	            AND address LIKE CONCAT('%',#{address},'%') OR detailed_address LIKE CONCAT('%',#{address},'%') 
+	         </if> <!-- 주소 -->
+	         
+	         <if test='membershipGrade != null and !membershipGrade.equals("")'>
+	            AND membership_grade = #{membershipGrade}
+	         </if> <!-- 회원등급 -->
+	        
+	         <choose> 
+	         	<when test='(registrationDateStart != null and !registrationDateStart.equals("")) and 
+         			(registrationDateEnd != null and !registrationDateEnd.equals(""))'>
+	         		AND registration_date BETWEEN #{registrationDateStart} AND #{registrationDateEnd}
+	         	</when>
+	         	<when test='(registrationDateStart == null or registrationDateStart.equals("")) and 
+	         		(registrationDateEnd != null and !registrationDateEnd.equals(""))'>
+				    <![CDATA[ AND registration_date <= #{registrationDateEnd} ]]>
+				</when>
+	         	<when test='(registrationDateStart != null and !registrationDateStart.equals("")) and 
+	         		(registrationDateEnd == null or registrationDateEnd.equals(""))'>
+	         		AND registration_date >= #{registrationDateStart} 
+	         	</when> 
+	         </choose> <!-- 가입일 -->
+	         
+	         <choose> 
+	         	<when test='(dateOfBirthStart != null and !dateOfBirthStart.equals("")) and 
+	         		(dateOfBirthEnd != null and !dateOfBirthEnd.equals(""))'>
+	         		AND date_of_birth BETWEEN #{dateOfBirthStart} AND #{dateOfBirthEnd}
+	         	</when>
+	         	<when test='(dateOfBirthStart == null or dateOfBirthStart.equals("")) and 
+	         		(dateOfBirthEnd != null and !dateOfBirthEnd.equals(""))'>
+				    <![CDATA[ AND date_of_birth <= #{dateOfBirthEnd} ]]>
+				</when>
+	         	<when test='(dateOfBirthStart != null and !dateOfBirthStart.equals("")) and 
+	         		(dateOfBirthEnd == null or dateOfBirthEnd.equals(""))'>
+	         		AND date_of_birth >= #{dateOfBirthStart} 
+	         	</when> 
+	         </choose> <!-- 생일 -->
+	         
+	         <choose>
+	         	<when test='(ageStart != null and !ageStart.equals("")) and 
+	         		(ageEnd != null and !ageEnd.equals(""))'>
+	         		AND (SELECT TRUNCATE((TO_DAYS(NOW()) - TO_DAYS(date_of_birth)) / 365, 0)) BETWEEN #{ageStart} AND #{ageEnd}
+	         	</when>
+	         	<when test='(ageStart == null or ageStart.equals("")) and 
+	         		(ageEnd != null and !ageEnd.equals(""))'>
+	         		AND (SELECT TRUNCATE((TO_DAYS(NOW()) - TO_DAYS(date_of_birth)) / 365, 0)) BETWEEN 0 AND #{ageEnd}
+	         	</when>
+	         	<when test='(ageStart != null and !ageStart.equals("")) and 
+	         		(ageEnd == null or ageEnd.equals(""))'>
+	         		AND (SELECT TRUNCATE((TO_DAYS(NOW()) - TO_DAYS(date_of_birth)) / 365, 0)) BETWEEN #{ageStart} AND 200
+	         	</when>
+	         </choose> <!-- 나이 -->
+	         
+	         <if test='gender != null and !gender.equals("")'>
+	            AND gender = #{gender}
+	         </if> <!-- 성별 -->
+	         
+	         <!-- 구매 금액 -->
+	         
+	         <!-- 구매 건수 -->
+	         
+	         <!-- 주문일 -->
+	         
+	         <!-- 결제 완료일 -->
+	         
+	         <!-- 주문 상품 -->
+	         
+	         <choose> 
+	         	<when test='(totalRewardsStart != null and !totalRewardsStart.equals("")) and 
+	         		(totalRewardsEnd != null and !totalRewardsEnd.equals(""))'>
+	         		AND total_rewards BETWEEN #{totalRewardsStart} AND #{totalRewardsEnd}
+	         	</when>
+	         	<when test='(totalRewardsStart == null or totalRewardsStart.equals("")) and 
+	         		(totalRewardsEnd != null and !totalRewardsEnd.equals(""))'>
+				    <![CDATA[ AND total_rewards <= #{totalRewardsEnd} ]]>
+				</when>
+	         	<when test='(totalRewardsStart != null and !totalRewardsStart.equals("")) and 
+	         		(totalRewardsEnd == null or totalRewardsEnd.equals(""))'>
+	         		AND total_rewards >= #{totalRewardsStart} 
+	         	</when> 
+	         </choose> <!-- 가용 적립금 -->
+	         
+	         <choose> 
+	         	<when test='(totalPointsStart != null and !totalPointsStart.equals("")) and 
+	         		(totalPointsEnd != null and !totalPointsEnd.equals(""))'>
+	         		AND total_points BETWEEN #{totalPointsStart} AND #{totalPointsEnd}
+	         	</when>
+	         	<when test='(totalPointsStart == null or totalPointsStart.equals("")) and 
+	         		(totalPointsEnd != null and !totalPointsEnd.equals(""))'>
+				    <![CDATA[ AND total_points <= #{totalPointsEnd} ]]>
+				</when>
+	         	<when test='(totalPointsStart != null and !totalPointsStart.equals("")) and 
+	         		(totalPointsEnd == null or totalPointsEnd.equals(""))'>
+	         		AND total_points >= #{totalPointsStart} 
+	         	</when> 
+	         </choose> <!-- 가용 포인트 -->
+	         
+	         <choose> 
+	         	<when test='(lastLoginDateStart != null and !lastLoginDateStart.equals("")) and 
+         			(lastLoginDateEnd != null and !lastLoginDateEnd.equals(""))'>
+	         		AND last_login_date BETWEEN #{lastLoginDateStart} AND #{lastLoginDateEnd}
+	         	</when>
+	         	<when test='(lastLoginDateStart == null or lastLoginDateStart.equals("")) and 
+	         		(lastLoginDateEnd != null and !lastLoginDateEnd.equals(""))'>
+				    <![CDATA[ AND last_login_date <= #{lastLoginDateEnd} ]]>
+				</when>
+	         	<when test='(lastLoginDateStart != null and !lastLoginDateStart.equals("")) and 
+	         		(lastLoginDateEnd == null or lastLoginDateEnd.equals(""))'>
+	         		AND last_login_date >= #{lastLoginDateStart} 
+	         	</when> 
+	         </choose> <!-- 접속일 -->
+	         
+	         <if test='dormantAccount != null and !dormantAccount.equals("")'>
+	            AND dormant_account = #{dormantAccount}
+	         </if> <!-- 휴면 회원 -->
+	         
+	     </where>
+	</select>
+</mapper>

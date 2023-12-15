@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+	
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<annotation-driven />
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<resources mapping="/resources/**" location="/resources/" />
+	
+	<!-- 
+		최대 파일 업로드 용량 설정
+		CommonsMultipartResolver : 전송 단위보다 큰 용량의 파일 데이터가 부분으로 전송 되었을 때,
+		다시 재조립해주는 객체
+	 -->
+	<beans:bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<beans:property name="maxUploadSize" value="5242880"></beans:property>
+	</beans:bean>
+	
+	<!--
+		인터셉터 객체 등록 
+	 -->	
+	<beans:bean id="headerCartInterceptor"
+		class="com.project.interceptor.kjs.HeaderCartInterceptor">
+	</beans:bean>
+		
+	<interceptors>
+		<interceptor>
+			<mapping path="/**/*"/>
+			<beans:ref bean="headerCartInterceptor"/>
+		</interceptor>
+
+	</interceptors>
+	
+	<beans:bean id="createOrderIdInterceptor"
+		class="com.project.interceptor.kjy.orderInterceptor">
+	</beans:bean>
+	
+	<interceptors>
+		<interceptor>
+			<mapping path="/order/requestOrder"/>
+			<beans:ref bean="createOrderIdInterceptor"/>
+		</interceptor>
+	</interceptors>
+	
+	<beans:bean id="RememberInterceptor"
+		class="com.project.interceptor.kjy.RememberInterceptor">
+	</beans:bean>
+	
+	<interceptors>
+		<interceptor>
+			<mapping path="/login/"/>
+			<beans:ref bean="RememberInterceptor"/>
+		</interceptor>
+	</interceptors>
+	
+	<!-- 아래의 패키지를 스캔하여 객체 확보 -->
+	<context:component-scan base-package="com.project.controller" />
+	<context:component-scan base-package="com.project.exception" />
+</beans:beans>

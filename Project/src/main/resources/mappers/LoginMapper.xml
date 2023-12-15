@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  	
+  
+    <mapper namespace="com.project.mappers.loginMapper">
+    <resultMap type="com.project.vodto.kjy.Memberkjy" id="memberLoginResultMap">
+  		<result property="memberId" column="member_id"/>
+  		<result property="remember" column="remember"/>
+  		<result property="name" column="name"/>
+  		<result property="email" column="email"/>
+  	</resultMap>
+    	<!-- 로그인 하는 유저의 정보가 DB에 있는지 조회 -->
+    	<select id="selectLoginUser" resultMap="memberLoginResultMap">
+    		select * from member where member_id = #{username} and password = sha1(md5(#{password}))
+    	</select>
+    	<!-- 로그인에 성공한 유저의 최종 접속일을 갱신 -->
+    	<update id="updateLatsAccess" >
+    		update member set last_login_date = now() where member_id = #{memberId}
+    	</update>
+    	<!-- 자동로그인이 체크되어있을 경우 db에 키값을 저장 -->
+    	<update id="updateRememberKey">
+    		update member set remember = #{key} where member_id = #{memberId}
+    	</update>
+    	<!-- 자동로그인 확인 -->
+    	<select id="rememberCheck" resultMap="memberLoginResultMap">
+    		select * from member where member_id = #{memberId} and remember = #{key}
+    	</select>
+    	<!-- id로 계정 조회 -->
+    	<select id="selectMemberById" resultMap="memberLoginResultMap">
+    		select * from member where member_id = #{id}
+    	</select>
+    	<!-- 이름과 이메일로 계정 조회 -->
+    	<select id="selectMemberByNameAndEmail" resultMap="memberLoginResultMap">
+    		select member_id, name, email from member where name = #{userName} and email = #{email}
+    		<if test="userId != null and userId !='noId'">
+    			and member_id = #{userId}
+    		</if>
+    	</select>
+    	<update id="updatePassword">
+    		update member set password = sha1(md5(#{password})) where member_id = #{userId}
+    	</update>
+    	<select id="isAdminBySelectPermission" resultMap="memberLoginResultMap">
+    		select member_id, permission from member where member_id = #{id} and permission = "ROLE_ADMIN" 
+    	</select>
+  	</mapper>

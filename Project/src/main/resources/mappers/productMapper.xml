@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.mappers.productMapper">
+	<select id="getProductInfo" resultType="com.project.vodto.kjs.DisPlayedProductDTO">
+		SELECT p.*, r.participation_count, r.rating
+		FROM products p
+		LEFT OUTER JOIN ratings r
+		ON p.product_id = r.product_id
+		WHERE p.product_id = #{productId}
+	</select>
+	<select id="getProductImages" resultType="com.project.vodto.kjs.ProductImage">
+		SELECT product_id, product_image FROM product_images WHERE product_id = #{productId}
+	</select>
+	<select id="getProductCategory" resultType="String">
+		SELECT c.name
+		FROM categories c
+		INNER JOIN category_paths p
+		ON c.id = p.ancestor
+		WHERE p.descendant = #{categoryKey}
+	</select>
+	<select id="getBestSeller" resultType="com.project.vodto.kjs.BestSellerVO">
+		SELECT p.product_id, p.product_name, p.selling_price, i.product_image
+		FROM products p
+		INNER JOIN (
+				SELECT product_id, product_image FROM product_images GROUP BY product_id
+			) AS i
+		ON p.product_id = i.product_id
+		WHERE p.best_seller_status = 1
+		ORDER BY RAND(), p.publication_date DESC LIMIT 4
+	</select>
+	<select id="getRelatedProduct" resultType="com.project.vodto.kjs.RelatedProductDTO">
+		SELECT p.product_id, p.product_name, i.product_image, r.rating, p.consumer_price, p.selling_price, c.name as category
+		FROM products p
+		LEFT OUTER JOIN product_images i
+		ON p.product_id = i.product_id
+		LEFT OUTER JOIN ratings r
+		ON p.product_id = r.product_id
+		INNER JOIN categories c
+		ON p.category_key = c.id
+		WHERE p.category_key = #{categoryKey} AND p.product_id != #{productId}
+		GROUP BY p.product_id
+		ORDER BY CASE WHEN p.product_name LIKE CONCAT(SUBSTR(#{productName}, 1, 5), '%') THEN 1
+					WHEN p.product_name LIKE CONCAT(SUBSTR(#{productName}, -5, 5), '%')THEN 2 ELSE 3 END,
+				CASE WHEN p.publisher = #{publisher} THEN 1 ELSE 2 END, p.publication_date DESC
+		LIMIT #{count}
+	</select>
+	<select id="getProductRatingCount" resultType="com.project.vodto.kjs.ProductRatingCountVO">
+		SELECT rating, count(rating) as count
+		FROM review_board
+		WHERE product_id = #{productId} AND is_delete = 'N'
+		GROUP BY rating;
+	</select>
+</mapper>

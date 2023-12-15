@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></bean>
+
+	<security:http>
+		<security:form-login login-page="/login/" login-processing-url="/login/" />
+		<security:logout logout-url="/logout" invalidate-session="true" logout-success-url="/login/" delete-cookies="al"/>
+		<security:access-denied-handler error-page="/login/accessError"/>
+	</security:http>
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:password-encoder ref="bcryptPasswordEncoder"></security:password-encoder>
+			<security:jdbc-user-service data-source-ref="dataSource"  users-by-username-query="SELECT member_id, password, 1 as enabled FROM member WHERE member_id = ?"
+            authorities-by-username-query="SELECT member_id, permission FROM member WHERE member_id = ?" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+	
+</beans>

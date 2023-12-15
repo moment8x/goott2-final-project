@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.mappers.adminBoardMapper">
+	<select id="selectPostInfo" resultType="PostResponse">
+		SELECT b.post_no,
+			   c.category_name,
+			   c.subcategory,
+		       b.title,
+		       m.name,
+		       b.author,
+	    CASE   WHEN r.re > 0 THEN '답변완료'       
+			   ELSE '답변전'
+		       END status,
+		       b.created_date
+		FROM board b
+		INNER JOIN board_categories c
+			ON b.category_id = c.category_id
+		INNER JOIN member m
+			ON b.author = m.member_id
+		LEFT JOIN board_uf f
+			ON b.post_no = f.post_no
+		LEFT JOIN (SELECT s.post_no, s.re, s.ref, s.ref_order
+				FROM (SELECT b.post_no, b.ref, b.ref_order,
+				(SELECT count(post_no) 
+				FROM board 
+				WHERE ref = b.ref AND step = b.step + 1 AND ref_order >= b.ref_order + 1) re
+				from board b) s) r
+			ON b.post_no = r.post_no
+		<where>
+			<if test='(createdDateStart != null and !createdDateStart.equals("")) and 
+	         		(createdDateEnd != null and !createdDateEnd.equals(""))'>
+	         		AND (b.created_date BETWEEN #{createdDateStart} AND #{createdDateEnd})
+         	</if>
+         	<if test='categoryId != null and !categoryId.equals("")' >
+				AND b.category_id = #{categoryId}
+			</if>
+			<if test='title != null and !title.equals("")' >
+				AND b.title = #{title}
+			</if>
+			<if test='content != null and !content.equals("")' >
+				AND b.content = #{content}
+			</if>
+			<if test='author != null and !author.equals("")' >
+				AND b.author = #{author}
+			</if>
+			
+			<choose>
+				<when test='reply == 1'>
+					AND r.re > 0
+				</when>
+				<when test='reply == 0'>
+					AND r.re = 0
+				</when>
+			</choose>	
+			
+			<choose>
+				<when test='file == 1'>
+					AND (f.upload_files_seq IS NOT NULL and f.upload_files_seq != '')
+				</when>
+				<when test='file == 0'>
+					AND (f.upload_files_seq IS NULL or f.upload_files_seq = '')
+				</when>
+			</choose>	
+		</where>
+		ORDER BY r.ref DESC, r.ref_order ASC
+	</select>	
+</mapper>

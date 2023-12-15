@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.mappers.adminStatisticsMapper">
+	
+	<select id="selectBestSeller" resultType="BestSellerResponse">
+		SELECT 		i.product_image, p.product_id, p.product_name, p.selling_price, p.category_key
+		FROM		products p 
+		INNER JOIN 	product_images i
+		ON 			p.product_id = i.product_id
+		WHERE 		p.best_seller_status = 1 
+		GROUP BY 	p.product_id
+		ORDER BY 	p.product_id DESC 
+					limit 6
+	</select>	
+	
+<!-- 매출 분석 -->
+	
+	<!-- 매출분석(일별 매출) -->
+	<select id="selectDaliyReport" resultType="RevenueResponse">
+			SELECT 	CONCAT(p.payment_time, '(', CASE DAYOFWEEK(p.payment_time) WHEN 1 THEN '일'
+															                   WHEN 2 THEN '월'
+															                   WHEN 3 THEN '화'
+															                   WHEN 4 THEN '수'
+															                   WHEN 5 THEN '목'
+															                   WHEN 6 THEN '금'
+															                   WHEN 7 THEN '토'
+																               END, ')') date,
+					(COUNT(DISTINCT p.order_no) + COUNT(DISTINCT p.non_order_no)) orderCount,
+					COALESCE(SUM(s.product_id_count),0) itemCount,
+					SUM(p.total_amount) totalPurchaseAmount,
+					SUM(p.shipping_fee) shippingFee,
+					COALESCE(SUM(s.coupon_discount),0) coupon,
+					SUM(p.used_reward ) reward,
+					SUM(p.used_points) point,
+					SUM(p.actual_payment_amount) totalPaymentAmount,
+					COALESCE(SUM(s.actual_refund_amount),0) totalRefundAmount,
+					SUM(p.actual_payment_amount - COALESCE(s.actual_refund_amount, 0)) netSales
+		FROM 		(
+						SELECT		@payment_time := DATE(IF(p.payment_method = 'bkt', b.payment_time, p.payment_time)) payment_time,
+									p.order_no,
+		                            p.non_order_no,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.total_amount ELSE 0 END total_amount,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.shipping_fee ELSE 0 END shipping_fee,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.used_reward ELSE 0 END used_reward,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.used_points ELSE 0 END used_points,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.actual_payment_amount ELSE 0 END actual_payment_amount,
+									p.payment_status
+						FROM 		payments p
+						LEFT JOIN 	bank_transfers b 
+		                ON			p.payment_number = b.payment_number  
+					) p
+		LEFT JOIN 	(
+						SELECT 		d.order_no,
+									d.non_order_no,
+									CASE WHEN d.product_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN SUM(d.coupon_discount) ELSE 0 END coupon_discount,
+		                            COUNT(DISTINCT d.product_id) product_id_count,
+		                            SUM(r.actual_refund_amount) actual_refund_amount
+						FROM 		detailed_order_items d
+		                LEFT JOIN	(
+										SELECT		r.actual_refund_amount, c.detailed_order_id
+										FROM		cancellations c 
+										LEFT JOIN	refunds r 
+										ON 			c.cancel_id = r.cancel_id
+		                                WHERE		r.refund_processing_detail = 'Y'
+									) r
+						ON			d.detailed_order_id = r.detailed_order_id	
+						GROUP BY 	order_no
+					) s 
+		ON 			p.order_no = s.order_no
+		<where>
+			<choose> 
+	         	<when test='(dateStart != null and !dateStart.equals("")) and 
+         			(dateEnd!= null and !dateEnd.equals(""))'>
+	         		p.payment_time BETWEEN #{dateStart} AND #{dateEnd}
+	         	</when>
+	         	<when test='(dateStart == null or dateStart.equals("")) and 
+	         		(dateEnd!= null and !dateEnd.equals(""))'>
+				    <![CDATA[ p.payment_time <= #{dateEnd} ]]>
+				</when>
+	         	<when test='(dateStart != null and !dateStart.equals("")) and 
+	         		(dateEnd == null or dateEnd.equals(""))'>
+	         		p.payment_time >= #{dateStart} 
+	         	</when> 
+	        </choose>	
+		</where>
+		GROUP BY	date 
+		ORDER BY	date DESC	
+	</select>	
+	
+	<!-- 매출분석(주별 매출) -->
+	<select id="selectWeeklyReport" resultType="RevenueResponse">
+		SELECT		CONCAT(MIN(DATE_FORMAT(week_start, '%Y-%m-%d')),' ~ ',MAX(DATE_FORMAT(week_end, '%Y-%m-%d'))) date,
+					COUNT(DISTINCT p.order_no) + COUNT(DISTINCT p.non_order_no) orderCount,
+					COALESCE(SUM(s.product_id_count),0) itemCount,
+					SUM(p.total_amount) totalPurchaseAmount,
+					SUM(p.shipping_fee)  shippingFee,
+					COALESCE(SUM(s.coupon_discount),0) coupon,
+					SUM(p.used_reward ) reward,
+					SUM(p.used_points) point,
+					SUM(p.actual_payment_amount) totalPaymentAmount,
+					COALESCE(SUM(s.actual_refund_amount),0) totalRefundAmount,
+					SUM(p.actual_payment_amount - COALESCE(s.actual_refund_amount, 0)) netSales
+		FROM 		(
+						SELECT		@payment_time := IF(p.payment_method = 'bkt', b.payment_time, p.payment_time) payment_time,
+									p.order_no,
+		                            p.non_order_no,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.total_amount ELSE 0 END total_amount,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.shipping_fee ELSE 0 END shipping_fee,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.used_reward ELSE 0 END used_reward,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.used_points ELSE 0 END used_points,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.actual_payment_amount ELSE 0 END actual_payment_amount,
+									p.payment_status,
+									DATE(@payment_time - INTERVAL WEEKDAY(@payment_time) DAY) week_start,
+									DATE(@payment_time + INTERVAL (6 - WEEKDAY(@payment_time)) DAY) week_end
+						FROM 		payments p
+						LEFT JOIN 	bank_transfers b ON p.payment_number = b.payment_number
+					) p
+		LEFT JOIN 	(
+						SELECT 		d.order_no,
+									d.non_order_no,
+									CASE WHEN d.product_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN SUM(d.coupon_discount) ELSE 0 END coupon_discount,
+		                            COUNT(DISTINCT d.product_id) product_id_count,
+		                            SUM(r.actual_refund_amount) actual_refund_amount
+						FROM 		detailed_order_items d
+		                LEFT JOIN	(
+										SELECT		r.actual_refund_amount, c.detailed_order_id
+										FROM		cancellations c 
+										LEFT JOIN	refunds r 
+										ON 			c.cancel_id = r.cancel_id
+		                                WHERE		r.refund_processing_detail = 'Y'
+									) r
+						ON			d.detailed_order_id = r.detailed_order_id	
+						GROUP BY 	order_no
+					) s 
+		ON 			p.order_no = s.order_no
+		<where>
+			<choose> 
+	         	<when test='(dateStart != null and !dateStart.equals("")) and 
+         			(dateEnd!= null and !dateEnd.equals(""))'>
+	         		p.payment_time BETWEEN #{dateStart} AND #{dateEnd}
+	         	</when>
+	         	<when test='(dateStart == null or dateStart.equals("")) and 
+	         		(dateEnd!= null and !dateEnd.equals(""))'>
+				    <![CDATA[ p.payment_time <= #{dateEnd} ]]>
+				</when>
+	         	<when test='(dateStart != null and !dateStart.equals("")) and 
+	         		(dateEnd == null or dateEnd.equals(""))'>
+	         		p.payment_time >= #{dateStart} 
+	         	</when> 
+	        </choose>	
+		</where>
+		GROUP BY 	WEEK(p.payment_time, 3)
+		ORDER BY 	date DESC
+	</select>	
+	
+	<!-- 매출분석(월별 매출) -->
+	<select id="selectMonthlyReport" resultType="RevenueResponse">
+		SELECT 		DATE_FORMAT(p.payment_time, '%Y-%m') date,
+					COUNT(DISTINCT p.order_no) + COUNT(DISTINCT p.non_order_no) orderCount,
+					SUM(s.product_id_count) itemCount,
+					SUM(p.total_amount) totalPurchaseAmount,
+					SUM(p.shipping_fee) shippingFee,
+					SUM(s.coupon_discount) coupon,
+					SUM(p.used_reward) reward,
+					SUM(p.used_points) point,
+					SUM(p.actual_payment_amount) totalPaymentAmount,
+					COALESCE(SUM(s.actual_refund_amount),0) totalRefundAmount,
+					SUM(p.actual_payment_amount - COALESCE(s.actual_refund_amount, 0)) netSales
+		FROM 		(
+						SELECT		IF(p.payment_method = 'bkt', b.payment_time, p.payment_time) payment_time,
+									p.order_no,
+		                            p.non_order_no,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.total_amount ELSE 0 END total_amount,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.shipping_fee ELSE 0 END shipping_fee,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.used_reward ELSE 0 END used_reward,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.used_points ELSE 0 END used_points,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.actual_payment_amount ELSE 0 END actual_payment_amount,
+									p.payment_status
+						FROM 		payments p
+						LEFT JOIN 	bank_transfers b ON p.payment_number = b.payment_number
+					) p
+		LEFT JOIN 	(
+						SELECT 		d.order_no,
+									d.non_order_no,
+									CASE WHEN d.product_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN SUM(d.coupon_discount) ELSE 0 END coupon_discount, 
+		                            COUNT(DISTINCT d.product_id) product_id_count,
+		                            SUM(r.actual_refund_amount) actual_refund_amount
+						FROM 		detailed_order_items d
+		                LEFT JOIN	(
+										SELECT		r.actual_refund_amount, c.detailed_order_id
+										FROM		cancellations c 
+										LEFT JOIN	refunds r 
+										ON 			c.cancel_id = r.cancel_id
+		                                WHERE		r.refund_processing_detail = 'Y'
+									) r
+						ON			d.detailed_order_id = r.detailed_order_id	
+						GROUP BY 	order_no
+					) s 
+		ON 			p.order_no = s.order_no
+		<where>
+			<choose> 
+	         	<when test='(dateStart != null and !dateStart.equals("")) and 
+         			(dateEnd!= null and !dateEnd.equals(""))'>
+	         		p.payment_time BETWEEN #{dateStart} AND #{dateEnd}
+	         	</when>
+	         	<when test='(dateStart == null or dateStart.equals("")) and 
+	         		(dateEnd!= null and !dateEnd.equals(""))'>
+				    <![CDATA[ p.payment_time <= #{dateEnd} ]]>
+				</when>
+	         	<when test='(dateStart != null and !dateStart.equals("")) and 
+	         		(dateEnd == null or dateEnd.equals(""))'>
+	         		p.payment_time >= #{dateStart} 
+	         	</when> 
+	        </choose>	
+		</where>
+		GROUP BY 	MONTH(p.payment_time)
+		ORDER BY	date DESC	
+	</select>	
+	
+	<!-- 매출분석(매출 집계) -->
+	<select id="selectRevenueReport" resultType="AggregateResponse">
+		SELECT 		SUM(p.actual_payment_amount - COALESCE(s.actual_refund_amount, 0)) netSales,
+		            SUM(s.net_purchase - COALESCE(FORMAT(s.refund_purchase, 0), 0)) netPurchases,
+		            (SUM(p.actual_payment_amount - COALESCE(s.actual_refund_amount, 0))) - (SUM(s.net_purchase - COALESCE(FORMAT(s.refund_purchase, 0), 0))) grossProfit
+		FROM 		(
+						
+						SELECT		@payment_time := IF(p.payment_method = 'bkt', b.payment_time, p.payment_time) payment_time,
+									p.order_no,
+		                            p.non_order_no,
+									CASE WHEN p.payment_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN p.actual_payment_amount ELSE 0 END actual_payment_amount
+						FROM 		payments p
+						LEFT JOIN 	bank_transfers b 
+		                ON			p.payment_number = b.payment_number  
+					) p
+		LEFT JOIN 	(
+						SELECT 		d.order_no,
+									d.non_order_no,
+									CASE WHEN d.product_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN SUM(p.supply_price * d.product_quantity) ELSE 0 END net_purchase, 
+		                            SUM(r.actual_refund_amount) actual_refund_amount,
+		                            SUM(r.refund_purchase) refund_purchase
+						FROM 		detailed_order_items d
+		                INNER JOIN  products p
+		                ON			d.product_id = p.product_id
+		                LEFT JOIN	(
+										SELECT		r.actual_refund_amount, 
+													c.detailed_order_id,
+		                                            p.supply_price * (r.total_refund_amount / p.selling_price) refund_purchase
+										FROM		cancellations c 
+										LEFT JOIN	refunds r 
+										ON 			c.cancel_id = r.cancel_id
+		                                INNER JOIN  products p
+		                                ON 			r.product_id = p.product_id
+		                                WHERE		r.refund_processing_detail = 'Y'
+									) r
+						ON			d.detailed_order_id = r.detailed_order_id	
+						GROUP BY 	order_no
+					) s 
+		ON 			p.order_no = s.order_no
+		<where>
+			<choose> 
+	         	<when test='(dateStart != null and !dateStart.equals("")) and 
+         			(dateEnd!= null and !dateEnd.equals(""))'>
+	         		p.payment_time BETWEEN #{dateStart} AND #{dateEnd}
+	         	</when>
+	         	<when test='(dateStart == null or dateStart.equals("")) and 
+	         		(dateEnd!= null and !dateEnd.equals(""))'>
+				    <![CDATA[ p.payment_time <= #{dateEnd} ]]>
+				</when>
+	         	<when test='(dateStart != null and !dateStart.equals("")) and 
+	         		(dateEnd == null or dateEnd.equals(""))'>
+	         		p.payment_time >= #{dateStart} 
+	         	</when> 
+	        </choose>	
+		</where>
+	</select>	
+	
+<!-- 상품 분석 -->
+
+	<!-- 상품 분석(판매 상품 순위) -->
+	<select id="selectProductRanking" resultType="ProductRankingResponse">
+		SELECT					@rank := @rank + 1 rank,
+								sq.productId,
+								sq.productImage,
+		                        sq.productName,
+								sq.sellingPrice,
+								sq.currentQuantity,
+								sq.paymentQuantity,
+								sq.refundQuantity,
+								sq.salesQuantity,
+								sq.totalSales
+		FROM(
+				SELECT			p.product_id productId, 
+								i.product_image productImage,
+		                        p.product_name productName, 
+								p.selling_price sellingPrice, 
+								p.current_quantity currentQuantity, 
+								SUM(s.quantity) paymentQuantity,
+								COUNT(r.product_id) refundQuantity,
+								(SUM(s.quantity) - COUNT(r.product_id)) salesQuantity, 
+								p.selling_price * (SUM(s.quantity) - COUNT(r.product_id)) totalSales
+				FROM 			(
+									SELECT		order_no,
+												product_id, 
+												detailed_order_id,
+									CASE WHEN 	product_status NOT REGEXP '취소|반품|교환|환불|입금전' 
+										 THEN 	product_quantity 
+		                                 ELSE 	0 
+									END 		quantity    
+									FROM		detailed_order_items
+								) s
+				LEFT JOIN 		(
+									SELECT		@payment_time := DATE(IF(p.payment_method = 'bkt', b.payment_time, p.payment_time)) payment_time,
+												p.order_no
+									FROM 		payments p
+									LEFT JOIN 	bank_transfers b 
+									ON			p.payment_number = b.payment_number  
+								) p
+				ON				s.order_no = p.order_no
+				LEFT JOIN		(
+									SELECT		r.actual_refund_amount, c.detailed_order_id, r.product_id
+									FROM		cancellations c 
+									LEFT JOIN	refunds r 
+									ON 			c.cancel_id = r.cancel_id
+									WHERE		r.refund_processing_detail = 'Y'
+								) r
+				ON				s.detailed_order_id = r.detailed_order_id
+				INNER JOIN 		products p 
+				ON 				s.product_id = p.product_id
+		        INNER JOIN		product_images i 
+		        ON				s.product_id = i.product_id
+		        <where>
+					<choose> 
+			         	<when test='(dateStart != null and !dateStart.equals("")) and 
+		         			(dateEnd!= null and !dateEnd.equals(""))'>
+			         		p.payment_time BETWEEN #{dateStart} AND #{dateEnd}
+			         	</when>
+			         	<when test='(dateStart == null or dateStart.equals("")) and 
+			         		(dateEnd!= null and !dateEnd.equals(""))'>
+						    <![CDATA[ p.payment_time <= #{dateEnd} ]]>
+						</when>
+			         	<when test='(dateStart != null and !dateStart.equals("")) and 
+			         		(dateEnd == null or dateEnd.equals(""))'>
+			         		p.payment_time >= #{dateStart} 
+			         	</when> 
+			        </choose>
+				</where>
+				GROUP BY 		p.product_id
+				ORDER BY 		<choose>
+									<when test='isTotalSalesRanking == true'>
+						         		totalSales DESC
+						         	</when>
+						         	<when test='isTotalSalesRanking == false'>
+						         		salesQuantity DESC
+						         	</when>
+								</choose>
+		) sq, (SELECT @rank := 0) ra <if test="limit != 0 "> LIMIT #{limit}</if>;
+	</select>
+	
+	<!-- 상품 분석(판매 분류 순위) -->
+	<select id="selectCategoryRanking" resultType="CategoryRankingResponse">
+		SELECT					@rank := @rank + 1 rank,
+								sq.mainCategory,
+								sq.subCategory1,
+								sq.subCategory2,
+								sq.detailCategory,
+								sq.paymentQuantity,
+								sq.refundQuantity,
+								sq.salesQuantity,
+								sq.sellingPrice
+		FROM(
+				SELECT			ca3.name AS mainCategory,
+								ca2.name AS subCategory1,
+								ca1.name AS subCategory2,
+								ca0.name AS detailCategory,
+								SUM(s.quantity) 'paymentQuantity',
+								COUNT(r.product_id) refundQuantity,
+								SUM(s.quantity) - COUNT(r.product_id) salesQuantity, 
+								p.selling_price sellingPrice,
+								p.selling_price * (SUM(s.quantity) - COUNT(r.product_id)) totalSales
+				FROM 			(
+									SELECT		order_no,
+												product_id, 
+												detailed_order_id,
+												CASE WHEN product_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN product_quantity ELSE 0 END quantity    
+									FROM		detailed_order_items
+								) s
+				LEFT JOIN 		(
+									SELECT		@payment_time := DATE(IF(p.payment_method = 'bkt', b.payment_time, p.payment_time)) payment_time,
+												p.order_no
+									FROM 		payments p
+									LEFT JOIN 	bank_transfers b 
+									ON			p.payment_number = b.payment_number  
+								) p
+				ON				s.order_no = p.order_no
+				LEFT JOIN		(
+									SELECT		r.actual_refund_amount, c.detailed_order_id, r.product_id
+									FROM		cancellations c 
+									LEFT JOIN	refunds r 
+									ON 			c.cancel_id = r.cancel_id
+									WHERE		r.refund_processing_detail = 'Y'
+								) r
+				ON				s.detailed_order_id = r.detailed_order_id
+				INNER JOIN 		products p 
+				ON 				s.product_id = p.product_id
+				LEFT JOIN 		category_paths pa3 
+		        ON 				p.category_key = pa3.descendant AND pa3.depth = 3
+				LEFT JOIN 		categories ca3 
+		        ON 				pa3.ancestor = ca3.id
+				LEFT JOIN 		category_paths pa2 
+		        ON 				p.category_key = pa2.descendant AND pa2.depth = 2
+				LEFT JOIN 		categories ca2 
+		        ON 				pa2.ancestor = ca2.id
+				LEFT JOIN 		category_paths pa1 
+		        ON 				p.category_key = pa1.descendant AND pa1.depth = 1
+				LEFT JOIN 		categories ca1 
+		        ON 				pa1.ancestor = ca1.id
+				LEFT JOIN 		category_paths pa0 
+		        ON 				p.category_key = pa0.descendant AND pa0.depth = 0
+				LEFT JOIN 		categories ca0 
+		        ON 				pa0.ancestor = ca0.id
+				<where>
+					<choose> 
+			         	<when test='(dateStart != null and !dateStart.equals("")) and 
+		         			(dateEnd!= null and !dateEnd.equals(""))'>
+			         		p.payment_time BETWEEN #{dateStart} AND #{dateEnd}
+			         	</when>
+			         	<when test='(dateStart == null or dateStart.equals("")) and 
+			         		(dateEnd!= null and !dateEnd.equals(""))'>
+						    <![CDATA[ p.payment_time <= #{dateEnd} ]]>
+						</when>
+			         	<when test='(dateStart != null and !dateStart.equals("")) and 
+			         		(dateEnd == null or dateEnd.equals(""))'>
+			         		p.payment_time >= #{dateStart} 
+			         	</when> 
+			        </choose>	
+				</where>
+				GROUP BY 		p.product_id
+				ORDER BY 		<choose>
+									<when test='isTotalSalesRanking == true'>
+						         		totalSales DESC
+						         	</when>
+						         	<when test='isTotalSalesRanking == false'>
+						         		salesQuantity DESC
+						         	</when>
+								</choose>
+		) sq, (SELECT @rank := 0) ra <if test="limit != 0 "> LIMIT #{limit}</if>
+	</select>
+	
+	<!-- 상품 분석(취소/반품 순위) -->
+	<select id="selectReturnRanking" resultType="ProductRankingResponse">
+		SELECT					@rank := @rank + 1 rank,
+								sq.productId,
+								sq.productImage,
+								sq.productName,
+								sq.sellingPrice,
+								sq.currentQuantity,
+								sq.paymentQuantity,
+								sq.refundQuantity,
+								sq.returnRate,
+								sq.totalSales
+		FROM(
+				SELECT			p.product_id productId, 
+								i.product_image productImage,
+								p.product_name productName, 
+								p.selling_price sellingPrice, 
+								p.current_quantity currentQuantity, 
+								SUM(s.quantity) paymentQuantity,
+								COUNT(r.product_id) refundQuantity,
+		                        COALESCE((COUNT(r.product_id) / SUM(s.quantity) * 100),0) returnRate,
+								p.selling_price * (SUM(s.quantity) - COUNT(r.product_id)) totalSales
+				FROM 			(
+									SELECT		order_no,
+												product_id, 
+												detailed_order_id,
+												CASE WHEN product_status NOT REGEXP '취소|반품|교환|환불|입금전' THEN product_quantity ELSE 0 END quantity    
+									FROM		detailed_order_items
+								) s
+				LEFT JOIN 		(
+									SELECT		@payment_time := DATE(IF(p.payment_method = 'bkt', b.payment_time, p.payment_time)) payment_time,
+												p.order_no
+									FROM 		payments p
+									LEFT JOIN 	bank_transfers b 
+									ON			p.payment_number = b.payment_number  
+								) p
+				ON				s.order_no = p.order_no								
+				LEFT JOIN		(
+									SELECT		r.actual_refund_amount, c.detailed_order_id, r.product_id
+									FROM		cancellations c 
+									LEFT JOIN	refunds r 
+									ON 			c.cancel_id = r.cancel_id
+									WHERE		r.refund_processing_detail = 'Y'
+								) r
+				ON				s.detailed_order_id = r.detailed_order_id
+				INNER JOIN 		products p 
+				ON 				s.product_id = p.product_id
+		        INNER JOIN		product_images i 
+		        ON				s.product_id = i.product_id
+		        <where>
+					<choose> 
+			         	<when test='(dateStart != null and !dateStart.equals("")) and 
+		         			(dateEnd!= null and !dateEnd.equals(""))'>
+			         		p.payment_time BETWEEN #{dateStart} AND #{dateEnd}
+			         	</when>
+			         	<when test='(dateStart == null or dateStart.equals("")) and 
+			         		(dateEnd!= null and !dateEnd.equals(""))'>
+						    <![CDATA[ p.payment_time <= #{dateEnd} ]]>
+						</when>
+			         	<when test='(dateStart != null and !dateStart.equals("")) and 
+			         		(dateEnd == null or dateEnd.equals(""))'>
+			         		p.payment_time >= #{dateStart} 
+			         	</when> 
+			        </choose>	
+				</where>
+				GROUP BY 		p.product_id
+				ORDER BY 		<choose>
+									<when test='isReturnRateRanking == true'>
+						         		returnRate DESC
+						         	</when>
+						         	<when test='isReturnRateRanking == false'>
+						         		refundQuantity DESC
+						         	</when>
+								</choose>
+		) sq, (SELECT @rank := 0) ra <if test="limit != 0 "> LIMIT #{limit}</if>;
+	</select>
+	
+	<!-- 상품 분석(장바구니 상품 분석) -->
+	<select id="selectCartInfo" resultType="UserStorageResponse">
+		SELECT					@rank := @rank + 1 rank,
+								sq.productId,
+								sq.productImage,
+								sq.productName,
+								sq.sellingPrice,
+								sq.quantity,
+								sq.paymentQuantity,
+								sq.currentQuantity
+		FROM(
+				SELECT			p.product_id productId, 
+								i.product_image productImage,
+								p.product_name productName, 
+								p.selling_price sellingPrice, 
+								sh.quantity quantity,
+								SUM(s.sales_quantity) paymentQuantity,
+								p.current_quantity currentQuantity							
+				FROM 			(
+									SELECT		@payment_time := DATE(IF(pa.payment_method = 'bkt', b.payment_time, pa.payment_time)) payment_time,
+												d.order_no,
+												d.product_id, 
+												d.detailed_order_id,
+									CASE WHEN 	d.product_status NOT REGEXP '취소|반품|교환|환불|입금전' 
+										 THEN   d.product_quantity
+										 ELSE 	0  
+		                            END 		sales_quantity    
+									FROM		detailed_order_items d
+									INNER JOIN	payments pa		
+									ON			d.order_no = pa.order_no
+		                            LEFT JOIN 	bank_transfers b 
+									ON			pa.payment_number = b.payment_number 
+		                            WHERE 		pa.payment_time BETWEEN DATE_ADD(NOW(), INTERVAL -1 WEEK) AND NOW()
+								) s
+		        INNER JOIN		product_images i 
+		        ON				s.product_id = i.product_id
+		        RIGHT JOIN		(
+									SELECT		product_id, SUM(quantity) quantity
+		                            FROM		shopping_cart
+		                            GROUP BY	product_id
+								) sh
+		        ON				s.product_id = sh.product_id
+		        INNER JOIN 		products p 
+				ON 				sh.product_id = p.product_id
+		        <where>
+					<choose> 
+			         	<when test='(dateStart != null and !dateStart.equals("")) and 
+		         			(dateEnd!= null and !dateEnd.equals(""))'>
+			         		s.payment_time BETWEEN #{dateStart} AND #{dateEnd}
+			         	</when>
+			         	<when test='(dateStart == null or dateStart.equals("")) and 
+			         		(dateEnd!= null and !dateEnd.equals(""))'>
+						    <![CDATA[ s.payment_time <= #{dateEnd} ]]>
+						</when>
+			         	<when test='(dateStart != null and !dateStart.equals("")) and 
+			         		(dateEnd == null or dateEnd.equals(""))'>
+			         		s.payment_time >= #{dateStart} 
+			         	</when> 
+			        </choose>	
+				</where>
+				GROUP BY 		sh.product_id
+				ORDER BY 		quantity DESC
+		) sq, (SELECT @rank := 0) ra <if test="limit != 0 "> LIMIT #{limit}</if>
+	</select>
+	
+	<!-- 상품 분석(관심 상품 분석) -->
+	<select id="selectWishlistInfo" resultType="UserStorageResponse">
+		SELECT					@rank := @rank + 1 rank,
+								sq.productId,
+								sq.productImage,
+								sq.productName,
+								sq.sellingPrice,
+								sq.paymentQuantity,
+								sq.currentQuantity,
+								sq.quantity
+		FROM(
+				SELECT			wl.product_id productId, 
+								wl.product_image productImage,
+								wl.product_name productName, 
+								wl.selling_price sellingPrice, 
+								wl.current_quantity currentQuantity,
+								COALESCE(SUM(s.sales_quantity),0) paymentQuantity,
+								wl.quantity
+				FROM 			(
+									SELECT		@payment_time := DATE(IF(pa.payment_method = 'bkt', b.payment_time, pa.payment_time)) payment_time,
+												d.order_no,
+												d.product_id, 
+												d.detailed_order_id,
+									CASE WHEN 	d.product_status NOT REGEXP '취소|반품|교환|환불|입금전' 
+										 THEN   d.product_quantity
+										 ELSE 	0  
+		                            END 		sales_quantity    
+									FROM		detailed_order_items d
+									INNER JOIN	payments pa		
+									ON			d.order_no = pa.order_no
+		                            LEFT JOIN 	bank_transfers b 
+									ON			pa.payment_number = b.payment_number 
+		                            WHERE 		pa.payment_time BETWEEN DATE_ADD(NOW(), INTERVAL -1 WEEK) AND NOW()
+								) s
+		        RIGHT JOIN		(
+									SELECT		w.product_id,
+												COUNT(w.product_id) quantity, 
+												i.product_image,
+												p.product_name, 
+												p.selling_price, 
+												p.current_quantity	
+		                            FROM		wishlist w
+									INNER JOIN 	products p 
+									ON 			w.product_id = p.product_id
+									INNER JOIN	(
+													SELECT 	 product_id, product_image
+		                                            FROM	 product_images
+		                                            GROUP BY product_id
+												) i 
+									ON			w.product_id = i.product_id
+		                            GROUP BY	w.product_id
+								) wl
+		        ON				s.product_id = wl.product_id
+		        <where>
+					<choose> 
+			         	<when test='(dateStart != null and !dateStart.equals("")) and 
+		         			(dateEnd!= null and !dateEnd.equals(""))'>
+			         		s.payment_time BETWEEN #{dateStart} AND #{dateEnd}
+			         	</when>
+			         	<when test='(dateStart == null or dateStart.equals("")) and 
+			         		(dateEnd!= null and !dateEnd.equals(""))'>
+						    <![CDATA[ s.payment_time <= #{dateEnd} ]]>
+						</when>
+			         	<when test='(dateStart != null and !dateStart.equals("")) and 
+			         		(dateEnd == null or dateEnd.equals(""))'>
+			         		s.payment_time >= #{dateStart} 
+			         	</when> 
+			        </choose>	
+				</where>
+				GROUP BY 		wl.product_id
+				ORDER BY 		quantity DESC
+		) sq, (SELECT @rank := 0) ra <if test="limit != 0 "> LIMIT #{limit}</if>
+	</select>
+	
+</mapper>

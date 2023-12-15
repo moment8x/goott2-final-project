@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.mappers.adminInquiryMapper">
+	<select id="selectInquiryInfo" resultType="InquiryResponse">
+		SELECT 		c.inquiry_type, 
+			   		c.title, 
+			   		c.order_no, 
+		       		c.email, 
+		       		m.name, 
+		       		c.author, 
+		       		c.created_date, 
+		       		c.answer_status,
+		       		(
+		       			SELECT author FROM customer_inquiries_board 
+		       		 	WHERE  ref = c.ref AND step = c.step + 1 AND ref_order > c.ref_order
+		       		 	AND    answer_status = 'a'
+		       		 ) answer,
+		       		c.answer_date
+		FROM   		customer_inquiries_board c
+		INNER JOIN  member m
+		ON 			c.author = m.member_id
+		LEFT JOIN   customer_inquiries_uf f
+		ON 			c.post_no = f.post_no
+		<where>
+			<if test='(createdDateStart != null and !createdDateStart.equals("")) and 
+	         		(createdDateEnd != null and !createdDateEnd.equals(""))'>
+	         		AND c.created_date BETWEEN #{createdDateStart} AND #{createdDateEnd}
+         	</if>
+			<if test='title != null and !title.equals("")' >
+				AND c.title = #{title}
+			</if>
+			<if test='email != null and !email.equals("")' >
+				AND c.email = #{email}
+			</if>
+			<if test='content != null and !content.equals("")' >
+				AND c.content = #{content}
+			</if>
+			<if test='author != null and !author.equals("")' >
+				AND c.author = #{author}
+			</if>
+			<if test='name != null and !name.equals("")' >
+				AND m.name = #{name}
+			</if>
+			<if test='orderNo != null and !orderNo.equals("")' >
+				AND c.order_no = #{orderNo}
+			</if>
+			<if test='answerStatus != null and !answerStatus.equals("")' >
+				AND c.answer_status = #{answerStatus}
+			</if>
+			<if test='inquiryType != null and !inquiryType.equals("")' >
+				AND c.inquiry_type = #{inquiryType}
+			</if>
+						
+			<choose>
+				<when test='file == 1'>
+					AND (f.upload_files_seq IS NOT NULL and f.upload_files_seq != '')
+				</when>
+				<when test='file == 0'>
+					AND (f.upload_files_seq IS NULL or f.upload_files_seq = '')
+				</when>
+			</choose>	
+		</where>
+		ORDER BY c.ref DESC, c.ref_order ASC
+	</select>	
+</mapper>

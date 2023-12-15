@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.mappers.nonShoppingCartMapper">
+	<insert id="insertNonMember">
+		INSERT INTO non_shopping_cart VALUES(#{nonMemberId}, #{nonMemberExpirationPeriod})
+	</insert>
+	<delete id="deleteNonMember">
+		<![CDATA[
+			DELETE FROM non_shopping_cart WHERE non_member_expiration_period < now()
+		]]>
+	</delete>
+</mapper>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ksh.mappers.InquiryMapper">
+
+	<insert id="saveInquiry"
+		parameterType="com.project.vodto.ksh.CustomerInquiryDTO">
+		insert into customer_inquiries_board (author, title, content,
+		answer_status, ref, inquiry_type, phone_number, inquiry_sms) values (#{author}, #{title},
+		#{content}, 'n', (select auto_increment from information_schema.tables
+		where table_schema = 'gott123' and table_name =
+		'customer_inquiries_board'), #{inquiryType}, #{phoneNumber}, #{inquirySms})
+		<selectKey resultType="int" keyProperty="postNo"
+			order="AFTER">
+			select post_no from customer_inquiries_board where author =
+			#{author} order
+			by post_no desc limit 1;
+		</selectKey>
+	</insert>
+
+	<insert id="uploadImages"
+		parameterType="com.project.vodto.UploadFiles">
+		INSERT INTO upload_files(thumbnail_file_name, extension,
+		original_file_name, new_file_name, file_size)
+		VALUES(#{thumbnailFileName}, #{extension}, #{originalFileName},
+		#{newFileName}, #{fileSize})
+		<selectKey resultType="int" keyProperty="uploadFilesSeq"
+			order="AFTER">
+			select upload_files_seq from upload_files where new_file_name =
+			#{newFileName};
+		</selectKey>
+	</insert>
+
+	<insert id="insertInquiryFile">
+		INSERT INTO customer_inquiries_uf (post_no,
+		upload_files_seq)
+		VALUES(#{postNo}, #{uploadFilesSeq})
+	</insert>
+
+	<select id="getInquiries"
+		resultType="com.project.vodto.CustomerInquiry">
+		select * from customer_inquiries_board where author IN (#{memberId}, 'qwer123') 
+		order by ref desc, step asc limit #{pi.startRowIndex}, #{pi.viewPostCntPerPage}
+	</select>
+	
+	<select id="getInquiryCnt" resultType="int">
+		select count(*) as totalPostCnt from customer_inquiries_board where author in (#{memberId}, 'qwer123')
+	</select>
+
+	<select id="getDetailInquiry"
+		resultType="com.project.vodto.ksh.CustomerInquiryDTO">
+		select *, count(u.upload_files_seq) AS uploadFilesSeq from
+		customer_inquiries_board b inner join customer_inquiries_uf u on
+		b.post_no = u.post_no and b.author in
+		(#{memberId}, 'qwer123') and b.post_no =
+		#{postNo};
+	</select>
+
+	<resultMap id="filesResult"
+		type="com.project.vodto.UploadFiles">
+
+		<result property="uploadFilesSeq" column="upload_files_seq" />
+		<result property="thumbnailFileName"
+			column="thumbnail_file_name" />
+		<result property="extension" column="extension" />
+		<result property="originalFileName" column="original_file_name" />
+		<result property="newFileName" column="new_file_name" />
+		<result property="fileSize" column="file_size" />
+		<result property="uploadFilesSeq" column="existingFile" />
+
+	</resultMap>
+
+	<select id="getInquiryFiles"
+		parameterType="com.project.vodto.UploadFiles" resultMap="filesResult">
+		<!-- select * from upload_files u inner join customer_inquiries_uf c on 
+			u.upload_files_seq = c.upload_files_seq inner join customer_inquiries_board 
+			b on b.post_no = c.post_no and b.author = #{author} and b.post_no = #{postNo}; -->
+		select u.*, IFNULL(u.upload_files_seq, 0) AS existingFile from
+		upload_files u inner join
+		customer_inquiries_uf c on u.upload_files_seq
+		= c.upload_files_seq
+		inner join customer_inquiries_board b on b.post_no
+		= c.post_no RIGHT OUTER JOIN (SELECT '') AS m_dual
+		ON b.author =
+		#{author} and b.post_no = #{postNo};
+
+	</select>
+
+	<select id="checkValidation" resultType="int">
+		SELECT IFNULL(post_no,
+		0) AS post_no
+		FROM customer_inquiries_board
+		RIGHT OUTER JOIN (SELECT '')
+		AS m_dual
+		ON post_no = #{postNo} and author in (#{author}, 'qwer123');
+	</select>
+
+	
+	<delete id="deleteFiles">
+		DELETE FROM upload_files
+		WHERE new_file_name =
+		#{newFileName}
+
+
+	</delete>
+	<update id="updateInquiry">
+		UPDATE customer_inquiries_board
+		SET title = #{title}, content = #{content}, inquiry_type = #{inquiryType}, phone_number = #{phoneNumber}, inquiry_sms = #{inquirySms}
+		WHERE post_no = #{postNo} and author = #{author};
+	</update>
+	<delete id="deleteInquiry">
+		delete from customer_inquiries_board where author = #{author} and post_no = #{postNo}
+	</delete>
+</mapper>

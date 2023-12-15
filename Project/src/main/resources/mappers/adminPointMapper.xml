@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.mappers.adminPointMapper">
+	<select id="selectPointInfo" resultType="PointInfoResponse">
+		SELECT accumulated_point, accumulated_use_point, total_points
+		FROM   member
+		WHERE  member_id = #{memberId}
+	</select>	
+	
+	<select id="selectPointList" resultType="PointListResponse">
+		SELECT   reason, date, point, balance, related_order
+		FROM     point_logs
+		WHERE    member_id = #{memberId}
+		ORDER BY date DESC
+	</select>	
+</mapper>
