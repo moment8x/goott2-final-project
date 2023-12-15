@@ -313,7 +313,6 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                         <div class="onhover-div onhover-div-login">
                                             <ul class="user-box-name">
                                                 <li class="product-box-contain">
-                                                    <i></i>
                                                     <c:choose>
 														<c:when test="${sessionScope.loginMember == null}">
 		                                                    <a href="/login/">로그인</a>
@@ -323,13 +322,16 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 														</c:otherwise>
 													</c:choose>
                                                 </li>
-
-                                                <li class="product-box-contain">
-                                                	<c:if test="${sessionScope.loginMember == null}">
-	                                                    <a href="/register/register">회원가입</a>
-                                                	</c:if>
-                                                </li>
-                                              <c:if test="${sessionScope.loginMember != null}">
+												 <c:choose>
+														<c:when test="${sessionScope.loginMember == null }">
+			                                                <li class="product-box-contain">
+			                                                    <a href="/register/register">회원가입</a>
+			                                                </li>
+														</c:when>
+														<c:otherwise>
+														</c:otherwise>
+												</c:choose>
+                                              <c:if test="${sessionScope.loginMember != null }">
                                               <li class="product-box-contain">
                                                     <a href="/user/myPage">My Page</a>
                                                 </li>

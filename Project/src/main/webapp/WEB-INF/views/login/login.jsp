@@ -225,6 +225,7 @@
                         <div class="other-log-in">
                         </div>
 
+						<!-- 
                         <div class="login-button">
                             <ul>
                             	<li>
@@ -242,7 +243,8 @@
                                 </li>
                             </ul>
                         </div>
-
+						 -->
+						
                         <div class="other-log-in">
                         </div>
                         <div class="sign-up-box">
