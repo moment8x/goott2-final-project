@@ -1406,7 +1406,7 @@ function editRturnAccount() {
 					</div>
 
 					<c:choose>
-						<c:when test="${detailOrder.paymentMethod eq 'bkt' }">
+						<c:when test="${detailOrder.paymentMethod eq 'bkt'}">
 							<ul class="summery-contain pb-0 border-bottom-0">
 								<li class="pb-0 refundList">
 									<h4>결제수단</h4> <c:if
@@ -1433,6 +1433,7 @@ function editRturnAccount() {
 								</li>
 
 							</ul>
+							
 							<div class="editRefund">
 
 								<div class="col-12">
