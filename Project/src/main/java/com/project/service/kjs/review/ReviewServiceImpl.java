@@ -142,7 +142,7 @@ public class ReviewServiceImpl implements ReviewService {
 		// 전체 글의 개수
 		int ProductCounts = rDao.selectProductCount(productId);
 		
-		PagingInfo pagingInfo = new PagingInfo(ProductCounts, 2, page, 10);
+		PagingInfo pagingInfo = new PagingInfo(ProductCounts, 10, page, 10);
 		return pagingInfo;
 	}
 

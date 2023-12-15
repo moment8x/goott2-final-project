@@ -95,11 +95,20 @@
    
       changeStar();
       
+      // 구매량 조절
+      $('.qty-input').on("blur", function () {
+  		  if (${product.currentQuantity} < $('.qty-input').val()) {
+  			  alert("재고량(${product.currentQuantity})보다 많이 구매하실 수 없습니다.");
+  			  $('.qty-input').val(1);
+  		  }
+  	  });
+      
       // 첨부파일
       uploadFiles();
       
       // 리뷰 작성하려 할 시 검증!
       $("form").click(function(e) {
+    	  console.log("이벤트 버블링...");
          if (${sessionScope.loginMember == null}) {
             if (window.confirm("회원만 리뷰 등록이 가능합니다. 로그인 페이지로 이동하시겠습니까?")) {
                location.href="/login/";
@@ -150,11 +159,13 @@
 					dataType : "JSON",
 					async : false,
 					success : function(data) {
+						console.log(data);
 						if (data != null) 
 							fileList = [];
 							deleteFileList = [];
 							showUploadedFile(key);
-							showRatingBox(ratingCount);
+							showRatingBox(data.ratingCount);
+							showReview(data);
 					}, error : function(data) {
 					}
 				});
@@ -343,7 +354,7 @@
 		});
 		$(".upFileArea").on("drop", function(e) {
 			e.preventDefault();
-			
+			console.log("flieList", fileList);
 			let key = $(this).attr("id").split("-")[0];
 			let files = e.originalEvent.dataTransfer.files;
 			for (let i = 0; i < files.length; i++) {
@@ -471,6 +482,8 @@
 				showReview(data);
 				paging(data.pagingInfo);
 				showRatingBox(data.ratingCount);
+				$(".this-rating").css("width", (data.product.rating * 20) + "%");
+				$('.display-rating').html(data.product.rating + " / 5");
 			}, error : function(data) {
 			}
 		});
@@ -610,10 +623,14 @@
    }
    
    function plusQTY() {
-      $('#qty').val(parseInt($('#qty').val()) + 1);
+	   if (${product.currentQuantity} > qty) {
+	      $('#qty').val(parseInt($('#qty').val()) + 1);
+	   } else {
+		   alert("재고량(${product.currentQuantity})보다 높게 설정이 불가능합니다.");
+	   }
    }
    function minusQTY() {
-      if ($('#qty').val() > 0) {
+      if ($('#qty').val() > 1) {
          $('#qty').val($('#qty').val() - 1);
       }
    }
@@ -872,7 +889,7 @@
 	                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
 	                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
 									</ul>
-									<ul class="rating-fill" style="width : ${product.rating * 20}%">
+									<ul class="rating-fill this-rating" style="width : ${product.rating * 20}%">
 	                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
 	                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li> 
 	                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
@@ -909,18 +926,6 @@
                                    <button onclick="buy();"
                                       class="btn btn-md bg-dark cart-button text-white w-80">바로구매</button>
                                 </div>
-                                 
-                                <!-- <div class="buy-box">
-                                   <a href="wishlist.html">
-                                      <i data-feather="heart"></i>
-                                      <span>Add To Wishlist</span>
-                                   </a>
-                                   <a href="compare.html">
-                                      <i data-feather="shuffle"></i>
-                                      <span>Add To Compare</span>
-                                   </a>
-                                </div> -->
-
                               </div>
                         </div>
                         <div class="col-12">
@@ -1088,7 +1093,7 @@
 							                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
 							                                 	<li><i class="fa-regular fa-star" style="color: #feb221;"></i></li>
 															</ul>
-															<ul class="rating-fill" style="width : ${product.rating * 20}%">
+															<ul class="rating-fill this-rating" style="width : ${product.rating * 20}%">
 							                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
 							                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li> 
 							                                    <li><i class="fa-solid fa-star" style="color: #feb221;"></i></li>
@@ -1097,7 +1102,7 @@
 							                                </ul>
 														</div>
                                                       </div>
-                                                      <h6 class="ms-3">${product.rating} / 5</h6>
+                                                      <h6 class="display-rating ms-3">${product.rating} / 5</h6>
                                                    </div>
                                                    
                                                    <div class="rating-box">
@@ -1385,24 +1390,6 @@
 	                                    src="${item.productImage}"
 	                                    class="img-fluid blur-up lazyload" alt="">
 	                                 </a>
-	
-	                                 <ul class="product-option">
-	                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-	                                       title="View"><a href="javascript:void(0)"
-	                                       data-bs-toggle="modal" data-bs-target="#view"> <i
-	                                          data-feather="eye"></i>
-	                                    </a></li>
-	
-	                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-	                                       title="Compare"><a href="compare.html"> <i
-	                                          data-feather="refresh-cw"></i>
-	                                    </a></li>
-	
-	                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-	                                       title="Wishlist"><a href="wishlist.html"
-	                                       class="notifi-wishlist"> <i data-feather="heart"></i>
-	                                    </a></li>
-	                                 </ul>
 	                              </div>
 	                           </div>
 	
@@ -1448,8 +1435,8 @@
 	                                             data-type="minus" data-field="">
 	                                             <i class="fa fa-minus" aria-hidden="true"></i>
 	                                          </button>
-	                                          <input class="form-control input-number qty-input"
-	                                             type="text" name="quantity" value="1">
+	                                          <!-- <input class="form-control input-number qty-input"
+	                                             type="text" name="quantity" value="1"> -->
 	                                          <button type="button" class="qty-right-plus bg-gray"
 	                                             data-type="plus" data-field="">
 	                                             <i class="fa fa-plus" aria-hidden="true"></i>

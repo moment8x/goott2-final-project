@@ -99,7 +99,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     		output += `<a href="/detail/${item.productId}" class="drop-image">`;
     		output += `<img src="${item.productImage}" class="blur-up lazyload" alt=""></a>`;
     		output += `<div class="drop-contain">`;
-    		output += `<a href="#">`;
+    		output += `<a href="/detail/${item.productId}" class="drop-image">`;
     		output += `<h5>${item.productName}</h5></a>`;
     		output += `<h6><span>${item.quantity} x </span>`
     		output += '<fmt:formatNumber value="${item.sellingPrice}" pattern="#,###" />원</h6>';
@@ -137,10 +137,10 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 				items.forEach(function (item) {
 					output += `<li class="product-box-contain">`;
 					output += `<div class="drop-cart">`;
-		    		output += `<a href="#" class="drop-image">`;
+		    		output += '<a href="/detail/' + item.productId + '" class="drop-image">';
 		    		output += '<img src=\"' + item.productImage + '\" class="blur-up lazyload" alt=""></a>';
 		    		output += `<div class="drop-contain">`;
-		    		output += `<a href="#">`;
+		    		output += '<a href="/detail/' + item.productId + '\" class="drop-image">';
 		    		output += '<h5>' + item.productName + '</h5></a>';
 		    		output += '<h6><span>' + item.quantity + 'x</span>' + item.sellingPrice.toLocaleString('ko-KR') + '원</h6>';
 		    		output += '<button class="close-button close_button"';
@@ -315,7 +315,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                 <li class="product-box-contain">
                                                     <i></i>
                                                     <c:choose>
-														<c:when test="${sessionScope.loginMember == null }">
+														<c:when test="${sessionScope.loginMember == null}">
 		                                                    <a href="/login/">로그인</a>
 														</c:when>
 														<c:otherwise>
@@ -325,13 +325,11 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                 </li>
 
                                                 <li class="product-box-contain">
-                                                    <a href="/register/register">회원가입</a>
+                                                	<c:if test="${sessionScope.loginMember == null}">
+	                                                    <a href="/register/register">회원가입</a>
+                                                	</c:if>
                                                 </li>
-
-                                                <li class="product-box-contain">
-                                                    <a href="forgot.html">Forgot Password</a>
-                                                </li>
-                                              <c:if test="${sessionScope.loginMember != null }">
+                                              <c:if test="${sessionScope.loginMember != null}">
                                               <li class="product-box-contain">
                                                     <a href="/user/myPage">My Page</a>
                                                 </li>

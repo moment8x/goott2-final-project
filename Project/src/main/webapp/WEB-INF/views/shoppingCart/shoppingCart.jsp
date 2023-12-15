@@ -47,6 +47,16 @@
 		let isFirst = true;
 		let isLogin = "N";
 		
+		window.onpageshow = function (e) {
+			if (e.persisted) {
+				//BFCache로 복원된 상태
+				console.log("chk");
+				location.reload();
+			} else {
+				console.log("nbb");
+			}
+		}
+		
 		$(function () {
 			// 받아 온 장바구니 정보 출력
 			spreadView();
@@ -95,6 +105,28 @@
 				$('#' + productId).next().next().prop("disabled", isChecked ? false : true);
 				$('#' + productId).prev().prev().prop("disabled", isChecked ? false : true);
 			});
+			
+			// 선택 취소 시 buyInfo에서 제외, 선택 시 buyInfo에 추가
+			$('.check-it').change(function () {
+				let productId = $(this).attr("id");
+				productId = productId.replace("check", "");
+				if ($(this).is(':checked')) {
+					buyInfo.push({
+						"productId" : productId,
+						"quantity" : $(productId).val()
+					})
+				} else {
+					let index = 0;
+					for (let data of buyInfo) {
+						if (data.productId == productId) {
+							buyInfo.splice(index, 1);
+							break;
+						}
+						index++;
+					}
+				}
+				buy();
+			}); 
 		});
 		
 		// 선택된 항목 삭제.
@@ -103,7 +135,6 @@
 			$("input[name='check_item']:checked").each(function(i){   //jQuery로 for문 돌면서 check 된값 배열에 담는다
 				items.push($(this).val());
 			});
-			
 			$.ajax({
 				url: "/shoppingCart/items",
 				type:"POST",
@@ -113,8 +144,11 @@
 				dataType: "json",
 				async: false,
 				success:function(data) {
-					spreadView();
-					newCart(data.cartItems);
+					if (data.status != 'fail') {
+						spreadView();
+						buy();
+						newCart(data.cartItems);
+					}
 				}, error:function(data) {
 					console.log("error");
 				}
@@ -166,8 +200,6 @@
 					output += `<div class="product-detail">`;
 					output += `<ul>`;
 					output += `<li class="name"><a href="/detail/\${item.productId}">\${productName}</a></li>`;
-					/* output += `<li class="text-content"><span class="text-title">Sold By:</span> Fresho</li>`;
-					output += `<li class="text-content"><span class="text-title">Quantity</span> - 500 g</li>`; */
 					// 가격
 					output += `<td class="price"><h4 class="table-title text-content">가격</h4>`;
 					output += '<h5>' + item.sellingPrice.toLocaleString('ko-KR') + "원"
@@ -213,26 +245,17 @@
 					subtotal += item.sellingPrice * qty;
 					buy();
 				});
-				
 				if (subtotal < 10000) {
 					shipping = 3000;
 				}
 				total = subtotal + shipping;
 				
-				/* output2 += '<div class="coupon-cart"><h6 class="text-content mb-2">Coupon Apply</h6>';
-				output2 += '<div class="mb-3 coupon-box input-group">';
-				output2 += '<input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Enter Coupon Code Here...">';
-				output2 += '<button class="btn-apply">Apply</button></div></div>'; */
 				output2 += `<ul><li><h4>구매 가격</h4><h4 class="price" id="subtotal">` + addComma(subtotal) + `원</h4></li>`;
 				output2 += '<li class="align-items-start"><h4>배송비</h4><h4 class="price text-end" id="shipping">' + addComma(shipping) + '원</h4>';
 				output2 += '</li></ul>';
 			} else if (data.status === "none") {
 				output += '<div><h4 style="text-align:center;"">등록된 상품이 없습니다.</h4></div>';
 				
-				/* output2 += '<div class="coupon-cart"><h6 class="text-content mb-2">Coupon Apply</h6>';
-				output2 += '<div class="mb-3 coupon-box input-group">';
-				output2 += '<input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Enter Coupon Code Here...">';
-				output2 += '<button class="btn-apply">Apply</button></div></div>'; */
 				output2 += `<ul><li><h4>구매 가격</h4><h4 class="price" id="subtotal">0원</h4></li>`;
 				output2 += '<li class="align-items-start"><h4>배송비</h4><h4 class="price text-end" id="shipping">0원</h4>';
 				output2 += '</li></ul>';
@@ -254,8 +277,6 @@
 				output += `<input type="hidden" name="productId" value="\${buyInfo[i].productId}">`;
 				output += `<input type="hidden" name="productQuantity" value="\${buyInfo[i].quantity}">`;
 				output += `<input type='hidden' name="fromCart" value="Y">`;
-				
-				//$('.move-payment').html(output);
 			}
 			$('.move-payment').html(output);
 		}
@@ -350,12 +371,15 @@
 				let elt = document.getElementsByClassName('calc_total')[i];
 				let id = elt.id.replace("total", "");
 				if (!$('#' + id).is(":disabled")) {
-					console.log("id", id);
-					console.log($('#' + id).is(":disabled"));
 					let temp = elt.innerHTML;
 					temp = digitizeNormal(temp);
 					sum += Number(temp);
 				}
+			}
+			if (sum < 10000) {
+				$('#shipping').html(addComma(3000) + "원");
+			} else {
+				$('#shipping').html("0원");
 			}
 			$('#subtotal').html(addComma(sum) + "원");
 		}
@@ -385,6 +409,7 @@
 					if (data.status == "success") {
 						spreadView();
 						newCart(data.cartItems);
+						buy();
 					}
 				}, error : function() {
 					console.log("help!me!");

@@ -663,7 +663,7 @@
                         <div class="input-box">
                             <form class="row g-4" id="form">
                             	<!-- 아이디 -->
-                            	<c:if test="${name != ''}">
+                            	<c:if test="${name == '' || name == null}">
                             		<div class="col-12">
 										<div class="form-floating theme-form-floating">
 											<input type="text" class="form-control" id="memberId" name="memberId" placeholder="ID">
@@ -693,6 +693,7 @@
                                 
                                 <!-- 이름 -->
                                 <div class="col-12">
+                                	<div>${pageScope.name}</div>
 	                                <c:choose>
 	                                	<c:when test="${name.length > 0}">
 			                                    <div class="form-floating theme-form-floating">
@@ -866,11 +867,11 @@
                                 </div>
                             </form>
                         </div>
-
+						<c:if test="${!name}">
                         <div class="other-log-in">
                             <h6>또는</h6>
                         </div>
-
+						
                         <div class="log-in-button">
                             <ul>
                                 <li>
@@ -889,7 +890,7 @@
                                 </li>
                             </ul>
                         </div>
-
+						</c:if>
                         <div class="other-log-in">
                             <h6></h6>
                         </div>

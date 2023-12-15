@@ -80,21 +80,23 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 	}
 
 	@Override
-	public boolean dellteItems(String memberId, boolean loginCheck, List<String> items)
+	public boolean deleteItems(String memberId, boolean loginCheck, List<String> items)
 			throws SQLException, NamingException {
 		boolean result = false;
-		
+		int check = 0;
 		if (loginCheck) {
 			// 회원일 시
+			for (int i = 0; i < items.size(); i++) {
+				check += scDao.deleteItem(memberId, items.get(i));
+			}
 		} else {
 			// 비회원일 시
-			int check = 0;
 			for (int i = 0; i < items.size(); i++) {
 				check += scDao.deleteItemNon(memberId, items.get(i));
 			}
-			if (check > 0) {
-				result = true;
-			}
+		}
+		if (check > 0) {
+			result = true;
 		}
 		
 		return result;

@@ -31,7 +31,6 @@ public class UploadFileServiceImpl implements UploadFileService {
 	@Override
 	public UploadFiles uploadFile(String originalFileName, long size, String contentType, byte[] data,
 			String realPath) throws IOException {
-		
 		UploadFiles uf = null;
 		
 		// 새 파일 업로드.
@@ -70,10 +69,9 @@ public class UploadFileServiceImpl implements UploadFileService {
 		// 리사이징
 		BufferedImage thumbNailImg = Scalr.resize(originImg, Mode.FIT_TO_HEIGHT, 50);
 		
-		String thumbImgName = "thumb_" + uf.getNewFileName().substring(uf.getNewFileName().lastIndexOf("\\") + 1);
+		String thumbImgName = "thumb_" + uf.getNewFileName().substring(uf.getNewFileName().lastIndexOf(File.separator) + 1);
 		
 		File saveTarget = new File(completePath + File.separator + thumbImgName);
-
 		// 저장될 섬네일 이름, 확장자, 파일
 		if (ImageIO.write(thumbNailImg, uf.getOriginalFileName().substring(uf.getOriginalFileName().lastIndexOf(".") + 1), saveTarget)) {
 			// 썸네일 이미지를 저장에 성공 시
