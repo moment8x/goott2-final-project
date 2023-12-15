@@ -171,7 +171,7 @@ function uploadImage(file) {
                                                     <label class="form-label-title col-sm-3 mb-0">제목</label>
                                                     <div class="col-sm-9">
                                                         <input class="form-control" type="text"
-                                                            placeholder="Product Name" name="subj" value="${board.title }">
+                                                            placeholder="Product Name" name="subj" value="${board.title }" readonly="readonly">
                                                     </div>
                                                 </div>
 
