@@ -27,6 +27,7 @@ public class orderInterceptor extends HandlerInterceptorAdapter {
             orderId = "N" + new Date().getTime();
             
          }
+      System.out.println("!!");
       request.setAttribute("orderId", orderId);
       request.setAttribute("impKey", impKey);
       

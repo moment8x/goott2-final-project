@@ -55,7 +55,7 @@ public class LoginController {
 		if(request.getParameter("csPath") != null && request.getParameter("csPath") != "") {
 			this.beforeUri = "http://localhost:8081/cs/" + request.getParameter("csPath");
 		}
-		if(beforeUri.contains("passwordUpdate") || beforeUri.contains("validCode") || beforeUri.contains("auth")) {
+		if(beforeUri.contains("passwordUpdate") || beforeUri.contains("validCode") || beforeUri.contains("auth") || beforeUri.contains("requestOrder") || beforeUri.contains("nonOrderComplete")) {
 			beforeUri ="http://localhost:8081/";
 		}
 		return "/login/login";

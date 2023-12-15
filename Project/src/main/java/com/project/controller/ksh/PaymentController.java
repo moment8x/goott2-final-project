@@ -134,14 +134,14 @@ public class PaymentController {
                paymentDetail.put("pd", pd);
                result = new ResponseEntity<Map<String, Object>>(paymentDetail, HttpStatus.OK); // 아작스로 돌아가서 쓸모없음
                // 문자
-//               if (pd.getPaymentNumber().contains("bkt") && pd.getBktSms().equals("sms")) {
-//                  MessageDTO messageDto = new MessageDTO();
-//                  messageDto.setTo(testPhone); 
-//                  messageDto.setContent("[deerBooks] 무통장입금 계좌 : "+pd.getDepositedAccount());
-//                  System.out.println(messageDto.toString());
-//                  SmsResponseDto responseDto = smsService.sendSms(messageDto);
-//                  System.out.println(responseDto.getStatusCode());
-//               }
+               if (pd.getPaymentNumber().contains("bkt") && pd.getBktSms().equals("sms")) {
+                  MessageDTO messageDto = new MessageDTO();
+                  messageDto.setTo(testPhone); 
+                  messageDto.setContent("[deerBooks] 무통장입금 계좌 : "+pd.getDepositedAccount()+ ", 필요 입금 금액 : " + pd.getAmountToPay()+"원");
+                  System.out.println(messageDto.toString());
+                  SmsResponseDto responseDto = smsService.sendSms(messageDto);
+                  System.out.println(responseDto.getStatusCode());
+               }
             } else { // 검증은 성공했지만 테이블 저장 실패
                System.out.println("몰까요?");
                if (pd.getPaymentNumber().contains("imp")) {

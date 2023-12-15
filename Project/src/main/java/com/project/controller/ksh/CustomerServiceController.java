@@ -206,6 +206,7 @@ public class CustomerServiceController {
 
 						if (uploadFiles != null) {
 							model.addAttribute("uploadFiles", uploadFiles);
+							model.addAttribute("ufCount", inquiry.getUploadFilesSeq());
 						}
 					} else {
 

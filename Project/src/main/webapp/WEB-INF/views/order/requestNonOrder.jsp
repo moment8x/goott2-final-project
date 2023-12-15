@@ -273,7 +273,10 @@ let deliveryMessage = "";
 			emailValid = true;
 		}
 	
-		if(addrValid && detailAddrValid && zipCodeValid && recipientValid && phoneNumberValid && passwordValid && emailValid) {
+		if($('#checkTerms').prop('checked')){
+			termsValid = true;	
+		}
+		if(addrValid && detailAddrValid && zipCodeValid && recipientValid && phoneNumberValid && passwordValid && emailValid && termsValid) {
 			console.log("통과하셨습니다~");
 			return true;
 		} else {
@@ -307,8 +310,9 @@ let deliveryMessage = "";
 	function checkPayMethod() {
 		 let payNo = "";
 		 let objAmountToPay = Number($('#payToAmount').text().replaceAll(",",""));
-		if(validateAll()) {
-			if ($("input[name='payMethod']").is(':checked')) {
+		 
+			if(validateAll()) {
+				if ($("input[name='payMethod']").is(':checked')) {
 		         // 전체 radio 중에서 하나라도 체크되어 있는지 확인
 		         // 아무것도 선택안되어있으면, false
 		         let payMethod = $("input[name='payMethod']:checked").val();
@@ -327,7 +331,9 @@ let deliveryMessage = "";
 		               "totalAmount" : totalAmount, // 총 상품 금액, 수정 필요
 		               "shippingFee" : shippingFee, // 배송비
 		               "amountToPay" : objAmountToPay, // (total+배송비-포인트-적립금)
-		               "actualPaymentAmount" : 0, // 실 결제 금액(무통장입금은 default 0)              
+		               "actualPaymentAmount" : 0, // 실 결제 금액(무통장입금은 default 0)
+		               "depositedAccount" : $("#bktBank").val(),
+		               "bktSms" : $('#bktSms').val(),
 		               products,
 		               nonOrderHistory : {
 	                   	   "nonRecipientName" : $('#nonRecipientName').val(),
@@ -368,7 +374,7 @@ let deliveryMessage = "";
 		      }
 		};
 		
-		
+
 	}
 
 
@@ -908,15 +914,15 @@ let deliveryMessage = "";
 								type="button" onclick="checkPayMethod()">결제하기</button>
 							<div class="checkout-offer" id="iframeParent">
 								<label for="acc-or" class="offer-name"> 위 주문내용을 확인하였으며,
-									결제에 동의합니다. <input type="checkbox" id="acc-or"> <span
+									결제에 동의합니다. <input type="checkbox" id="checkTerms"> <span
 									class="checkmark"></span>
 								</label>
 								<iframe id="iframeSon" src="../resources/terms.txt"></iframe>
 								<!-- 약관 -->
 							</div>
-							  <button
+							  <!--<button
 								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
-								type="button" onclick="abcTest()">테스트</button><!--
+								type="button" onclick="abcTest()">테스트</button>
 							<button type="button"
 								class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold"
 								onclick="identify()">본인 인증</button>-->
