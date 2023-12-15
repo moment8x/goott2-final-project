@@ -613,7 +613,7 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 	}
 	
 	function outputShippingAddr(addr) {
-		console.log("id", "${sessionScope.loginMember}");
+		/* console.log("id", "${sessionScope.loginMember}"); */
 		let output = `<button type="button" class="btn theme-bg-color btn-md text-white"
 			onclick="sample6_execDaumPostcode('shippingZipNoModify', 'shippingAddrModify', 'shippingDetailAddrModify', 'shippingExtraAddress');">주소 찾기</button>`
 		output += `<div class="col-xxl-6">`
