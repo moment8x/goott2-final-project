@@ -841,7 +841,7 @@ let deliveryMessage = "";
 						<div class="right-side-summery-box">
 							<div class="summery-box-2">
 								<div class="summery-header">
-									<h3>Order Summery</h3>
+									<h3>결제 정보</h3>
 								</div>
 								<ul class="summery-contain">
 									<c:forEach var="info" items="${requestScope.productInfos }"
@@ -893,7 +893,7 @@ let deliveryMessage = "";
 											class="img-fluid" alt="">
 									</div>
 									<div class="offer-name">
-										<h6>Notification</h6>
+										<h6>안내</h6>
 									</div>
 								</div>
 

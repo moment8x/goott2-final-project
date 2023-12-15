@@ -623,7 +623,7 @@
    }
    
    function plusQTY() {
-	   if (${product.currentQuantity} > qty) {
+	   if (${product.currentQuantity} > $('#qty').val()) {
 	      $('#qty').val(parseInt($('#qty').val()) + 1);
 	   } else {
 		   alert("재고량(${product.currentQuantity})보다 높게 설정이 불가능합니다.");
