@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,11 +49,19 @@ public class AdminProductsController {
 	}
 	
 	@GetMapping("/productManage")	// 모든 상품 조회(판매중인 상품은 쿼리스트링으로 받아서)
-	public Map<String, Object> getAllPrducts(@RequestParam String sellingProducts) {
+	public Map<String, Object> getAllPrducts(
+			@RequestParam String searchKey,
+			@RequestParam String searchValue,
+			@RequestParam String categoryKey,
+			@RequestParam(defaultValue = "0") byte childCategory,
+			@RequestParam String startDate,
+			@RequestParam String endDate,
+			@RequestParam(defaultValue = "2") byte bestSellerStatus)
+			/*@RequestParam String sellingProducts)*/ {
 		
-		Map<String, Object> result = adminProductsService.getAllProducts(sellingProducts);
-		
-		return result;
+		AdminProductsSearchVO search = AdminProductsSearchVO.create(searchKey, searchValue, categoryKey, childCategory, startDate, endDate, bestSellerStatus);
+		System.out.println("search : " + search.toString());
+		return adminProductsService.getAllProducts(search);
 	}
 	
 	// ----------------------------------------------------------------
@@ -290,7 +299,7 @@ public class AdminProductsController {
 	}
 	
 	@GetMapping("/category/{categoryKey}")
-	public Map<String, Object> selectedCategories(@RequestParam String categoryCode) {
+	public Map<String, Object> selectedCategories(@PathVariable("categoryKey") String categoryCode) {
 		System.out.println("카테고리 - 하위 카테고리 조회");
 		return adminProductsService.getCategoryChild(categoryCode);
 	}
@@ -305,7 +314,6 @@ public class AdminProductsController {
 			@RequestParam String endDate,
 			@RequestParam(defaultValue = "2") byte bestSellerStatus
 			) {
-		System.out.println("검색 - controller");
 		/*
 		검색 분류 - searchKey,	검색 분류의 값 - searchValue
 		상품 분류 - category_code,	하위 분류 포함 검색 - child_category	(boolean)

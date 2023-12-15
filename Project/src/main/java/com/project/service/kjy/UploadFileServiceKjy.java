@@ -26,14 +26,13 @@ public class UploadFileServiceKjy {
 	public UploadFiles uploadFileKjy(String originalFileName, long size, byte[] data, String contentType, String realPath) throws Exception {
 		UploadFiles uploadFile = new UploadFiles(0, contentType, realPath, originalFileName, originalFileName, size);
 		String completePath = makeCalculatePath(realPath);
-		System.out.println("completePath : " + completePath);
 		
 		if(size > 0) {
 			String newFileName = getNewFileName(originalFileName, realPath, completePath);
 			uploadFile.setNewFileName(newFileName);
 			FileCopyUtils.copy(data, new File(realPath + newFileName));
 			if(ImgMimeType.contentTypeIsImage(contentType)) {
-				String thumbFileName = makeThumbNailImage(newFileName, realPath, completePath);
+				String thumbFileName = makeThumbNailImage(uploadFile, realPath, completePath);
 				if(!"실패".equals(thumbFileName)) {
 					uploadFile.setThumbnailFileName(thumbFileName);
 				}
@@ -53,15 +52,15 @@ public class UploadFileServiceKjy {
 		
 		return realPath + date;
 	}
-	private static String makeThumbNailImage(String newFileName, String realPath, String completePath) throws IOException {
-		BufferedImage originImg = ImageIO.read(new File(realPath + newFileName)); // 원본 파일
+	private static String makeThumbNailImage(UploadFiles uf, String realPath, String completePath) throws IOException {
+		BufferedImage originImg = ImageIO.read(new File(realPath + uf.getNewFileName())); // 원본 파일
 		BufferedImage thumbNailImg = Scalr.resize(originImg, Mode.FIT_TO_HEIGHT, 50); // 리사이징
 		
-		String thumbImgName = "thumb_" + newFileName.substring(newFileName.lastIndexOf("\\") + 1);
-		String ext = newFileName.substring(newFileName.lastIndexOf(".") + 1);
+		String thumbImgName = "thumb_" + uf.getNewFileName().substring(uf.getNewFileName().lastIndexOf("\\") + 1);
+		String ext = uf.getNewFileName().substring(uf.getNewFileName().lastIndexOf(".") + 1);
+		uf.setExtension(ext);
 		
 		File saveTarget = new File(completePath + File.separator + thumbImgName);
-		 System.out.println(thumbNailImg +", "+ ext+", "+ saveTarget);
 		if(ImageIO.write(thumbNailImg, ext, saveTarget)) { // 썸네일 이미지를 저장 -> 성공이면 uf에 담기
 			return completePath.substring(realPath.length()) + File.separator + thumbImgName;
 		}

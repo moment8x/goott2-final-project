@@ -7,6 +7,8 @@ const ReturnChart = ({ refundQuantityData, returnRateData, label }) => {
   const series = refundQuantityData && refundQuantityData.map((data) => data.refundQuantity);
   const returnSeries = returnRateData && returnRateData.map((data) => data.returnRate);
 
+  console.log('series: ', series);
+
   const options = {
     labels: refundQuantityData
       ? refundQuantityData.map((data) => data.productName)

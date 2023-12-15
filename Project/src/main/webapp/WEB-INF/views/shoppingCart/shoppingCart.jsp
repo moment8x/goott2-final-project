@@ -67,6 +67,34 @@
 					updateQTY(prod, $(this).val());
 				}
 			});
+			
+			// checked 속성이 false일 시 금액에 포함X
+			$('input[type="checkbox"]').click(function (e) {
+				let subtotal = $('#subtotal').text().replace('원','').replace(/(,)/g, '');
+				let shipping = 0;
+				let total = $('#total_amount').text().replace('원',"").replace(/(,)/g, '');
+				let productId = $(this).val();
+				let id = "total" + productId;	// 선택된 상품의 가격을 찾기 위한 id
+				let isChecked = $('#' + productId).prop('disabled');
+				
+				if (!$(this).is(":checked")) {
+					subtotal = subtotal - $('#' + id).html().replace('원','').replace(/(,)/g, '');
+				} else {
+					subtotal = parseInt(subtotal) + parseInt($('#' + id).html().replace('원','').replace(/(,)/g, ''));
+				}
+				if (subtotal < 10000) {
+					shipping = 3000;
+				}
+				
+				total = subtotal + shipping;
+				
+				$('#subtotal').html(addComma(subtotal) + '원');
+				$('#shipping').html(addComma(shipping) + '원');
+				$('#total_amount').html(addComma(total) + '원');
+				$('#' + productId).prop("disabled", isChecked ? false : true);
+				$('#' + productId).next().next().prop("disabled", isChecked ? false : true);
+				$('#' + productId).prev().prev().prop("disabled", isChecked ? false : true);
+			});
 		});
 		
 		// 선택된 항목 삭제.
@@ -129,8 +157,8 @@
 					}
 					let qty = data.list.list[i].quantity;
 					output += `<tr class="product-box-contain">`;
-					// 완성 전 주석처리!
-					output += `<td class="product-checkbox" style="min-width:15px;"><input class="checkbox_animated check-it" type="checkbox" name="check_item" value="\${item.productId}" checked/></td>`;
+					// 체크박스
+					output += `<td class="product-checkbox" style="min-width:15px;"><input id="check\${item.productId}" class="checkbox_animated check-it" type="checkbox" name="check_item" value="\${item.productId}" checked/></td>`;
 					// 이미지, 책 제목
 					output += `<td class="product-detail">`;
 					output += `<div class="product border-0">`;
@@ -138,17 +166,17 @@
 					output += `<div class="product-detail">`;
 					output += `<ul>`;
 					output += `<li class="name"><a href="/detail/\${item.productId}">\${productName}</a></li>`;
-					output += `<li class="text-content"><span class="text-title">Sold By:</span> Fresho</li>`;
-					output += `<li class="text-content"><span class="text-title">Quantity</span> - 500 g</li>`;
+					/* output += `<li class="text-content"><span class="text-title">Sold By:</span> Fresho</li>`;
+					output += `<li class="text-content"><span class="text-title">Quantity</span> - 500 g</li>`; */
 					// 가격
-					output += `<td class="price"><h4 class="table-title text-content">Price</h4>`;
+					output += `<td class="price"><h4 class="table-title text-content">가격</h4>`;
 					output += '<h5>' + item.sellingPrice.toLocaleString('ko-KR') + "원"
 					output += '<del class="text-content">' + item.consumerPrice.toLocaleString('ko-KR') + '원</del></h5>';
-					output += '<h6 class="theme-color">You Save : '
+					output += '<h6 class="theme-color">할인된 금액 : '
 					output += (item.consumerPrice - item.sellingPrice).toLocaleString('ko-KR') + '원</h6></td>';
 					// QTY
 					if (item.currentQuantity >  0) {
-						output += `<td class="quantity"><h4 class="table-title text-content">Qty</h4>`;
+						output += `<td class="quantity"><h4 class="table-title text-content">수량</h4>`;
 						output += `<div class="quantity-price"><div class="cart_qty"><div class="input-group">`;
 						output += `<button type="button" class="btn qty-left-minus" onclick="qtyMinus('\${item.productId}', '\${item.sellingPrice}');">`;
 						output += `<i class="fa fa-minus ms-0" aria-hidden="true"></i></button>`;
@@ -158,7 +186,7 @@
 						output += `<button type="button" class="btn qty-right-plus" onclick="qtyPlus('\${item.productId}', '\${item.sellingPrice}', '\${item.currentQuantity}');">`;
 						output += `<i class="fa fa-plus ms-0" aria-hidden="true"></i></button></div></div></div></td>`;
 					} else {
-						output += `<td class="quantity"><h4 class="table-title text-content">Qty</h4>`;
+						output += `<td class="quantity"><h4 class="table-title text-content">수량</h4>`;
 						output += `<div class="quantity-price"><div class="cart_qty"><div class="input-group">`;
 						output += `<button type="button" class="btn qty-left-minus" onclick="qtyMinus('\${item.productId}', '\${item.sellingPrice}');" disabled>`;
 						output += `<i class="fa fa-minus ms-0" aria-hidden="true"></i></button>`;
@@ -167,11 +195,11 @@
 						output += `<i class="fa fa-plus ms-0" aria-hidden="true"></i></button></div></div></div></td>`;
 					}
 					// 해당 아이템 최종 가격
-					output += `<td class="subtotal"><h4 class="table-title text-content">Total</h4>`;
+					output += `<td class="subtotal"><h4 class="table-title text-content">소계</h4>`;
 					output += `<h5 id="\${'total' + item.productId}" class="subtotal calc_total">`;
 					output += (item.sellingPrice * item.quantity).toLocaleString('ko-KR') + '원</h5></td>';
 					
-					output += '<td class="save-remove" style="min-width:20px;"><h4 class="table-title text-content">Action</h4>';
+					output += '<td class="save-remove" style="min-width:20px;"><h4 class="table-title text-content">장바구니 삭제</h4>';
 					output += `<button class="remove close_button" onclick="deleteItem(this);" value="\${item.productId}">`
 					output += '<i class="fa-regular fa-trash-can"></i></button></td></tr>';
 					// 아오 ㅠㅠ
@@ -191,29 +219,26 @@
 				}
 				total = subtotal + shipping;
 				
-				output2 += '<div class="coupon-cart"><h6 class="text-content mb-2">Coupon Apply</h6>';
+				/* output2 += '<div class="coupon-cart"><h6 class="text-content mb-2">Coupon Apply</h6>';
 				output2 += '<div class="mb-3 coupon-box input-group">';
 				output2 += '<input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Enter Coupon Code Here...">';
-				output2 += '<button class="btn-apply">Apply</button></div></div>';
-				output2 += `<ul><li><h4>Subtotal</h4><h4 class="price" id="subtotal">` + addComma(subtotal) + `원</h4></li>`;
-				output2 += '<li><h4>Coupon Discount</h4><h4 class="price">(-) 0.00</h4></li>';
-				output2 += '<li class="align-items-start"><h4>Shipping</h4><h4 class="price text-end" id="shipping">' + addComma(shipping) + '원</h4>';
+				output2 += '<button class="btn-apply">Apply</button></div></div>'; */
+				output2 += `<ul><li><h4>구매 가격</h4><h4 class="price" id="subtotal">` + addComma(subtotal) + `원</h4></li>`;
+				output2 += '<li class="align-items-start"><h4>배송비</h4><h4 class="price text-end" id="shipping">' + addComma(shipping) + '원</h4>';
 				output2 += '</li></ul>';
 			} else if (data.status === "none") {
-				output += '<div>등록된 상품이 없습니다.</div>';
-				output += '<div><button onclick="location.href=\'/login/\'">로그인 하기</button></div>';
+				output += '<div><h4 style="text-align:center;"">등록된 상품이 없습니다.</h4></div>';
 				
-				output2 += '<div class="coupon-cart"><h6 class="text-content mb-2">Coupon Apply</h6>';
+				/* output2 += '<div class="coupon-cart"><h6 class="text-content mb-2">Coupon Apply</h6>';
 				output2 += '<div class="mb-3 coupon-box input-group">';
 				output2 += '<input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Enter Coupon Code Here...">';
-				output2 += '<button class="btn-apply">Apply</button></div></div>';
-				output2 += `<ul><li><h4>Subtotal</h4><h4 class="price" id="subtotal">0원</h4></li>`;
-				output2 += '<li><h4>Coupon Discount</h4><h4 class="price">(-) 0.00</h4></li>';
-				output2 += '<li class="align-items-start"><h4>Shipping</h4><h4 class="price text-end" id="shipping">0원</h4>';
+				output2 += '<button class="btn-apply">Apply</button></div></div>'; */
+				output2 += `<ul><li><h4>구매 가격</h4><h4 class="price" id="subtotal">0원</h4></li>`;
+				output2 += '<li class="align-items-start"><h4>배송비</h4><h4 class="price text-end" id="shipping">0원</h4>';
 				output2 += '</li></ul>';
 			}
 			
-			output3 += '<li class="list-total border-top-0"><h4>Total (USD)</h4>';
+			output3 += '<li class="list-total border-top-0"><h4>총 계</h4>';
 			output3 += '<h4 class="price theme-color" id="total_amount">' + addComma(total) + '원</h4></li>';
 			
 			$('.tbody').html(output);
@@ -240,10 +265,8 @@
 			return Number(dataValue).toLocaleString('en');
 		}
 		
-		// 원화표시 삭제 및 콤마 삭제
+		// 콤마 삭제
 		function digitize(prod) {
-			$('#total' + prod).html($('#total' + prod).html().substr(1));	// 원화표시 삭제
-			$('#subtotal').html($('#subtotal').html().substr(1));
 			// 콤마가 있다면
 			if($('#total' + prod).html().indexOf(",") != -1){
 				$('#total' + prod).html($('#total' + prod).html().replace(/(,)/g, "")); // 콤마를 ""로 replace함
@@ -251,7 +274,7 @@
 			}
 		}
 		function digitizeNormal(price) {
-			price = price.substr(0, price.lastIndexOf("원") - 1);
+			price = price.substr(0, price.lastIndexOf("원"));
 			
 			if(price.indexOf(",") != -1){
 				price = price.replace(/(,)/g, "");
@@ -307,7 +330,7 @@
 				async: false,
 				success: function(data) {
 					if (data.status === "success") {
-						subtotal();
+						subtotal(productId);
 						totalAmount();
 						buy();
 					} else if (data.status === "problem") {
@@ -321,12 +344,18 @@
 		}
 		
 		// 구매액(subtotal)
-		function subtotal() {
+		function subtotal(productId) {
 			let sum = 0;
 			for (let i = 0; i < $('h5.subtotal').length; i++) {
-				let temp = document.getElementsByClassName('calc_total')[i].innerHTML;
-				temp = digitizeNormal(temp);
-				sum += Number(temp);
+				let elt = document.getElementsByClassName('calc_total')[i];
+				let id = elt.id.replace("total", "");
+				if (!$('#' + id).is(":disabled")) {
+					console.log("id", id);
+					console.log($('#' + id).is(":disabled"));
+					let temp = elt.innerHTML;
+					temp = digitizeNormal(temp);
+					sum += Number(temp);
+				}
 			}
 			$('#subtotal').html(addComma(sum) + "원");
 		}
@@ -434,7 +463,7 @@
             <li>
                 <a href="cart.html">
                     <i class="iconly-Bag-2 icli fly-cate"></i>
-                    <span>Cart</span>
+                    <span>장바구니</span>
                 </a>
             </li>
         </ul>
@@ -447,15 +476,15 @@
             <div class="row">
                 <div class="col-12">
                     <div class="breadscrumb-contain">
-                        <h2>Cart</h2>
+                        <h2>장바구니</h2>
                         <nav>
                             <ol class="breadcrumb mb-0">
                                 <li class="breadcrumb-item">
-                                    <a href="index.html">
+                                    <a href="/index.html">
                                         <i class="fa-solid fa-house"></i>
                                     </a>
                                 </li>
-                                <li class="breadcrumb-item active" aria-current="page">Cart</li>
+                                <li class="breadcrumb-item active" aria-current="page">장바구니</li>
                             </ol>
                         </nav>
                     </div>
@@ -502,14 +531,8 @@
                                 	<form action="/order/requestOrder" method="post">
 	                                	<div class="move-payment"></div>
 	                                    <button type="submit" class="btn btn-animation proceed-btn fw-bold">
-	                                    Process To Checkout</button>
+	                                    결제하기</button>
                                 	</form>
-                                </li>
-
-                                <li>
-                                    <button onclick="location.href = '/';"
-                                        class="btn btn-light shopping-button text-dark">
-                                        <i class="fa-solid fa-arrow-left-long"></i>Return To Shopping</button>
                                 </li>
                             </ul>
                         </div>

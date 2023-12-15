@@ -105,20 +105,20 @@ const COLUMNS = [
   },
 ];
 
-const IndeterminateCheckbox = React.forwardRef(({ indeterminate, ...rest }, ref) => {
-  const defaultRef = React.useRef();
-  const resolvedRef = ref || defaultRef;
+// const IndeterminateCheckbox = React.forwardRef(({ indeterminate, ...rest }, ref) => {
+//   const defaultRef = React.useRef();
+//   const resolvedRef = ref || defaultRef;
 
-  useEffect(() => {
-    resolvedRef.current.indeterminate = indeterminate;
-  }, [resolvedRef, indeterminate]);
+//   useEffect(() => {
+//     resolvedRef.current.indeterminate = indeterminate;
+//   }, [resolvedRef, indeterminate]);
 
-  return (
-    <>
-      <input type='checkbox' ref={resolvedRef} {...rest} className='table-checkbox' />
-    </>
-  );
-});
+//   return (
+//     <>
+//       <input type='checkbox' ref={resolvedRef} {...rest} className='table-checkbox' />
+//     </>
+//   );
+// });
 
 const SearchedMember = ({ title = '회원 목록', data }) => {
   const columns = useMemo(() => COLUMNS, []);
@@ -141,26 +141,26 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
 
     useSortBy,
     usePagination,
-    useRowSelect,
+    useRowSelect
 
-    (hooks) => {
-      hooks.visibleColumns.push((columns) => [
-        {
-          id: 'selection',
-          Header: ({ getToggleAllRowsSelectedProps }) => (
-            <div>
-              <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
-            </div>
-          ),
-          Cell: ({ row }) => (
-            <div>
-              <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
-            </div>
-          ),
-        },
-        ...columns,
-      ]);
-    }
+    // (hooks) => {
+    //   hooks.visibleColumns.push((columns) => [
+    //     {
+    //       id: 'selection',
+    //       Header: ({ getToggleAllRowsSelectedProps }) => (
+    //         <div>
+    //           <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
+    //         </div>
+    //       ),
+    //       Cell: ({ row }) => (
+    //         <div>
+    //           <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+    //         </div>
+    //       ),
+    //     },
+    //     ...columns,
+    //   ]);
+    // }
   );
   const {
     getTableProps,
@@ -279,13 +279,11 @@ const SearchedMember = ({ title = '회원 목록', data }) => {
                           return (
                             <td
                               {...cell.getCellProps()}
-                              className='table-td cursor-pointer'
+                              className='table-td cursor-pointer pr-0 pl-12'
                               onClick={index !== 0 ? () => openModal(row) : null}
                             >
                               {/* row 클릭 시 모달 오픈 */}
-
                               {cell.render('Cell')}
-
                               {/* <Link to='' onClick={openModal}>
                                 {cell.render('Cell')}
                               </Link> */}

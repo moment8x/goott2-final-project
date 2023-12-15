@@ -55,21 +55,18 @@ public class LoginController {
 		if(request.getParameter("csPath") != null && request.getParameter("csPath") != "") {
 			this.beforeUri = "http://localhost:8081/cs/" + request.getParameter("csPath");
 		}
-		if(beforeUri.contains("passwordUpdate") || beforeUri.contains("validCode") || beforeUri.contains("auth")) {
+		if(beforeUri.contains("passwordUpdate") || beforeUri.contains("validCode") || beforeUri.contains("auth") || beforeUri.contains("requestOrder") || beforeUri.contains("nonOrderComplete")) {
 			beforeUri ="http://localhost:8081/";
 		}
-		System.out.println("befo : " + this.beforeUri);
 		return "/login/login";
 	}
 	
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ModelAndView loginProcess(LoginDTO loginDTO, ModelAndView model, HttpServletRequest request,
 			HttpServletResponse response) {
-		System.out.println(loginDTO.toString());
 		try {
 			Memberkjy loginMember = loginService.getLogin(loginDTO);
 			if(loginMember != null) {
-				System.out.println(loginMember);
 				request.getSession().setAttribute("loginMember", loginMember);
 				model.addObject("loginStatus", "loginOk");
 				if(beforeUri != null) {
@@ -355,7 +352,6 @@ public class LoginController {
         }
             br.close();
             
-        System.out.println("호"+res.toString());
    
 		return accessToken;
 	}
@@ -419,7 +415,6 @@ public class LoginController {
 		                    }
 		                    getInfoReader.close();
 		                    
-		                    System.out.println("카카오로그인 유저 정보다람쥐썬더 " + getInfoResponse.toString());
 		                    
 		                    JsonNode userInfoJson = objectMapper.readTree(getInfoResponse.toString());
 		                    
@@ -461,7 +456,6 @@ public class LoginController {
 		                    }
 		                    getInfoReader.close();
 		                    
-		                    System.out.println("카카오로그인 유저 정보다람쥐썬더 " + getInfoResponse.toString());
 		                    
 		                    JsonNode userInfoJson = objectMapper.readTree(getInfoResponse.toString());
 		                    
@@ -591,6 +585,8 @@ public class LoginController {
 		try {
 			if(loginService.emailAuth(email, userName, userId)) {
 				model.addAttribute("status", "auth");
+			} else {
+				model.addAttribute("status", "failed");
 			}
 		} catch (Exception e) {
 			model.addAttribute("status", "error");
@@ -609,7 +605,6 @@ public class LoginController {
 				model.addAttribute("memberId", member.getMemberId());
 				model.addAttribute("status", "success");
 			} else if("password".equals(status)) {
-				System.out.println("4444");
 				model.addAttribute("memberId", member.getMemberId());
 				model.addAttribute("status", "successPd");
 			}

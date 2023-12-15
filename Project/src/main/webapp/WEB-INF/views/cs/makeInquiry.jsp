@@ -247,6 +247,8 @@
 			isValidTitle = true;
 		}
 		
+		
+		
 		if($('#inquiryContent').val() != "") {
 			isValidContent = true;
 		}
@@ -280,6 +282,7 @@
 				console.log(isValidContent);
 				console.log(isValidState);
 				if(!isValidTitle && !isValidContent && !isValidState){
+					
 					alert("변경 사항이 없습니다.");
 				} else {
 					saveFile = true;

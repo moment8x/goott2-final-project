@@ -1,12 +1,11 @@
-import React, { useEffect, useRef, useState, lazy } from 'react';
-import Card from '@/components/ui/Card';
-import Textinput from '@/components/ui/Textinput';
-import Select from 'react-select';
-import Radio from '@/components/ui/Radio';
-import Flatpickr from 'react-flatpickr';
 import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
 import Checkbox from '@/components/ui/Checkbox';
-// import SearchedMembers from './member-result';
+import Radio from '@/components/ui/Radio';
+import Textinput from '@/components/ui/Textinput';
+import { useEffect, useState } from 'react';
+import Flatpickr from 'react-flatpickr';
+import Select from 'react-select';
 
 // select
 const privacy = [
@@ -365,7 +364,7 @@ const MemberSearch = ({ setSearchedInfo }) => {
                             name='anniversary'
                             onChange={(e, name) => checkSelectValue(e, name)}
                             // 수정 필요
-                            value={[{ value: selectLabel.anniversary, label: selectLabel.anniversary }]}
+                            // value={[{ value: selectLabel.anniversary, label: selectLabel.anniversary }]}
                           />
                           {inputSelectOption !== '' && (
                             <span>
@@ -558,12 +557,12 @@ const MemberSearch = ({ setSearchedInfo }) => {
           </div>
         </Card>
         <div className='box box-warning flex justify-center gap-3'>
-          <button className='btn btn-dark' onClick={handleSubmit}>
+          <button className='btn btn-dark flex items-center' onClick={handleSubmit}>
             검&nbsp;&nbsp;&nbsp;&nbsp;색
           </button>
-          <button type='submit' className='btn btn-secondary' onClick={handleReset}>
+          {/* <button type='submit' className='btn btn-secondary' onClick={handleReset}>
             초기화
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

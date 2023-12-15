@@ -62,12 +62,10 @@
 
 	function payLink(data, pId) {
 		if (data.isLogin == "loginOK") {
-			$('#memberLoginPay').attr("href",
-					"/order/requestOrder?productId=" + pId + "&isLogin=Y");
+			$('#memberLoginPay').attr("href", "/order/requestOrder?productId=" + pId + "&isLogin=Y&qty=1");
 		} else {
 			$('#loginPay').attr("href", "/login/");
-			$('#noLoginPay').attr("href",
-					"/order/requestOrder?productISd=" + pId + "&isLogin=N");
+			$('#noLoginPay').attr("href", "/order/requestOrder?productId=" + pId + "&isLogin=N&qty=1");
 		}
 	}
 
@@ -164,7 +162,7 @@
 		let likeDislikeId = $(`#\${productId}`);
 		let member = '${sessionScope.loginMember.memberId}'
 		if (member == "") {
-			alert("로그인 해주세요");
+			alert("로그인이 필요한 서비스 입니다.");
 			location.href = '/login/';
 		} else if (likeDislikeId.hasClass("fa-regular")) {
 			likeDislikeId.removeClass("fa-regular").addClass("fa-solid");
@@ -183,11 +181,7 @@
 
 				},
 				error : function(error) {
-					if (error.status === 409) {
-						alert("상품이 이미 리스트에 있습니다.")
-						likeDislikeId.removeClass("fa-solid").addClass(
-								"fa-regular");
-					}
+
 				}
 			});
 
@@ -204,7 +198,7 @@
 				dataType : 'json',
 				async : false,
 				success : function(data) {
-					console.log(productId + "번 상품 좋아요")
+					console.log(productId + " 좋아요")
 
 				},
 				error : function() {
@@ -490,46 +484,41 @@
 	</section>
 	<!-- Shop Section End -->
 
-
-
-	<!-- Quick View Modal Box Start -->
-	<div class="modal fade theme-modal view-modal" id="view" tabindex="-1"
-		aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div
-			class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-sm-down">
-			<div class="modal-content">
-				<div class="modal-header p-0">
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close">
-						<i class="fa-solid fa-xmark"></i>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="row g-sm-4 g-2">
-						<div class="col-lg-6" style="display: flex">
-							<div class="slider-image">
-								<img
-									src="https://media.istockphoto.com/id/1437657408/ko/%EB%B2%A1%ED%84%B0/%ED%9D%B0%EC%83%89-%EB%B0%B0%EA%B2%BD%EC%97%90-%EA%B2%A9%EB%A6%AC%EB%90%9C-%EC%88%98%EC%B1%84%ED%99%94-%EC%95%84%EA%B8%B0-%EC%82%AC%EC%8A%B4-%EA%B7%80%EC%97%AC%EC%9A%B4-%EC%82%BC%EB%A6%BC-%EB%8F%99%EB%AC%BC-%EC%86%90%EC%9C%BC%EB%A1%9C-%EA%B7%B8%EB%A6%B0-%EA%B7%B8%EB%A6%BC-%ED%82%A4%EC%A6%88-%EB%94%94%EC%9E%90%EC%9D%B8.jpg?s=1024x1024&w=is&k=20&c=U3NghfcvPpFArhj6oAg9-6iVjW4pINKHcjNHFarbEzk="
-									class="img-fluid blur-up lazyload" alt="" />
-							</div>
-							<div>
-							 <c:choose>
-							 	<c:when test="${sessionScope.loginMember != null }">
-							 		<a href="" id="memberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-							 	</c:when>
-							 	<c:otherwise>
-							 		<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-									<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>
-							 	</c:otherwise>
-							 </c:choose>												
-							</div>
-						</div>
-					</div>
-				</div>
+	
+	<!-- The Modal -->
+	<div class="modal fade" id="view" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	
+	      <!-- Modal Header -->
+	      <div class="modal-header">
+	        <h4 class="modal-title">Modal Heading</h4>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+	      </div>
+	
+	      <!-- Modal body -->
+	      <div class="modal-body">
+	        <div>
+				<c:choose>
+					<c:when test="${sessionScope.loginMember != null }">
+						<a href="" id="memberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+					</c:when>
+					<c:otherwise>
+						<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+						<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>
+					</c:otherwise>
+				</c:choose>												
 			</div>
-		</div>
+	      </div>
+	
+	      <!-- Modal footer -->
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+	      </div>
+	
+	    </div>
+	  </div>
 	</div>
-	<!-- Quick View Modal Box End -->
 
 	<div class="modal" id="shoppingCartModal">
 		<div class="modal-dialog">

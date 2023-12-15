@@ -22,13 +22,6 @@ const COLUMNS = [
     },
   },
   {
-    Header: '',
-    accessor: 'productImage',
-    Cell: (row) => {
-      return <img src={row?.cell?.value} width='40' />;
-    },
-  },
-  {
     Header: '상품명',
     accessor: 'productName',
     Cell: (row) => {
@@ -147,11 +140,11 @@ const CartResult = ({ title = '장바구니상품 순위 내역', data }) => {
                             <td
                               {...cell.getCellProps()}
                               className={`${
-                                index < 3
+                                index < 2
                                   ? 'table-td cursor-pointer text-center'
-                                  : index == 3
-                                  ? 'table-td cursor-pointer text-left pr-0'
-                                  : 'table-td cursor-pointer text-right pr-10'
+                                  : index == 2
+                                  ? 'table-td cursor-pointer text-left pr-0 pl-12'
+                                  : 'table-td cursor-pointer text-right pr-12'
                               }`}
                             >
                               {cell.render('Cell')}

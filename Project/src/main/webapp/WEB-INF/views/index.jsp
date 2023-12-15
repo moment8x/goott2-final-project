@@ -78,7 +78,7 @@ function changeRatingProductInfo(data) {
 </style>
 </head>
 
-<body class="bg-effect">
+<body class="">
 
 	<jsp:include page="./header.jsp"></jsp:include>
 
@@ -88,7 +88,7 @@ function changeRatingProductInfo(data) {
             <div class="row g-4">
                 <div class="col-xl-9 col-lg-8">
                     <div class="home-contain h-100">
-                        <img src="/resources/assets/images/banner1.png" class="bg-img blur-up lazyload" alt="">
+                        <img src="/resources/assets/images/banner2.jpg" class="bg-img blur-up lazyload" alt="">
                         </div>
                         <div class="home-detail p-center-left w-75 position-relative mend-auto">
                         </div>
@@ -98,7 +98,7 @@ function changeRatingProductInfo(data) {
                         <img src="/resources/assets/images/subBanner1.png" class="bg-img blur-up lazyload" alt="">
                         <div class="home-detail p-top-left home-p-sm w-75">
                             <div>
-                                <h2 class="mt-0 text-danger">45% <span class="discount text-title text-warnning" style="font-size: 42px;">할인</span></h2>
+                                <h2 class="mt-0 text-danger">15% <span class="discount text-title text-warnning" style="font-size: 42px;">할인</span></h2>
                             </div>
                         </div>
                     </div>
@@ -124,17 +124,17 @@ function changeRatingProductInfo(data) {
                     <div class="slider-9">
                         <div>
                             <a href="/login/" class="category-box wow fadeInUp" data-wow-delay="0.15s">
-                                <div>
+                                <div style="margin: 0, 500px;">
                                     <img src="/resources/assets/images/login.png" class="blur-up lazyload" alt="">
                                     <h5>로그인</h5>
                                 </div>
                             </a>
                         </div>
                         <div>
-                            <a href="shop-left-sidebar.html" class="category-box wow fadeInUp">
+                            <a href="/user/myPage" class="category-box wow fadeInUp">
                                 <div>
                                     <img src="/resources/assets/images/invoice.png" class="blur-up lazyload" alt="">
-                                    <h5>주문내역 조회</h5>
+                                    <h5>마이페이지</h5>
                                 </div>
                             </a>
                         </div>
@@ -149,7 +149,7 @@ function changeRatingProductInfo(data) {
                         </div>
 
                         <div>
-                            <a href="shop-left-sidebar.html" class="category-box wow fadeInUp" data-wow-delay="0.1s">
+                            <a href="/cs/serviceCenter" class="category-box wow fadeInUp" data-wow-delay="0.1s">
                                 <div>
                                     <img src="/resources/assets/images/customer-care.png" class="blur-up lazyload" alt="">
                                     <h5>고객센터</h5>
@@ -163,42 +163,6 @@ function changeRatingProductInfo(data) {
                                 <div>
                                     <img src="/resources/assets/images/notice.png"" class="blur-up lazyload" alt="">
                                     <h5>공지사항</h5>
-                                </div>
-                            </a>
-                        </div>
-
-                        <div>
-                            <a href="shop-left-sidebar.html" class="category-box wow fadeInUp" data-wow-delay="0.25s">
-                                <div>
-                                    <img src="/resources/assets/svg/1/milk.svg" class="blur-up lazyload" alt="">
-                                    <h5>Milk & Dairies</h5>
-                                </div>
-                            </a>
-                        </div>
-
-                        <div>
-                            <a href="shop-left-sidebar.html" class="category-box wow fadeInUp" data-wow-delay="0.3s">
-                                <div>
-                                    <img src="/resources/assets/svg/1/pet.svg" class="blur-up lazyload" alt="">
-                                    <h5>Pet Food</h5>
-                                </div>
-                            </a>
-                        </div>
-
-                        <div>
-                            <a href="shop-left-sidebar.html" class="category-box wow fadeInUp" data-wow-delay="0.35s">
-                                <div>
-                                    <img src="/resources/assets/svg/1/biscuit.svg" class="blur-up lazyload" alt="">
-                                    <h5>Biscuits & Snacks</h5>
-                                </div>
-                            </a>
-                        </div>
-
-                        <div>
-                            <a href="shop-left-sidebar.html" class="category-box wow fadeInUp" data-wow-delay="0.4s">
-                                <div>
-                                    <img src="/resources/assets/svg/1/grocery.svg" class="blur-up lazyload" alt="">
-                                    <h5>Grocery & Staples</h5>
                                 </div>
                             </a>
                         </div>
@@ -511,7 +475,7 @@ function changeRatingProductInfo(data) {
 
     <!-- Blog Section Start -->
     <section>
-        <div class="container-fluid-lg">
+        <div class="container-fluid-lg" style="padding-bottom: 150px;">
             <div class="title">
                 <h2>고객님들께서 많이 담아간 상품</h2>
                 <span class="title-leaf">
@@ -548,35 +512,6 @@ function changeRatingProductInfo(data) {
     </section>
     <!-- Blog Section End -->
 
-    <!-- Newsletter Section Start -->
-    <section class="newsletter-section section-b-space">
-        <div class="container-fluid-lg">
-            <div class="newsletter-box newsletter-box-2">
-                <div class="newsletter-contain py-5">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-xxl-4 col-lg-5 col-md-7 col-sm-9 offset-xxl-2 offset-md-1">
-                                <div class="newsletter-detail">
-                                    <h2>Join our newsletter and get...</h2>
-                                    <h5>$20 discount for your first order</h5>
-                                    <div class="input-box">
-                                        <input type="email" class="form-control" id="exampleFormControlInput1"
-                                            placeholder="Enter Your Email">
-                                        <i class="fa-solid fa-envelope arrow"></i>
-                                        <button class="sub-btn btn">
-                                            <span class="d-sm-block d-none">Subscribe</span>
-                                            <i class="fa-solid fa-arrow-right icon"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Newsletter Section End -->
 
     <!-- Quick View Modal Box Start -->
     <div class="modal fade theme-modal view-modal" id="view" tabindex="-1" aria-labelledby="exampleModalLabel"

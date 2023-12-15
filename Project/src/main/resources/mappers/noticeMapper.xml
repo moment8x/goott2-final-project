@@ -39,4 +39,52 @@
   	<select id="selectBoardCount" resultType="int">
   		select count(*) from board where category_id = 3 or category_id = 4
   	</select>
+  	<insert id="insertNoticeReply">
+  		<selectKey keyProperty="postNo" order="AFTER" resultType="int">
+  			select post_no from gott123.board where author = #{author} and content = #{content} and parent_post = #{parentPost} and ref = 0
+  		</selectKey>
+  		insert into gott123.board(author, category_id, title, content, parent_post, ref) values(#{author}, 5, "noticeReply", #{content}, #{parentPost}, 0);
+  	</insert>
+  	<update id="updateNoticeReplyRef">
+  		update gott123.board set ref = #{postNo} where post_no = #{postNo}
+  	</update>
+    <insert id="insertNoticeReplyImages" parameterType="java.util.List">
+	    <selectKey keyProperty="uploadFilesSeq" order="AFTER" resultType="int">
+	        select upload_files_seq from gott123.upload_files where new_file_name = #{newFileName}
+	    </selectKey>
+	        INSERT INTO gott123.upload_files(thumbnail_file_name, extension, original_file_name, new_file_name, file_size)
+	        VALUES
+	        (#{thumbnailFileName}, #{extension}, #{originalFileName}, #{newFileName}, #{fileSize}
+	        )
+	</insert>
+  	<select id="selectUploadFileNo" resultType="int">
+	  	<foreach item="uploadFile" collection="list">
+	  		select upload_fiels_seq from gott123.upload_files where new_file_name = #{uploadFile.newFileName}  
+  		</foreach>
+	</select>
+	<insert id="insertBoarUf">
+		insert into gott123.board_uf(post_no, upload_files_seq) values(#{postNo}, #{uploadNo});
+	</insert>	
+	<resultMap type="com.project.vodto.kjy.Reply" id="replyResultMap">
+	    <id property="postNo" column="post_no"/>
+	    <result property="author" column="author"/>
+	    <result property="createdDate" column="created_date"/>
+	    <result property="content" column="content"/>
+	    <result property="ref" column="ref"/>
+	    <collection property="thumbnailFileName" javaType="java.util.List" ofType="java.lang.String" column="thumbnail_file_name" >
+	    	<result property="thumbnailFileName" column="thumbnail_file_name"/>
+	    </collection>
+	</resultMap>
+	<select id="selectNoticeReply" resultMap="replyResultMap">
+		SELECT b.post_no, b.author, b.created_date, b.content, f.thumbnail_file_name
+		FROM board b
+		LEFT JOIN board_uf u ON b.post_no = u.post_no
+		LEFT JOIN upload_files f ON u.upload_files_seq = f.upload_files_seq
+		WHERE b.category_id = 5 AND b.parent_post = #{parentNo}
+		ORDER BY b.ref
+		LIMIT #{pagingInfo.startRowIndex}, #{pagingInfo.viewProductPerPage}
+	</select>
+	<select id="selectCountNoticeReply" resultType="int">
+		select count(post_no) from board where category_id = 5 and parent_post = #{parentNo}
+	</select>
   </mapper>

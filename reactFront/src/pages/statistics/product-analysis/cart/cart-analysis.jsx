@@ -77,7 +77,7 @@ const CartAnalysis = ({ setData, setCartQuantity, data }) => {
         </div>
       </Card>
       <div className='box box-warning flex justify-center gap-3 m-3'>
-        <button className='btn btn-dark' onClick={handleSubmit}>
+        <button className='btn btn-dark flex items-center' onClick={handleSubmit}>
           검&nbsp;&nbsp;&nbsp;&nbsp;색
         </button>
       </div>

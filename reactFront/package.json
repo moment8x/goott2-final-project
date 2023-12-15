@@ -29,8 +29,6 @@
     "cleave.js": "^1.6.0",
     "d3-array": "^3.2.2",
     "dayjs": "^1.11.7",
-    "echarts": "^5.4.3",
-    "echarts-for-react": "^3.0.2",
     "framer-motion": "^10.12.12",
     "leaflet": "^1.9.3",
     "localforage": "^1.10.0",

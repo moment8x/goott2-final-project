@@ -65,7 +65,6 @@ public class ListServiceImpl implements ListService {
 		return lDao.selectProductCategory(key);
 	}
 
-
 	private PagingInfo getPagingInfo(String key, int page) throws Exception {		
 		// 전체 글의 개수
 		int ProductCounts = lDao.selectProductCount(key);

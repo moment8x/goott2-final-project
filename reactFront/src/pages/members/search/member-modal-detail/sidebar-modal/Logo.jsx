@@ -9,6 +9,7 @@ import useSkin from '@/hooks/useSkin';
 // import images
 import MobileLogo from '@/assets/images/logo/logo-c.svg';
 import MobileLogoWhite from '@/assets/images/logo/logo-c-white.svg';
+import DearLogo from '@/assets/images/logo/logo/logo-dear.svg';
 
 const SidebarLogo = ({ menuHover }) => {
   const [isDark] = useDarkMode();
@@ -25,15 +26,15 @@ const SidebarLogo = ({ menuHover }) => {
       
       `}
     >
-      <Link to="admin/home">
-        <div className="flex items-center space-x-4">
-          <div className="logo-icon">
-            {!isDark && !isSemiDark ? <img src={MobileLogo} alt="" /> : <img src={MobileLogoWhite} alt="" />}
+      <Link to='admin/home'>
+        <div className='flex items-center space-x-4'>
+          <div className='logo-icon'>
+            {!isDark && !isSemiDark ? <img src={DearLogo} alt='' /> : <img src={MobileLogoWhite} alt='' />}
           </div>
 
           {(!collapsed || menuHover) && (
             <div>
-              <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Deer Books</h1>
+              <h1 className='text-xl font-semibold text-slate-900 dark:text-slate-100'></h1>
             </div>
           )}
         </div>

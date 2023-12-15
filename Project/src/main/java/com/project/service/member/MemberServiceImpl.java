@@ -38,7 +38,9 @@ import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.MyPageReview;
 import com.project.vodto.jmj.PagingInfo;
+import com.project.vodto.jmj.PagingInfoPointLog;
 import com.project.vodto.jmj.ReturnOrder;
+import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
 import com.project.vodto.kjs.ShippingAddrDTO;
 import com.project.vodto.kjs.SignUpDTO;
@@ -151,7 +153,9 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public Map<String, Object> memberInfo(String memberId, int pageNo) throws SQLException, NamingException {
-		PagingInfo pi = pagination(pageNo, memberId);
+		Map<String, Object> map = pagination(pageNo, memberId);
+		PagingInfo pi = (PagingInfo) map.get("orderHistoryPaging");
+		PagingInfoPointLog pointLogPaging =(PagingInfoPointLog)map.get("pointLogPaging");
 
 		List<MyPageOrderList> lst = mDao.selectOrderHistory(memberId, pi);
 		List<GetBankTransfer> bankTransfer = mDao.selectBankTransfers(memberId);
@@ -171,39 +175,74 @@ public class MemberServiceImpl implements MemberService {
 		result.put("rewardLog", mDao.selectRewardLog(memberId));
 		result.put("couponLog", mDao.selectCouponLog(memberId));
 		result.put("myReview", mDao.selectMyreview(memberId));
+		result.put("cancelList", mDao.getCancelOrder(memberId));
+		result.put("returnList", mDao.getReturnList(memberId));
+		result.put("exchangeList", mDao.getExchangeList(memberId));
+		result.put("pointLogPaging", pointLogPaging);
 
 		return result;
 	}
 
-	private PagingInfo pagination(int pageNo, String memberId) throws SQLException, NamingException {
-		PagingInfo result = new PagingInfo();
-
+	private Map<String, Object> pagination(int pageNo, String memberId) throws SQLException, NamingException {
+		PagingInfo orderHistory = new PagingInfo();
+		PagingInfoPointLog pointLog = new PagingInfoPointLog();
+		Map<String, Object> result = new HashMap<String, Object>();
+//----------------------------------------주문내역---------------------------------------------------
 		// 현재 페이지 번호 셋팅
-		result.setPageNo(pageNo);
+		orderHistory.setPageNo(pageNo);
 
 		// 전체 주문 갯수
-		result.setTotalPostCnt(mDao.getTotalOrderCnt(memberId));
+		orderHistory.setTotalPostCnt(mDao.getTotalOrderCnt(memberId));
+
+		// 총 주문 페이지 수 구하기
+		orderHistory.setTotalPageCnt(orderHistory.getTotalPostCnt(), orderHistory.getViewPostCntPerPage());
 
 		// 총 포인트로그 갯수
-		result.setTotalPointLogCnt(mDao.getTotalPointLogCnt(memberId));
-
-		// 총페이지 수 구하기
-		result.setTotalPageCnt(result.getTotalPostCnt(), result.getViewPostCntPerPage());
+//		result.setTotalPointLogCnt(mDao.getTotalPointLogCnt(memberId));
 
 		// 보여주기 시작할 row index번호 구하기
-		result.setStartRowIndex();
+		orderHistory.setStartRowIndex();
 
 		// 몇개의 페이징 블럭이 나오는지
-		result.setTotalPagingBlockCnt();
+		orderHistory.setTotalPagingBlockCnt();
 
 		// 현재 페이지가 속한 페이징 블럭 번호
-		result.setPageBlockOfCurrentPage();
+		orderHistory.setPageBlockOfCurrentPage();
 
 		// 현재 블럭의 시작 페이지 번호
-		result.setStartNumOfCurrentPagingBlock();
+		orderHistory.setStartNumOfCurrentPagingBlock();
 
 		// 현재 블럭의 끝 페이지 번호 구하기
-		result.setEndNumOfCurrentPagingBlock();
+		orderHistory.setEndNumOfCurrentPagingBlock();
+
+		result.put("orderHistoryPaging", orderHistory);
+//-------------------------------------------------------------------------------------------------
+//------------------------------------------포인트로그---------------------------------------------
+		// 현재 페이지 번호 셋팅
+		pointLog.setPageNo(pageNo);
+
+		// 총 주문 페이지 수 구하기
+		pointLog.setTotalPointLogPageCnt(pointLog.getTotalPointLogCnt(), pointLog.getViewPostCntPerPage());
+
+		// 총 포인트로그 갯수
+		pointLog.setTotalPointLogCnt(mDao.getTotalPointLogCnt(memberId));
+
+		// 보여주기 시작할 row index번호 구하기
+		pointLog.setStartRowIndex();
+
+		// 몇개의 페이징 블럭이 나오는지
+		pointLog.setTotalPagingBlockCnt();
+
+		// 현재 페이지가 속한 페이징 블럭 번호
+		pointLog.setPageBlockOfCurrentPage();
+
+		// 현재 블럭의 시작 페이지 번호
+		pointLog.setStartNumOfCurrentPagingBlock();
+
+		// 현재 블럭의 끝 페이지 번호 구하기
+		pointLog.setEndNumOfCurrentPagingBlock();
+
+		result.put("pointLogPaging", pointLog);
 
 		return result;
 	}
@@ -217,37 +256,36 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public boolean duplicateUserEmail(String email) throws SQLException, NamingException, MessagingException {
 		boolean result = false;
-		if(mDao.duplicateUserEmail(email) != null) { //이메일이 중복
+		if (mDao.duplicateUserEmail(email) != null) { // 이메일이 중복
 			result = true;
 		}
 		return result;
 	}
-	
-	public Map<String, Object> emailSend(String email) throws MessagingException{
-		Map<String, Object> result = new HashMap<String, Object>();
+
+	public boolean emailSend(String email) throws MessagingException {
+//		Map<String, Object> result = new HashMap<String, Object>();
 		String code = UUID.randomUUID().toString();
 		System.out.println("code!!!!!!!!!!!!!!!!!!!!!!!!!! : " + code);
 //		this.emailCode = code;
-		
-//		boolean result = false;
-		
+
+		boolean result = false;
+
 		String emailTo = email;
 		String emailFrom = "game046@naver.com";
 		String subject = "Dear Books 이메일 인증";
 		String message = "코드 " + code + " 를 입력해서 인증을 해주세요.";
-		
+
 		MimeMessage mimeMsg = mailSender.createMimeMessage();
 		MimeMessageHelper mimeHelper = new MimeMessageHelper(mimeMsg);
-		
+
 		mimeHelper.setFrom(emailFrom);
 		mimeHelper.setTo(emailTo);
 		mimeHelper.setSubject(subject);
 		mimeHelper.setText(message);
-		
+
 		mailSender.send(mimeMsg);
-		
-		result.put("code", code);
-		
+		result = true;
+
 		return result;
 	}
 
@@ -270,11 +308,21 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public boolean insertShippingAddress(String memberId, ShippingAddress tmpAddr)
 			throws SQLException, NamingException {
 		boolean result = false;
 
-		if (mDao.addShippingAddress(memberId, tmpAddr) == 1) {
+		if (tmpAddr.getBasicAddr() == 'Y') {
+			System.out.println("기본배송지로 설정");
+			if (mDao.allBasicAddrN(memberId) != 0) {
+				mDao.addShippingAddress(memberId, tmpAddr);
+				System.out.println("배송지 추가 완료");
+				result = true;
+			}
+		} else if (tmpAddr.getBasicAddr() == 'N') {
+			mDao.addShippingAddress(memberId, tmpAddr);
+			System.out.println("기본배송지가 아닌 배송지 추가 완료");
 			result = true;
 		}
 
@@ -465,23 +513,39 @@ public class MemberServiceImpl implements MemberService {
 						for (String category : couponCategory) {
 							// 취소상품 카테고리키랑 쿠폰 카테고리키랑 일치한다면
 							if (cancelOrder.getCategoryKey().equals(category)) {
-								for (int i = 0; i < detailOrder.size(); i++) {
-									// 주문목록에 선택한상품이 있다면 삭제
-									if (detailOrder.get(i).getProductId().equals(cancelOrder.getProductId())) {
-										detailOrder.remove(i);
-										System.out.println("detailOrder" + detailOrder.toString());
-										// 삭제후에 주문목록에 상품이 존재한다면
-										if (detailOrder.size() > 0) {
-											System.out.println("쿠폰환불안됨");
-											result.put("status", "noCoupon");
-										} else {
+								// for (int i = 0; i < detailOrder.size(); i++) {
+								// 주문목록에 선택한상품이 있다면 삭제
+//									if (detailOrder.get(i).getProductId().equals(cancelOrder.getProductId())) {
+//										detailOrder.remove(i);
+								System.out.println("detailOrder" + detailOrder.toString());
+								// 삭제후에 주문목록에 상품이 존재한다면
+								for (int i = couponsHistory.size() - 1; i >= 0; i--) {
+									System.out.println("쿠폰히스토리 IIIIIIIII" + i);
+//											CouponHistory couponApplyProduct = couponsHistory.get(i);
+									if (couponsHistory.get(i).getCouponDiscount() > 0) {
+										if (couponsHistory.get(i).getProductId().equals(cancelOrder.getProductId())) {
 											System.out.println("쿠폰환불됨");
 											result.put("status", "okCoupon");
+											break;
+										} else {
+											System.out.println("쿠폰환불안됨");
+											result.put("status", "noCoupon");
 										}
+									} else {
+										System.out.println("쿠폰환불안됨");
+										result.put("status", "noCoupon");
 									}
 								}
 							}
 						}
+					} else if (ch.getCouponDiscount() == 0) {
+						// 쿠폰 적용을 안 한 주문이다
+						System.out.println("쿠폰환불안됨");
+						result.put("status", "noCoupon");
+						// 부분취소의 경우
+//						취소할 상품금액에서 시작
+						result.put("calcRefund", calcRefund(cancelProductPrice, couponDiscount, cancelPrice,
+								refundReward, refundPoint, refundAmount, detailOrderInfo));
 					}
 				}
 			}
@@ -537,7 +601,7 @@ public class MemberServiceImpl implements MemberService {
 					result.put("refundPoint", refundPoint);
 					result.put("refundAmount", refundAmount);
 				} else {
-					//취소할 상품 금액이 포인트보다 크다면
+					// 취소할 상품 금액이 포인트보다 크다면
 //					취소상품금액 - 사용 포인트 = 차액 환불
 //					usedPoint 0 업데이트
 					refundAmount = cancelPrice - detailOrderInfo.getUsedPoints();
@@ -565,7 +629,7 @@ public class MemberServiceImpl implements MemberService {
 		boolean allCancel = true;
 		int selectQty = 0;
 		int detailedOrderId = 0;
-		int amount = 0;
+		int amount = 0; // 상품가격 * 취소하려고 선택한 수량
 		System.out.println(tmpCancel.toString());
 		// 해당주문에서 취소하려고 선택한 상품
 
@@ -583,17 +647,18 @@ public class MemberServiceImpl implements MemberService {
 		List<DetailOrder> detailOrder = mDao.selectDetailOrder(memberId, tmpCancel.getOrderNo()); // 해당주문에서 주문한 상품 전체
 		DetailOrderInfo detailOrderInfo = mDao.selectDetailOrderInfo(memberId, tmpCancel.getOrderNo()); // 해당 주문 주문상세
 		Member member = mDao.selectMyInfo(memberId);
-		List<CouponHistory> couponsHistory = mDao.getOrderCouponsHistory(memberId, tmpCancel.getOrderNo()); // 해당주문에서 사용한 쿠폰내역
+		List<CouponHistory> couponsHistory = mDao.getOrderCouponsHistory(memberId, tmpCancel.getOrderNo()); // 해당주문에서
+																											// 사용한 쿠폰내역
 		int totalRefundAmount = amount + detailOrderInfo.getUsedPoints() + detailOrderInfo.getUsedReward()
 				+ cancelOrder.getCouponDiscount(); // 취소하는 상품 할인전금액
 		int productQuantity = mDao.selectProductQuantity(tmpCancel.getOrderNo(), cancelOrder.getProductId());
-
+		int remainingQuantity = productQuantity - selectQty;
 		System.out.println("productId" + cancelOrder.getProductId());
 		System.out.println("productPrice" + cancelOrder.getProductPrice());
 
 //		// 취소테이블 인서트
 		if (mDao.insertCancelOrder(cancelOrder.getProductId(), tmpCancel.getReason(), amount, detailedOrderId,
-				detailOrderInfo.getPaymentMethod()) > 0) {
+				detailOrderInfo.getPaymentMethod(), memberId) > 0) {
 			System.out.println("취소 저장 완");
 //			// //환불테이블 인서트
 			if (mDao.insertRefund(cancelOrder.getProductId(), totalRefundAmount, tmpCancel.getActualRefundAmount(),
@@ -603,15 +668,24 @@ public class MemberServiceImpl implements MemberService {
 				// 취소하는 상품 수량이랑 상품 주문수량이랑 일치하지 않는다면
 				if (productQuantity != selectQty) {
 					// 주문수량 업데이트
-					int remainingQuantity = productQuantity - selectQty;
-					System.out.println("remainingQuantity" + remainingQuantity);
-					mDao.updateProductQuantity(selectQty, tmpCancel.getOrderNo(), cancelOrder.getProductId());
+					mDao.updateProductQuantity(selectQty, tmpCancel.getOrderNo(), cancelOrder.getProductId(),
+							remainingQuantity);
 					System.out.println("주문수량 업데이트 완");
 					result.put("remainingQuantity", remainingQuantity);
-				} else {
-					// 디테일 프로덕트상태 주문취소로 업데이트
+				} else { // 취소 하는 상품 수량이랑 상품 주문수량이랑 일치한다면
+					mDao.updateProductQuantity(selectQty, tmpCancel.getOrderNo(), cancelOrder.getProductId(),
+							remainingQuantity);
+				}
+				// 디테일 프로덕트상태 업데이트
+				if(productQuantity != selectQty) { 
+					// 취소하는 상품 수량이랑 선택한 상품 수량이랑 일치하지 않는다면 부분취소로 업데이트
+					if(mDao.updateProductStatus(detailedOrderId) > 0) {
+						System.out.println("디테일 상태 부분취소로 업데이트 완");						
+					}
+				}else {
 					if (mDao.updateDetailProductStatus(detailedOrderId) > 0) {
-						System.out.println("디테일 상태 업데이트 완");
+						
+						System.out.println("디테일 상태 주문취소로 업데이트 완");
 						for (DetailOrder cancelDetail : detailOrder) {
 //						// 모든 디테일 상품 상태가 취소라면 주문내역 배송상태 취소로 변경
 							if (!"주문취소".equals(cancelDetail.getProductStatus())) {
@@ -622,13 +696,15 @@ public class MemberServiceImpl implements MemberService {
 								System.out.println("주문내역 배송상태 변경 완");
 							}
 						}
-					}
+					}					
 				}
+
 				System.out.println(tmpCancel.toString());
 				// 실 결제금액 업데이트
-//				if (mDao.updateActualAmount(tmpCancel.getOrderNo(), tmpCancel.getActualRefundAmount(), detailOrderInfo.getPaymentMethod()) != 0) {
-//					System.out.println("실 결제금액 업데이트 완");
-//				}
+				if (mDao.updateActualAmount(tmpCancel.getOrderNo(), tmpCancel.getActualRefundAmount(),
+						detailOrderInfo.getPaymentMethod()) != 0) {
+					System.out.println("실 결제금액 업데이트 완");
+				}
 
 //				// 환불계좌정보 업데이트
 				if (mDao.updateRefundAccount(memberId, tmpCancel) != 0) {
@@ -676,7 +752,6 @@ public class MemberServiceImpl implements MemberService {
 				// 돌려줄 쿠폰이 있다면
 				if (tmpCancel.getCouponName() != null && tmpCancel.getCouponName().size() != 0) {
 					for (int i = 0; i < tmpCancel.getCouponName().size(); i++) {
-
 						// 쿠폰로그 사용일, 사용한 주문번호 null로 업데이트
 						if (mDao.updateCouponLog(memberId, tmpCancel.getOrderNo(),
 								tmpCancel.getCouponName().get(i)) > 0) {
@@ -702,16 +777,23 @@ public class MemberServiceImpl implements MemberService {
 		int detailedOrderId = 0;
 		boolean result = false;
 		boolean allApplyReturn = true;
-		
-		for(int i = 0; i < ro.getDetailedOrderId().size(); i++) {
+		int selectQty = 0;
+
+		for (int i = 0; i < ro.getDetailedOrderId().size(); i++) {
 			detailedOrderId = ro.getDetailedOrderId().get(i);
+		}
+		for (int i = 0; i < ro.getSelectQty().size(); i++) {
+			selectQty = ro.getSelectQty().get(i);
+			System.out.println(selectQty);
 		}
 
 		List<DetailOrder> detailOrder = mDao.selectDetailOrder(memberId, ro.getOrderNo()); // 해당주문에서 주문한 상품 전체
 		DetailOrderInfo detailOrderInfo = mDao.selectDetailOrderInfo(memberId, ro.getOrderNo()); // 해당 주문 주문상세
 		DetailOrder retrunOrder = mDao.selectCancelOrder(memberId, ro.getOrderNo(), detailedOrderId);
+		int productQuantity = mDao.selectProductQuantity(ro.getOrderNo(), retrunOrder.getProductId());
+		int remainingQuantity = productQuantity - selectQty;
 
-		if (mDao.insertReturn(retrunOrder.getProductId(), ro.getReturnReason(), detailedOrderId) > 0) {
+		if (mDao.insertReturn(retrunOrder.getProductId(), ro.getReturnReason(), detailedOrderId, memberId) > 0) {
 			System.out.println("반품 인서트 완");
 			if (mDao.insertReturnShippingAddress(ro) > 0) {
 				System.out.println("회수 배송지 입력 완");
@@ -727,6 +809,16 @@ public class MemberServiceImpl implements MemberService {
 							} else {
 								mDao.updatedeliveryStatusWithReturn(memberId, ro.getOrderNo());
 								System.out.println("주문내역 배송상태 변경 완");
+							}
+							// 주문한 상품 수량이랑 반품하는 상품 수량이랑 일치하지 않는다면
+							if (productQuantity != selectQty) {
+								// 주문수량 업데이트
+								mDao.updateProductQuantity(selectQty, ro.getOrderNo(), retrunOrder.getProductId(),
+										remainingQuantity);
+								System.out.println("주문수량 업데이트 완");
+							} else {// 주문한 상품 수량이랑 반품하는 상품 수량이랑 일치한다면
+								mDao.updateProductQuantity(selectQty, ro.getOrderNo(), retrunOrder.getProductId(),
+										remainingQuantity);
 							}
 						}
 					}
@@ -745,11 +837,11 @@ public class MemberServiceImpl implements MemberService {
 		boolean result = false;
 		boolean allApplyExchange = true;
 		int detailedOrderId = 0;
-		
-		for(int i = 0; i < ed.getDetailedOrderId().size(); i++) {
+
+		for (int i = 0; i < ed.getDetailedOrderId().size(); i++) {
 			detailedOrderId = ed.getDetailedOrderId().get(i);
 		}
-		
+
 		List<DetailOrder> detailOrder = mDao.selectDetailOrder(memberId, ed.getOrderNo()); // 해당주문에서 주문한 상품 전체
 		DetailOrderInfo detailOrderInfo = mDao.selectDetailOrderInfo(memberId, ed.getOrderNo()); // 해당 주문 주문상세
 		DetailOrder exchangeOrder = mDao.selectCancelOrder(memberId, ed.getOrderNo(), detailedOrderId);
@@ -822,6 +914,12 @@ public class MemberServiceImpl implements MemberService {
 		return result;
 	}
 
+	@Override
+	public List<SelectWishlist> viewWishlist(String memberId) throws SQLException, NamingException {
+
+		return mDao.viewWishlist(memberId);
+	}
+
 	// --------------------------------------- 장민정 끝
 	// ----------------------------------------
 	// --------------------------------------- 김진솔 시작
@@ -839,14 +937,10 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public boolean insertMember(SignUpDTO member) throws SQLException, NamingException {
+	public boolean insertMember(SignUpDTO member) throws Exception {
 		boolean result = false;
 		String newFileName = "";
-		if (member.getCellPhoneNumber() == null || member.getCellPhoneNumber().length() < 1 ) {
-			member.setPhoneNumber(member.getPhoneNumber1() + "-" + member.getPhoneNumber2() + "-" + member.getPhoneNumber1());
-			member.setCellPhoneNumber(
-					member.getCellPhoneNumber1() + "-" + member.getCellPhoneNumber2() + "-" + member.getCellPhoneNumber3());
-		}
+		
 		// 회원 가입 - 프로필 사진 저장
 		if (member.getFileList().size() > 0) {
 			UploadFiles file = new UploadFiles();
@@ -870,7 +964,7 @@ public class MemberServiceImpl implements MemberService {
 			shipping.setZipCode(member.getZipCode());
 			shipping.setAddress(member.getAddress());
 			shipping.setDetailAddress(member.getDetailedAddress());
-			if (member.getBasicAddr() == null || member.getBasicAddr().equals("")) {
+			if (member.getBasicAddr() == null) {
 				member.setBasicAddr("N");
 			}
 			shipping.setBasicAddr(member.getBasicAddr());
@@ -893,8 +987,6 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public void sendEmail(String email, String code) throws MessagingException {
-		System.out.println("sendMail 서비스");
-
 		String emailTo = email;
 		String emailFrom = "lesilion@naver.com";
 		String subject = "DeerBooks 이메일 인증";
@@ -913,8 +1005,7 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public boolean confirmCode(String sessionCode, String userCode) {
 		boolean result = false;
-		System.out.println("코드 검증");
-
+		
 		if (sessionCode.equals(userCode)) {
 			result = true;
 		}
@@ -930,16 +1021,16 @@ public class MemberServiceImpl implements MemberService {
 		Random random = new Random();
 		StringBuilder buffer = new StringBuilder(stringLength);
 		for (int i = 0; i < stringLength; i++) {
-		    int randomLimitedInt = leftLimit + (int)(random.nextFloat() * (rightLimit - leftLimit + 1));
-		    if (randomLimitedInt != 91 || randomLimitedInt != 92 || randomLimitedInt != 93 || randomLimitedInt != 96) {
-		    	buffer.append((char) randomLimitedInt);
-		    } else {
-		    	i--;
-		    }
+			int randomLimitedInt = leftLimit + (int) (random.nextFloat() * (rightLimit - leftLimit + 1));
+			if (randomLimitedInt != 91 || randomLimitedInt != 92 || randomLimitedInt != 93 || randomLimitedInt != 96) {
+				buffer.append((char) randomLimitedInt);
+			} else {
+				i--;
+			}
 		}
 		String generatedString = buffer.toString();
 		System.out.println(generatedString);
-		
+
 		return generatedString + memberId;
 	}
 
@@ -947,7 +1038,8 @@ public class MemberServiceImpl implements MemberService {
 	public List<TermsOfSignUpVO> getTerms() throws SQLException, NamingException {
 		return mDao.getTerms();
 	}
-	
-	// --------------------------------------- 김진솔 끝 ----------------------------------------
+
+	// --------------------------------------- 김진솔 끝
+	// ----------------------------------------
 
 }

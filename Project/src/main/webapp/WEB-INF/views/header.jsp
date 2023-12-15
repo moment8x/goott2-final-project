@@ -109,7 +109,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
     		output += `<c:if test='${cartItems == "none"}'>`;
     		output += `등록된 상품이 없습니다.</c:if>`;
     		
-    		output2 += `<h5>Total :</h5>`;
+    		output2 += `<h5>총계 :</h5>`;
     		output2 += `<c:if test='${cartItems != "none"}'>`;
     		output2 += `<c:set var="total" value="0" />`;
             output2 += `<c:forEach var="item" items="${cartItems}" varStatus="status">`;
@@ -129,7 +129,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 		
 		function newCart(items) {
 			let output = "";
-			let output2 = '<h5>Total :</h5>';
+			let output2 = '<h5>총 계 :</h5>';
 			let output3 = '';
 			
 			if (items !== "none") {
@@ -201,71 +201,13 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                 <div>
                                     <div class="timer-notification">
                                        <h6>
-                       					 사슴을 살려주세요!
-                       					 <a href="shop-left-sidebar.html" class="text-white">Save Life!</a >
+                       					 Deer Books에 오신것을 환영합니다!
+                       					 <!-- <a href="shop-left-sidebar.html" class="text-white">Save Life!</a > -->
                     				  </h6>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="col-lg-3">
-                        <ul class="about-list right-nav-about">
-                            <li class="right-nav-list">
-                                <div class="dropdown theme-form-select">
-                                    <button class="btn dropdown-toggle" type="button" id="select-language"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        <img src="/resources/assets/images/country/united-states.png"
-                                            class="img-fluid blur-up lazyload" alt="">
-                                        <span>English</span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="select-language">
-                                        <li>
-                                            <a class="dropdown-item" href="javascript:void(0)" id="english">
-                                                <img src="/resources/assets/images/country/united-kingdom.png"
-                                                    class="img-fluid blur-up lazyload" alt="">
-                                                <span>English</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="javascript:void(0)" id="france">
-                                                <img src="/resources/assets/images/country/germany.png"
-                                                    class="img-fluid blur-up lazyload" alt="">
-                                                <span>Germany</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="javascript:void(0)" id="chinese">
-                                                <img src="/resources/assets/images/country/turkish.png"
-                                                    class="img-fluid blur-up lazyload" alt="">
-                                                <span>Turki</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li class="right-nav-list">
-                                <div class="dropdown theme-form-select">
-                                    <button class="btn dropdown-toggle" type="button" id="select-dollar"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span>USD</span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end sm-dropdown-menu"
-                                        aria-labelledby="select-dollar">
-                                        <li>
-                                            <a class="dropdown-item" id="aud" href="javascript:void(0)">AUD</a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" id="eur" href="javascript:void(0)">EUR</a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" id="cny" href="javascript:void(0)">CNY</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </div>
@@ -281,22 +223,11 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                     <i class="fa-solid fa-bars"></i>
                                 </span>
                             </button>
-                            <a href="/" class="web-logo nav-logo">
-
-                                <img src="/resources/assets/images/deer.png" class="img-fluid blur-up lazyload" alt="">
+                            <a href="/" >
+                                <img src="/resources/assets/images/deer_logo.svg" class="img-fluid blur-up lazyload" alt="">
                             </a>
 
                             <div class="middle-box">
-                                <div class="location-box">
-                                    <button class="btn location-button" data-bs-toggle="modal"
-                                        data-bs-target="#locationModal">
-                                        <span class="location-arrow">
-                                            <i data-feather="map-pin"></i>
-                                        </span>
-                                        <span class="locat-name">Your Location</span>
-                                        <i class="fa-solid fa-angle-down"></i>
-                                    </button>
-                                </div>
 
                                 <div class="search-box">
                                     <div class="input-group">
@@ -331,17 +262,6 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                             </div>
                                         </div>
 
-                                    <li class="right-side">
-                                        <a href="contact-us.html" class="delivery-login-box">
-                                            <div class="delivery-icon">
-                                                <i data-feather="phone-call"></i>
-                                            </div>
-                                            <div class="delivery-detail">
-                                                <h6>24/7 Delivery</h6>
-                                                <h5>+91 888 104 2340</h5>
-                                            </div>
-                                        </a>
-                                    </li>
                                     <li class="right-side" data-bs-toggle="modal" data-bs-target="#deal-box">
                                             <i data-feather="heart"></i>
 
@@ -364,9 +284,9 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                                 </div>
 
                                                 <div class="button-group">
-                                                    <a href="/shoppingCart/shoppingCart" class="btn btn-sm cart-button">View Cart</a>
-                                                    <a href="checkout.html" class="btn btn-sm cart-button theme-bg-color
-                                                    text-white">Checkout</a>
+                                                    <a href="/shoppingCart/shoppingCart" class="btn btn-sm cart-button" style="margin:auto;">장바구니</a>
+                                                    <!-- <a href="checkout.html" class="btn btn-sm cart-button theme-bg-color
+                                                    text-white">결제</a> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -376,48 +296,46 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                             <div class="delivery-icon">
                                                 <i data-feather="user"></i>
                                             </div>
-                                            <div class="delivery-detail">
-                                                <h6>Hello,</h6>
-                                                <h5>My Account</h5>
-                                            </div>
+                                            	<c:choose>
+													<c:when test="${sessionScope.loginMember == null }">
+		                                                <div class="delivery-detail">
+			                                                <h5>로그인 해주세요</h5>
+			                                            </div>
+													</c:when>
+													<c:otherwise>
+		                                                <div class="delivery-detail">
+			                                                <h5>${sessionScope.loginMember.memberId }님 안녕하세요!</h5>
+			                                            </div>
+													</c:otherwise>
+												</c:choose>                  
                                         </div>
 
                                         <div class="onhover-div onhover-div-login">
                                             <ul class="user-box-name">
                                                 <li class="product-box-contain">
                                                     <i></i>
-                                                    <!-- 시큐리티 적용시
-                                                    <sec:authorize access="isAnonymous()" >
-                                                    	<a href="/login/">Log In</a>
-                                                    </sec:authorize>
-                                                    <sec:authorize access="isAuthenticated()">
-                                                    	  <form method="post" action="/logout">
-													        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-													        <input type="submit" value="로그아웃" />    
-													        </form>                                                
-                                                    </sec:authorize>
-                                                    -->
                                                     <c:choose>
 														<c:when test="${sessionScope.loginMember == null }">
-		                                                    <a href="/login/">Log In</a>
+		                                                    <a href="/login/">로그인</a>
 														</c:when>
 														<c:otherwise>
-		                                                    <a href="/login/logout">Log out</a>
+		                                                    <a href="/login/logout">로그 아웃</a>
 														</c:otherwise>
 													</c:choose>
                                                 </li>
 
                                                 <li class="product-box-contain">
-                                                    <a href="/register/register">Register</a>
+                                                    <a href="/register/register">회원가입</a>
                                                 </li>
 
                                                 <li class="product-box-contain">
                                                     <a href="forgot.html">Forgot Password</a>
                                                 </li>
-                                                
+                                              <c:if test="${sessionScope.loginMember != null }">
                                               <li class="product-box-contain">
                                                     <a href="/user/myPage">My Page</a>
                                                 </li>
+                                               </c:if>
                                               
                                             </ul>
                                         </div>
@@ -438,7 +356,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                         <div class="header-nav-left">
                             <button class="dropdown-category">
                                 <i data-feather="align-left"></i>
-                                <span>All Categories</span>
+                                <span>전체 분류</span>
                             </button>
 
                             <div class="category-dropdown">
@@ -448,7 +366,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                         <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
-		                  <ul class="category-list">
+		                  <ul class="category-list" >
 		                    <li class="onhover-category-list" >
 		                      <a href="javascript:void(0)" class="category-name">
 		                        <img src="/resources/assets/images/open-book.png" alt="" />
@@ -702,12 +620,6 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
 			                  </ul>
                             </div>
                         </div>
-                        <div class="header-nav-right">
-                            <button class="btn deal-button" data-bs-toggle="modal" data-bs-target="#deal-box">
-                                <i data-feather="zap"></i>
-                                <span>Deal Today</span>
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -721,8 +633,8 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
             <div class="modal-content">
                 <div class="modal-header">
                     <div>
-                        <h5 class="modal-title w-100" id="deal_today">Deal Today</h5>
-                        <p class="mt-1 text-content">Recommended deals for you.</p>
+                        <h5 class="modal-title w-100" id="deal_today"></h5>
+                        <p class="mt-1 text-content"></p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                         <i class="fa-solid fa-xmark"></i>

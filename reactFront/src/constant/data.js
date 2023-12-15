@@ -94,12 +94,6 @@ export const menuItems = [
       {
         childtitle: '상품 등록',
         childlink: 'admin/products/register',
-        multi_menu: [
-          {
-            multiTitle: '일반 등록',
-            multiLink: 'admin/products/register',
-          },
-        ],
       },
       {
         childtitle: '상품 관리',
@@ -127,14 +121,8 @@ export const menuItems = [
         childlink: 'admin/members/dashboard',
       },
       {
-        childtitle: '회원 조회',
-        childlink: 'user2',
-        multi_menu: [
-          {
-            multiTitle: '회원 정보 조회',
-            multiLink: 'admin/members/search',
-          },
-        ],
+        childtitle: '회원 정보 조회',
+        childlink: 'admin/members/search',
       },
       {
         childtitle: '회원 관리',
