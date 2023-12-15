@@ -690,6 +690,13 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 			async : false,
 			success : function(data) {
 				console.log(data);
+				if(data == "success"){
+					let addr = $('#' + addrSeq);
+					console.log(addr + "삭제")
+					addr.fadeOut(300, function () {
+						addr.remove();
+	                });			
+				}
 			},
 			error : function() {
 			}
@@ -1124,6 +1131,7 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 	function updateReview(postNo, productId) {
 		let rating = $("input:radio[name='reviewStar']:checked").val();
 		let reviewContent = $('#reviewContent').val()
+		console.log(rating)
 		$.ajax({
 	         url: "/user/updateReview",
 	         type: "GET",
@@ -1136,11 +1144,11 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 	         dataType: "JSON",
 	         async: false,
 	         success: function(data) {
-	            console.log("success", data);
-	            if (data.status === "success") {
-	               $('#modifyReviewModal').hide
-	               location.reload()
-	            } 
+	            console.log(data);
+	          //  if (data.status === "success") {
+	            //  $('#modifyReviewModal').hide
+	           //    location.reload()
+	         //   } 
 	         }, error: function(data) {
 	            console.log("err", data);
 	         }
@@ -1536,8 +1544,8 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 						</div>
 						<div class="profile-box">
 							<div class="cover-image">
-								<!-- <img src="/resources/assets/images/deer.png"
-									class="img-fluid blur-up lazyload" alt="" /> -->
+								<img src="/resources/assets/images/deer.png"
+									class="img-fluid blur-up lazyload" alt="" />
 							</div>
 
 							<div class="profile-contain">
@@ -2776,7 +2784,7 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 									<div class="row g-sm-4 g-3">
 										<c:forEach var="addr" items="${userAddrList }">
 
-											<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
+											<div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6" id="${addr.addrSeq }">
 
 												<div class="address-box">
 													<div>
@@ -2832,8 +2840,7 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 															onclick="editShippingAddr(${addr.addrSeq});">
 															<i data-feather="edit"></i> Edit
 														</button>
-														<button class="btn btn-sm add-button w-100"
-															data-bs-toggle="modal" data-bs-target="#removeProfile"
+														<button class="btn btn-sm add-button w-100" type="button"
 															onclick="delShippingAddr(${addr.addrSeq});">
 															<i data-feather="trash-2"></i> Remove
 														</button>
@@ -3302,7 +3309,7 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 	</div>
 	<!-- Edit Card End -->
 
-	<!-- Remove Profile Modal Start -->
+	<!-- Remove Profile Modal Start 
 	<div class="modal fade theme-modal remove-profile" id="removeProfile"
 		tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div
@@ -3346,7 +3353,7 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 				</div>
 			</div>
 		</div>
-	</div>
+	</div>-->
 	<!-- Remove Profile Modal End -->
 
 	<!-- latest jquery-->

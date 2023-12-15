@@ -342,8 +342,8 @@ public class myPageController {
 		try {
 			if(mService.emailSend(email)) {
 				System.out.println(email+" 로 전송 완료");
+				result = true;
 			}
-			result = true;
 		} catch (MessagingException e) {
 			e.printStackTrace();
 		}
@@ -474,10 +474,11 @@ public class myPageController {
 	}
 
 	@RequestMapping(value = "deleteShippingAddr", method = RequestMethod.POST)
-	public void deleteShippingAddr(@RequestParam Map<String, Object> map, HttpServletRequest request) {
+	public ResponseEntity<String> deleteShippingAddr(@RequestParam Map<String, Object> map, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
+		ResponseEntity<String> result = null;
 
 		Object addrSeqObj = map.get("addrSeq");
 
@@ -491,7 +492,7 @@ public class myPageController {
 
 				if (mService.deleteShippingAddr(memberId, addrSeq) == 0) {
 					System.out.println("배송주소록 삭제 완");
-					;
+					result = new ResponseEntity<String>("success", HttpStatus.OK);
 				}
 			} catch (Exception e) {
 				System.out.println("예외났음 : " + addrSeqObj);
@@ -500,6 +501,8 @@ public class myPageController {
 			// addrSeqObj가 null인 경우
 			System.out.println("addrSeq null");
 		}
+		
+		return result;
 	}
 
 	@RequestMapping(value = "setBasicAddr", method = RequestMethod.POST)
@@ -758,7 +761,7 @@ public class myPageController {
 	}
 	
 	@PostMapping("profileUpload")
-	public ResponseEntity<UploadFiles> rofileUpload(MultipartFile uploadFile, HttpServletRequest request) {
+	public ResponseEntity<UploadFiles> profileUpload(MultipartFile uploadFile, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Memberkjy member = (Memberkjy) session.getAttribute("loginMember");
 		String memberId = member.getMemberId();
@@ -881,14 +884,19 @@ public class myPageController {
 		String memberId = ((Memberkjy)session.getAttribute("loginMember")).getMemberId();
 		
 		String realPath = request.getSession().getServletContext().getRealPath("resources/uploads");
+		System.out.println("별점" + rating);
 		
 		try {
 			review = rService.getReview(postNo, memberId);
+			System.out.println(review.toString());
 			if (review.getAuthor() != null) {
 				// 등록된 파일이 있는가 확인하고 있으면 fileList에 put
-				for (UploadFiles uf : review.getImages()) {
-					fileList.add(uf);
-					rService.updateReview(postNo, content, rating, calcFileList(), deleteFileList, realPath, productId);
+				System.out.println("리뷰이미지!!!!!!!!!!!!"+review.getImages());
+				if(review.getImages() != null) {
+					for (UploadFiles uf : review.getImages()) {
+						fileList.add(uf);
+						rService.updateReview(postNo, content, rating, calcFileList(), deleteFileList, realPath, productId);
+					}					
 				}
 				
 				map.put("review", review);
