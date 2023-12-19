@@ -142,6 +142,8 @@ public interface MemberService {
 	String randomId(String memberId);
 	// 회원가입 시 약관 가져오기
 	List<TermsOfSignUpVO> getTerms() throws SQLException, NamingException;
+	// 이메일 중복 체크
+	boolean isExist(String email) throws SQLException, NamingException;
 	// ------------------------------------ 김진솔 끝 -----------------------------------
 	
 

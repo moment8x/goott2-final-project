@@ -1039,6 +1039,17 @@ public class MemberServiceImpl implements MemberService {
 		return mDao.getTerms();
 	}
 
+	@Override
+	public boolean isExist(String email) throws SQLException, NamingException {
+		boolean result = false;
+		
+		if (mDao.isExist(email) > 0) {
+			result = true;
+		}
+		
+		return result;
+	}
+
 	// --------------------------------------- 김진솔 끝
 	// ----------------------------------------
 

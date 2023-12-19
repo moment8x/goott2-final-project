@@ -290,6 +290,8 @@
 					/* $('#updateInquiry').submit(); */
 				}
 			}
+		} else {
+			alert('모든 항목을 입력해주세요.');
 		}
 		closeConfirmModal();
 	}

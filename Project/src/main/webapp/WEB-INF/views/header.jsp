@@ -181,8 +181,8 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                 <div class="row">
                     <div class="col-xxl-3 d-xxl-block d-none">
                         <div class="top-left-header">
-                            <i class="iconly-Location icli text-white"></i>
-                            <span class="text-white">1418 Riverwood Drive, CA 96052, US</span>
+                          <!--   <i class="iconly-Location icli text-white"></i>
+                            <span class="text-white">1418 Riverwood Drive, CA 96052, US</span> -->
                         </div>
                     </div>
 
@@ -262,10 +262,7 @@ pageEncoding="UTF-8"%> <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/c
                                             </div>
                                         </div>
 
-                                    <li class="right-side" data-bs-toggle="modal" data-bs-target="#deal-box">
-                                            <i data-feather="heart"></i>
-
-                                    </li>
+                                    
                                     <li class="right-side">
                                         <div class="onhover-dropdown header-badge">
                                             <button type="button" class="btn p-0 position-relative header-wishlist"

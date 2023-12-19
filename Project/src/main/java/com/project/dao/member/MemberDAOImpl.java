@@ -858,7 +858,13 @@ public class MemberDAOImpl implements MemberDAO {
 	public List<TermsOfSignUpVO> getTerms() throws SQLException, NamingException {
 		return ses.selectList(ns + ".getTerms");
 	}
+	
+	@Override
+	public int isExist(String email) throws SQLException, NamingException {
+		return ses.selectOne(ns + ".isExist", email);
+	}
 	// ---------------------------------------- 김진솔 끝 -----------------------------------------
+
 
 
 }

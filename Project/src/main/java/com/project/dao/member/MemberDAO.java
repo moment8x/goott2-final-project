@@ -304,6 +304,8 @@ public interface MemberDAO {
 	int insertShipping(ShippingAddrDTO shipping) throws SQLException, NamingException;
 	// 약관 가져오기
 	List<TermsOfSignUpVO> getTerms() throws SQLException, NamingException;
+	// 이메일 중복 확인
+	int isExist(String email) throws SQLException, NamingException;
 	// ----------------------------------- 김진솔 끝 ------------------------------------
 	
 	

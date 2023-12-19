@@ -437,13 +437,13 @@
          <div class="row">
             <div class="col-12">
                <div class="breadscrumb-contain">
-                  <h2>Checkout</h2>
+                  <h2>회원 주문/결제</h2>
                   <nav>
                      <ol class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="index.html"> <i
                               class="fa-solid fa-house"></i>
                         </a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+                        <li class="breadcrumb-item active" aria-current="page">회원 주문/결제</li>
                      </ol>
                   </nav>
                </div>
@@ -826,7 +826,7 @@
                            </div>
                            <div class="checkout-box">
                               <div class="checkout-title">
-                                 <h4>Payment Option</h4>
+                                 <h4>결제수단</h4>
                               </div>
 
                               <div class="checkout-detail">
@@ -943,7 +943,7 @@
                <div class="right-side-summery-box">
                   <div class="summery-box-2">
                      <div class="summery-header">
-                        <h3>Order Summery</h3>
+                        <h3>결제 정보</h3>
                      </div>
                      <ul class="summery-contain">
                         <c:forEach var="info" items="${requestScope.productInfos }"
@@ -1050,7 +1050,7 @@
                               class="img-fluid" alt="">
                         </div>
                         <div class="offer-name">
-                           <h6>Notification</h6>
+                           <h6>안내</h6>
                         </div>
                      </div>
 

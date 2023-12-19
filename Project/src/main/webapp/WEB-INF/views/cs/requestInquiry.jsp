@@ -355,7 +355,7 @@ display:flex;
 																	<img
 																		src="../resources/inquiryUploads${file.newFileName }"
 																		id="newFile${status.index }" class="d-block"
-																		style="max-width: 450px;">
+																		style="width:512px; height:512px;">
 																</div>
 															</c:forEach>
 

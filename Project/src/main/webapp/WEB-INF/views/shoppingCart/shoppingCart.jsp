@@ -132,6 +132,7 @@
 		// 선택된 항목 삭제.
 		function delCheckedItem() {
 			let items = [];
+			let index = 0;
 			$("input[name='check_item']:checked").each(function(i){   //jQuery로 for문 돌면서 check 된값 배열에 담는다
 				items.push($(this).val());
 			});
@@ -145,6 +146,16 @@
 				async: false,
 				success:function(data) {
 					if (data.status != 'fail') {
+						for (let id of items) {
+							let index = 0;
+							for (let data of buyInfo) {
+								if (data.productId == id) {
+									buyInfo.splice(index, 1);
+									break;
+								}
+								index++;
+							}
+						}
 						spreadView();
 						buy();
 						newCart(data.cartItems);
