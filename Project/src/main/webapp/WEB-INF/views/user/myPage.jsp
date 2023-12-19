@@ -613,7 +613,6 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 	}
 	
 	function outputShippingAddr(addr) {
-		/* console.log("id", "${sessionScope.loginMember}"); */
 		let output = `<button type="button" class="btn theme-bg-color btn-md text-white"
 			onclick="sample6_execDaumPostcode('shippingZipNoModify', 'shippingAddrModify', 'shippingDetailAddrModify', 'shippingExtraAddress');">주소 찾기</button>`
 		output += `<div class="col-xxl-6">`
@@ -3178,47 +3177,6 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 					</button>
 				</div>
 				<div class="viewModifyReview"></div>
-				<!--  	<div class="modal-body modifyReview">
-					<table class="table mb-0 productInfo">
-						<tbody>
-							<tr>
-								<td class="product-detail">
-									<div class="product border-0">
-										<a href="/detail/" class="product-image"> <img
-											src="/resources/assets/images/noimage.jpg"
-											class="img-fluid blur-up lazyload" alt="">
-										</a>
-									</div>
-								</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class="name">
-									<h4 class="table-title text-content">상품이름</h4> <a
-									href="/detail/" id="productName"></a>
-								</td>
-								<td class="name">
-									<h4 class="table-title text-content">별점</h4> 
-								</td>
-							</tr>
-						</tbody>
-					</table>
-					<div class="form-floating mb-4 theme-form-floating">
-						content<input type="text" class="form-control" id="exchangeReason"
-							value="상품 하자" name="reason" readonly="readonly" />
-						<div class="deliverMsg">
-							<i class="fa-solid fa-circle-exclamation" style="color: #ff0059;"></i>
-							상품에 하자가 있는 경우에만 교환이 가능합니다.
-						</div>
-					</div>
-				</div>
-				<div class="uploadFile"></div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary btn-md"
-						data-bs-dismiss="modal" onclick="btnCancel();">닫기</button>
-					<button type="button" class="btn theme-bg-color btn-md text-white"
-						onclick="updateReview()">수정</button>
-				</div>-->
 			</div>
 		</div>
 	</div>
@@ -3247,114 +3205,6 @@ function sample6_execDaumPostcode(zipCode, userAddr, detailAddr, extraAddress) {
 		</div>
 	</div>
 	<!-- Edit Profile End -->
-
-	<!-- Edit Card Start -->
-	<div class="modal fade theme-modal" id="editCard" tabindex="-1"
-		aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div
-			class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen-sm-down">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel8">Edit Card</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal">
-						<i class="fa-solid fa-xmark"></i>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="row g-4">
-						<div class="col-xxl-6">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="finame"
-										value="Mark" /> <label for="finame">First Name</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-xxl-6">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<input type="text" class="form-control" id="laname"
-										value="Jecno" /> <label for="laname">Last Name</label>
-								</div>
-							</form>
-						</div>
-
-						<div class="col-xxl-4">
-							<form>
-								<div class="form-floating theme-form-floating">
-									<select class="form-select" id="floatingSelect12"
-										aria-label="Floating label select example">
-										<option selected>Card Type</option>
-										<option value="kindom">Visa Card</option>
-										<option value="states">MasterCard Card</option>
-										<option value="fra">RuPay Card</option>
-										<option value="china">Contactless Card</option>
-										<option value="spain">Maestro Card</option>
-									</select> <label for="floatingSelect12">Card Type</label>
-								</div>
-							</form>
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-animation btn-md fw-bold"
-						data-bs-dismiss="modal">Cancel</button>
-					<button type="button"
-						class="btn theme-bg-color btn-md fw-bold text-light">
-						Update Card</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Edit Card End -->
-
-	<!-- Remove Profile Modal Start 
-	<div class="modal fade theme-modal remove-profile" id="removeProfile"
-		tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div
-			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-			<div class="modal-content">
-				<div class="modal-header d-block text-center">
-					<h5 class="modal-title w-100" id="exampleModalLabel22">삭제하시겠습니까?</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close">
-						<i class="fa-solid fa-xmark"></i>
-					</button>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-animation btn-md fw-bold"
-						data-bs-dismiss="modal">No</button>
-					<button type="button"
-						class="btn theme-bg-color btn-md fw-bold text-light"
-						data-bs-target="#removeAddress" data-bs-toggle="modal">
-						Yes</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="modal fade theme-modal remove-profile" id="removeAddress"
-		tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div
-			class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title text-center" id="exampleModalLabel12">
-						삭제되었습니다.</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close">
-						<i class="fa-solid fa-xmark"></i>
-					</button>
-				</div>
-				<div class="modal-footer pt-0">
-					<button type="button"
-						class="btn theme-bg-color btn-md fw-bold text-light"
-						onclick="location.reload();" data-bs-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>-->
-	<!-- Remove Profile Modal End -->
 
 	<!-- latest jquery-->
 	<script src="/resources/assets/js/jquery-3.6.0.min.js"></script>
