@@ -211,16 +211,16 @@
     		
     		// 이메일 유효성 검사
     		$('#email').on('blur', function() {
-             let regEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
-             if (regEmail.test($('#email').val())) {
-                isValidEmail = true;
-                $('#email-code').parent().next().html('');
-             } else {
-                $('#email').parent().next().next().next().html("올바른 이메일이 아닙니다.");
-                notValidCss("email-code");
-                isValidEmail = false;
-             }
-          });
+    			let regEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
+    			if (regEmail.test($('#email').val())) {
+    				isValidEmail = true;
+    				$('#email-code').parent().next().html('');
+    			} else {
+    				$('#email').parent().next().next().next().html("올바른 이메일이 아닙니다.");
+    				notValidCss("email-code");
+    				isValidEmail = false;
+    			}
+    		});
     		
     		$('#phone-number').on('blur', function() {
     			let regNumber = /^([0-9]{2,3})-?([0-9]{3,4})-?([0-9]{4})$/;
@@ -357,6 +357,9 @@
     				success : function(data) {
     					if (data.status = "success") {
     						alert('메일을 발송했습니다.');
+    					} else (data.status = "exist") {
+    						alert("이미 가입된 메일입니다.");
+    						$('#email').val("");
     					}
     				}, error : function(data) {
     					console.log("error", data);
