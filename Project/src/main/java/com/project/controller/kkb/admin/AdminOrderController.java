@@ -120,7 +120,7 @@ public class AdminOrderController {
 	
 	/* 입금 전 관리 (입금 확인 [입금전 -> 결제완료] ) 
 	 * 배송 준비중 관리 (결제완료 처리[출고완료 -> 결제완료]) */
-	@PutMapping("/preShipped")
+	@PutMapping("/PreShipped")
 	public ResponseEntity<String> setPreShipped(@RequestBody List<String> orderNoList) {	
 		int result = adminOrderService.editPreShipped(orderNoList);
 		
@@ -132,7 +132,7 @@ public class AdminOrderController {
 	} 
 	
 	/* 입금 전 관리 (주문 취소 버튼 - 주문번호별) */
-	@PutMapping("/preShipped/o/cancel")
+	@PutMapping("/PreShipped/o/cancel")
 	public ResponseEntity<String> setPendingOrderCancel(
 			@RequestBody List<String> orderNoList) {	
 		
@@ -146,7 +146,7 @@ public class AdminOrderController {
 	} 
 	
 	/* 입금 전 관리 (주문 취소 버튼 - 품목주문별) */
-	@PutMapping("/preShipped/p/cancel")
+	@PutMapping("/PreShipped/p/cancel")
 	public ResponseEntity<String> setPendingProductCancel(
 			@RequestBody List<ProductCancelRequest> productOrderNoList) {	
 		

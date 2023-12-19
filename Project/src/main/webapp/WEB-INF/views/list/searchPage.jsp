@@ -12,159 +12,160 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 </head>
 <script>
-   let checkedList = [];
-   let checkedLang = [];
-   let sort = "aToz";
-   let page = 1;
-   let totalPageCnt = 0;
+	let checkedList = [];
+	let checkedLang = [];
+	let sort = "aToz";
+	let page = 1;
+	let totalPagingBlockCnt = 0;
 $(function() {
-   totalPageCnt = "${paging.totalPageCnt}";
-   
-   $('.key-category input[type="checkbox"]').on("change", function() {
-      if($(this).prop("checked")){
-         checkedList.push($(this).val());
-
-         getProduct(checkedList,checkedLang, sort, 1);
-      } else {
-         if(checkedList.includes($(this).val())){
-            checkedList.splice(checkedList.indexOf($(this).val()), 1);
-            getProduct(checkedList,checkedLang, sort, page);
-         }
-      }
-   });
-   
-   $(".pagingBtnDiv").on("click", "button" , function() {
-      page = $(this).html();
-      getProduct(checkedList ,checkedLang, sort, page);
-      $(".pagingBtnDiv button").removeClass("clicked"); 
-       $(".page-"+page).addClass("clicked");
-   });
-   
-   $('.lang-category input[type="checkbox"]').on("change", function() {
-      if($(this).prop("checked")){
-         checkedLang.push($(this).val());
-
-         getProduct(checkedList,checkedLang, sort, 1);
-      } else {
-         if(checkedLang.includes($(this).val())){
-            checkedLang.splice(checkedLang.indexOf($(this).val()), 1);
-
-            getProduct(checkedList,checkedLang, sort, page);
-         }
-      }
-   });
-   
-   $('#dropDownUl a').on("click", function() {
-      sort = $(this).attr("id");
-      getProduct(checkedList ,checkedLang, sort, page);
-   });
-   
+	totalPagingBlockCnt = "${paging.totalPagingBlockCnt}";
+	
+	$('.key-category input[type="checkbox"]').on("change", function() {
+		if($(this).prop("checked")){
+			checkedList.push($(this).val());
+			console.log(checkedList);
+			getProduct(checkedList,checkedLang, sort, page);
+		} else {
+			if(checkedList.includes($(this).val())){
+				checkedList.splice(checkedList.indexOf($(this).val()), 1);
+				console.log(checkedList);
+				getProduct(checkedList,checkedLang, sort, page);
+			}
+		}
+	});
+	
+	$(".pagingBtnDiv").on("click", "button" , function() {
+		page = $(this).html();
+		getProduct(checkedList ,checkedLang, sort, page);
+		$(".pagingBtnDiv button").removeClass("clicked"); 
+	    $(".page-"+page).addClass("clicked");
+	});
+	
+	$('.lang-category input[type="checkbox"]').on("change", function() {
+		if($(this).prop("checked")){
+			checkedLang.push($(this).val());
+			console.log(checkedLang);
+			getProduct(checkedList,checkedLang, sort, page);
+		} else {
+			if(checkedLang.includes($(this).val())){
+				checkedLang.splice(checkedLang.indexOf($(this).val()), 1);
+				console.log(checkedLang);
+				getProduct(checkedList,checkedLang, sort, page);
+			}
+		}
+	});
+	
+	$('#dropDownUl a').on("click", function() {
+		sort = $(this).attr("id");
+		getProduct(checkedList ,checkedLang, sort, page);
+	});
+	
 });
 function setPagingLink() {
-   for(let i = 1; i < 11; i++){
-      $('.link'+i).attr("href",($(".link"+i).attr("href")+"&active="+activeClass));
-   }
+	for(let i = 1; i < 11; i++){
+		$('.link'+i).attr("href",($(".link"+i).attr("href")+"&active="+activeClass));
+	}
 }
 
 function getProduct(listCategory, listLang, sortValue, pageValue) {
-   let val = getParamsVal();
-   $.ajax({
-      url : '/list/searchPageWithFilter',
-      type : 'POST',
-      data : {
-         "val" : val,
-         "checkedList[]" : listCategory,
-         "checkedLang[]" : listLang,
-         "sort" : sortValue,
-         "page" : pageValue
-      },
-      dataType : 'json',
-      async : false,
-      success : function(data) {
-         // 전송에 성공하면 이 콜백 함수를 실행 (data 에는 응답받은 데이터가 저장된다)
-         parse(data.pList);
-         makePageButton(data.paging);
-      },
-      error : function() {
-         // 전송에 실패하면 이 콜백 함수를 실행
-      }
-   });
+	let val = getParamsVal();
+	$.ajax({
+		url : '/list/searchPageWithFilter',
+		type : 'POST',
+		data : {
+			"val" : val,
+			"checkedList[]" : listCategory,
+			"checkedLang[]" : listLang,
+			"sort" : sortValue,
+			"page" : pageValue,
+		},
+		dataType : 'json',
+		async : false,
+		success : function(data) {
+			// 전송에 성공하면 이 콜백 함수를 실행 (data 에는 응답받은 데이터가 저장된다)
+			parse(data.pList);
+			makePageButton(data.paging);
+		},
+		error : function() {
+			// 전송에 실패하면 이 콜백 함수를 실행
+		}
+	});
 }
 function getParamsVal() {
-   let queryString = decodeURIComponent(window.location.search);
-   let val = queryString.split("=")[1];
-   return val
+	let queryString = decodeURIComponent(window.location.search);
+	let val = queryString.split("=")[1];
+	return val
 }
 function parse(data) {
-   let output = "";
-   $.each(data, function(i, product) {
-           output += `<div><div class="product-box-3 h-100 wow fadeInUp"><div class="product-header"><div class="product-image">`
-           output += `<a href="product-left-thumbnail.html"><img src="\${product.productImage }"class="img-fluid blur-up lazyload" alt=""></a>`
+	let output = "";
+	$.each(data, function(i, product) {
+     		output += `<div><div class="product-box-3 h-100 wow fadeInUp"><div class="product-header"><div class="product-image">`
+     		output += `<a href="product-left-thumbnail.html"><img src="\${product.productImage }"class="img-fluid blur-up lazyload" alt=""></a>`
             output += `<ul class="product-option">`
-           output += `<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="\${product.productId }" title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i></a></li>`
-           output += `<li  data-bs-toggle="tooltip" data-bs-placement="top" title="장바구니" ><a href="/shoppingCart/insert?product_id='\${product.productId }"><i data-feather="shopping-cart"></i></a></li>`
-         output += `<li data-bs-toggle="tooltip" data-bs-placement="top"title="Wishlist"><a href="wishlist.html"class="notifi-wishlist"> <i data-feather="heart"></i></a></li>`
-         output += `</ul></div></div>`
-         output += `<div class="product-footer"><div class="product-detail"><span class="span-name">Vegetable</span><a href="product-left-thumbnail.html"><h5 class="name">\${product.productName }</h5></a>`
-         output += `<p class="text-content mt-1 mb-2 product-content">\${product.introductionIntro }</p>`
-         output += `<div class="product-rating mt-2"><ul class="rating">`
-         output += `<li><i data-feather="star" class="fill"></i></li><li><i data-feather="star" class="fill"></i></li><li><i data-feather="star" class="fill"></i></li><li><i data-feather="star" class="fill"></i></li><li><i data-feather="star"></i></li></ul><span>(4.0)</span>`
-         let sellPrice = product.sellingPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-         let consumerPrice = product.consumerPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-         output += `</div><h6 class="unit">\${product.pageCount }</h6><h5 class="price"><span class="theme-color"><span class="theme-color">\${sellPrice}원</span><del>\${consumerPrice}원</del></h5></div></div></div></div>`
-   })
-   $(".product-list-section").html(output);
-   feather.replace();
+     		output += `<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="\${product.productId }" title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i></a></li>`
+     		output += `<li  data-bs-toggle="tooltip" data-bs-placement="top" title="장바구니" ><a href="/shoppingCart/insert?product_id='\${product.productId }"><i data-feather="shopping-cart"></i></a></li>`
+			output += `<li data-bs-toggle="tooltip" data-bs-placement="top"title="Wishlist"><a href="wishlist.html"class="notifi-wishlist"> <i data-feather="heart"></i></a></li>`
+			output += `</ul></div></div>`
+			output += `<div class="product-footer"><div class="product-detail"><span class="span-name">Vegetable</span><a href="product-left-thumbnail.html"><h5 class="name">\${product.productName }</h5></a>`
+			output += `<p class="text-content mt-1 mb-2 product-content">\${product.introductionIntro }</p>`
+			output += `<div class="product-rating mt-2"><ul class="rating">`
+			output += `<li><i data-feather="star" class="fill"></i></li><li><i data-feather="star" class="fill"></i></li><li><i data-feather="star" class="fill"></i></li><li><i data-feather="star" class="fill"></i></li><li><i data-feather="star"></i></li></ul><span>(4.0)</span>`
+			let sellPrice = product.sellingPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+			let consumerPrice = product.consumerPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+			output += `</div><h6 class="unit">\${product.pageCount }</h6><h5 class="price"><span class="theme-color"><span class="theme-color">\${sellPrice}원</span><del>\${consumerPrice}원</del></h5></div></div></div></div>`
+	})
+	$(".product-list-section").html(output);
+	feather.replace();
 }
 function pagingbutton(button) {
-   page = button.innerHTML;
-   getProduct(checkedList ,checkedLang, sort, page);
-   $(".pagingBtnDiv .page-link").removeClass("clicked"); 
+	page = button.innerHTML;
+	getProduct(checkedList ,checkedLang, sort, page);
+	$(".pagingBtnDiv .page-link").removeClass("clicked"); 
     $(button).addClass("clicked");
 }
 function beforePaging() {
-   if(page > 10){
-   page = (Math.floor(page / 10)-1)* 10 + 1;
-   getProduct(checkedList ,checkedLang, sort, page);
-    $(".page-"+page).addClass("clicked");
-   } else {
-      return false;
-   }
+	if(page > 10){
+	page = (Math.floor(page / 10)-1)* 10 + 1;
+	getProduct(checkedList ,checkedLang, sort, page);
+	 $(".page-"+page).addClass("clicked");
+	} else {
+		return false;
+	}
 }
 function afterPaging() {
-   if(Math.ceil(page / 10) < (totalPageCnt/10)){
-   page = Math.floor((page - 1) / 10) * 10 + 11;
-   getProduct(checkedList ,checkedLang, sort, page);
-    $(".page-"+page).addClass("clicked");
-   } else {
-      return false;
-   }
+	if(Math.ceil(page / 10) < (totalPagingBlockCnt/10)){
+	page = Math.floor((page - 1) / 10) * 10 + 11;
+	getProduct(checkedList ,checkedLang, sort, page);
+	 $(".page-"+page).addClass("clicked");
+	} else {
+		return false;
+	}
 }
 function makePageButton(paging) {
-
-   let output = "";
-   if (paging.totalPageCnt > paging.endNumOfCurrentPagingBlock){
-      for(let i = paging.startNumOfCurrentPagingBlock; i <paging.endNumOfCurrentPagingBlock+1; i++){   
-         output += `<li class="page-item active">`;
-         output += `<button class="page-link page-\${i}">\${i}</button>`;
-         output += `</li>`;
-      }
-   } else {
-      for(let i = paging.startNumOfCurrentPagingBlock; i <paging.totalPageCnt+1; i++){   
-         output += `<li class="page-item active">`;
-         output += `<button class="page-link page-\${i}">\${i}</button>`;
-         output += `</li>`;
-      }
-   }
-      $(".pagingBtnDiv").html(output);
-      
+	console.log(paging);
+	let output = "";
+	if (paging.totalPagingBlockCnt > paging.endNumOfCurrentPagingBlock){
+		for(let i = paging.startNumOfCurrentPagingBlock; i <paging.endNumOfCurrentPagingBlock+1; i++){	
+			output += `<li class="page-item active">`;
+			output += `<button class="page-link page-\${i}">\${i}</button>`;
+			output += `</li>`;
+		}
+	} else {
+		for(let i = paging.startNumOfCurrentPagingBlock; i <paging.totalPagingBlockCnt+1; i++){	
+			output += `<li class="page-item active">`;
+			output += `<button class="page-link page-\${i}">\${i}</button>`;
+			output += `</li>`;
+		}
+	}
+	   $(".pagingBtnDiv").html(output);
+	   
 }
 
 </script>
 <style>
 .clicked {
-   background-color: white !important;
-   color: black !important;
+	background-color: white !important;
+	color: black !important;
 }
 </style>
 <body>
@@ -239,7 +240,7 @@ function makePageButton(paging) {
     <section class="section-b-space shop-section">
         <div class="container-fluid-lg">
             <div class="row">
-               <div class="col-custome-3">
+            	<div class="col-custome-3">
                     <div class="left-box right-box wow fadeInUp">
                         <div class="shop-left-sidebar shop-right-sidebar">
                             <div class="back-button">
@@ -258,6 +259,11 @@ function makePageButton(paging) {
                                     <div id="collapseOne" class="accordion-collapse collapse show"
                                         aria-labelledby="headingOne">
                                         <div class="accordion-body">
+                                            <div class="form-floating theme-form-floating-2 search-box">
+                                                <input type="search" class="form-control" id="search"
+                                                    placeholder="Search ..">
+                                                <label for="search">Search</label>
+                                            </div>
                                             <ul class="category-list custom-padding custom-height"> 
                                             <c:forEach var="category" items="${categories }" varStatus="loop">  
                                                 <li>
@@ -265,7 +271,7 @@ function makePageButton(paging) {
                                                         <input class="checkbox_animated" type="checkbox" id="categories${loop.index }" value="${category.categoryKey }">
                                                         <label class="form-check-label" for="categories${loop.index }">
                                                             <span class="name">${category.categoryName }</span>
-                                                            <span class="number" style="margin-right: 10px;">${category.categoryCount }</span>
+                                                            <span class="number">${category.categoryCount }</span>
                                                         </label>
                                                     </div>
                                                 </li>
@@ -597,12 +603,12 @@ function makePageButton(paging) {
                     <div
                         class="row g-sm-4 g-3 row-cols-xxl-4 row-cols-xl-3 row-cols-lg-2 row-cols-md-3 row-cols-2 product-list-section list-style">
                      <c:choose>
-                        <c:when test="${products == 'notSearch' }">
-                           <div class="product-box-3 h-100 wow fadeInUp" style="height:200px; align-items: center; text-align: center;"><h2>검색에 해당하는 상품이 존재하지 않습니다.</h2></div>
-                        </c:when>
-                        <c:otherwise>
-                           <c:forEach var="product" items="${products }">
-                              <div>
+                     	<c:when test="${products == 'notSearch' }">
+                     		<div class="product-box-3 h-100 wow fadeInUp" style="height:200px; align-items: center; text-align: center;"><h2>검색에 해당하는 상품이 존재하지 않습니다.</h2></div>
+                     	</c:when>
+                     	<c:otherwise>
+                     		<c:forEach var="product" items="${products }">
+                     			<div>
                             <div class="product-box-3 h-100 wow fadeInUp">
                                 <div class="product-header">
                                     <div class="product-image">
@@ -611,20 +617,20 @@ function makePageButton(paging) {
                                                 class="img-fluid blur-up lazyload" alt="">
                                         </a>
                                         <ul class="product-option">
-                                       <li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="${product.productId }"
-                                          title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i>
-                                       </a></li>
-                                          
+													<li data-bs-toggle="tooltip" data-bs-placement="top" id="payModalBtn" value="${product.productId }"
+														title="바로 구매"> <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view"><i data-feather="credit-card"></i>
+													</a></li>
+														
 
-                                    <li  data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="장바구니" ><a href="/shoppingCart/insert?product_id='${product.productId }"><i data-feather="shopping-cart"></i></a>
-                                    </li>
+												<li  data-bs-toggle="tooltip" data-bs-placement="top"
+													title="장바구니" ><a href="/shoppingCart/insert?product_id='${product.productId }"><i data-feather="shopping-cart"></i></a>
+												</li>
 
-                                    <li data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Wishlist"><a href="wishlist.html"
-                                       class="notifi-wishlist"> <i data-feather="heart"></i>
-                                    </a></li>
-                              </ul>
+												<li data-bs-toggle="tooltip" data-bs-placement="top"
+													title="Wishlist"><a href="wishlist.html"
+													class="notifi-wishlist"> <i data-feather="heart"></i>
+												</a></li>
+										</ul>
                                     </div>
                                 </div>
                                 <div class="product-footer">
@@ -634,9 +640,9 @@ function makePageButton(paging) {
                                             <h5 class="name">${product.productName }</h5>
                                         </a>
                                         <c:choose>
-                                           <c:when test="${product.introductionIntro != null }">
-                                              <p class="text-content mt-1 mb-2 product-content">${product.introductionIntro }</p>
-                                           </c:when>
+                                        	<c:when test="${product.introductionIntro != null }">
+                                        		<p class="text-content mt-1 mb-2 product-content">${product.introductionIntro }</p>
+                                        	</c:when>
                                         </c:choose>
                                         <div class="product-rating mt-2">
                                             <ul class="rating">
@@ -667,12 +673,12 @@ function makePageButton(paging) {
                                 </div>
                             </div>
                         </div>
-                           </c:forEach>
-                        </c:otherwise>
+                     		</c:forEach>
+                     	</c:otherwise>
                      </c:choose>
                         </div>
                     </div>
-               
+
                     <nav class="custome-pagination">
                         <ul class="pagination justify-content-center">
                             <li class="page-item paging-left-arrow">
@@ -683,19 +689,19 @@ function makePageButton(paging) {
                             <div class="pagingBtnDiv">
                             <c:set var="val" value="${param.val }" />
                             <c:choose>
-                            <c:when test="${paging.totalPageCnt > paging.endNumOfCurrentPagingBlock }">
-                               <c:forEach var="i" begin="${paging.startNumOfCurrentPagingBlock}" end="${paging.endNumOfCurrentPagingBlock }" step="1">
-                                  <li class="page-item active">
-                                         <button class="page-link page-${i}">${i}</button>
-                                    </li>
+                            <c:when test="${paging.totalPagingBlockCnt > paging.endNumOfCurrentPagingBlock }">
+                            	<c:forEach var="i" begin="${paging.startNumOfCurrentPagingBlock}" end="${paging.endNumOfCurrentPagingBlock }" step="1">
+                            		<li class="page-item active">
+                              	  		<button class="page-link page-${i}">${i}</button>
+                           			</li>
                             </c:forEach>
                             </c:when>
                             <c:otherwise>
-                               <c:forEach var="i" begin="${paging.startNumOfCurrentPagingBlock}" end="${paging.totalPageCnt }" step="1">
-                                  <li class="page-item active">
-                                      <button class="page-link plink${i}" >${i}</button>
-                                  </li>
-                               </c:forEach>
+                            	<c:forEach var="i" begin="${paging.startNumOfCurrentPagingBlock}" end="${paging.totalPagingBlockCnt }" step="1">
+		                            <li class="page-item active">
+		                                <button class="page-link plink${i}" >${i}</button>
+		                            </li>
+	                            </c:forEach>
                             </c:otherwise>
                             </c:choose>
                             </div>
@@ -715,48 +721,44 @@ function makePageButton(paging) {
     <!-- Shop Section End -->
     
     <!-- Quick View Modal Box Start -->
-   <div class="modal fade theme-modal view-modal" id="view" tabindex="-1"
-      aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div
-         class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-sm-down">
-         <div class="modal-content">
-            <div class="modal-header p-0">
-               <button type="button" class="btn-close" data-bs-dismiss="modal"
-                  aria-label="Close">
-                  <i class="fa-solid fa-xmark"></i>
-               </button>
-            </div>
-            <div class="modal-body">
-               <div class="row g-sm-4 g-2">
-                  <div class="col-lg-6" style="display: flex">
-                     <div class="slider-image">
-                        <img src="https://media.istockphoto.com/id/1437657408/ko/%EB%B2%A1%ED%84%B0/%ED%9D%B0%EC%83%89-%EB%B0%B0%EA%B2%BD%EC%97%90-%EA%B2%A9%EB%A6%AC%EB%90%9C-%EC%88%98%EC%B1%84%ED%99%94-%EC%95%84%EA%B8%B0-%EC%82%AC%EC%8A%B4-%EA%B7%80%EC%97%AC%EC%9A%B4-%EC%82%BC%EB%A6%BC-%EB%8F%99%EB%AC%BC-%EC%86%90%EC%9C%BC%EB%A1%9C-%EA%B7%B8%EB%A6%B0-%EA%B7%B8%EB%A6%BC-%ED%82%A4%EC%A6%88-%EB%94%94%EC%9E%90%EC%9D%B8.jpg?s=1024x1024&w=is&k=20&c=U3NghfcvPpFArhj6oAg9-6iVjW4pINKHcjNHFarbEzk="
-                           class="img-fluid blur-up lazyload" alt="" />
-                     </div>
-                     <div>
-                      <c:choose>
-                         <c:when test="${sessionScope.loginMember != null }">
-                            <a href="/order/requestOrder?product_id="+pId+"&isLogin=Y" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-                         </c:when>
-                         <c:otherwise>
-                            <a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
-                           <a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>
-                         </c:otherwise>
-                      </c:choose>                                    
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-   </div>
-   <!-- Quick View Modal Box End -->
+	<div class="modal fade theme-modal view-modal" id="view" tabindex="-1"
+		aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div
+			class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-sm-down">
+			<div class="modal-content">
+				<div class="modal-header p-0">
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa-solid fa-xmark"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="row g-sm-4 g-2">
+						<div class="col-lg-6" style="display: flex">
+							<div class="slider-image">
+								<img src="https://media.istockphoto.com/id/1437657408/ko/%EB%B2%A1%ED%84%B0/%ED%9D%B0%EC%83%89-%EB%B0%B0%EA%B2%BD%EC%97%90-%EA%B2%A9%EB%A6%AC%EB%90%9C-%EC%88%98%EC%B1%84%ED%99%94-%EC%95%84%EA%B8%B0-%EC%82%AC%EC%8A%B4-%EA%B7%80%EC%97%AC%EC%9A%B4-%EC%82%BC%EB%A6%BC-%EB%8F%99%EB%AC%BC-%EC%86%90%EC%9C%BC%EB%A1%9C-%EA%B7%B8%EB%A6%B0-%EA%B7%B8%EB%A6%BC-%ED%82%A4%EC%A6%88-%EB%94%94%EC%9E%90%EC%9D%B8.jpg?s=1024x1024&w=is&k=20&c=U3NghfcvPpFArhj6oAg9-6iVjW4pINKHcjNHFarbEzk="
+									class="img-fluid blur-up lazyload" alt="" />
+							</div>
+							<div>
+							 <c:choose>
+							 	<c:when test="${sessionScope.loginMember != null }">
+							 		<a href="/order/requestOrder?product_id="+pId+"&isLogin=Y" id="MemberLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+							 	</c:when>
+							 	<c:otherwise>
+							 		<a href="" id="loginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F4BF96;" onclick="">회원 구매</button></a>
+									<a href="" id="noLoginPay"><button type="button" class="btn buttonBuyMember" style="background-color: #F9B572;" onclick="">비 회원 구매</button></a>
+							 	</c:otherwise>
+							 </c:choose>												
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Quick View Modal Box End -->
     
     <jsp:include page="../footer.jsp"></jsp:include>
-    
-      <script src="/resources/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
-    <script src="/resources/assets/js/bootstrap/bootstrap-notify.min.js"></script>
-    <script src="/resources/assets/js/bootstrap/popper.min.js"></script>
 </body>
 
 </html>
