@@ -38,7 +38,6 @@ import com.project.vodto.jmj.GetOrderStatusSearchKeyword;
 import com.project.vodto.jmj.MyPageOrderList;
 import com.project.vodto.jmj.MyPageReview;
 import com.project.vodto.jmj.PagingInfo;
-import com.project.vodto.jmj.PagingInfoPointLog;
 import com.project.vodto.jmj.ReturnOrder;
 import com.project.vodto.jmj.SelectWishlist;
 import com.project.vodto.jmj.exchangeDTO;
@@ -155,7 +154,6 @@ public class MemberServiceImpl implements MemberService {
 	public Map<String, Object> memberInfo(String memberId, int pageNo) throws SQLException, NamingException {
 		Map<String, Object> map = pagination(pageNo, memberId);
 		PagingInfo pi = (PagingInfo) map.get("orderHistoryPaging");
-		PagingInfoPointLog pointLogPaging =(PagingInfoPointLog)map.get("pointLogPaging");
 
 		List<MyPageOrderList> lst = mDao.selectOrderHistory(memberId, pi);
 		List<GetBankTransfer> bankTransfer = mDao.selectBankTransfers(memberId);
@@ -178,16 +176,13 @@ public class MemberServiceImpl implements MemberService {
 		result.put("cancelList", mDao.getCancelOrder(memberId));
 		result.put("returnList", mDao.getReturnList(memberId));
 		result.put("exchangeList", mDao.getExchangeList(memberId));
-		result.put("pointLogPaging", pointLogPaging);
 
 		return result;
 	}
 
 	private Map<String, Object> pagination(int pageNo, String memberId) throws SQLException, NamingException {
 		PagingInfo orderHistory = new PagingInfo();
-		PagingInfoPointLog pointLog = new PagingInfoPointLog();
 		Map<String, Object> result = new HashMap<String, Object>();
-//----------------------------------------주문내역---------------------------------------------------
 		// 현재 페이지 번호 셋팅
 		orderHistory.setPageNo(pageNo);
 
@@ -216,33 +211,6 @@ public class MemberServiceImpl implements MemberService {
 		orderHistory.setEndNumOfCurrentPagingBlock();
 
 		result.put("orderHistoryPaging", orderHistory);
-//-------------------------------------------------------------------------------------------------
-//------------------------------------------포인트로그---------------------------------------------
-		// 현재 페이지 번호 셋팅
-		pointLog.setPageNo(pageNo);
-
-		// 총 주문 페이지 수 구하기
-		pointLog.setTotalPointLogPageCnt(pointLog.getTotalPointLogCnt(), pointLog.getViewPostCntPerPage());
-
-		// 총 포인트로그 갯수
-		pointLog.setTotalPointLogCnt(mDao.getTotalPointLogCnt(memberId));
-
-		// 보여주기 시작할 row index번호 구하기
-		pointLog.setStartRowIndex();
-
-		// 몇개의 페이징 블럭이 나오는지
-		pointLog.setTotalPagingBlockCnt();
-
-		// 현재 페이지가 속한 페이징 블럭 번호
-		pointLog.setPageBlockOfCurrentPage();
-
-		// 현재 블럭의 시작 페이지 번호
-		pointLog.setStartNumOfCurrentPagingBlock();
-
-		// 현재 블럭의 끝 페이지 번호 구하기
-		pointLog.setEndNumOfCurrentPagingBlock();
-
-		result.put("pointLogPaging", pointLog);
 
 		return result;
 	}
@@ -404,13 +372,8 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public List<MyPageOrderList> getCurOrderHistory(String memberId) throws SQLException, NamingException {
-//		List<MyPageOrderList> sp = mDao.selectPaymentMethodAndOrderNo(memberId);
 
-//		for(MyPageOrderList po: sp) {
-//			String paymentMethod = po.getPaymentMethod();
-//			String orderNo = po.getOrderNo();
 		List<MyPageOrderList> curOrder = mDao.selectCurOrderHistory(memberId);
-//		}
 
 		return curOrder;
 	}
@@ -513,15 +476,9 @@ public class MemberServiceImpl implements MemberService {
 						for (String category : couponCategory) {
 							// 취소상품 카테고리키랑 쿠폰 카테고리키랑 일치한다면
 							if (cancelOrder.getCategoryKey().equals(category)) {
-								// for (int i = 0; i < detailOrder.size(); i++) {
-								// 주문목록에 선택한상품이 있다면 삭제
-//									if (detailOrder.get(i).getProductId().equals(cancelOrder.getProductId())) {
-//										detailOrder.remove(i);
 								System.out.println("detailOrder" + detailOrder.toString());
-								// 삭제후에 주문목록에 상품이 존재한다면
 								for (int i = couponsHistory.size() - 1; i >= 0; i--) {
 									System.out.println("쿠폰히스토리 IIIIIIIII" + i);
-//											CouponHistory couponApplyProduct = couponsHistory.get(i);
 									if (couponsHistory.get(i).getCouponDiscount() > 0) {
 										if (couponsHistory.get(i).getProductId().equals(cancelOrder.getProductId())) {
 											System.out.println("쿠폰환불됨");
