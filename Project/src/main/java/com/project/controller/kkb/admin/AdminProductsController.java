@@ -53,6 +53,7 @@ public class AdminProductsController {
 			@RequestParam String searchKey,
 			@RequestParam String searchValue,
 			@RequestParam String categoryKey,
+			@RequestParam(defaultValue = "0") byte childCategory,
 			@RequestParam String startDate,
 			@RequestParam String endDate,
 			@RequestParam(defaultValue = "2") byte bestSellerStatus)
@@ -308,10 +309,12 @@ public class AdminProductsController {
 			@RequestParam String searchKey,
 			@RequestParam String searchValue,
 			@RequestParam String categoryKey,
+			@RequestParam(defaultValue = "0") byte childCategory,
 			@RequestParam String startDate,
 			@RequestParam String endDate,
 			@RequestParam(defaultValue = "2") byte bestSellerStatus
 			) {
+		System.out.println("검색 - controller");
 		/*
 		검색 분류 - searchKey,	검색 분류의 값 - searchValue
 		상품 분류 - category_code,	하위 분류 포함 검색 - child_category	(boolean)

@@ -608,5 +608,8 @@
 	<select id="getTerms" resultType="com.project.vodto.kjs.TermsOfSignUpVO">
 		SELECT terms_type, terms_content FROM terms_and_conditions WHERE terms_type='회원가입' OR terms_type='개인정보'
 	</select>
+	<select id="isExist" resultType="string">
+		SELECT COUNT(email) FROM member WHERE email=#{email}
+	</select>
 	<!-- =========================== 김진솔 끝 =========================== -->
 </mapper>

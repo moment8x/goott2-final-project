@@ -131,14 +131,17 @@ public class RegisterController {
 	@RequestMapping("sendMail")
 	public ResponseEntity<String> sendMail(HttpServletRequest request, @RequestParam("email") String email) {
 		ResponseEntity<String> result = null;
-		
-		String code = UUID.randomUUID().toString();
-		request.getSession().setAttribute("authCode", code);
-		System.out.println("code : " + code);
 		try {
-			mService.sendEmail(email, code);
-			result = new ResponseEntity<String>("success", HttpStatus.OK);
-		} catch (MessagingException e) {
+			if (mService.isExist(email)) {
+				String code = UUID.randomUUID().toString();
+				request.getSession().setAttribute("authCode", code);
+				System.out.println("code : " + code);
+					mService.sendEmail(email, code);
+					result = new ResponseEntity<String>("success", HttpStatus.OK);
+			} else {
+				result = new ResponseEntity<String>("exist", HttpStatus.OK);
+			}
+		} catch (SQLException | NamingException | MessagingException e) {
 			e.printStackTrace();
 			result = new ResponseEntity<String>("error", HttpStatus.BAD_REQUEST);
 		}

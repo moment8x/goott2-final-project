@@ -60,12 +60,12 @@
 			<if test='bestSellerStatus == 1'>
 				AND p.best_seller_status = 1
 			</if>
-			<if test='categoryKey != null and !categoryKey.equals("")'>
+			<if test='categoryKey != null and !categoryKey.equals("") and childCategory == 1'>
 				AND p.category_key LIKE CONCAT('%', #{categoryKey}, '%')
 			</if>
-			<!-- <if test='categoryKey != null and !categoryKey.equals("")'>
+			<if test='(categoryKey != null and !categoryKey.equals("")) and (childCategory == 0 or childCategory.equals(""))'>
 				AND p.category_key = #{categoryKey}
-			</if> -->
+			</if>
 			<if test='startDate != null and !startDate.equals("") and endDate != null and !endDate.equals("")'>
 				AND DATE_FORMAT(p.publication_date, '%Y-%m-%d') BETWEEN STR_TO_DATE(#{startDate}, '%Y-%m-%d') AND STR_TO_DATE(#{endDate}, '%Y-%m-%d')
 			</if>
@@ -124,7 +124,7 @@
 	  </insert>
 	  <insert id="insertProductImagesForAdmin">
 	  		insert into gott123.product_images(product_id, product_image) values	 		
-	  		<foreach collection="list" item="file" separator=",">
+	  		<foreach collection="uploadFiles" item="file" separator=",">
 	  			(#{productId}, #{file.newFileName})
 	  		</foreach>
 	  </insert>
@@ -141,7 +141,7 @@
 	  </delete>
 	  <delete id="deleteProductImagesForAdmin">
 	  	delete from gott123.product_images where product_image in
-	  	<foreach collection="list" index="image" open="(" close=")" separator=",">
+	  	<foreach collection="images" index="image" open="(" close=")" separator=",">
 	  		#{image}
 	  	</foreach> 
 	  </delete>
@@ -168,43 +168,39 @@
 		WHERE p.ancestor = #{categoryKey} AND p.depth = 1
 	</select>
 	<select id="getSearchProductsList" resultType="com.project.vodto.kjs.AdminStockListVO">
-		SELECT  	@rownum:=@rownum+1 AS no, 
-					p.product_id, p.product_name, 
-					p.current_quantity,
-					p.current_quantity AS quantity,
-					category.id as category_key, 
-					category.name as category_name,
-					(SELECT product_image FROM product_images pi WHERE pi.product_id = p.product_id LIMIT 1) as product_image,
-					p.consumer_price,
-					(SELECT SUM(product_quantity) FROM detailed_order_items doi WHERE doi.product_id = p.product_id) as sales_volume
+		SELECT @rownum:=@rownum+1 AS no, p.product_id, p.product_name, p.current_quantity,
+				category.id as category_key, category.name as category_name,
+        		(SELECT product_image FROM product_images pi WHERE pi.product_id = p.product_id LIMIT 1) as product_image,
+        		p.consumer_price,
+				(SELECT SUM(product_quantity) FROM detailed_order_items doi WHERE doi.product_id = p.product_id) as sales_volume
 		FROM products p
 		INNER JOIN categories category
 		ON category.id = p.category_key
 		INNER JOIN (SELECT @rownum:=0) AS r
 		<where>
 			<choose>
-				<when test='searchKey != null and searchKey.equals("productId")'>
+				<when test='searchKey.equals("productId")'>
 					p.product_id = #{searchValue}
 				</when>
-				<when test='searchKey != null and searchKey.equals("categoryName")'>
+				<when test='searchKey.equals("categoryName")'>
 					category.name LIKE CONCAT('%', #{searchValue}, '%')
 				</when>
-				<when test='searchKey != null and searchKey.equals("categoryKey")'>
+				<when test='searchKey.equals("categoryKey")'>
 					category.id = #{searchValue}
 				</when>
-				<when test='searchKey != null and searchKey.equals("ISBN")'>
+				<when test='searchKey.equals("ISBN")'>
 					p.isbn = #{searchValue}
 				</when>
-				<when test='searchKey != null and searchKey.equals("authorTranslator")'>
+				<when test='searchKey.equals("authorTranslator")'>
 					p.author_translator LIKE CONCAT('%', #{searchValue}, '%') OR p.original_author LIKE CONCAT('%', #{searchValue}, '%')
 				</when>
-				<when test='searchKey != null and searchKey.equals("illustrator")'>
+				<when test='searchKey.equals("illustrator")'>
 					p.illustrator LIKE CONCAT('%', #{searchValue}, '%')
 				</when>
-				<when test='searchKey != null and searchKey.equals("publisher")'>
+				<when test='searchKey.equals("publisher")'>
 					p.publisher LIKE CONCAT('%', #{searchValue}, '%')
 				</when>
-				<when test='searchKey != null and searchKey.equals("publicationDate")'>
+				<when test='searchKey.equals("publicationDate")'>
 					p.publication_date = #{publicationDate}
 				</when>
 				<otherwise>
@@ -217,19 +213,16 @@
 			<if test='bestSellerStatus == 1'>
 				AND p.best_seller_status = 1
 			</if>
-			<if test='categoryKey != null and !categoryKey.equals("")'>
+			<if test='categoryKey != null and !categoryKey.equals("") and childCategory == 1'>
 				AND p.category_key LIKE CONCAT('%', #{categoryKey}, '%')
 			</if>
-			<!-- <if test='categoryKey != null and !categoryKey.equals("")'>
+			<if test='(categoryKey != null and !categoryKey.equals("")) and (childCategory == 0 or childCategory.equals(""))'>
 				AND p.category_key = #{categoryKey}
-			</if> -->
+			</if>
 			<if test='startDate != null and !startDate.equals("") and endDate != null and !endDate.equals("")'>
 				AND DATE_FORMAT(p.publication_date, '%Y-%m-%d') BETWEEN STR_TO_DATE(#{startDate}, '%Y-%m-%d') AND STR_TO_DATE(#{endDate}, '%Y-%m-%d')
 			</if>
-			<if test='sellingProducts != null and !sellingProducts.equals("")'>
-				AND p.current_quantity > 0
-			</if>
-        </where>    
+		</where>
 		ORDER BY no DESC
 	</select>
 	<update id="updateStock" parameterType="java.util.List">

@@ -377,8 +377,6 @@ const ProductStockSearch = ({ setSearchedInfo, setSearchedProduct }) => {
                               value={selectedMainCategory}
                               options={mainCategoryList}
                               onChange={(option) => handleMainCategoryChange(option)}
-                              getOptionLabel={(option) => option.label}
-                              getOptionValue={(option) => option.value}
                               placeholder='대분류'
                               styles={styles}
                             />
@@ -388,8 +386,6 @@ const ProductStockSearch = ({ setSearchedInfo, setSearchedProduct }) => {
                               value={selectedSub1Category}
                               options={sub1CategoryList}
                               onChange={handleSub1CategoryChange}
-                              getOptionLabel={(option) => option.label}
-                              getOptionValue={(option) => option.value}
                               placeholder='중분류'
                               isDisabled={!selectedMainCategory} // 상품 카테고리가 선택되지 않으면 비활성화
                               styles={styles}
@@ -400,8 +396,6 @@ const ProductStockSearch = ({ setSearchedInfo, setSearchedProduct }) => {
                               value={selectedSub2Category}
                               options={sub2CategoryList}
                               onChange={handleSub2CategoryChange}
-                              getOptionLabel={(option) => option.label}
-                              getOptionValue={(option) => option.value}
                               placeholder='소분류'
                               isDisabled={!selectedSub1Category} // 하위 카테고리가 선택되지 않으면 비활성화
                               styles={styles}
@@ -412,8 +406,6 @@ const ProductStockSearch = ({ setSearchedInfo, setSearchedProduct }) => {
                               value={selectedDetailCategory}
                               options={detailCategoryList}
                               onChange={handleDetailCategoryChange}
-                              getOptionLabel={(option) => option.label}
-                              getOptionValue={(option) => option.value}
                               placeholder='상세분류'
                               isDisabled={!selectedSub2Category} // 하위 카테고리가 선택되지 않으면 비활성화
                               styles={styles}
@@ -424,15 +416,15 @@ const ProductStockSearch = ({ setSearchedInfo, setSearchedProduct }) => {
                       <tr>
                         <td className='table-td w-[150px]'>상품구분</td>
                         <td className='flex gap-5 mt-[16px]'>
-                          {productDivision.map((Division, i) => (
+                          {productDivision.map((division, i) => (
                             <Radio
                               key={i}
                               name='bestSellerStatus'
-                              label={Division.label}
-                              value={Division.value}
-                              checked={selectDivision === Division.value}
+                              label={division.label}
+                              value={division.value}
+                              checked={selectDivision === division.value}
                               onChange={handleRadio}
-                              activeClass={Division.activeClass}
+                              activeClass={division.activeClass}
                             />
                           ))}
                         </td>
